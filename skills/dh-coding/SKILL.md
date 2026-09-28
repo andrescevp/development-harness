@@ -101,8 +101,7 @@ Everyday coding-quality guidance, applied to every change alongside TDD:
 ## Hard Constraints
 
 - **The 300-line limit applies ONLY to code files** (source and test files).
-  Documentation, configuration, and markdown are exempt; skill files follow
-  the ≤ 250-line convention.
+  Documentation, configuration, and markdown are exempt.
 - Follow SOLID and clean code practices: focused functions and modules, descriptive names, no duplicated logic.
 - Keep changes tightly scoped to the active sub-task.
 - Never expose secrets, tokens, or credentials in code, logs, or output.

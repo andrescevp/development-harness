@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T08:54:43.860Z",
+    "generated": "2026-09-28T09:01:27.089Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -1060,7 +1060,7 @@
     {
       "file": "skills/dh-coding/SKILL.md",
       "kind": "skill",
-      "lines": 152,
+      "lines": 151,
       "frontmatter": {
         "status": "ok",
         "errors": [],
