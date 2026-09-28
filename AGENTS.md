@@ -77,8 +77,11 @@ delegation with this mapping:
 
 ## Provenance
 
-- Harness content is extracted from `~/.agents` (read-only source; nothing
-  there is modified). OpenCode-only — no copilot/gemini variants.
+- Harness content is **fully repo-authored** (2026-09-29): `agents/` and
+  `skills/` are owned by this repository — nothing is extracted from
+  `~/.agents` anymore. `scripts/extract.mjs` is a repo-integrity check;
+  `docs/EXTRACTION.md` retains the extraction history.
+- OpenCode-only — no copilot/gemini variants.
 - Alias mapping on copy: `senior-architect` → `dh-software-architect`,
   `senior-engineer` → `dh-software-engineer` (frontmatter `name` only; bodies
   byte-identical).

@@ -1,319 +1,20 @@
 {
-  "$comment": "Dev Harness V2 plugin — scoped include/exclude + expectations manifest. Single source of truth reused by scripts/extract.mjs and scripts/audit.mjs (and, in ST5, the plugin asset builder). USER-MANDATED SCOPE: 6 agents + 11 existing loop skills (+ NEW coding in ST3); NO commands, NO prompts. Scope revision applied 2026-09-27: the earlier full extraction (14 agents / 37 skills / 11 commands / 9 prompts) was pruned to this manifest (see docs/EXTRACTION.md 'Scope revision' and tasks/review.md addendum).",
+  "$comment": "Dev Harness V2 plugin — REPO-AUTHORED manifest (2026-09-29): agents/ (7) and skills/ (15 + index.md) are owned by this repository; nothing is extracted from ~/.agents anymore. scripts/extract.mjs is a repo-integrity check; audit/copy-assets derive expectations from this file.",
+  "repoAuthored": true,
   "sections": {
     "agents": {
-      "src": "agents",
-      "dest": "agents",
-      "kind": "files",
       "expectedItems": 7
     },
     "skills": {
-      "src": "skills",
-      "dest": "skills",
-      "kind": "dirs",
-      "expectedItems": 11
+      "expectedItems": 15
     },
     "skillsIndex": {
-      "src": "skills",
-      "dest": "skills",
-      "kind": "index-file",
       "expectedItems": 1
     }
   },
-  "include": {
-    "agents": [
-      "senior-architect.md",
-      "senior-engineer.md",
-      "reviewer.md",
-      "final-reviewer.md",
-      "executor.md",
-      "explorer.md"
-    ],
-    "skills": [
-      "artifact-check",
-      "simplify",
-      "domain-check",
-      "code-review",
-      "execute-plan",
-      "execute-plan-task",
-      "final-review",
-      "planning",
-      "preflight",
-      "review",
-      "create-documentation"
-    ]
-  },
   "bundledSkillMdCount": {
-    "now": 14,
-    "afterSt3": 15,
-    "afterSt3Note": "11 extracted SKILL.md + the new `dh-coding` skill created in ST3. The audit, ST5 asset builder, and ST7 docs must use 12 AFTER ST3; 11 now (coding expected-pending). dh-grill-sdd (SDD interviewer) added 2026-09-28."
-  },
-  "agentRenames": {
-    "senior-architect.md": {
-      "to": "dh-software-architect.md",
-      "newName": "dh-software-architect"
-    },
-    "senior-engineer.md": {
-      "to": "dh-software-engineer.md",
-      "newName": "dh-software-engineer"
-    },
-    "reviewer.md": {
-      "to": "dh-reviewer.md",
-      "newName": "dh-reviewer"
-    },
-    "final-reviewer.md": {
-      "to": "dh-final-reviewer.md",
-      "newName": "dh-final-reviewer"
-    },
-    "executor.md": {
-      "to": "dh-executor.md",
-      "newName": "dh-executor"
-    },
-    "explorer.md": {
-      "to": "dh-explorer.md",
-      "newName": "dh-explorer"
-    }
-  },
-  "patches": [
-    {
-      "$comment": "M3 (user mandate): strip the `permission` frontmatter key from bundled agents. Idempotent; extracted agents register with tools-derived permission rules only.",
-      "scope": "agents",
-      "action": "strip-frontmatter-key",
-      "key": "permission"
-    },
-    {
-      "$comment": "M2 wiring: prime the two planner agents to use the harness plan-lifecycle tools. Sanctioned append to the agent BODY — verifyAliasBodyIntegrity strips this exact marker block before comparing bodies.",
-      "scope": "agents",
-      "action": "append-body-note",
-      "files": [
-        "software-architect.md",
-        "software-engineer.md"
-      ],
-      "marker": "> Harness plan tools (bundled):",
-      "note": "> Harness plan tools (bundled):\n> Use dh_plan_read / dh_plan_update_status / dh_plan_create for reading, updating, and scaffolding phased plans (docs/plans). Fall back to direct plan.md edits only when the tools are unavailable."
-    },
-    {
-      "$comment": "Executor directive (user mandate 2026-09-28, reaffirmed): logged-command strategy (log file in SYSTEM TEMP + head/tail window); survives re-extraction on the dh-prefixed agent file.",
-      "scope": "agents",
-      "action": "append-body-note",
-      "files": [
-        "dh-executor.md"
-      ],
-      "marker": "> Command execution strategy (bundled):",
-      "note": "> Command execution strategy (bundled):\n> ## Command Execution Strategy (MANDATORY)\n> \n> Every command you run must be logged and summarized with a head/tail window:\n> \n> - **Always** run the command with a log file so it can be explored if needed.\n> - **Log files live in the system temporary directory** (never in the project).\n> - After the command finishes, print the **start** of the log (`head`), a\n>   `...[TRUNCATED]...` marker, and the **end** of the log (`tail`) so the\n>   caller sees both the beginning and the outcome of the execution.\n> - Keep the log path in your report so the caller (or you) can explore the\n>   full log on demand. Only delete logs after the session ends or when the\n>   caller confirms they are no longer needed.\n> - Prefer the bundled `dh_logged_command` tool when available — it implements\n>   exactly this strategy (temp log + head/tail window + log path). Fall back\n>   to the manual patterns below when the tool is unavailable.\n> \n> **Linux / macOS** (unique log name via `mktemp` in the temp dir):\n> \n> ```bash\n> LOG=$(mktemp ${TMPDIR:-/tmp}/exec-XXXXXX.log); ./script.sh > \"$LOG\" 2>&1; EXIT=$?; echo \"exit=$EXIT\"; head -n 20 \"$LOG\"; echo -e \"\\n...[TRUNCATED]...\\n\"; tail -n 30 \"$LOG\"; echo \"log=$LOG\"\n> ```\n> \n> **Windows PowerShell**:\n> \n> ```powershell\n> $log = Join-Path $env:TEMP (\"exec-\" + [guid]::NewGuid().ToString(\"N\") + \".log\"); .\\script.ps1 *>&1 > $log; $exit = $LASTEXITCODE; Write-Output \"exit=$exit\"; Get-Content $log -TotalCount 20; Write-Host \"`n...[TRUNCATED]...`n\"; Get-Content $log -Tail 30; Write-Output \"log=$log\"\n> ```\n> \n> - If the command produces no output, `head`/`tail` will be empty — report\n>   `exit=$EXIT` and the log path, and note that the log is empty.\n> - For interactive or long-running commands, keep the same pattern; use a\n>   reasonable timeout and report the timeout as the failure reason."
-    },
-    {
-      "$comment": "User mandate (2026-09-28): bundled agents ship without the tools frontmatter key (with permission already stripped they register with no static tool rules). Persistent so re-extracts do not restore source tools blocks.",
-      "scope": "agents",
-      "action": "strip-frontmatter-key",
-      "key": "tools"
-    },
-    {
-      "$comment": "User mandate (2026-09-28): the plan requirements contract file renamed task.md -> sdd.md; dh-final-reviewer's body references the contract path and must keep the renamed path across re-extracts.",
-      "scope": "agents",
-      "action": "replace-body-text",
-      "files": [
-        "dh-final-reviewer.md"
-      ],
-      "from": "./docs/plans/<plan-slug>/task.md",
-      "to": "./docs/plans/<plan-slug>/sdd.md"
-    },
-    {
-      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `code-review`; kept across re-extracts.",
-      "scope": "agents",
-      "action": "replace-body-text",
-      "files": [
-        "dh-final-reviewer.md"
-      ],
-      "from": "`code-review`",
-      "to": "`dh-code-review`"
-    },
-    {
-      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `code-review`; kept across re-extracts.",
-      "scope": "agents",
-      "action": "replace-body-text",
-      "files": [
-        "dh-reviewer.md"
-      ],
-      "from": "`code-review`",
-      "to": "`dh-code-review`"
-    },
-    {
-      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `artifact-check`; kept across re-extracts.",
-      "scope": "agents",
-      "action": "replace-body-text",
-      "files": [
-        "dh-software-architect.md"
-      ],
-      "from": "`artifact-check`",
-      "to": "`dh-artifact-check`"
-    },
-    {
-      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `contingency`; kept across re-extracts.",
-      "scope": "agents",
-      "action": "replace-body-text",
-      "files": [
-        "dh-software-architect.md"
-      ],
-      "from": "`contingency`",
-      "to": "`dh-contingency`"
-    },
-    {
-      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `create-documentation`; kept across re-extracts.",
-      "scope": "agents",
-      "action": "replace-body-text",
-      "files": [
-        "dh-software-architect.md"
-      ],
-      "from": "`create-documentation`",
-      "to": "`dh-create-documentation`"
-    },
-    {
-      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `domain-check`; kept across re-extracts.",
-      "scope": "agents",
-      "action": "replace-body-text",
-      "files": [
-        "dh-software-architect.md"
-      ],
-      "from": "`domain-check`",
-      "to": "`dh-domain-check`"
-    },
-    {
-      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `planning`; kept across re-extracts.",
-      "scope": "agents",
-      "action": "replace-body-text",
-      "files": [
-        "dh-software-architect.md"
-      ],
-      "from": "`planning`",
-      "to": "`dh-planning`"
-    },
-    {
-      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `preflight`; kept across re-extracts.",
-      "scope": "agents",
-      "action": "replace-body-text",
-      "files": [
-        "dh-software-architect.md"
-      ],
-      "from": "`preflight`",
-      "to": "`dh-preflight`"
-    },
-    {
-      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `code-review`; kept across re-extracts.",
-      "scope": "agents",
-      "action": "replace-body-text",
-      "files": [
-        "dh-software-engineer.md"
-      ],
-      "from": "`code-review`",
-      "to": "`dh-code-review`"
-    },
-    {
-      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `coding`; kept across re-extracts.",
-      "scope": "agents",
-      "action": "replace-body-text",
-      "files": [
-        "dh-software-engineer.md"
-      ],
-      "from": "`coding`",
-      "to": "`dh-coding`"
-    },
-    {
-      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `create-documentation`; kept across re-extracts.",
-      "scope": "agents",
-      "action": "replace-body-text",
-      "files": [
-        "dh-software-engineer.md"
-      ],
-      "from": "`create-documentation`",
-      "to": "`dh-create-documentation`"
-    },
-    {
-      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `simplify`; kept across re-extracts.",
-      "scope": "agents",
-      "action": "replace-body-text",
-      "files": [
-        "dh-software-engineer.md"
-      ],
-      "from": "`simplify`",
-      "to": "`dh-simplify`"
-    },
-    {
-      "$comment": "User edit (2026-09-28): QA tools table extended with knip/semgrep/dependency-cruiser — kept across re-extracts.",
-      "scope": "agents",
-      "action": "replace-body-text",
-      "files": [
-        "dh-software-architect.md"
-      ],
-      "from": "| JS/TS | `biome`, `tsc`, `jscpd` |",
-      "to": "| JS/TS | `biome`, `tsc`, `jscpd`, `knip`, `semgrep`, `dependency-cruiser` |"
-    },
-    {
-      "$comment": "Doc search directive (2026-09-28): all bundled agents should search generated docs via notesmd-cli/obsidian (fallback rg).",
-      "scope": "agents",
-      "action": "append-body-note",
-      "files": [
-        "dh-executor.md",
-        "dh-explorer.md",
-        "dh-final-reviewer.md",
-        "dh-reviewer.md",
-        "dh-software-architect.md",
-        "dh-software-engineer.md"
-      ],
-      "marker": "> Doc search (bundled):",
-      "note": "> Doc search (bundled):\n> Search generated docs quickly: notesmd-cli search-content \"<term>\" --vault \"<project>\" or obsidian search query=\"<term>\" ; fallback rg --glob *.md. See AGENTS.md."
-    },
-    {
-      "$comment": "dh-code-ruler wiring (2026-09-28): architect agent runs dh-code-ruler to create/refresh CODE_RULES.md.",
-      "scope": "agents",
-      "action": "append-body-note",
-      "files": [
-        "dh-software-architect.md"
-      ],
-      "marker": "> Code rules (dh-code-ruler):",
-      "note": "> Code rules (dh-code-ruler):\n> When CODE_RULES.md is missing at the project root, run the dh-code-ruler skill (grill + code analysis + stack best practices) to generate it; dh-coding enforces it."
-    },
-    {
-      "$comment": "Doc owner delegation (2026-09-28): all agents delegate documentation work to @dh-documentor.",
-      "scope": "agents",
-      "action": "append-body-note",
-      "files": [
-        "dh-executor.md",
-        "dh-explorer.md",
-        "dh-final-reviewer.md",
-        "dh-reviewer.md",
-        "dh-software-architect.md",
-        "dh-software-engineer.md"
-      ],
-      "marker": "> Documentation owner (bundled):",
-      "note": "> Documentation owner (bundled):\n> Generated documentation (create/update/delete/retrieve, excluding docs/plans) is owned by @dh-documentor — delegate documentation work to it (dh-create-documentation + dh sheet tools)."
-    }
-  ],
-  "repoAuthored": {
-    "$comment": "Dirs fully preserved on re-extract (never wiped/overwritten from source). The bundled skills are this repo's distribution: ST1+ST4 patch their content, so source-fresh copies would clobber the patches. Agents stay source-derived (renames + M3 strip only).",
-    "skills": [
-      "dh-artifact-check",
-      "dh-simplify",
-      "dh-domain-check",
-      "dh-code-review",
-      "dh-execute-plan",
-      "dh-execute-plan-task",
-      "dh-final-review",
-      "dh-planning",
-      "dh-preflight",
-      "dh-review",
-      "dh-create-documentation",
-      "dh-coding",
-      "dh-grill-sdd",
-      "dh-setup",
-      "dh-code-ruler"
-    ]
-  },
-  "agentAliases": {
-    "senior-architect": "dh-software-architect",
-    "senior-engineer": "dh-software-engineer",
-    "software-architect": "dh-software-architect",
-    "software-engineer": "dh-software-engineer"
+    "total": 15,
+    "note": "All bundled skills are repo-authored; count = skills/ dirs."
   },
   "lineLimits": {
     "skill": 250,
@@ -323,27 +24,29 @@
   "loop": {
     "skills": [
       "dh-artifact-check",
-      "dh-simplify",
-      "dh-domain-check",
       "dh-code-review",
+      "dh-code-ruler",
+      "dh-coding",
+      "dh-create-documentation",
+      "dh-domain-check",
       "dh-execute-plan",
       "dh-execute-plan-task",
       "dh-final-review",
+      "dh-grill-sdd",
       "dh-planning",
       "dh-preflight",
       "dh-review",
-      "dh-create-documentation",
-      "dh-coding"
+      "dh-setup",
+      "dh-simplify"
     ],
-    "expectedPendingSkills": [],
     "agents": [
-      "dh-software-architect",
-      "dh-software-engineer",
-      "dh-reviewer",
-      "dh-final-reviewer",
-      "dh-executor",
-      "dh-explorer",
-      "dh-documentor"
+      "dh-documentor.md",
+      "dh-executor.md",
+      "dh-explorer.md",
+      "dh-final-reviewer.md",
+      "dh-reviewer.md",
+      "dh-software-architect.md",
+      "dh-software-engineer.md"
     ]
   },
   "junk": {
@@ -590,28 +293,5 @@
       "repo-root"
     ],
     "$commentKebab": "ST4 (dev-harness-phases-and-tools): phase-aware resume/selection, phase-completion tracking, and repo-root AGENTS.md pointer are intentional prose in the loop skills. Tool ids (dh_plan_*) contain underscores, so they never trip the kebab check."
-  },
-  "skillRenames": {
-    "artifact-check": "dh-artifact-check",
-    "simplify": "dh-simplify",
-    "domain-check": "dh-domain-check",
-    "code-review": "dh-code-review",
-    "execute-plan": "dh-execute-plan",
-    "execute-plan-task": "dh-execute-plan-task",
-    "final-review": "dh-final-review",
-    "planning": "dh-planning",
-    "preflight": "dh-preflight",
-    "review": "dh-review",
-    "create-documentation": "dh-create-documentation",
-    "coding": "dh-coding"
-  },
-  "repoAuthoredAgents": [
-    "dh-executor.md",
-    "dh-explorer.md",
-    "dh-final-reviewer.md",
-    "dh-reviewer.md",
-    "dh-software-architect.md",
-    "dh-software-engineer.md",
-    "dh-documentor.md"
-  ]
+  }
 }

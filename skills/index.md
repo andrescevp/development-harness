@@ -105,6 +105,6 @@ validation/execution) · `dh-explorer` (codebase exploration), `dh-documentor` (
 
 ## Out of scope
 
-Commands, prompts, and all other harness content from `~/.agents` are
+Commands, prompts, and all other non-bundled harness content are
 intentionally NOT bundled (user-mandated manifest). See
 [`docs/EXTRACTION.md`](../docs/EXTRACTION.md).

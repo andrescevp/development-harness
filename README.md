@@ -9,7 +9,7 @@ planning → execution → review → release loop.
 | | |
 |---|---|
 | Platform | OpenCode V2 (`@opencode/plugin`, `Plugin.define`) |
-| Source harness | `~/.agents` (read-only; opencode-only) |
+| Source harness | Fully repo-authored (agents/ + skills/ owned by this repo) |
 | Manifest | 7 agents · 15 skills · **no commands/prompts** (user-mandated scope + dh-grill-sdd) |
 | Toolchain | TypeScript + tsup + vitest (pnpm) |
 
@@ -58,14 +58,16 @@ tools are unavailable).
 
 ## Provenance
 
-- Harness content is extracted from `~/.agents` (read-only source; nothing
-  there is modified). See [`docs/EXTRACTION.md`](docs/EXTRACTION.md).
-- Alias mapping on copy: `senior-architect` → `dh-software-architect`,
-  `senior-engineer` → `dh-software-engineer` (frontmatter `name` only; bodies
-  byte-identical modulo the sanctioned plan-tools note).
-- Bundled agents ship **without the `permission` frontmatter key** (M3
-  mandate) — permission rules derive from `tools` only; the strip is a
-  declarative patch applied on extraction and verified by `extract --check`.
+- Harness content is **fully repo-authored** (2026-09-29): `agents/` and
+  `skills/` are owned by this repository — nothing is extracted from
+  `~/.agents` anymore; `scripts/extract.mjs` is a repo-integrity check.
+  See [`docs/EXTRACTION.md`](docs/EXTRACTION.md) for the history.
+- The `dh-` naming is the canonical manifest (agents 7, skills 15; the
+  `senior-*` → `dh-software-*` mapping was applied once during the original
+  extraction and is now permanent in the repo files).
+- Bundled agents ship **without the `permission` and `tools` frontmatter
+  keys** — registration carries no static tool rules; enforced by
+  `extract --check` and the audit.
 - Runtime delegation normalization (the plugin registers only the 6 manifest
   agents): `@build`/`@senior-engineer` → `@dh-software-engineer`,
   `@senior-architect`/`@plan` → `@dh-software-architect` — see AGENTS.md table.
