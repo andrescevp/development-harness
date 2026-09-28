@@ -1,0 +1,11 @@
+{
+  // demo-project opencode.jsonc — isolated demo that loads the
+  // dev-harness-skills plugin from the parent repo.
+  "$schema": "https://opencode.ai/config.json",
+  "plugins": [
+    // The plugin package directory (repo root). Relative form is portable
+    // within this repository clone; the absolute form also works:
+    // "file:///home/andres/workspace/dev-harness-skills"
+    "../"
+  ]
+}

@@ -1,6 +1,6 @@
 # Audit Report — Dev Harness V2 Plugin (ST2)
 
-Generated 2026-09-28T14:19:46.827Z by `scripts/audit.mjs`.
+Generated 2026-09-28T15:27:12.203Z by `scripts/audit.mjs`.
 
 ## Verdict
 
