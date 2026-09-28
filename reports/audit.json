@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T08:47:22.024Z",
+    "generated": "2026-09-28T08:48:44.791Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 7,
         "sev": "WARN",
-        "note": "249 resolved; 0 code-context; 0 allowlisted; 99 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+        "note": "249 resolved; 0 code-context; 0 allowlisted; 100 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
       },
       {
         "name": "Loop membership",
@@ -279,6 +279,13 @@
     },
     {
       "token": "osv-scanner",
+      "count": 1,
+      "files": [
+        "agents/dh-software-architect.md"
+      ]
+    },
+    {
+      "token": "dependency-cruiser",
       "count": 1,
       "files": [
         "agents/dh-software-architect.md"

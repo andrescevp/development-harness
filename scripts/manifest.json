@@ -237,6 +237,16 @@
       ],
       "from": "`simplify`",
       "to": "`dh-simplify`"
+    },
+    {
+      "$comment": "User edit (2026-09-28): QA tools table extended with knip/semgrep/dependency-cruiser — kept across re-extracts.",
+      "scope": "agents",
+      "action": "replace-body-text",
+      "files": [
+        "dh-software-architect.md"
+      ],
+      "from": "| JS/TS | `biome`, `tsc`, `jscpd` |",
+      "to": "| JS/TS | `biome`, `tsc`, `jscpd`, `knip`, `semgrep`, `dependency-cruiser` |"
     }
   ],
   "repoAuthored": {

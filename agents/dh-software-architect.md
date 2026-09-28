@@ -35,7 +35,7 @@ Check these are installed in target projects; add as dev dependencies if missing
 |------|-------|
 | All | `osv-scanner` |
 | Python | `ruff`, `mypy`, `pyupgrade`, `bandit`, `copydetect` |
-| JS/TS | `biome`, `tsc`, `jscpd` |
+| JS/TS | `biome`, `tsc`, `jscpd`, `knip`, `semgrep`, `dependency-cruiser` |
 | PHP | `phpstan`, `deptrac`, `rector`, `phpcs`, `phpcpd` |
 
 ## Workflow
