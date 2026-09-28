@@ -1,20 +1,7 @@
 ---
 name: dh-coding
 description: >
-  Apply TDD coding best practices when implementing, writing, or fixing code —
-  write a failing test first, implement the minimal change to make it pass,
-  then refactor, running validation via @dh-executor and stopping after 3
-  consecutive failures. Code rules ALWAYS live at project level in
-  CODE_RULES.md at the project root: enforce it when present; when absent,
-  analyze the codebase and CREATE it before implementing. Do not rely on
-  global guideline files — keep CODE_RULES.md updated via
-  dh-create-documentation. Stay project type aware (software vs non-software,
-  uv/pnpm/npm/poetry toolchains) when delegating and implementing. Also
-  applies performance directives (webservices, data operations, scripting),
-  security directives (webservices, pipelines), and setup best practices.
-  Use when asked to implement, write code, or fix a bug, or during
-  execute-plan-task sub-task 2.1 of the skills loop — not for plan
-  orchestration (use execute-plan) or review-only requests (use review).
+  TDD coding best practices: failing test first, minimal implementation, refactor; enforce CODE_RULES.md at project root (create from code analysis when absent). Use when implementing code, fixing bugs, or during execute-plan-task 2.1.
 license: MIT
 compatibility: opencode
 allowed-tools: read, write, edit, bash

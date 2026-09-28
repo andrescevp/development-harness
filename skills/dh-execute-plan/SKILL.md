@@ -1,15 +1,7 @@
 ---
 name: dh-execute-plan
 description: >
-  Use this skill when orchestrating the full plan-driven development lifecycle
-  — read plan.md, iterate through sub-tasks in order delegating execution to
-  execute-plan-task, verification to review, and final sign-off to final-review,
-  handling mid-plan interruptions by resuming from the In Progress sub-task,
-  then updating plan.md and index.md on completion. On completion, run evolve
-  and state-sync for all projects, plus create-documentation and semver for
-  software projects. Use when the user says 'execute plan', 'run the plan',
-  'complete the plan', or 'finish all tasks' — not for single sub-task work
-  (use execute-plan-task) or plans still in development.
+  Orchestrate full plan execution: read plan.md, iterate sub-tasks delegating execution and review, resume on interruption, final-review sign-off, update index.md. Use when the user says 'execute plan', 'run the plan', or 'finish all tasks'.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: read, write, edit, bash

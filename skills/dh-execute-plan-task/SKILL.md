@@ -1,17 +1,7 @@
 ---
 name: dh-execute-plan-task
 description: >
-  Execute a single sub-task from a plan — select the active sub-task (the
-  first In Progress phase's In Progress/Pending sub-task) from plan.md,
-  implement it following TDD with
-  project-type-aware agent delegation (domain-check before complex
-  implementation, simplify after validation, and create-documentation for new
-  modules/APIs on software projects), run validation via @dh-executor, request
-  review, handle feedback with fix loops, and update plan status. Use when
-  implementing the next sub-task from plan.md, continuing an in-progress
-  sub-task, or when the user says 'execute next task', 'implement sub-task',
-  'work on the plan', or 'next step' — not for full plan orchestration (use
-  execute-plan) or ad-hoc work without a plan.
+  Execute a single sub-task from plan.md: select the active one (In Progress phase first), implement (TDD), validate via dh-executor, update status; project-type aware. Use for the next sub-task or continuing work — not orchestration.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: read, write, edit, bash

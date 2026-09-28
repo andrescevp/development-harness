@@ -1,14 +1,7 @@
 ---
 name: dh-artifact-check
 description: >
-  Compile final production builds and validate deployment scripts against
-  established contingency plans: detect the build system, run the production
-  build, verify build artifacts exist and are non-empty, validate deploy
-  script syntax and basic correctness, and produce a build readiness report.
-  Use when preparing a release, smoke-testing the deployment path before
-  shipping (invoked by /release as step 4), or when the user asks "validate
-  build", "check artifacts", "does it build?", "validate the artifact",
-  "is the build clean?", or "verify deployment readiness".
+  Compile production builds and validate deployment scripts: detect build system, run build, verify artifacts exist/non-empty, check deploy script syntax. Use to validate build, check artifacts, verify deployment readiness, or smoke-test.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: bash, read

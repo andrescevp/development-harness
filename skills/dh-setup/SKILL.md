@@ -1,20 +1,7 @@
 ---
 name: dh-setup
 description: >
-  Verify and prepare everything the dev-harness needs to run properly: audit
-  system software (chrome, uv, nvm, osv-scanner, docker, jq, xq, yq, graphify,
-  optional phpenv, obsidian, notesmd-cli) and guide installation for anything missing; list and
-  configure user-level integrations — MCP servers (chrome-devtools-mcp,
-  playwright MCP, android-remote-control-mcp), the opencode-rules plugin
-  (>= v2), and the graphify external tool — as config choices left to the
-  user; and scaffold project-level quality gates: pre-commit/husky or
-  equivalent hooks with clear rules, plus the QA toolset for the project's
-  stack (All: osv-scanner; Python: ruff/mypy/pyupgrade/bandit/copydetect;
-  JS/TS: biome/tsc/jscpd/knip/semgrep/dependency-cruiser; PHP:
-  phpstan/deptrac/rector/phpcs/phpcpd; other stacks: research equivalents).
-  Use when asked to "check system requirements", "install the harness
-  prerequisites", "setup the environment", "configure mcp/plugins", "add
-  pre-commit/husky", or before first use of the harness on a new machine.
+  Audit system software (chrome, uv, nvm, osv-scanner, docker, jq/xq/yq, graphify, optional phpenv/obsidian/notesmd-cli), configure user MCPs/plugins, scaffold project QA (hooks + per-stack tools). Use to check requirements or setup the environment.
 license: MIT
 compatibility: opencode
 allowed-tools: read, write, edit, bash, websearch

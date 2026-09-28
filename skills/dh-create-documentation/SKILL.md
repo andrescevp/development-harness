@@ -1,16 +1,7 @@
 ---
 name: dh-create-documentation
 description: >
-  Use this skill when asked to create, generate, write, or produce documentation —
-  project docs, API references, architecture overviews, README files, technical
-  guides, or any structured document, as single-file or multi-file sets with
-  cross-references. Use when the user says "document this",
-  "create docs for", "generate documentation", "write a README", "document the API",
-  "make docs for", or similar, or after creating substantial code that needs
-  documentation. Supports Markdown (default), HTML, and Mermaid diagram formats.
-  The Obsidian vault IS the project root (`{project_root}`) and ALL documentation
-  lives under `{project_root}/docs`, with frontmatter metadata
-  (tags, project, created, stack, updated, feature, epic).
+  Create structured docs (Markdown/HTML/Mermaid): project docs, API refs, READMEs, guides; Obsidian vault = {project_root}, ALL docs under {project_root}/docs, frontmatter metadata. Use to document this, write a README, or generate documentation.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: bash, read, write, edit, glob

@@ -1,16 +1,7 @@
 ---
 name: dh-review
 description: >
-  Use this skill when reviewing a single plan sub-task result against its
-  acceptance criteria, scope boundaries, and done-when conditions — reviewing
-  the implementation diff for acceptance criteria fulfillment, scope
-  compliance, validation/testing, and regression risk, delegating code quality
-  review to @dh-reviewer and architecture validation to domain-check for software
-  projects, then producing a structured verdict with actionable findings in
-  tasks/review.md. Use after a sub-task is implemented before marking it
-  Complete, when asked to 'review the task' or 'verify the sub-task', or during
-  plan execution — not for full-plan sign-off (use final-review) or ad-hoc code
-  review (use code-review).
+  Verify a plan sub-task against acceptance criteria, scope, done-when; review diff, validation, regression risk; structured verdict to tasks/review.md. Use after implementation or to review/verify the sub-task.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: read, write, bash
