@@ -2,23 +2,26 @@
 
 ## Step 5: Obsidian Push
 
-After writing docs, push each file to the project vault at `./docs/`. The vault lives at the project root (auto-detected via `git rev-parse --show-toplevel` or current directory), making learnings and documentation portable with the project.
+The Obsidian vault IS the project root: `{project_root}` (auto-detected via `git rev-parse --show-toplevel` or the current directory). Documentation is written directly into the root at its designed relative path — there is no `./docs` wrapper and no `{vault}/{project}/` nesting. This step enriches every written document with complete frontmatter so it is discoverable in Obsidian.
 
 ### 5a. Determine vault path
 
 The vault is resolved in this order:
-1. `OBSIDIAN_VAULT` env var (override)
-2. `{project_root}/docs/` (auto-detected)
+1. `OBSIDIAN_VAULT` env var (override — e.g., a dedicated notes vault)
+2. `{project_root}` (auto-detected; the default vault is the project root itself)
 
 ```bash
-# Auto-detect project root
-PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-PROJECT="$(basename "$PROJECT_ROOT")"
+# Auto-detect project root (= the Obsidian vault)
+VAULT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+PROJECT="$(basename "$VAULT")"
 
-# Resolve vault
-VAULT="${OBSIDIAN_VAULT:-$PROJECT_ROOT/docs}"
-OBSIDIAN_DIR="$VAULT/$PROJECT"
+# Override with a dedicated vault if configured
+VAULT="${OBSIDIAN_VAULT:-$VAULT}"
 ```
+
+`OBSIDIAN_DIR` is not needed — with `VAULT == project root`, documents keep
+their designed relative layout under `$VAULT` (e.g. `$VAULT/index.md`,
+`$VAULT/api/endpoints.md`).
 
 ### 5b. Generate frontmatter
 
@@ -47,30 +50,28 @@ epic: <epic-name>          # e.g. "v2.0-migration", "observability"
 
 ### 5c. Write to vault
 
-Use the `run-notesmd-cli` skill (backed by `notesmd-cli`) when possible. The vault path structure:
+Use the `run-notesmd-cli` skill (backed by `notesmd-cli`) when possible. The vault path structure (vault == project root, designed layout):
 
 ```
 {vault}/
-  {project-name}/
-    index.md              ← Main entry with frontmatter
-    getting-started.md    ← With frontmatter
-    architecture.md       ← With frontmatter
-    api/
-      index.md            ← With frontmatter
-      endpoints.md        ← With frontmatter
+  index.md              ← Main entry with frontmatter
+  getting-started.md    ← With frontmatter
+  architecture.md       ← With frontmatter
+  api/
+    index.md            ← With frontmatter
+    endpoints.md        ← With frontmatter
 ```
 
 **Preferred method — use `run-notesmd-cli` (notesmd-cli):**
 
 ```bash
-# Use the obsidian CLI if available and Obsidian is running
-for file in docs/*.md docs/**/*.md; do
+# Enrich each generated document with frontmatter in place (vault == project root)
+for file in index.md getting-started.md architecture.md api/*.md; do
   [ -f "$file" ] || continue
-  rel="${file#docs/}"
-  target_path="$OBSIDIAN_DIR/$rel"
+  target_path="$VAULT/$file"
   mkdir -p "$(dirname "$target_path")"
 
-  # Prepend frontmatter
+  # Prepend or merge frontmatter (merge if the file already has a --- block)
   {
     echo "---"
     echo "tags: [documentation]"
@@ -90,22 +91,21 @@ done
 
 # Attempt Obsidian CLI refresh (best-effort)
 if command -v obsidian >/dev/null 2>&1; then
-  obsidian open path="$OBSIDIAN_DIR/index.md" 2>/dev/null || true
+  obsidian open path="$VAULT/index.md" 2>/dev/null || true
 fi
 ```
 
 **Fallback (Obsidian CLI unavailable):**
 
-If the `obsidian` CLI is not available or Obsidian is not running, write files directly. The user can open Obsidian later to see them:
+If the `obsidian` CLI is not available or Obsidian is not running, the files
+are already in the vault (the vault is the project root) — just ensure the
+frontmatter is present and tell the user to open Obsidian to see them:
 
 ```bash
-for file in docs/*.md docs/**/*.md; do
+# Documents already live in the vault; only frontmatter enrichment is needed.
+for file in index.md getting-started.md architecture.md api/*.md; do
   [ -f "$file" ] || continue
-  rel="${file#docs/}"
-  target="$OBSIDIAN_DIR/$rel"
-  mkdir -p "$(dirname "$target")"
-  cp "$file" "$target"
-  echo "Written directly: $target"
+  echo "Already in vault: $VAULT/$file (frontmatter ensured above)"
 done
 ```
 
@@ -114,14 +114,10 @@ done
 After pushing, report:
 
 ```
-Documentation created in: ./docs/
+Documentation created in: {vault}/   (vault == project root)
 Files generated: 5
-Pushed to vault: {vault}/{project}/ (5 files)
-- {vault}/{project}/index.md
-- {vault}/{project}/getting-started.md
-- {vault}/{project}/architecture.md
-- {vault}/{project}/api/index.md
-- {vault}/{project}/api/endpoints.md
+Frontmatter applied to: {vault}/index.md, {vault}/getting-started.md,
+  {vault}/architecture.md, {vault}/api/index.md, {vault}/api/endpoints.md
 ```
 
-If Obsidian is running and the CLI is available, also note that the vault is synced. Otherwise, tell the user to open Obsidian to see the new files.
+If Obsidian is running and the CLI is available, also note that the vault is synced. Otherwise, tell the user to open Obsidian to see the new files (they are already in the vault — the project root).
