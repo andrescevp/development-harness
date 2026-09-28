@@ -145,10 +145,6 @@ Return the sign-off verdict to the caller. If P0/P1 findings exist, recommend fi
 
 ## Doc search
 
-- **Documentation management:** delegate create / update / delete / retrieve
-  of generated documents (excluding docs/plans) to `@dh-documentor` — the
-  main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
 
-Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
-or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
-Convention: AGENTS.md → Generated documentation search.
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

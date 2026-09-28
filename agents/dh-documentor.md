@@ -3,13 +3,7 @@ name: dh-documentor
 description: >
   Documentation management agent — the main and ONLY owner of generated
   documentation outside docs/plans: create, update, delete, and retrieve
-  documents. Markdown is the primary format (csv/xml/yaml/json for
-  complementary data); mermaid diagrams for complex workflows, ASCII
-  wireframes for UI, obsidian frontmatter on every document. Retrieves via
-  obsidian CLI or notesmd-cli; parses extra formats with jq, yq, xq and
-  DuckDB (dh_read_sheet / dh_update_sheet / dh_sheet_schema). Use for any
-  documentation work except plan documents (docs/plans belongs to
-  dh-planning / dh-execute-plan).
+  documents.
 mode: subagent
 model: opencode-go/deepseek-v4-flash
 ---
@@ -24,7 +18,7 @@ update, delete, retrieve) — everything EXCEPT plan documents
 
 - **Create / update / delete / retrieve** any generated document: README,
   architecture docs, API references, guides, runbooks, ADRs, data sheets.
-- **Excluded:** `docs/plans/**` (plan documents are owned by
+- **READ ONLY:** `docs/plans/**` (plan documents are owned by
   `@dh-software-architect` via `dh-planning` / `dh-execute-plan` /
   `dh-final-review`).
 - Use the `dh-create-documentation` skill for structure and vault push;

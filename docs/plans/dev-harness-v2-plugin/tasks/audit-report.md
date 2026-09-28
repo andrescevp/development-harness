@@ -1,6 +1,6 @@
 # Audit Report — Dev Harness V2 Plugin (ST2)
 
-Generated 2026-09-28T14:03:54.540Z by `scripts/audit.mjs`.
+Generated 2026-09-28T14:15:39.650Z by `scripts/audit.mjs`.
 
 ## Verdict
 
@@ -14,7 +14,7 @@ Generated 2026-09-28T14:03:54.540Z by `scripts/audit.mjs`.
 | Frontmatter parse | 23 | PASS | 23 files on audit surface |
 | Name regex | 22 | PASS | ^[a-z0-9]+(-[a-z0-9]+)*$ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 7 | WARN | 339 resolved; 1 code-context; 0 allowlisted; 126 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented) |
+| Cross-references | 7 | WARN | 345 resolved; 1 code-context; 0 allowlisted; 126 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented) |
 | Loop membership | 19 | PASS | 12/12 skills present + coding expected-pending (ST3); 7/6 agents present |
 | Secret scan | 24 | PASS | 24 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
@@ -65,7 +65,7 @@ _None._
 
 Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; full list in reports/audit.json):
 
-- `project-name` × 14
+- `project-name` × 15
 - `osv-scanner` × 7
 - `phased-plan-template` × 5
 - `bounded-context` × 4

@@ -313,6 +313,7 @@ function verifyAliasBodyIntegrity() {
     .map((p) => p.marker)
     .filter(Boolean);
   for (const [from, r] of Object.entries(AGENT_RENAMES)) {
+    if ((M.repoAuthoredAgents ?? []).includes(r.to)) continue; // repo-authored: user-owned content, not source-verified
     const srcText = fs.readFileSync(path.join(SOURCE_ROOT, 'agents', from), 'utf8');
     const destText = fs.readFileSync(path.join(REPO_ROOT, 'agents', r.to), 'utf8');
     const srcBody = applyBodyPatches(splitFrontmatter(srcText, from).body, r.to);
