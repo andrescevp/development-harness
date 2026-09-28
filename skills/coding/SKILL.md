@@ -57,8 +57,8 @@ Detect the project type before delegating or implementing. Check the project roo
 
 - **Software project markers** (any present at the project root): `package.json`, `pyproject.toml`, `Cargo.toml`, `composer.json`, `go.mod`, `CMakeLists.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `pubspec.yaml`, `build.gradle`, `*.csproj`, `*.sln`, and similar language build files.
 - **Language/toolkit detection:** infer the stack and its tooling from the marker — for example `package.json` → npm/pnpm/bun, `pyproject.toml` → uv/poetry/pip, `Cargo.toml` → cargo, `composer.json` → composer. Use the project's own tooling and lockfiles; do not introduce a different package manager or toolchain.
-- **Software projects:** implement simple changes directly; delegate standard and complex or multi-file work to `@software-engineer` (this plugin's builder agent); run validation through `@executor`. When invoked from the skills loop, `domain-check` runs before complex implementation and `simplify` runs after validation.
-- **Non-software projects** (docs, config, design assets — no marker files): delegate implementation to `@software-engineer` as well; skip the `simplify`, `domain-check`, and `create-documentation` steps.
+- **Software projects:** delegate ALL implementation to `@senior-engineer` (bundled as `software-engineer` — the harness's single task executor); run validation through `@executor`. When invoked from the skills loop, `domain-check` runs before complex implementation and `simplify` runs after validation.
+- **Non-software projects** (docs, config, design assets — no marker files): delegate implementation to `@senior-engineer` as well; skip the `simplify`, `domain-check`, and `create-documentation` steps.
 
 ## Hard Constraints
 

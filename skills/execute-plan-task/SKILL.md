@@ -26,9 +26,10 @@ Execute one self-contained sub-task from `./docs/plans/<plan-slug>/plan.md`.
 
 - Read the plan with the `harness_plan_read` tool (`{ slug }` → structured JSON: meta, phases[].title/status, subTasks[].phase/title/status) to find the active sub-task. Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually, following the phased template markers (`## Phases` → `### Phase N: <title>` → `#### Sub-Task N.M: <title>` with `- **Status:**` bullets). If the plan does not exist, stop and report that no plan was found — suggest running the `planning` skill first.
 - Treat the sub-task entry in plan.md as the full implementation brief.
-- **Detect project type** before agent delegation: check for software marker files (see below). This determines which builder agent to use and whether to run the `simplify` step.
-- For **software projects**: delegate to `@senior-engineer` for complex/multi-file implementation, `@build` for standard changes. Run `domain-check` before complex implementation, `simplify` after validation, and `create-documentation` for new modules/APIs.
-- For **non-software projects**: delegate to `@build` for all implementation — do NOT use `@senior-engineer` or `@senior-architect`. Skip the `simplify`, `domain-check`, and `create-documentation` steps entirely.
+- **ALL sub-task execution is delegated to `@senior-engineer`** (the harness's task executor; bundled/registered in this plugin as `software-engineer` — same agent, alias per AGENTS.md). There is no complexity- or type-based builder split: simple, standard, complex, and non-software work ALL go to `@senior-engineer`.
+- **Detect project type** before the post-steps: it determines whether `domain-check`, `simplify`, and `create-documentation` run (software projects only) — it does NOT change who implements.
+- For **software projects**: run `domain-check` before complex implementation, `simplify` after validation, and `create-documentation` for new modules/APIs.
+- For **non-software projects**: skip the `simplify`, `domain-check`, and `create-documentation` steps entirely; implementation still goes to `@senior-engineer`.
 - Delegate validation to `@executor` for tests, linters, and builds.
 - Delegate review to `@reviewer` for code quality and acceptance criteria checks.
 - Do not modify files outside the sub-task scope.
@@ -44,9 +45,12 @@ Check the project root for software marker files to determine project type. This
 
 **Detection logic:**
 1. Run `ls <project-root>/` and check for any of the marker files above.
-2. If a marker file is found → **software project** (use `@senior-engineer` for complex work, run `domain-check` before complex implementation, `simplify` after validation, `create-documentation` for new modules/APIs).
-3. If no marker files found → **non-software project** (use `@build` for all work, skip `domain-check`, `simplify`, and `create-documentation`).
+2. If a marker file is found → **software project** (run `domain-check` before complex implementation, `simplify` after validation, `create-documentation` for new modules/APIs).
+3. If no marker files found → **non-software project** (skip `domain-check`, `simplify`, and `create-documentation`).
 4. If uncertain (e.g., a `Makefile` with no other code), check for source code directories (`src/`, `lib/`, `app/`) as secondary indicators.
+
+Implementation delegation is IDENTICAL for both types: **every sub-task is
+implemented by `@senior-engineer`** (bundled as `software-engineer`).
 
 > **Why this matters:** Non-software projects (docs repos, config repos, design assets) don't benefit from architecture/engineering agents or code-level simplification. Using the wrong agent type wastes context and produces irrelevant findings.
 
@@ -63,21 +67,16 @@ Read the plan with the `harness_plan_read` tool (`{ slug }`) and find exactly on
 
 ### Step 2: Implement the sub-task
 
-Follow the sub-task's instructions, in-scope list, and implementation suggestions. **Agent selection depends on project type** (detected above):
+Follow the sub-task's instructions, in-scope list, and implementation suggestions. **Every sub-task is delegated to `@senior-engineer`** (bundled as `software-engineer`):
 
-**For software projects:**
-- **Complex work** (multi-file, architectural decisions, new modules): first run the `domain-check` skill to validate the proposed architecture against DDD bounded contexts and SOLID principles, then delegate to `@senior-engineer` with the full sub-task brief plus domain-check findings.
-- **Standard work** (1–3 files, straightforward logic, existing patterns): delegate to `@build`.
-- **Simple work** (single file, <50 lines changed, no new dependencies): implement directly.
-- **TDD**: write a failing test first, then implement the minimal change to make it pass.
+- Delegate the FULL sub-task brief to `@senior-engineer` — for complex work (multi-file, architectural decisions, new modules), run the `domain-check` skill first and include its findings in the delegation.
+- The implementation follows the `coding` skill through `@senior-engineer` (test-first TDD; `CODE_RULES.md` at project root when present).
+- **TDD**: the failing test is written first, then the minimal change to make it pass — performed inside the `@senior-engineer` implementation pass.
+- Do NOT implement sub-task work directly and do NOT seek another builder: `@senior-engineer` is the single task executor in this harness.
 
-**For non-software projects:**
-- All work: delegate to `@build` as the primary builder agent.
-- Do NOT use `@senior-engineer` or `@senior-architect` — these agents are designed for software code and will produce irrelevant or overly complex output for docs/config/design work.
-- Simple changes (single file, <50 lines) can be implemented directly without delegation.
-
-**General rules (both types):**
+**General rules:**
 - Stay within the sub-task's in-scope boundaries. Do not widen scope.
+- Never mark a phase `Completed` yourself while any sub-task in it is still open (phase coordination belongs to the orchestrator or the gated tool).
 
 ### Step 3: Run validation
 
@@ -137,24 +136,19 @@ Read the review and address findings:
 3. When standalone: if a next sub-task exists and is `Pending`, mark it as `In Progress`.
 4. When standalone: update `./docs/plans/index.md` with the latest status if this was the final sub-task.
 
-## Complexity Assessment Guide
+## Execution Delegation Guide
 
-### Software Projects
+**Single executor policy:** every sub-task — software, non-software, simple,
+standard, complex — is implemented by `@senior-engineer` (bundled as
+`software-engineer`).
 
-| Complexity | Signs | Delegate to |
+| Work | Delegate to | Post-steps |
 |---|---|---|
-| Simple | Single file, <50 lines changed, no new dependencies | Implement directly |
-| Standard | 1–3 files, straightforward logic, existing patterns | `@build` |
-| Complex | 4+ files, architectural decisions, new modules, migrations | `@senior-engineer` |
-| High-risk | Security, data migration, breaking API changes | `@senior-engineer` + `@reviewer` |
+| Software (complex, architectural) | `@senior-engineer` | `domain-check` first, then `simplify` + `create-documentation` |
+| Software (other) | `@senior-engineer` | `simplify` after validation |
+| Non-software | `@senior-engineer` | none (skip `simplify`/`domain-check`/`create-documentation`) |
 
-### Non-Software Projects
-
-| Complexity | Signs | Delegate to |
-|---|---|---|
-| Simple | Single file, <50 lines changed | Implement directly |
-| All other | Any multi-file or multi-step change | `@build` |
-| **Do not use** | — | `@senior-engineer`, `@senior-architect` |
+Validation always runs through `@executor`; review through `@reviewer`.
 
 ## Loop Integration (bundled)
 

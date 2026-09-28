@@ -55,6 +55,11 @@ unavailable). Format contract:
 
 ## Agent-name normalization (runtime delegation)
 
+**Single task executor:** ALL sub-task implementation in this harness is
+delegated to `@senior-engineer` (registered in the plugin as
+`software-engineer` — same agent). There is no complexity- or type-based
+builder split; `execute-plan-task` and `coding` route every task there.
+
 `@build`, `@senior-engineer`, `@senior-architect`, and `@plan` do NOT resolve
 in the plugin runtime — only the 6 manifest agents exist. Normalize every
 delegation with this mapping:

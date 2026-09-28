@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T07:00:15.746Z",
+    "generated": "2026-09-28T07:36:01.365Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -35,9 +35,9 @@
       },
       {
         "name": "Cross-references",
-        "count": 8,
+        "count": 1,
         "sev": "WARN",
-        "note": "178 resolved; 0 code-context; 0 allowlisted; 73 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+        "note": "193 resolved; 0 code-context; 0 allowlisted; 74 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
       },
       {
         "name": "Loop membership",
@@ -63,55 +63,6 @@
   "deviations": [],
   "fails": [],
   "atMentions": [
-    {
-      "file": "skills/execute-plan-task/SKILL.md",
-      "line": 10,
-      "mention": "@build",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/execute-plan-task/SKILL.md",
-      "line": 11,
-      "mention": "@build",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/execute-plan-task/SKILL.md",
-      "line": 28,
-      "mention": "@build",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/execute-plan-task/SKILL.md",
-      "line": 50,
-      "mention": "@build",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/execute-plan-task/SKILL.md",
-      "line": 55,
-      "mention": "@build",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/execute-plan-task/SKILL.md",
-      "line": 127,
-      "mention": "@build",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/execute-plan-task/SKILL.md",
-      "line": 136,
-      "mention": "@build",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
     {
       "file": "skills/planning/SKILL.md",
       "line": 29,
@@ -442,6 +393,20 @@
       ]
     },
     {
+      "token": "type-based",
+      "count": 1,
+      "files": [
+        "skills/execute-plan-task/SKILL.md"
+      ]
+    },
+    {
+      "token": "post-steps",
+      "count": 1,
+      "files": [
+        "skills/execute-plan-task/SKILL.md"
+      ]
+    },
+    {
       "token": "project-root",
       "count": 1,
       "files": [
@@ -464,13 +429,6 @@
     },
     {
       "token": "re-validation",
-      "count": 1,
-      "files": [
-        "skills/execute-plan-task/SKILL.md"
-      ]
-    },
-    {
-      "token": "multi-step",
       "count": 1,
       "files": [
         "skills/execute-plan-task/SKILL.md"
@@ -938,7 +896,7 @@
     {
       "file": "skills/execute-plan-task/SKILL.md",
       "kind": "skill",
-      "lines": 185,
+      "lines": 179,
       "frontmatter": {
         "status": "ok",
         "errors": [],
