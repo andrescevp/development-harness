@@ -31,7 +31,7 @@ where they differ) and re-verify.
 | jq | yes | `jq --version` | https://jqlang.org/ — distro package or `brew install jq` |
 | xq | yes | `xq --version` | https://github.com/sibprogrammer/xq — `go install github.com/sibprogrammer/xq/cmd/xq@latest` or `brew install sibprogrammer/xq` |
 | yq | yes | `yq --version` | https://github.com/mikefarah/yq — `brew install yq` or download binary |
-| graphify | yes | `graphify --version` | https://github.com/Graphify-Labs/graphify — follow repo install (CLI/npm/deno) |
+| graphify | yes | `graphify --version` | https://github.com/Graphify-Labs/graphify (v8 README) — `uv tool install graphifyy` (or `pipx install graphifyy`), then register the skill with `graphify install` |
 | obsidian | optional | `command -v obsidian` (app + best-effort CLI) | https://obsidian.md — recommended when the project vault flow (dh-create-documentation) should sync live |
 | notesmd-cli | optional | `notesmd --version` / `command -v notesmd` | https://github.com/Yakitrak/notesmd-cli — `yay -S notesmd-cli-bin` (Arch) / `brew install yakitrak/yakitrak/notesmd-cli` / release binary; used by dh-create-documentation for vault operations without Obsidian running |
 | duckdb (CLI, optional) | optional | `duckdb --version` | https://duckdb.org — native CLI alternative to the plugin's bundled sheet tools (dh_read_sheet/dh_update_sheet use the duckdb npm package) |
@@ -85,8 +85,18 @@ the configuration, but let the user decide whether to enable each.
 - Add to `opencode.jsonc` `"plugins"`: `"opencode-rules@latest"` (verify the
   installed version is v2+; `opencode plugin list` shows the loaded version).
 
-**External tool:** graphify — https://github.com/Graphify-Labs/graphify
-- Installed at Step 1; add any project key/alias configuration per the repo docs.
+**External tool:** graphify — https://github.com/Graphify-Labs/graphify (v8)
+- Install (Step 1): `uv tool install graphifyy` (or `pipx install graphifyy`).
+- Register the skill for the assistant: `graphify install`.
+- For an OpenCode project setup (as used in other projects):
+  ```bash
+  uv tool install graphifyy
+  graphify install
+  graphify install --project --platform opencode
+  ```
+- After setup, run opencode with `@graphify` as the message to initialize
+  the code database (maps the project into a knowledge graph under
+  `graphify-out/`: `graph.html`, `GRAPH_REPORT.md`, `graph.json`).
 
 Verify with: `opencode plugin list` (plugins), `opencode debug config` (mcp
 entries resolved). Report as "available — user decision" for each.
