@@ -3,7 +3,7 @@ name: dh-setup
 description: >
   Verify and prepare everything the dev-harness needs to run properly: audit
   system software (chrome, uv, nvm, osv-scanner, docker, jq, xq, yq, graphify,
-  optional phpenv) and guide installation for anything missing; list and
+  optional phpenv, obsidian, notesmd-cli) and guide installation for anything missing; list and
   configure user-level integrations — MCP servers (chrome-devtools-mcp,
   playwright MCP, android-remote-control-mcp), the opencode-rules plugin
   (>= v2), and the graphify external tool — as config choices left to the
@@ -45,10 +45,15 @@ where they differ) and re-verify.
 | xq | yes | `xq --version` | https://github.com/sibprogrammer/xq — `go install github.com/sibprogrammer/xq/cmd/xq@latest` or `brew install sibprogrammer/xq` |
 | yq | yes | `yq --version` | https://github.com/mikefarah/yq — `brew install yq` or download binary |
 | graphify | yes | `graphify --version` | https://github.com/Graphify-Labs/graphify — follow repo install (CLI/npm/deno) |
+| obsidian | optional | `command -v obsidian` (app + best-effort CLI) | https://obsidian.md — recommended when the project vault flow (dh-create-documentation) should sync live |
+| notesmd-cli | optional | `notesmd --version` / `command -v notesmd` | https://github.com/Yakitrak/notesmd-cli — `yay -S notesmd-cli-bin` (Arch) / `brew install yakitrak/yakitrak/notesmd-cli` / release binary; used by dh-create-documentation for vault operations without Obsidian running |
 | phpenv | optional | `phpenv --version` / `phpenv versions` | https://github.com/phpenv/phpenv — skip with a note when absent |
 
-For anything missing, do NOT silently skip (except `phpenv`): install it or
-report the blocker with the exact command the user must run.
+For anything missing, do NOT silently skip (except the optional items —
+`phpenv`, `obsidian`, `notesmd-cli`): install it or report the blocker with
+the exact command the user must run. `notesmd-cli` / `obsidian` support the
+Obsidian vault workflow used by `dh-create-documentation` (vault = project
+root, docs under `{project_root}/docs`).
 
 ## Step 2: User-Level Integrations (config choices — up to the user)
 
