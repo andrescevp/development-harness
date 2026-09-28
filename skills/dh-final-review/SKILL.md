@@ -1,16 +1,7 @@
 ---
 name: dh-final-review
 description: >
-  Use this skill when performing final plan-level sign-off review — verify all
-  sub-tasks are Completed, review the full diff against sdd.md requirements
-  (falling back to plan.md if sdd.md is missing), delegate in-depth review to
-  @dh-final-reviewer, run artifact-check and preflight for release readiness plus
-  a semver bump recommendation on software projects, and produce a binding
-  verdict (Approve / Approve with comments / Request changes) written to
-  tasks/review.md. Use when the plan is fully implemented and individually
-  reviewed, before merge, or when asked to 'final review', 'sign off', or
-  'close the plan' — not for per-sub-task reviews (use review) or in-progress
-  plans.
+  Plan sign-off: verify all sub-tasks Completed, full diff vs sdd.md, release checks (artifact-check/preflight), semver recommendation, binding verdict to tasks/review.md. Use to final review, sign off, or close a plan.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: read, write, bash

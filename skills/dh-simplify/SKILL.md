@@ -1,6 +1,7 @@
 ---
 name: dh-simplify
-description: Use this skill when reviewing changed code for reuse, quality, and efficiency, then fixing any issues found — launching three parallel review agents (code reuse, code quality, efficiency) on the full diff and aggregating their findings into direct fixes. Use after making changes or when asked to 'clean up', 'refactor', 'simplify', or 'improve this code'.
+description: >
+  Review changed code for reuse, quality, and efficiency (three parallel reviews), then fix findings directly. Use after making changes or when asked to clean up, refactor, simplify, or improve this code.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: bash, read, write, edit

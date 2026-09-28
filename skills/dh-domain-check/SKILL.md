@@ -1,15 +1,7 @@
 ---
 name: dh-domain-check
 description: >
-  Map a task to its DDD bounded context(s) and validate proposed changes against
-  SOLID principles as an architectural guardrail before implementation: inspect
-  project structure and domain language, flag cross-context boundary violations
-  and architectural risks, and produce a verdict (Clear to proceed / Proceed
-  with caution / Architecture concern). Use after planning and before coding —
-  when a plan needs architectural validation, when the task crosses multiple
-  modules or contexts, when invoked as a pre-implementation gate, or when the
-  user asks "validate architecture", "is this SOLID?", "bounded context check",
-  or "domain mapping".
+  Map tasks to DDD bounded contexts and validate SOLID as a pre-implementation gate; flag boundary violations, produce verdict. Use after planning, to validate architecture, check SOLID, or bounded context check.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: read, write

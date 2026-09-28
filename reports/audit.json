@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T12:00:54.631Z",
+    "generated": "2026-09-28T12:03:28.063Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -1153,13 +1153,13 @@
     {
       "file": "skills/dh-artifact-check/SKILL.md",
       "kind": "skill",
-      "lines": 72,
+      "lines": 65,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-artifact-check",
-          "description": "Compile final production builds and validate deployment scripts against established contingency plans: detect the build system, run the production build, verify build artifacts exist and are non-empty, validate deploy script syntax and basic correctness, and produce a build readiness report. Use when preparing a release, smoke-testing the deployment path before shipping (invoked by /release as step 4), or when the user asks \"validate build\", \"check artifacts\", \"does it build?\", \"validate the artifact\", \"is the build clean?\", or \"verify deployment readiness\".",
+          "description": "Compile production builds and validate deployment scripts: detect build system, run build, verify artifacts exist/non-empty, check deploy script syntax. Use to validate build, check artifacts, verify deployment readiness, or smoke-test.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "bash, read",
@@ -1171,13 +1171,13 @@
     {
       "file": "skills/dh-code-review/SKILL.md",
       "kind": "skill",
-      "lines": 88,
+      "lines": 89,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-code-review",
-          "description": "Use this skill when reviewing code — check correctness, security, robustness, performance, and maintainability with high-signal, evidence-based findings at real risk (P0–P3 severity), and write the review to the plan's tasks/review.md. Use for PR reviews, code audits, reviewing plan sub-tasks, or when asked to \"review this\", \"audit this code\", or \"check my changes\" — ask for the diff scope if not provided.",
+          "description": "Review code: correctness, security, robustness, performance, maintainability; high-signal findings (P0-P3) via code-review skill to tasks/review.md. Use for PR reviews, code audits, sub-task reviews, 'review this'.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "bash, read, write",
@@ -1189,13 +1189,13 @@
     {
       "file": "skills/dh-coding/SKILL.md",
       "kind": "skill",
-      "lines": 151,
+      "lines": 138,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-coding",
-          "description": "Apply TDD coding best practices when implementing, writing, or fixing code — write a failing test first, implement the minimal change to make it pass, then refactor, running validation via @dh-executor and stopping after 3 consecutive failures. Code rules ALWAYS live at project level in CODE_RULES.md at the project root: enforce it when present; when absent, analyze the codebase and CREATE it before implementing. Do not rely on global guideline files — keep CODE_RULES.md updated via dh-create-documentation. Stay project type aware (software vs non-software, uv/pnpm/npm/poetry toolchains) when delegating and implementing. Also applies performance directives (webservices, data operations, scripting), security directives (webservices, pipelines), and setup best practices. Use when asked to implement, write code, or fix a bug, or during execute-plan-task sub-task 2.1 of the skills loop — not for plan orchestration (use execute-plan) or review-only requests (use review).",
+          "description": "TDD coding best practices: failing test first, minimal implementation, refactor; enforce CODE_RULES.md at project root (create from code analysis when absent). Use when implementing code, fixing bugs, or during execute-plan-task 2.1.",
           "license": "MIT",
           "compatibility": "opencode",
           "allowed-tools": "read, write, edit, bash",
@@ -1207,13 +1207,13 @@
     {
       "file": "skills/dh-create-documentation/SKILL.md",
       "kind": "skill",
-      "lines": 185,
+      "lines": 176,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-create-documentation",
-          "description": "Use this skill when asked to create, generate, write, or produce documentation — project docs, API references, architecture overviews, README files, technical guides, or any structured document, as single-file or multi-file sets with cross-references. Use when the user says \"document this\", \"create docs for\", \"generate documentation\", \"write a README\", \"document the API\", \"make docs for\", or similar, or after creating substantial code that needs documentation. Supports Markdown (default), HTML, and Mermaid diagram formats. The Obsidian vault IS the project root (`{project_root}`) and ALL documentation lives under `{project_root}/docs`, with frontmatter metadata (tags, project, created, stack, updated, feature, epic).",
+          "description": "Create structured docs (Markdown/HTML/Mermaid): project docs, API refs, READMEs, guides; Obsidian vault = {project_root}, ALL docs under {project_root}/docs, frontmatter metadata. Use to document this, write a README, or generate documentation.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "bash, read, write, edit, glob",
@@ -1225,13 +1225,13 @@
     {
       "file": "skills/dh-domain-check/SKILL.md",
       "kind": "skill",
-      "lines": 84,
+      "lines": 76,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-domain-check",
-          "description": "Map a task to its DDD bounded context(s) and validate proposed changes against SOLID principles as an architectural guardrail before implementation: inspect project structure and domain language, flag cross-context boundary violations and architectural risks, and produce a verdict (Clear to proceed / Proceed with caution / Architecture concern). Use after planning and before coding — when a plan needs architectural validation, when the task crosses multiple modules or contexts, when invoked as a pre-implementation gate, or when the user asks \"validate architecture\", \"is this SOLID?\", \"bounded context check\", or \"domain mapping\".",
+          "description": "Map tasks to DDD bounded contexts and validate SOLID as a pre-implementation gate; flag boundary violations, produce verdict. Use after planning, to validate architecture, check SOLID, or bounded context check.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "read, write",
@@ -1243,13 +1243,13 @@
     {
       "file": "skills/dh-execute-plan/SKILL.md",
       "kind": "skill",
-      "lines": 152,
+      "lines": 144,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-execute-plan",
-          "description": "Use this skill when orchestrating the full plan-driven development lifecycle — read plan.md, iterate through sub-tasks in order delegating execution to execute-plan-task, verification to review, and final sign-off to final-review, handling mid-plan interruptions by resuming from the In Progress sub-task, then updating plan.md and index.md on completion. On completion, run evolve and state-sync for all projects, plus create-documentation and semver for software projects. Use when the user says 'execute plan', 'run the plan', 'complete the plan', or 'finish all tasks' — not for single sub-task work (use execute-plan-task) or plans still in development.",
+          "description": "Orchestrate full plan execution: read plan.md, iterate sub-tasks delegating execution and review, resume on interruption, final-review sign-off, update index.md. Use when the user says 'execute plan', 'run the plan', or 'finish all tasks'.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "read, write, edit, bash",
@@ -1261,13 +1261,13 @@
     {
       "file": "skills/dh-execute-plan-task/SKILL.md",
       "kind": "skill",
-      "lines": 176,
+      "lines": 166,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-execute-plan-task",
-          "description": "Execute a single sub-task from a plan — select the active sub-task (the first In Progress phase's In Progress/Pending sub-task) from plan.md, implement it following TDD with project-type-aware agent delegation (domain-check before complex implementation, simplify after validation, and create-documentation for new modules/APIs on software projects), run validation via @dh-executor, request review, handle feedback with fix loops, and update plan status. Use when implementing the next sub-task from plan.md, continuing an in-progress sub-task, or when the user says 'execute next task', 'implement sub-task', 'work on the plan', or 'next step' — not for full plan orchestration (use execute-plan) or ad-hoc work without a plan.",
+          "description": "Execute a single sub-task from plan.md: select the active one (In Progress phase first), implement (TDD), validate via dh-executor, update status; project-type aware. Use for the next sub-task or continuing work — not orchestration.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "read, write, edit, bash",
@@ -1279,13 +1279,13 @@
     {
       "file": "skills/dh-final-review/SKILL.md",
       "kind": "skill",
-      "lines": 154,
+      "lines": 145,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-final-review",
-          "description": "Use this skill when performing final plan-level sign-off review — verify all sub-tasks are Completed, review the full diff against sdd.md requirements (falling back to plan.md if sdd.md is missing), delegate in-depth review to @dh-final-reviewer, run artifact-check and preflight for release readiness plus a semver bump recommendation on software projects, and produce a binding verdict (Approve / Approve with comments / Request changes) written to tasks/review.md. Use when the plan is fully implemented and individually reviewed, before merge, or when asked to 'final review', 'sign off', or 'close the plan' — not for per-sub-task reviews (use review) or in-progress plans.",
+          "description": "Plan sign-off: verify all sub-tasks Completed, full diff vs sdd.md, release checks (artifact-check/preflight), semver recommendation, binding verdict to tasks/review.md. Use to final review, sign off, or close a plan.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "read, write, bash",
@@ -1297,13 +1297,13 @@
     {
       "file": "skills/dh-grill-sdd/SKILL.md",
       "kind": "skill",
-      "lines": 136,
+      "lines": 126,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-grill-sdd",
-          "description": "Interview the user and produce a proper Software Design Document (SDD) at ./docs/plans/<plan-slug>/sdd.md — the requirements contract that the dh-planning skill consumes before creating a plan. Use when starting plan work and the SDD does not exist yet, when the user asks to \"write the sdd\", \"grill the requirements\", \"document the design\", or when dh-planning detects ./docs/plans/<plan-slug>/sdd.md is missing. Interview-first: ask focused numbered questions (goal, scope, constraints, acceptance criteria, risks, existing assets), then synthesize the SDD with stable requirement IDs, scope boundaries, edge cases, and open questions. Not for reviewing existing SDDs (use dh-review) or writing implementation plans (use dh-planning).",
+          "description": "Interview and produce ./docs/plans/<slug>/sdd.md — the requirements contract (goal, scope, constraints, acceptance criteria, risks, stable IDs). dh-planning runs it when the SDD is absent. Use to write the sdd or grill requirements.",
           "license": "MIT",
           "compatibility": "opencode",
           "allowed-tools": "read, write, edit, bash",
@@ -1315,13 +1315,13 @@
     {
       "file": "skills/dh-planning/SKILL.md",
       "kind": "skill",
-      "lines": 106,
+      "lines": 107,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-planning",
-          "description": "Use this skill when writing clear, detailed, step-by-step implementation plans to ./docs/plans/<plan-slug>/plan.md so any human or agent can execute the task — breaking work into ordered phases (each phase with sub-tasks), with objectives, requirements mapping (stable IDs), in-scope/out-of-scope items, acceptance criteria, validation guidance, and a requirements snapshot, then updating index.md; before planning it runs the SDD gate — if ./docs/plans/<plan-slug>/sdd.md does not exist it invokes dh-grill-sdd to interview the user and produce the requirements contract, then maps plan sub-tasks to the SDD's stable IDs; the phased template and parser contract live in references/phased-plan-template.md and the harness plan tools (dh_plan_create / dh_plan_read) may scaffold and verify plans when installed. Use when planning implementation work, breaking down tasks, or when the user says 'plan this' or 'create a plan' — not for purely advisory, exploratory, or review-only requests; ask structured questions when the request lacks detail.",
+          "description": "Write phased plans to ./docs/plans/<slug>/plan.md: phases with sub-tasks, requirements mapping (stable IDs), scope, acceptance criteria. SDD gate: invoke dh-grill-sdd when ./docs/plans/<slug>/sdd.md is absent. Use to plan this or create a plan.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "read, write, edit",
@@ -1333,13 +1333,13 @@
     {
       "file": "skills/dh-preflight/SKILL.md",
       "kind": "skill",
-      "lines": 61,
+      "lines": 54,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-preflight",
-          "description": "Execute the complete test suite, linters, and static analysis tools as a formal pre-release gate — auto-detecting the project's tooling, checking for uncommitted changes or dirty state, and producing a single pass/fail verdict with per-tool results and actionable failure details (blocking release on any failure without auto-fixing). Use when preparing a release, running CI checks locally, invoked by /release as step 2, or when the user asks \"run preflight\", \"pre-release check\", \"validate before release\", \"gate check\", \"is this ready to release?\", or \"run all checks\".",
+          "description": "Run tests, linters, static analysis as a release gate: auto-detect tooling, check dirty state, pass/fail verdict with actionable failures (no auto-fixes). Use to run preflight, pre-release check, or validate before release.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "bash, read",
@@ -1351,13 +1351,13 @@
     {
       "file": "skills/dh-review/SKILL.md",
       "kind": "skill",
-      "lines": 145,
+      "lines": 136,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-review",
-          "description": "Use this skill when reviewing a single plan sub-task result against its acceptance criteria, scope boundaries, and done-when conditions — reviewing the implementation diff for acceptance criteria fulfillment, scope compliance, validation/testing, and regression risk, delegating code quality review to @dh-reviewer and architecture validation to domain-check for software projects, then producing a structured verdict with actionable findings in tasks/review.md. Use after a sub-task is implemented before marking it Complete, when asked to 'review the task' or 'verify the sub-task', or during plan execution — not for full-plan sign-off (use final-review) or ad-hoc code review (use code-review).",
+          "description": "Verify a plan sub-task against acceptance criteria, scope, done-when; review diff, validation, regression risk; structured verdict to tasks/review.md. Use after implementation or to review/verify the sub-task.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "read, write, bash",
@@ -1369,13 +1369,13 @@
     {
       "file": "skills/dh-setup/SKILL.md",
       "kind": "skill",
-      "lines": 123,
+      "lines": 110,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-setup",
-          "description": "Verify and prepare everything the dev-harness needs to run properly: audit system software (chrome, uv, nvm, osv-scanner, docker, jq, xq, yq, graphify, optional phpenv, obsidian, notesmd-cli) and guide installation for anything missing; list and configure user-level integrations — MCP servers (chrome-devtools-mcp, playwright MCP, android-remote-control-mcp), the opencode-rules plugin (>= v2), and the graphify external tool — as config choices left to the user; and scaffold project-level quality gates: pre-commit/husky or equivalent hooks with clear rules, plus the QA toolset for the project's stack (All: osv-scanner; Python: ruff/mypy/pyupgrade/bandit/copydetect; JS/TS: biome/tsc/jscpd/knip/semgrep/dependency-cruiser; PHP: phpstan/deptrac/rector/phpcs/phpcpd; other stacks: research equivalents). Use when asked to \"check system requirements\", \"install the harness prerequisites\", \"setup the environment\", \"configure mcp/plugins\", \"add pre-commit/husky\", or before first use of the harness on a new machine.",
+          "description": "Audit system software (chrome, uv, nvm, osv-scanner, docker, jq/xq/yq, graphify, optional phpenv/obsidian/notesmd-cli), configure user MCPs/plugins, scaffold project QA (hooks + per-stack tools). Use to check requirements or setup the environment.",
           "license": "MIT",
           "compatibility": "opencode",
           "allowed-tools": "read, write, edit, bash, websearch",
@@ -1387,13 +1387,13 @@
     {
       "file": "skills/dh-simplify/SKILL.md",
       "kind": "skill",
-      "lines": 61,
+      "lines": 62,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-simplify",
-          "description": "Use this skill when reviewing changed code for reuse, quality, and efficiency, then fixing any issues found — launching three parallel review agents (code reuse, code quality, efficiency) on the full diff and aggregating their findings into direct fixes. Use after making changes or when asked to 'clean up', 'refactor', 'simplify', or 'improve this code'.",
+          "description": "Review changed code for reuse, quality, and efficiency (three parallel reviews), then fix findings directly. Use after making changes or when asked to clean up, refactor, simplify, or improve this code.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "bash, read, write, edit",

@@ -1,6 +1,7 @@
 ---
 name: dh-code-review
-description: Use this skill when reviewing code — check correctness, security, robustness, performance, and maintainability with high-signal, evidence-based findings at real risk (P0–P3 severity), and write the review to the plan's tasks/review.md. Use for PR reviews, code audits, reviewing plan sub-tasks, or when asked to "review this", "audit this code", or "check my changes" — ask for the diff scope if not provided.
+description: >
+  Review code: correctness, security, robustness, performance, maintainability; high-signal findings (P0-P3) via code-review skill to tasks/review.md. Use for PR reviews, code audits, sub-task reviews, 'review this'.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: bash, read, write

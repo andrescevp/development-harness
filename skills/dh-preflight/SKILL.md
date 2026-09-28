@@ -1,14 +1,7 @@
 ---
 name: dh-preflight
 description: >
-  Execute the complete test suite, linters, and static analysis tools as a
-  formal pre-release gate — auto-detecting the project's tooling, checking for
-  uncommitted changes or dirty state, and producing a single pass/fail verdict
-  with per-tool results and actionable failure details (blocking release on any
-  failure without auto-fixing). Use when preparing a release, running CI checks
-  locally, invoked by /release as step 2, or when the user asks "run preflight",
-  "pre-release check", "validate before release", "gate check",
-  "is this ready to release?", or "run all checks".
+  Run tests, linters, static analysis as a release gate: auto-detect tooling, check dirty state, pass/fail verdict with actionable failures (no auto-fixes). Use to run preflight, pre-release check, or validate before release.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: bash, read

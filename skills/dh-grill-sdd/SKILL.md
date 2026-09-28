@@ -1,17 +1,7 @@
 ---
 name: dh-grill-sdd
 description: >
-  Interview the user and produce a proper Software Design Document (SDD) at
-  ./docs/plans/<plan-slug>/sdd.md — the requirements contract that the
-  dh-planning skill consumes before creating a plan. Use when starting plan
-  work and the SDD does not exist yet, when the user asks to "write the sdd",
-  "grill the requirements", "document the design", or when dh-planning
-  detects ./docs/plans/<plan-slug>/sdd.md is missing. Interview-first: ask
-  focused numbered questions (goal, scope, constraints, acceptance criteria,
-  risks, existing assets), then synthesize the SDD with stable requirement
-  IDs, scope boundaries, edge cases, and open questions. Not for reviewing
-  existing SDDs (use dh-review) or writing implementation plans (use
-  dh-planning).
+  Interview and produce ./docs/plans/<slug>/sdd.md — the requirements contract (goal, scope, constraints, acceptance criteria, risks, stable IDs). dh-planning runs it when the SDD is absent. Use to write the sdd or grill requirements.
 license: MIT
 compatibility: opencode
 allowed-tools: read, write, edit, bash

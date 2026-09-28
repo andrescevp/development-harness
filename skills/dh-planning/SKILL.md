@@ -1,6 +1,7 @@
 ---
 name: dh-planning
-description: Use this skill when writing clear, detailed, step-by-step implementation plans to ./docs/plans/<plan-slug>/plan.md so any human or agent can execute the task — breaking work into ordered phases (each phase with sub-tasks), with objectives, requirements mapping (stable IDs), in-scope/out-of-scope items, acceptance criteria, validation guidance, and a requirements snapshot, then updating index.md; before planning it runs the SDD gate — if ./docs/plans/<plan-slug>/sdd.md does not exist it invokes dh-grill-sdd to interview the user and produce the requirements contract, then maps plan sub-tasks to the SDD's stable IDs; the phased template and parser contract live in references/phased-plan-template.md and the harness plan tools (dh_plan_create / dh_plan_read) may scaffold and verify plans when installed. Use when planning implementation work, breaking down tasks, or when the user says 'plan this' or 'create a plan' — not for purely advisory, exploratory, or review-only requests; ask structured questions when the request lacks detail.
+description: >
+  Write phased plans to ./docs/plans/<slug>/plan.md: phases with sub-tasks, requirements mapping (stable IDs), scope, acceptance criteria. SDD gate: invoke dh-grill-sdd when ./docs/plans/<slug>/sdd.md is absent. Use to plan this or create a plan.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: read, write, edit
