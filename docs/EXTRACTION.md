@@ -185,3 +185,12 @@ re-extract re-applies it idempotently. The plugin also registers
   `dh-planning` runs the **SDD gate** (invoke dh-grill-sdd) when the SDD does
   not exist before creating the plan. It is the 13th bundled skill
   (repo-authored; preserved by extraction).
+
+## Patch: dh-setup skill (2026-09-28, user mandate)
+
+NEW 14th bundled skill `dh-setup`: verifies harness prerequisites —
+system software (chrome, uv, nvm, osv-scanner, docker, jq, xq, yq, graphify,
+optional phpenv), user-level integrations (chrome-devtools-mcp, playwright
+MCP, android-remote-control-mcp, opencode-rules >= v2 plugin, graphify),
+and project-level quality gates (pre-commit/husky hooks with clear rules +
+stack QA tools matrix). Repo-authored (preserved by extraction).

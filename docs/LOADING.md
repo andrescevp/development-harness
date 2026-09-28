@@ -28,10 +28,11 @@ After loading, confirm the manifest is registered:
 ```
 opencode debug agents   → look for: dh-software-architect, dh-software-engineer,
                           reviewer, final-reviewer, executor, explorer
-opencode debug skills   → look for: artifact-check, simplify, domain-check,
-                          coding, code-review, execute-plan, execute-plan-task,
-                          final-review, planning, preflight, review,
-                          create-documentation
+opencode debug skills   → look for: dh-artifact-check, dh-simplify,
+                          dh-domain-check, dh-coding, dh-code-review,
+                          dh-execute-plan, dh-execute-plan-task, dh-final-review,
+                          dh-planning, dh-preflight, dh-review,
+                          dh-create-documentation, dh-grill-sdd, dh-setup
 opencode debug commands → no new commands (commands are out of scope)
 ```
 

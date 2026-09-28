@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T09:01:27.089Z",
+    "generated": "2026-09-28T09:08:57.055Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -11,19 +11,19 @@
     "dimensions": [
       {
         "name": "Inventory & structure",
-        "count": 19,
+        "count": 20,
         "sev": "PASS",
         "note": "counts match manifest (6 agents, 11 skill dirs + index.md; no commands/, no prompts/)"
       },
       {
         "name": "Frontmatter parse",
-        "count": 20,
+        "count": 21,
         "sev": "PASS",
-        "note": "20 files on audit surface"
+        "note": "21 files on audit surface"
       },
       {
         "name": "Name regex",
-        "count": 19,
+        "count": 20,
         "sev": "PASS",
         "note": "^[a-z0-9]+(-[a-z0-9]+)*$"
       },
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 7,
         "sev": "WARN",
-        "note": "253 resolved; 0 code-context; 0 allowlisted; 102 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+        "note": "255 resolved; 1 code-context; 0 allowlisted; 119 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
       },
       {
         "name": "Loop membership",
@@ -115,6 +115,14 @@
   ],
   "kebabList": [
     {
+      "token": "osv-scanner",
+      "count": 7,
+      "files": [
+        "agents/dh-software-architect.md",
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
       "token": "phased-plan-template",
       "count": 5,
       "files": [
@@ -147,10 +155,39 @@
       ]
     },
     {
+      "token": "chrome-devtools-mcp",
+      "count": 3,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "opencode-rules",
+      "count": 3,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "pre-commit",
+      "count": 3,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
       "token": "architect-skills",
       "count": 2,
       "files": [
         "agents/dh-software-architect.md"
+      ]
+    },
+    {
+      "token": "dependency-cruiser",
+      "count": 2,
+      "files": [
+        "agents/dh-software-architect.md",
+        "skills/dh-setup/SKILL.md"
       ]
     },
     {
@@ -243,6 +280,20 @@
       ]
     },
     {
+      "token": "user-level",
+      "count": 2,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "android-remote-control-mcp",
+      "count": 2,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
       "token": "full-file",
       "count": 1,
       "files": [
@@ -279,20 +330,6 @@
     },
     {
       "token": "tool-specific",
-      "count": 1,
-      "files": [
-        "agents/dh-software-architect.md"
-      ]
-    },
-    {
-      "token": "osv-scanner",
-      "count": 1,
-      "files": [
-        "agents/dh-software-architect.md"
-      ]
-    },
-    {
-      "token": "dependency-cruiser",
       "count": 1,
       "files": [
         "agents/dh-software-architect.md"
@@ -744,6 +781,90 @@
       "count": 1,
       "files": [
         "skills/dh-review/SKILL.md"
+      ]
+    },
+    {
+      "token": "re-verify",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "google-chrome",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "nvm-sh",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "chrome-devtools",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "getting-started-mcp",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "project-appropriate",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "lint-staged",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "no-verify",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "duplicate-code",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "unused-code",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "pre-existing",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "per-tool",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
       ]
     },
     {
@@ -1238,6 +1359,24 @@
       "findings": []
     },
     {
+      "file": "skills/dh-setup/SKILL.md",
+      "kind": "skill",
+      "lines": 118,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-setup",
+          "description": "Verify and prepare everything the dev-harness needs to run properly: audit system software (chrome, uv, nvm, osv-scanner, docker, jq, xq, yq, graphify, optional phpenv) and guide installation for anything missing; list and configure user-level integrations — MCP servers (chrome-devtools-mcp, playwright MCP, android-remote-control-mcp), the opencode-rules plugin (>= v2), and the graphify external tool — as config choices left to the user; and scaffold project-level quality gates: pre-commit/husky or equivalent hooks with clear rules, plus the QA toolset for the project's stack (All: osv-scanner; Python: ruff/mypy/pyupgrade/bandit/copydetect; JS/TS: biome/tsc/jscpd/knip/semgrep/dependency-cruiser; PHP: phpstan/deptrac/rector/phpcs/phpcpd; other stacks: research equivalents). Use when asked to \"check system requirements\", \"install the harness prerequisites\", \"setup the environment\", \"configure mcp/plugins\", \"add pre-commit/husky\", or before first use of the harness on a new machine.",
+          "license": "MIT",
+          "compatibility": "opencode",
+          "allowed-tools": "read, write, edit, bash, websearch",
+          "metadata": "audience: developers workflow: setup"
+        }
+      },
+      "findings": []
+    },
+    {
       "file": "skills/dh-simplify/SKILL.md",
       "kind": "skill",
       "lines": 61,
@@ -1258,7 +1397,7 @@
     {
       "file": "skills/index.md",
       "kind": "index",
-      "lines": 108,
+      "lines": 109,
       "frontmatter": {
         "status": "none-expected"
       },

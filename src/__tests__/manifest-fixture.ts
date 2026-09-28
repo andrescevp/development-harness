@@ -29,6 +29,7 @@ export const MANIFEST_SKILLS = [
   'dh-review',
   'dh-create-documentation',
   'dh-grill-sdd',
+  'dh-setup',
 ] as const;
 
 export const NAME_REGEX = /^[a-z0-9]+(-[a-z0-9]+)*$/;

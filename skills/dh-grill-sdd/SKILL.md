@@ -133,4 +133,3 @@ status: proposed
 - [ ] Requirements R1…Rn with stable IDs
 - [ ] Scope in/out, constraints, risks, acceptance criteria present
 - [ ] No implementation details smuggled into requirements
-- [ ] File under 300 lines

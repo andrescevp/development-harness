@@ -44,8 +44,8 @@
     ]
   },
   "bundledSkillMdCount": {
-    "now": 12,
-    "afterSt3": 13,
+    "now": 13,
+    "afterSt3": 14,
     "afterSt3Note": "11 extracted SKILL.md + the new `dh-coding` skill created in ST3. The audit, ST5 asset builder, and ST7 docs must use 12 AFTER ST3; 11 now (coding expected-pending). dh-grill-sdd (SDD interviewer) added 2026-09-28."
   },
   "agentRenames": {
@@ -264,7 +264,8 @@
       "dh-review",
       "dh-create-documentation",
       "dh-coding",
-      "dh-grill-sdd"
+      "dh-grill-sdd",
+      "dh-setup"
     ]
   },
   "agentAliases": {
