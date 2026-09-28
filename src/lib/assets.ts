@@ -11,57 +11,57 @@
  *   cannot take the whole plugin down; `errors` entries carry the reason.
  */
 
-import fs from "node:fs"
-import path from "node:path"
-import { parseFrontmatter } from "./frontmatter.js"
-import { buildAgentRecord, buildSkillRecord } from "./records.js"
-import type { AgentRecord, SkillRecord } from "./records.js"
+import fs from 'node:fs';
+import path from 'node:path';
+import { parseFrontmatter } from './frontmatter.js';
+import type { AgentRecord, SkillRecord } from './records.js';
+import { buildAgentRecord, buildSkillRecord } from './records.js';
 
-export interface LoadError {
-  file: string
-  reason: string
+interface LoadError {
+  file: string;
+  reason: string;
 }
 
 export interface HarnessAssets {
-  agents: AgentRecord[]
-  skills: SkillRecord[]
+  agents: AgentRecord[];
+  skills: SkillRecord[];
   /** Raw content of skills/index.md, or undefined when absent. */
-  index: string | undefined
-  errors: LoadError[]
+  index: string | undefined;
+  errors: LoadError[];
 }
 
 /** Absolute path of the assets directory next to this module (dist/assets in the bundle). */
-export function defaultAssetsRoot(): string {
-  return path.join(import.meta.dirname, "assets")
+function defaultAssetsRoot(): string {
+  return path.join(import.meta.dirname, 'assets');
 }
 
 function readFileSafe(file: string): string | undefined {
   try {
-    return fs.readFileSync(file, "utf8")
+    return fs.readFileSync(file, 'utf8');
   } catch {
-    return undefined
+    return undefined;
   }
 }
 
 /** All *.md files directly inside rootDir (non-recursive — agents is flat). */
 function listMarkdownFiles(dir: string): string[] {
-  if (!fs.existsSync(dir)) return []
+  if (!fs.existsSync(dir)) return [];
   return fs
     .readdirSync(dir, { withFileTypes: true })
-    .filter((e) => e.isFile() && e.name.endsWith(".md"))
+    .filter((e) => e.isFile() && e.name.endsWith('.md'))
     .map((e) => path.join(dir, e.name))
-    .sort()
+    .sort();
 }
 
 /** The SKILL.md of every direct subdirectory of rootDir. */
 function listSkillFiles(dir: string): string[] {
-  if (!fs.existsSync(dir)) return []
+  if (!fs.existsSync(dir)) return [];
   return fs
     .readdirSync(dir, { withFileTypes: true })
     .filter((e) => e.isDirectory())
-    .map((e) => path.join(dir, e.name, "SKILL.md"))
+    .map((e) => path.join(dir, e.name, 'SKILL.md'))
     .filter((f) => fs.existsSync(f))
-    .sort()
+    .sort();
 }
 
 /**
@@ -72,30 +72,36 @@ function listSkillFiles(dir: string): string[] {
  * Invalid files land in `errors` and are excluded from the records.
  */
 export function loadHarnessAssets(assetsRoot?: string): HarnessAssets {
-  const root = assetsRoot ?? defaultAssetsRoot()
-  const errors: LoadError[] = []
-  const agents: AgentRecord[] = []
-  const skills: SkillRecord[] = []
+  const root = assetsRoot ?? defaultAssetsRoot();
+  const errors: LoadError[] = [];
+  const agents: AgentRecord[] = [];
+  const skills: SkillRecord[] = [];
 
-  for (const file of listMarkdownFiles(path.join(root, "agents"))) {
-    const contents = readFileSafe(file)
-    if (contents === undefined) { errors.push({ file, reason: "unreadable" }); continue }
+  for (const file of listMarkdownFiles(path.join(root, 'agents'))) {
+    const contents = readFileSafe(file);
+    if (contents === undefined) {
+      errors.push({ file, reason: 'unreadable' });
+      continue;
+    }
     try {
-      agents.push(buildAgentRecord(parseFrontmatter(contents), path.basename(file)))
+      agents.push(buildAgentRecord(parseFrontmatter(contents), path.basename(file)));
     } catch (err) {
-      errors.push({ file, reason: err instanceof Error ? err.message : String(err) })
+      errors.push({ file, reason: err instanceof Error ? err.message : String(err) });
     }
   }
 
-  for (const file of listSkillFiles(path.join(root, "skills"))) {
-    const contents = readFileSafe(file)
-    if (contents === undefined) { errors.push({ file, reason: "unreadable" }); continue }
+  for (const file of listSkillFiles(path.join(root, 'skills'))) {
+    const contents = readFileSafe(file);
+    if (contents === undefined) {
+      errors.push({ file, reason: 'unreadable' });
+      continue;
+    }
     try {
-      skills.push(buildSkillRecord(parseFrontmatter(contents), file, path.basename(path.dirname(file))))
+      skills.push(buildSkillRecord(parseFrontmatter(contents), file, path.basename(path.dirname(file))));
     } catch (err) {
-      errors.push({ file, reason: err instanceof Error ? err.message : String(err) })
+      errors.push({ file, reason: err instanceof Error ? err.message : String(err) });
     }
   }
 
-  return { agents, skills, index: readFileSafe(path.join(root, "skills", "index.md")), errors }
+  return { agents, skills, index: readFileSafe(path.join(root, 'skills', 'index.md')), errors };
 }

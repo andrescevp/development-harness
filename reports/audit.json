@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T08:22:37.530Z",
+    "generated": "2026-09-28T08:35:33.127Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"

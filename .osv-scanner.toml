@@ -1,0 +1,4 @@
+# osv-scanner configuration
+# See: https://github.com/google/osv-scanner
+# Add per-vulnerability [[IgnoredVulns]] entries only with a reason
+# (e.g. no fix available upstream). Fresh dependency scans should be clean.

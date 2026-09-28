@@ -4,7 +4,7 @@
  * Mirrors skills/planning/references/phased-plan-template.md structure.
  */
 
-export const SUB_TASK_SKELETON = `- **Status:** Pending
+const SUB_TASK_SKELETON = `- **Status:** Pending
 - **Objective:** [What this sub-task should accomplish]
 - **Related Requirements:** [Requirement IDs]
 - **Dependencies and Preconditions:** [Prerequisites]
@@ -15,33 +15,39 @@ export const SUB_TASK_SKELETON = `- **Status:** Pending
 - **Cautionary Points (Risks & Edge Cases):** [Where to be careful]
 - **Implementation Suggestions:** [Practical guidance]
 - **Testing Suggestions:** [Validation commands or checks]
-- **Done When:** [Observable completion conditions]`
+- **Done When:** [Observable completion conditions]`;
 
-export function subTaskBlock(phaseNumber: number, subNumber: number, title: string): string {
+function subTaskBlock(phaseNumber: number, subNumber: number, title: string): string {
   return `#### Sub-Task ${phaseNumber}.${subNumber}: ${title}
 
-${SUB_TASK_SKELETON}`
+${SUB_TASK_SKELETON}`;
 }
 
-export function phaseBlock(phaseNumber: number, title: string, subTaskBlocks: string[]): string {
-  const subs = subTaskBlocks.join("\n\n")
+function phaseBlock(phaseNumber: number, title: string, subTaskBlocks: string[]): string {
+  const subs = subTaskBlocks.join('\n\n');
   return `### Phase ${phaseNumber}: ${title}
 
 - **Status:** Pending
 
-${subs}`
+${subs}`;
 }
 
 export function planScaffold(input: {
-  title: string
-  slug: string
-  objective: string
-  phases: { title: string; subTasks: { title: string }[] }[]
+  title: string;
+  slug: string;
+  objective: string;
+  phases: { title: string; subTasks: { title: string }[] }[];
 }): string {
-  const today = new Date().toISOString().slice(0, 10)
+  const today = new Date().toISOString().slice(0, 10);
   const phaseBlocks = input.phases
-    .map((p, i) => phaseBlock(i + 1, p.title, p.subTasks.map((s, j) => subTaskBlock(i + 1, j + 1, s.title))))
-    .join("\n\n")
+    .map((p, i) =>
+      phaseBlock(
+        i + 1,
+        p.title,
+        p.subTasks.map((s, j) => subTaskBlock(i + 1, j + 1, s.title))
+      )
+    )
+    .join('\n\n');
 
   return `---
 title: ${input.title}
@@ -93,5 +99,5 @@ ${phaseBlocks}
 ## Open Questions
 
 - [Only if important non-blocking uncertainty remains]
-`
+`;
 }

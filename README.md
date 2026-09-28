@@ -81,6 +81,14 @@ pnpm test       # vitest suite (51 tests): parser, builders, registration
 # see docs/LOADING.md for alternatives + verification + troubleshooting
 ```
 
+QA command set (mirrors the libresurvey frontend stack):
+
+```sh
+pnpm qa:check        # biome + knip + jscpd + dependency-cruiser + osv/semgrep (docker)
+pnpm qa:check:full   # qa:check + test + typecheck + audit + build + smoke-load
+pnpm format:biome   # apply biome formatting
+```
+
 Gate command set (release readiness):
 
 ```sh

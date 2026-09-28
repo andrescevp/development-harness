@@ -1,0 +1,18 @@
+{
+  "threshold": 0,
+  "reporters": ["console", "markdown"],
+  "gitignore": true,
+  "minLines": 5,
+  "minTokens": 50,
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/coverage/**",
+    "**/report/**",
+    "**/*.md",
+    "**/docs/**",
+    "**/src/__tests__/fixtures/**"
+  ],
+  "format": ["typescript", "javascript"],
+  "path": ["src", "scripts"]
+}

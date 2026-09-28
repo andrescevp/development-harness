@@ -100,3 +100,20 @@ delegation with this mapping:
   See [`docs/LOADING.md`](docs/LOADING.md) for alternatives + verification.
 - **Verify:** launch opencode and confirm the 6 agents and 13 skills appear
   (including `dh-coding`) and no commands are registered.
+## QA tooling
+
+Full QA stack wired through `pnpm qa:check` (fails on any finding):
+
+| Tool | Script | Scope |
+|---|---|---|
+| Biome | `pnpm lint:biome` / `pnpm format:biome` | lint + format of `src/` `scripts/` |
+| Knip | `pnpm lint:knip` | unused exports/deps/binaries |
+| jscpd | `pnpm lint:dup` | duplicate code detection (config `.jscpd.json`) |
+| dependency-cruiser | `pnpm lint:depcruise` (`.dependency-cruiser.json`) | import-graph rules: no-circular, no-duplicates, no-orphans, no node builtins in lib code; tsconfig-aware, cruises `src/` |
+| OSV-Scanner | `pnpm scan:deps` (docker) | dependency vulnerabilities |
+| Semgrep | `pnpm scan:code` (docker) | security patterns |
+| TypeScript | `tsc -b` (in `pnpm build`) | strict typecheck (typescript 6.x — dependency-cruiser requires <7) |
+| Vitest | `pnpm test` | unit tests |
+
+Full gate: `pnpm qa:check:full` = qa:check + test + typecheck + audit + build + smoke-load.
+Note: `pnpm audit` collides with pnpm's security audit — the harness audit is `pnpm run audit`.

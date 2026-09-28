@@ -5,15 +5,17 @@
  */
 
 export function renderMarkdown(r) {
-  const allFindings = r.records.flatMap((rec) => rec.findings.map((f) => ({ file: rec.file, dimension: f.dimension, severity: f.severity, note: f.note })))
-  const warns = allFindings.filter((f) => f.severity === 'warn' && f.dimension !== 'schema-deviation')
+  const allFindings = r.records.flatMap((rec) =>
+    rec.findings.map((f) => ({ file: rec.file, dimension: f.dimension, severity: f.severity, note: f.note }))
+  );
+  const warns = allFindings.filter((f) => f.severity === 'warn' && f.dimension !== 'schema-deviation');
   // Cross-reference warns (@mentions + prose kebab tokens) are listed in their own
   // sections below; include them in the header count so "Warn deviations" is not misleading.
-  const headerWarns = warns.length + (r.atMentions?.length ?? 0) + (r.kebabList?.length ?? 0)
-  const atTop = r.atMentions.slice(0, 20)
-  const kebabTop = r.kebabList.slice(0, 25)
-  const hiSec = r.secretHigh
-  const junkList = r.junkList
+  const headerWarns = warns.length + (r.atMentions?.length ?? 0) + (r.kebabList?.length ?? 0);
+  const atTop = r.atMentions.slice(0, 20);
+  const kebabTop = r.kebabList.slice(0, 25);
+  const hiSec = r.secretHigh;
+  const junkList = r.junkList;
   return `# Audit Report — Dev Harness V2 Plugin (ST2)
 
 Generated ${r.meta.generated} by \`${r.meta.script}\`.
@@ -54,7 +56,16 @@ ${kebabTop.length ? kebabTop.map((k) => `- \`${k.token}\` × ${k.count}`).join('
 ## Secret scan
 
 - Low-signature prose hits (instructional): **${r.secretLow}** (env-var names, max_tokens, "never expose" rules).
-- High-signature matches: **${hiSec.length}** ${hiSec.length ? '(top: ' + hiSec.slice(0, 5).map((h) => `\`${h.pattern}\` @ ${h.file}:${h.line}`).join('; ') + ')' : '_none_'}.
+- High-signature matches: **${hiSec.length}** ${
+    hiSec.length
+      ? '(top: ' +
+        hiSec
+          .slice(0, 5)
+          .map((h) => `\`${h.pattern}\` @ ${h.file}:${h.line}`)
+          .join('; ') +
+        ')'
+      : '_none_'
+  }.
 
 ## Junk scan
 
@@ -68,9 +79,9 @@ node scripts/audit.mjs            # full run (regenerates reports/audit.json + t
 node scripts/audit.mjs --json     # also dump full JSON report to stdout
 node scripts/audit.mjs --report <path>   # redirect the markdown report
 \`\`\`
-`
+`;
 }
 
 function rowMd(f) {
-  return `| ${f.file} | ${f.dimension} | ${f.severity} | ${f.note} |`
+  return `| ${f.file} | ${f.dimension} | ${f.severity} | ${f.note} |`;
 }

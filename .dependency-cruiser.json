@@ -1,0 +1,27 @@
+{
+  "extends": "dependency-cruiser/configs/recommended-strict",
+  "$schema": "https://unpkg.com/dependency-cruiser@18/schema.json",
+  "forbidden": [
+    {
+      "name": "not-to-node-builtins",
+      "severity": "error",
+      "comment": "Plugin code runs inside the opencode host (node), but accidental node builtin imports in shared libs should stay explicit.",
+      "from": {},
+      "to": { "path": "^node:" }
+    }
+  ],
+  "options": {
+    "includeOnly": "^src",
+    "exclude": {
+      "path": "(node_modules|dist|__tests__|\\.test\\.|\\.spec\\.)"
+    },
+    "tsConfig": {
+      "fileName": "tsconfig.json"
+    },
+    "reporterOptions": {
+      "text": {
+        "highlightFocused": true
+      }
+    }
+  }
+}

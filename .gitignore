@@ -17,4 +17,4 @@ coverage/
 
 # Python caches (skills ship scripts)
 __pycache__/
-.pytest_cache/
+.pytest_cache/report/

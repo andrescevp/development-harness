@@ -22,7 +22,18 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "smoke-load": "node scripts/smoke-load.mjs"
+    "smoke-load": "node scripts/smoke-load.mjs",
+    "lint:biome": "biome check src/ scripts/",
+    "format:biome": "biome check --write src/ scripts/",
+    "format:biome:check": "biome check src/ scripts/",
+    "lint:knip": "knip",
+    "lint:dup": "jscpd",
+    "lint:depcruise": "depcruise src --config .dependency-cruiser.json",
+    "scan:deps": "docker run --rm -v \"${PWD}:/src\" ghcr.io/google/osv-scanner --config=/src/.osv-scanner.toml --lockfile /src/pnpm-lock.yaml; true",
+    "scan:code": "docker run --rm -v \"${PWD}:/src\" semgrep/semgrep semgrep --config=p/typescript --config=p/security-audit --metrics=off /src/src",
+    "qa:fix": "pnpm format:biome",
+    "qa:check": "pnpm lint:biome && pnpm format:biome:check && pnpm lint:knip && pnpm lint:dup && pnpm lint:depcruise && pnpm scan:deps && pnpm scan:code",
+    "qa:check:full": "pnpm qa:check && pnpm test && pnpm typecheck && pnpm run audit && pnpm build && node scripts/smoke-load.mjs"
   },
   "engines": {
     "node": ">=20.11"
@@ -32,9 +43,21 @@
     "yaml": "^2.9.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.14",
     "@types/node": "^26.6.3",
+    "dependency-cruiser": "^18.4.0",
+    "jscpd": "^5.3.2",
+    "knip": "^6.38.0",
     "tsup": "^8.5.1",
-    "typescript": "^7.0.2",
+    "typescript": "^6.0.3",
     "vitest": "^5.0.2"
+  },
+  "knip": {
+    "$schema": "https://unpkg.com/knip@6/schema.json",
+    "project": [
+      "src/**/*.ts"
+    ],
+    "ignoreDependencies": [],
+    "ignore": []
   }
 }
