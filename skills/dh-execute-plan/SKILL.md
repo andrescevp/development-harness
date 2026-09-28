@@ -145,13 +145,7 @@ around a blocker.
 
 ## References
 
-- `dh-execute-plan-task` skill: `~/.agents/skills/execute-plan-task/SKILL.md` — executes a single sub-task.
-- `dh-review` skill: `~/.agents/skills/review/SKILL.md` — verifies a single sub-task result.
-- `dh-final-review` skill: `~/.agents/skills/final-review/SKILL.md` — produces plan-level sign-off.
-- `evolve` skill: `~/.agents/skills/evolve/SKILL.md` — captures learnings after plan completion (all project types).
-- `state-sync` skill: `~/.agents/skills/state-sync/SKILL.md` — updates knowledge management docs after plan completion (all project types).
-- `dh-create-documentation` skill: `~/.agents/skills/create-documentation/SKILL.md` — generates docs after plan completion (software projects only).
-- `semver` skill: `~/.agents/skills/semver/SKILL.md` — applies semantic versioning after plan completion (software projects only).
-- `plan.md` command: `~/.agents/commands/plan.md` — for creating new plans.
-- `next-subsdd.md` command: `~/.agents/commands/next-subsdd.md` — the single-task execution pattern.
-- `address-review.md` command: `~/.agents/commands/address-review.md` — the pattern for addressing and re-reviewing findings.
+- `dh-execute-plan-task` skill: executes a single sub-task.
+- `dh-review` skill: verifies a single sub-task result.
+- `dh-final-review` skill: produces plan-level sign-off.
+- `dh-create-documentation` skill: generates docs after plan completion (software projects only).

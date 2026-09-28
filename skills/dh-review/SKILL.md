@@ -140,6 +140,5 @@ Return the review verdict to the caller. If P0/P1 findings exist, recommend fixe
 
 ## References
 
-- `review-subtask.md` command: `~/.agents/commands/review-subtask.md` — the review pattern this skill formalizes.
-- `dh-code-review` skill: `~/.agents/skills/code-review/SKILL.md` — the detailed code review methodology delegated to `@dh-reviewer`.
-- `dh-domain-check` skill: `~/.agents/skills/domain-check/SKILL.md` — architecture validation for cross-module changes (software projects only).
+- `dh-code-review` skill: the detailed code review methodology delegated to `@dh-reviewer`.
+- `dh-domain-check` skill: architecture validation for cross-module changes (software projects only).

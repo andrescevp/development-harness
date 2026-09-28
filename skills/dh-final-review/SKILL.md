@@ -147,9 +147,7 @@ Return the sign-off verdict to the caller. If P0/P1 findings exist, recommend fi
 
 ## References
 
-- `final-review.md` command: `~/.agents/commands/final-review.md` — the final review pattern this skill formalizes.
-- `dh-code-review` skill: `~/.agents/skills/code-review/SKILL.md` — the in-depth review methodology used by `@dh-final-reviewer`.
-- `dh-artifact-check` skill: `~/.agents/skills/artifact-check/SKILL.md` — build validation for release readiness (software projects only).
-- `dh-preflight` skill: `~/.agents/skills/preflight/SKILL.md` — full test/lint gate for release readiness (software projects only).
-- `semver` skill: `~/.agents/skills/semver/SKILL.md` — version bump recommendation (software projects only).
-- `@dh-final-reviewer` agent: `~/.agents/agents/final-reviewer.md` — the agent that performs deep code review with a premium model.
+- `dh-code-review` skill: the in-depth review methodology used by `@dh-final-reviewer`.
+- `dh-artifact-check` skill: build validation for release readiness (software projects only).
+- `dh-preflight` skill: full test/lint gate for release readiness (software projects only).
+- `@dh-final-reviewer` agent: the agent that performs deep code review with a premium model.

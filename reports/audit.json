@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T08:13:46.614Z",
+    "generated": "2026-09-28T08:22:37.530Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 7,
         "sev": "WARN",
-        "note": "237 resolved; 0 code-context; 0 allowlisted; 85 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+        "note": "237 resolved; 0 code-context; 0 allowlisted; 78 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
       },
       {
         "name": "Loop membership",
@@ -115,24 +115,6 @@
   ],
   "kebabList": [
     {
-      "token": "domain-check",
-      "count": 6,
-      "files": [
-        "agents/dh-software-architect.md",
-        "skills/dh-domain-check/SKILL.md",
-        "skills/dh-execute-plan-task/SKILL.md",
-        "skills/dh-review/SKILL.md"
-      ]
-    },
-    {
-      "token": "state-sync",
-      "count": 5,
-      "files": [
-        "agents/dh-software-architect.md",
-        "skills/dh-execute-plan/SKILL.md"
-      ]
-    },
-    {
       "token": "phased-plan-template",
       "count": 5,
       "files": [
@@ -140,29 +122,19 @@
       ]
     },
     {
-      "token": "create-documentation",
+      "token": "domain-check",
       "count": 4,
       "files": [
         "agents/dh-software-architect.md",
-        "agents/dh-software-engineer.md",
-        "skills/dh-execute-plan/SKILL.md",
-        "skills/dh-execute-plan-task/SKILL.md"
+        "skills/dh-domain-check/SKILL.md"
       ]
     },
     {
-      "token": "next-subsdd",
-      "count": 4,
-      "files": [
-        "skills/dh-execute-plan/SKILL.md",
-        "skills/dh-execute-plan-task/SKILL.md"
-      ]
-    },
-    {
-      "token": "final-review",
+      "token": "state-sync",
       "count": 3,
       "files": [
-        "skills/dh-execute-plan/SKILL.md",
-        "skills/dh-final-review/SKILL.md"
+        "agents/dh-software-architect.md",
+        "skills/dh-execute-plan/SKILL.md"
       ]
     },
     {
@@ -189,11 +161,11 @@
       ]
     },
     {
-      "token": "artifact-check",
+      "token": "create-documentation",
       "count": 2,
       "files": [
         "agents/dh-software-architect.md",
-        "skills/dh-final-review/SKILL.md"
+        "agents/dh-software-engineer.md"
       ]
     },
     {
@@ -243,13 +215,6 @@
       ]
     },
     {
-      "token": "review-subsdd",
-      "count": 2,
-      "files": [
-        "skills/dh-execute-plan-task/SKILL.md"
-      ]
-    },
-    {
       "token": "full-file",
       "count": 1,
       "files": [
@@ -293,6 +258,13 @@
     },
     {
       "token": "osv-scanner",
+      "count": 1,
+      "files": [
+        "agents/dh-software-architect.md"
+      ]
+    },
+    {
+      "token": "artifact-check",
       "count": 1,
       "files": [
         "agents/dh-software-architect.md"
@@ -481,27 +453,6 @@
       ]
     },
     {
-      "token": "execute-plan-task",
-      "count": 1,
-      "files": [
-        "skills/dh-execute-plan/SKILL.md"
-      ]
-    },
-    {
-      "token": "single-task",
-      "count": 1,
-      "files": [
-        "skills/dh-execute-plan/SKILL.md"
-      ]
-    },
-    {
-      "token": "re-reviewing",
-      "count": 1,
-      "files": [
-        "skills/dh-execute-plan/SKILL.md"
-      ]
-    },
-    {
       "token": "type-based",
       "count": 1,
       "files": [
@@ -573,13 +524,6 @@
     },
     {
       "token": "full-scope",
-      "count": 1,
-      "files": [
-        "skills/dh-final-review/SKILL.md"
-      ]
-    },
-    {
-      "token": "final-reviewer",
       "count": 1,
       "files": [
         "skills/dh-final-review/SKILL.md"
@@ -1002,7 +946,7 @@
     {
       "file": "skills/dh-execute-plan/SKILL.md",
       "kind": "skill",
-      "lines": 158,
+      "lines": 152,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1020,7 +964,7 @@
     {
       "file": "skills/dh-execute-plan-task/SKILL.md",
       "kind": "skill",
-      "lines": 179,
+      "lines": 176,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1038,7 +982,7 @@
     {
       "file": "skills/dh-final-review/SKILL.md",
       "kind": "skill",
-      "lines": 156,
+      "lines": 154,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1110,7 +1054,7 @@
     {
       "file": "skills/dh-review/SKILL.md",
       "kind": "skill",
-      "lines": 146,
+      "lines": 145,
       "frontmatter": {
         "status": "ok",
         "errors": [],
