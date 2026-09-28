@@ -204,6 +204,16 @@ constraints and checks, performance constraints and checks, stack best
 practices (websearch when possible). `dh-coding` now delegates CODE_RULES.md
 creation to it when the file is absent. Repo-authored (preserved).
 
+## Patch: all agents repo-authored (2026-09-28, user edit)
+
+ALL bundled agents (dh-executor, dh-explorer, dh-final-reviewer, dh-reviewer,
+dh-software-architect, dh-software-engineer, dh-documentor) are now
+repo-authored (manifest repoAuthoredAgents): extraction preserves them
+verbatim and the alias-body verify skips them. The previous pipeline
+append-body-note blocks were hand-edited into normal sections (## Headers +
+plain text) by the user; dormant pipeline patch entries remain for
+documentation only.
+
 ## Patch: dh-documentor agent + doc contract + DuckDB sheet tools (2026-09-28)
 
 - NEW repo-authored agent `dh-documentor` (7th agent): main and ONLY owner

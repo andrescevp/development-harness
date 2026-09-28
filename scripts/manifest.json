@@ -606,6 +606,12 @@
     "coding": "dh-coding"
   },
   "repoAuthoredAgents": [
+    "dh-executor.md",
+    "dh-explorer.md",
+    "dh-final-reviewer.md",
+    "dh-reviewer.md",
+    "dh-software-architect.md",
+    "dh-software-engineer.md",
     "dh-documentor.md"
   ]
 }

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T14:03:54.540Z",
+    "generated": "2026-09-28T14:15:39.650Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 7,
         "sev": "WARN",
-        "note": "339 resolved; 1 code-context; 0 allowlisted; 126 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+        "note": "345 resolved; 1 code-context; 0 allowlisted; 126 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
       },
       {
         "name": "Loop membership",
@@ -116,14 +116,14 @@
   "kebabList": [
     {
       "token": "project-name",
-      "count": 14,
+      "count": 15,
       "files": [
         "skills/dh-artifact-check/SKILL.md",
         "skills/dh-code-review/SKILL.md",
+        "skills/dh-code-ruler/SKILL.md",
         "skills/dh-coding/SKILL.md",
         "skills/dh-create-documentation/SKILL.md",
-        "skills/dh-domain-check/SKILL.md",
-        "skills/dh-execute-plan/SKILL.md"
+        "skills/dh-domain-check/SKILL.md"
       ]
     },
     {
@@ -1105,13 +1105,13 @@
     {
       "file": "agents/dh-documentor.md",
       "kind": "agent",
-      "lines": 63,
+      "lines": 57,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-documentor",
-          "description": "Documentation management agent — the main and ONLY owner of generated documentation outside docs/plans: create, update, delete, and retrieve documents. Markdown is the primary format (csv/xml/yaml/json for complementary data); mermaid diagrams for complex workflows, ASCII wireframes for UI, obsidian frontmatter on every document. Retrieves via obsidian CLI or notesmd-cli; parses extra formats with jq, yq, xq and DuckDB (dh_read_sheet / dh_update_sheet / dh_sheet_schema). Use for any documentation work except plan documents (docs/plans belongs to dh-planning / dh-execute-plan).",
+          "description": "Documentation management agent — the main and ONLY owner of generated documentation outside docs/plans: create, update, delete, and retrieve documents.",
           "mode": "subagent",
           "model": "opencode-go/deepseek-v4-flash"
         }
@@ -1221,7 +1221,7 @@
     {
       "file": "skills/dh-artifact-check/SKILL.md",
       "kind": "skill",
-      "lines": 75,
+      "lines": 71,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1239,7 +1239,7 @@
     {
       "file": "skills/dh-code-review/SKILL.md",
       "kind": "skill",
-      "lines": 99,
+      "lines": 95,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1257,7 +1257,7 @@
     {
       "file": "skills/dh-code-ruler/SKILL.md",
       "kind": "skill",
-      "lines": 103,
+      "lines": 109,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1275,7 +1275,7 @@
     {
       "file": "skills/dh-coding/SKILL.md",
       "kind": "skill",
-      "lines": 145,
+      "lines": 141,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1311,7 +1311,7 @@
     {
       "file": "skills/dh-domain-check/SKILL.md",
       "kind": "skill",
-      "lines": 86,
+      "lines": 82,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1329,7 +1329,7 @@
     {
       "file": "skills/dh-execute-plan/SKILL.md",
       "kind": "skill",
-      "lines": 154,
+      "lines": 150,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1347,7 +1347,7 @@
     {
       "file": "skills/dh-execute-plan-task/SKILL.md",
       "kind": "skill",
-      "lines": 176,
+      "lines": 172,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1365,7 +1365,7 @@
     {
       "file": "skills/dh-final-review/SKILL.md",
       "kind": "skill",
-      "lines": 155,
+      "lines": 151,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1383,7 +1383,7 @@
     {
       "file": "skills/dh-grill-sdd/SKILL.md",
       "kind": "skill",
-      "lines": 136,
+      "lines": 132,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1401,7 +1401,7 @@
     {
       "file": "skills/dh-planning/SKILL.md",
       "kind": "skill",
-      "lines": 117,
+      "lines": 113,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1419,7 +1419,7 @@
     {
       "file": "skills/dh-preflight/SKILL.md",
       "kind": "skill",
-      "lines": 64,
+      "lines": 60,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1437,7 +1437,7 @@
     {
       "file": "skills/dh-review/SKILL.md",
       "kind": "skill",
-      "lines": 146,
+      "lines": 142,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1455,7 +1455,7 @@
     {
       "file": "skills/dh-setup/SKILL.md",
       "kind": "skill",
-      "lines": 141,
+      "lines": 137,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1473,7 +1473,7 @@
     {
       "file": "skills/dh-simplify/SKILL.md",
       "kind": "skill",
-      "lines": 72,
+      "lines": 68,
       "frontmatter": {
         "status": "ok",
         "errors": [],

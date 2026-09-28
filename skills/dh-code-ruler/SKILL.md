@@ -101,3 +101,9 @@ file; `dh-code-ruler` is executed by `dh-software-architect` (or invoked by
 - [ ] Enforcement mapped (commands/gates) per rule where possible
 - [ ] No invented rules; assumptions marked
 - [ ] Mirrors the project's actual configs (linters, toolchain, docs)
+
+## Doc search
+
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
