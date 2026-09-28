@@ -1,0 +1,20 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+
+# Secrets — never version-controlled
+.env
+.env.*
+
+# Editor and OS junk
+*.bak
+*.bak.*
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Python caches (skills ship scripts)
+__pycache__/
+.pytest_cache/

@@ -1,0 +1,1098 @@
+{
+  "meta": {
+    "generated": "2026-09-28T06:59:39.139Z",
+    "repo": "/home/andres/workspace/dev-harness-skills",
+    "script": "scripts/audit.mjs",
+    "reRun": "node scripts/audit.mjs"
+  },
+  "exitCode": 0,
+  "summary": {
+    "verdict": "PASS",
+    "dimensions": [
+      {
+        "name": "Inventory & structure",
+        "count": 18,
+        "sev": "PASS",
+        "note": "counts match manifest (6 agents, 11 skill dirs + index.md; no commands/, no prompts/)"
+      },
+      {
+        "name": "Frontmatter parse",
+        "count": 19,
+        "sev": "PASS",
+        "note": "19 files on audit surface"
+      },
+      {
+        "name": "Name regex",
+        "count": 18,
+        "sev": "PASS",
+        "note": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      },
+      {
+        "name": "Size limits",
+        "count": 0,
+        "sev": "PASS",
+        "note": "SKILL.md < 250, agents < 300; warn-only"
+      },
+      {
+        "name": "Cross-references",
+        "count": 12,
+        "sev": "WARN",
+        "note": "202 resolved; 0 code-context; 0 allowlisted; 74 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+      },
+      {
+        "name": "Loop membership",
+        "count": 18,
+        "sev": "PASS",
+        "note": "12/12 skills present + coding expected-pending (ST3); 6/6 agents present"
+      },
+      {
+        "name": "Secret scan",
+        "count": 16,
+        "sev": "PASS",
+        "note": "16 low-signature prose hits (instructional), 0 high-signature"
+      },
+      {
+        "name": "Junk scan",
+        "count": 0,
+        "sev": "PASS",
+        "note": "0 junk files, 0 symlinks"
+      }
+    ]
+  },
+  "schemaDevs": [],
+  "deviations": [],
+  "fails": [],
+  "atMentions": [
+    {
+      "file": "skills/execute-plan/SKILL.md",
+      "line": 130,
+      "mention": "@build",
+      "severity": "warn",
+      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
+    },
+    {
+      "file": "skills/execute-plan/SKILL.md",
+      "line": 131,
+      "mention": "@plan",
+      "severity": "warn",
+      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
+    },
+    {
+      "file": "skills/execute-plan-task/SKILL.md",
+      "line": 10,
+      "mention": "@build",
+      "severity": "warn",
+      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
+    },
+    {
+      "file": "skills/execute-plan-task/SKILL.md",
+      "line": 11,
+      "mention": "@build",
+      "severity": "warn",
+      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
+    },
+    {
+      "file": "skills/execute-plan-task/SKILL.md",
+      "line": 28,
+      "mention": "@build",
+      "severity": "warn",
+      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
+    },
+    {
+      "file": "skills/execute-plan-task/SKILL.md",
+      "line": 50,
+      "mention": "@build",
+      "severity": "warn",
+      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
+    },
+    {
+      "file": "skills/execute-plan-task/SKILL.md",
+      "line": 55,
+      "mention": "@build",
+      "severity": "warn",
+      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
+    },
+    {
+      "file": "skills/execute-plan-task/SKILL.md",
+      "line": 126,
+      "mention": "@build",
+      "severity": "warn",
+      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
+    },
+    {
+      "file": "skills/execute-plan-task/SKILL.md",
+      "line": 135,
+      "mention": "@build",
+      "severity": "warn",
+      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
+    },
+    {
+      "file": "skills/execute-plan-task/SKILL.md",
+      "line": 166,
+      "mention": "@build",
+      "severity": "warn",
+      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
+    },
+    {
+      "file": "skills/execute-plan-task/SKILL.md",
+      "line": 167,
+      "mention": "@plan",
+      "severity": "warn",
+      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
+    },
+    {
+      "file": "skills/planning/SKILL.md",
+      "line": 29,
+      "mention": "@build",
+      "severity": "warn",
+      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
+    }
+  ],
+  "kebabList": [
+    {
+      "token": "state-sync",
+      "count": 5,
+      "files": [
+        "agents/software-architect.md",
+        "skills/execute-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "architect-skills",
+      "count": 2,
+      "files": [
+        "agents/software-architect.md"
+      ]
+    },
+    {
+      "token": "bounded-context",
+      "count": 2,
+      "files": [
+        "agents/software-architect.md",
+        "skills/domain-check/SKILL.md"
+      ]
+    },
+    {
+      "token": "system-wide",
+      "count": 2,
+      "files": [
+        "skills/artifact-check/SKILL.md",
+        "skills/preflight/SKILL.md"
+      ]
+    },
+    {
+      "token": "non-blocking",
+      "count": 2,
+      "files": [
+        "skills/code-review/SKILL.md",
+        "skills/planning/SKILL.md"
+      ]
+    },
+    {
+      "token": "user-specified",
+      "count": 2,
+      "files": [
+        "skills/create-documentation/SKILL.md"
+      ]
+    },
+    {
+      "token": "anti-corruption",
+      "count": 2,
+      "files": [
+        "skills/domain-check/SKILL.md"
+      ]
+    },
+    {
+      "token": "re-running",
+      "count": 2,
+      "files": [
+        "skills/execute-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "repo-root",
+      "count": 2,
+      "files": [
+        "skills/execute-plan/SKILL.md",
+        "skills/execute-plan-task/SKILL.md"
+      ]
+    },
+    {
+      "token": "code-level",
+      "count": 2,
+      "files": [
+        "skills/execute-plan-task/SKILL.md",
+        "skills/review/SKILL.md"
+      ]
+    },
+    {
+      "token": "re-review",
+      "count": 2,
+      "files": [
+        "skills/execute-plan-task/SKILL.md",
+        "skills/final-review/SKILL.md"
+      ]
+    },
+    {
+      "token": "full-file",
+      "count": 1,
+      "files": [
+        "agents/explorer.md"
+      ]
+    },
+    {
+      "token": "system-level",
+      "count": 1,
+      "files": [
+        "agents/software-architect.md"
+      ]
+    },
+    {
+      "token": "data-flow",
+      "count": 1,
+      "files": [
+        "agents/software-architect.md"
+      ]
+    },
+    {
+      "token": "infrastructure-as-code",
+      "count": 1,
+      "files": [
+        "agents/software-architect.md"
+      ]
+    },
+    {
+      "token": "cross-cutting",
+      "count": 1,
+      "files": [
+        "agents/software-architect.md"
+      ]
+    },
+    {
+      "token": "tool-specific",
+      "count": 1,
+      "files": [
+        "agents/software-architect.md"
+      ]
+    },
+    {
+      "token": "osv-scanner",
+      "count": 1,
+      "files": [
+        "agents/software-architect.md"
+      ]
+    },
+    {
+      "token": "at-least-once",
+      "count": 1,
+      "files": [
+        "agents/software-architect.md"
+      ]
+    },
+    {
+      "token": "zero-downtime",
+      "count": 1,
+      "files": [
+        "agents/software-architect.md"
+      ]
+    },
+    {
+      "token": "stop-and-start",
+      "count": 1,
+      "files": [
+        "agents/software-architect.md"
+      ]
+    },
+    {
+      "token": "framework-native",
+      "count": 1,
+      "files": [
+        "agents/software-architect.md"
+      ]
+    },
+    {
+      "token": "third-party",
+      "count": 1,
+      "files": [
+        "agents/software-architect.md"
+      ]
+    },
+    {
+      "token": "bash-based",
+      "count": 1,
+      "files": [
+        "agents/software-engineer.md"
+      ]
+    },
+    {
+      "token": "language-standard",
+      "count": 1,
+      "files": [
+        "agents/software-engineer.md"
+      ]
+    },
+    {
+      "token": "hard-code",
+      "count": 1,
+      "files": [
+        "agents/software-engineer.md"
+      ]
+    },
+    {
+      "token": "non-zero",
+      "count": 1,
+      "files": [
+        "skills/artifact-check/SKILL.md"
+      ]
+    },
+    {
+      "token": "evidence-based",
+      "count": 1,
+      "files": [
+        "skills/code-review/SKILL.md"
+      ]
+    },
+    {
+      "token": "high-confidence",
+      "count": 1,
+      "files": [
+        "skills/code-review/SKILL.md"
+      ]
+    },
+    {
+      "token": "low-impact",
+      "count": 1,
+      "files": [
+        "skills/code-review/SKILL.md"
+      ]
+    },
+    {
+      "token": "coding-guideline",
+      "count": 1,
+      "files": [
+        "skills/coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "cross-referenced",
+      "count": 1,
+      "files": [
+        "skills/create-documentation/SKILL.md"
+      ]
+    },
+    {
+      "token": "format-guide",
+      "count": 1,
+      "files": [
+        "skills/create-documentation/SKILL.md"
+      ]
+    },
+    {
+      "token": "obsidian-push",
+      "count": 1,
+      "files": [
+        "skills/create-documentation/SKILL.md"
+      ]
+    },
+    {
+      "token": "complete-example",
+      "count": 1,
+      "files": [
+        "skills/create-documentation/SKILL.md"
+      ]
+    },
+    {
+      "token": "api-endpoints",
+      "count": 1,
+      "files": [
+        "skills/create-documentation/SKILL.md"
+      ]
+    },
+    {
+      "token": "deployment-guide",
+      "count": 1,
+      "files": [
+        "skills/create-documentation/SKILL.md"
+      ]
+    },
+    {
+      "token": "api-overview",
+      "count": 1,
+      "files": [
+        "skills/create-documentation/SKILL.md"
+      ]
+    },
+    {
+      "token": "best-effort",
+      "count": 1,
+      "files": [
+        "skills/create-documentation/SKILL.md"
+      ]
+    },
+    {
+      "token": "force-fit",
+      "count": 1,
+      "files": [
+        "skills/domain-check/SKILL.md"
+      ]
+    },
+    {
+      "token": "top-level",
+      "count": 1,
+      "files": [
+        "skills/domain-check/SKILL.md"
+      ]
+    },
+    {
+      "token": "re-execute",
+      "count": 1,
+      "files": [
+        "skills/execute-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "re-detect",
+      "count": 1,
+      "files": [
+        "skills/execute-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "single-task",
+      "count": 1,
+      "files": [
+        "skills/execute-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "re-reviewing",
+      "count": 1,
+      "files": [
+        "skills/execute-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "project-root",
+      "count": 1,
+      "files": [
+        "skills/execute-plan-task/SKILL.md"
+      ]
+    },
+    {
+      "token": "code-focused",
+      "count": 1,
+      "files": [
+        "skills/execute-plan-task/SKILL.md"
+      ]
+    },
+    {
+      "token": "public-facing",
+      "count": 1,
+      "files": [
+        "skills/execute-plan-task/SKILL.md"
+      ]
+    },
+    {
+      "token": "re-validation",
+      "count": 1,
+      "files": [
+        "skills/execute-plan-task/SKILL.md"
+      ]
+    },
+    {
+      "token": "multi-step",
+      "count": 1,
+      "files": [
+        "skills/execute-plan-task/SKILL.md"
+      ]
+    },
+    {
+      "token": "full-diff",
+      "count": 1,
+      "files": [
+        "skills/final-review/SKILL.md"
+      ]
+    },
+    {
+      "token": "review-only",
+      "count": 1,
+      "files": [
+        "skills/final-review/SKILL.md"
+      ]
+    },
+    {
+      "token": "merge-base",
+      "count": 1,
+      "files": [
+        "skills/final-review/SKILL.md"
+      ]
+    },
+    {
+      "token": "cross-sub-task",
+      "count": 1,
+      "files": [
+        "skills/final-review/SKILL.md"
+      ]
+    },
+    {
+      "token": "full-scope",
+      "count": 1,
+      "files": [
+        "skills/final-review/SKILL.md"
+      ]
+    },
+    {
+      "token": "implementation-agnostic",
+      "count": 1,
+      "files": [
+        "skills/planning/SKILL.md"
+      ]
+    },
+    {
+      "token": "software-specific",
+      "count": 1,
+      "files": [
+        "skills/planning/SKILL.md"
+      ]
+    },
+    {
+      "token": "non-goals",
+      "count": 1,
+      "files": [
+        "skills/planning/SKILL.md"
+      ]
+    },
+    {
+      "token": "to-end",
+      "count": 1,
+      "files": [
+        "skills/planning/SKILL.md"
+      ]
+    },
+    {
+      "token": "golangci-lint",
+      "count": 1,
+      "files": [
+        "skills/preflight/SKILL.md"
+      ]
+    },
+    {
+      "token": "plan-defined",
+      "count": 1,
+      "files": [
+        "skills/review/SKILL.md"
+      ]
+    },
+    {
+      "token": "hand-rolled",
+      "count": 1,
+      "files": [
+        "skills/simplify/SKILL.md"
+      ]
+    },
+    {
+      "token": "near-duplicate",
+      "count": 1,
+      "files": [
+        "skills/simplify/SKILL.md"
+      ]
+    },
+    {
+      "token": "well-named",
+      "count": 1,
+      "files": [
+        "skills/simplify/SKILL.md"
+      ]
+    },
+    {
+      "token": "non-obvious",
+      "count": 1,
+      "files": [
+        "skills/simplify/SKILL.md"
+      ]
+    },
+    {
+      "token": "per-request",
+      "count": 1,
+      "files": [
+        "skills/simplify/SKILL.md"
+      ]
+    },
+    {
+      "token": "per-render",
+      "count": 1,
+      "files": [
+        "skills/simplify/SKILL.md"
+      ]
+    },
+    {
+      "token": "no-op",
+      "count": 1,
+      "files": [
+        "skills/simplify/SKILL.md"
+      ]
+    },
+    {
+      "token": "change-detection",
+      "count": 1,
+      "files": [
+        "skills/simplify/SKILL.md"
+      ]
+    },
+    {
+      "token": "same-reference",
+      "count": 1,
+      "files": [
+        "skills/simplify/SKILL.md"
+      ]
+    },
+    {
+      "token": "early-return",
+      "count": 1,
+      "files": [
+        "skills/simplify/SKILL.md"
+      ]
+    },
+    {
+      "token": "no-ops",
+      "count": 1,
+      "files": [
+        "skills/simplify/SKILL.md"
+      ]
+    },
+    {
+      "token": "pre-checking",
+      "count": 1,
+      "files": [
+        "skills/simplify/SKILL.md"
+      ]
+    },
+    {
+      "token": "anti-pattern",
+      "count": 1,
+      "files": [
+        "skills/simplify/SKILL.md"
+      ]
+    }
+  ],
+  "secretLow": 16,
+  "secretHigh": [],
+  "junkList": [],
+  "symlinkCount": 0,
+  "loop": {
+    "skills": [
+      {
+        "name": "planning",
+        "status": "present"
+      },
+      {
+        "name": "domain-check",
+        "status": "present"
+      },
+      {
+        "name": "execute-plan",
+        "status": "present"
+      },
+      {
+        "name": "execute-plan-task",
+        "status": "present"
+      },
+      {
+        "name": "simplify",
+        "status": "present"
+      },
+      {
+        "name": "review",
+        "status": "present"
+      },
+      {
+        "name": "code-review",
+        "status": "present"
+      },
+      {
+        "name": "preflight",
+        "status": "present"
+      },
+      {
+        "name": "artifact-check",
+        "status": "present"
+      },
+      {
+        "name": "final-review",
+        "status": "present"
+      },
+      {
+        "name": "create-documentation",
+        "status": "present"
+      },
+      {
+        "name": "coding",
+        "status": "present"
+      }
+    ],
+    "agents": [
+      {
+        "name": "software-architect",
+        "status": "present"
+      },
+      {
+        "name": "software-engineer",
+        "status": "present"
+      },
+      {
+        "name": "reviewer",
+        "status": "present"
+      },
+      {
+        "name": "final-reviewer",
+        "status": "present"
+      },
+      {
+        "name": "executor",
+        "status": "present"
+      },
+      {
+        "name": "explorer",
+        "status": "present"
+      }
+    ]
+  },
+  "records": [
+    {
+      "file": "agents/executor.md",
+      "kind": "agent",
+      "lines": 44,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "executor",
+          "description": "Execute commands, run tests, builds, formatters, linters, and validation on behalf of other agents. Use for any command execution, test running, or build task.",
+          "mode": "subagent",
+          "model": "opencode-go/deepseek-v4-flash",
+          "tools": "bash: true read: true",
+          "permission": "external_directory: '/tmp': allow '/tmp/**': allow task: deny"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "agents/explorer.md",
+      "kind": "agent",
+      "lines": 41,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "explorer",
+          "description": "Explore codebases quickly using glob, grep, and targeted reads. Use for codebase exploration, file search, and pattern discovery.",
+          "mode": "subagent",
+          "model": "opencode-go/deepseek-v4-flash",
+          "tools": "read: true",
+          "permission": "edit: deny task: deny"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "agents/final-reviewer.md",
+      "kind": "agent",
+      "lines": 40,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "final-reviewer",
+          "description": "Final in-depth reviewer — performs full diff review against task requirements and plan. Use via @final-reviewer for sign-off review.",
+          "mode": "subagent",
+          "model": "opencode-go/deepseek-v4-flash",
+          "variant": "max",
+          "tools": "bash: true read: true write: true",
+          "permission": "edit: '*': deny './docs/plans/<plan-slug>/tasks/*': allow"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "agents/reviewer.md",
+      "kind": "agent",
+      "lines": 38,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "reviewer",
+          "description": "Scoped code reviewer — reviews changed code against sub-task acceptance criteria. Use via @reviewer for implementation review.",
+          "mode": "subagent",
+          "model": "opencode-go/deepseek-v4-flash",
+          "variant": "max",
+          "tools": "bash: true read: true write: true",
+          "permission": "edit: '*': deny './docs/plans/<plan-slug>/tasks/*': allow"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "agents/software-architect.md",
+      "kind": "agent",
+      "lines": 89,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "software-architect",
+          "description": "Senior Architect Architect — solutions creator before coding, expert in arcitectural patterns. Use it to planify creation or updates of software features.",
+          "mode": "all",
+          "model": "opencode-go/deepseek-v4-flash",
+          "variant": "max",
+          "tools": "bash: true read: true write: true edit: true",
+          "permission": "external_directory: '/tmp': allow '/tmp/**': allow task: allow"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "agents/software-engineer.md",
+      "kind": "agent",
+      "lines": 103,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "software-engineer",
+          "description": "Senior Software Engineer — main coder agent to update or create new features. Use it for any software development tasks.",
+          "mode": "all",
+          "model": "opencode-go/deepseek-v4-flash",
+          "variant": "max",
+          "tools": "bash: true read: true write: true edit: true"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "skills/artifact-check/SKILL.md",
+      "kind": "skill",
+      "lines": 72,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "artifact-check",
+          "description": "Compile final production builds and validate deployment scripts against established contingency plans: detect the build system, run the production build, verify build artifacts exist and are non-empty, validate deploy script syntax and basic correctness, and produce a build readiness report. Use when preparing a release, smoke-testing the deployment path before shipping (invoked by /release as step 4), or when the user asks \"validate build\", \"check artifacts\", \"does it build?\", \"validate the artifact\", \"is the build clean?\", or \"verify deployment readiness\".",
+          "license": "MIT",
+          "compatibility": "opencode, copilot, antigravity",
+          "allowed-tools": "bash, read",
+          "metadata": "audience: developers workflow: development"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "skills/code-review/SKILL.md",
+      "kind": "skill",
+      "lines": 88,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "code-review",
+          "description": "Use this skill when reviewing code — check correctness, security, robustness, performance, and maintainability with high-signal, evidence-based findings at real risk (P0–P3 severity), and write the review to the plan's tasks/review.md. Use for PR reviews, code audits, reviewing plan sub-tasks, or when asked to \"review this\", \"audit this code\", or \"check my changes\" — ask for the diff scope if not provided.",
+          "license": "MIT",
+          "compatibility": "opencode, copilot, antigravity",
+          "allowed-tools": "bash, read, write",
+          "metadata": "audience: developers workflow: development"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "skills/coding/SKILL.md",
+      "kind": "skill",
+      "lines": 88,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "coding",
+          "description": "Apply TDD coding best practices when implementing, writing, or fixing code — write a failing test first, implement the minimal change to make it pass, then refactor, running validation via @executor and stopping after 3 consecutive failures. Read and enforce project-specific rules from CODE_RULES.md at the project root when present, falling back to the harness global coding guidelines by convention otherwise, and stay project type aware (software vs non-software, uv/pnpm/npm/poetry toolchains) when delegating and implementing. Use when asked to implement, write code, or fix a bug, or during execute-plan-task sub-task 2.1 of the skills loop — not for plan orchestration (use execute-plan) or review-only requests (use review).",
+          "license": "MIT",
+          "compatibility": "opencode",
+          "allowed-tools": "read, write, edit, bash",
+          "metadata": "audience: developers workflow: development"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "skills/create-documentation/SKILL.md",
+      "kind": "skill",
+      "lines": 184,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "create-documentation",
+          "description": "Use this skill when asked to create, generate, write, or produce documentation — project docs, API references, architecture overviews, README files, technical guides, or any structured document, as single-file or multi-file sets with cross-references. Use when the user says \"document this\", \"create docs for\", \"generate documentation\", \"write a README\", \"document the API\", \"make docs for\", or similar, or after creating substantial code that needs documentation. Supports Markdown (default), HTML, and Mermaid diagram formats, then pushes a copy to the project vault at `./docs/` with frontmatter metadata (tags, project, created, stack, updated, feature, epic).",
+          "license": "MIT",
+          "compatibility": "opencode, copilot, antigravity",
+          "allowed-tools": "bash, read, write, edit, glob",
+          "metadata": "audience: developers workflow: documentation"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "skills/domain-check/SKILL.md",
+      "kind": "skill",
+      "lines": 84,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "domain-check",
+          "description": "Map a task to its DDD bounded context(s) and validate proposed changes against SOLID principles as an architectural guardrail before implementation: inspect project structure and domain language, flag cross-context boundary violations and architectural risks, and produce a verdict (Clear to proceed / Proceed with caution / Architecture concern). Use after planning and before coding — when a plan needs architectural validation, when the task crosses multiple modules or contexts, when invoked as a pre-implementation gate, or when the user asks \"validate architecture\", \"is this SOLID?\", \"bounded context check\", or \"domain mapping\".",
+          "license": "MIT",
+          "compatibility": "opencode, copilot, antigravity",
+          "allowed-tools": "read, write",
+          "metadata": "audience: developers workflow: development"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "skills/execute-plan/SKILL.md",
+      "kind": "skill",
+      "lines": 152,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "execute-plan",
+          "description": "Use this skill when orchestrating the full plan-driven development lifecycle — read plan.md, iterate through sub-tasks in order delegating execution to execute-plan-task, verification to review, and final sign-off to final-review, handling mid-plan interruptions by resuming from the In Progress sub-task, then updating plan.md and index.md on completion. On completion, run evolve and state-sync for all projects, plus create-documentation and semver for software projects. Use when the user says 'execute plan', 'run the plan', 'complete the plan', or 'finish all tasks' — not for single sub-task work (use execute-plan-task) or plans still in development.",
+          "license": "MIT",
+          "compatibility": "opencode, copilot, antigravity",
+          "allowed-tools": "read, write, edit, bash",
+          "metadata": "audience: developers workflow: development"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "skills/execute-plan-task/SKILL.md",
+      "kind": "skill",
+      "lines": 189,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "execute-plan-task",
+          "description": "Execute a single sub-task from a plan — select the active sub-task (In Progress or first Pending) from plan.md, implement it following TDD with project-type-aware agent delegation (domain-check before complex implementation, simplify after validation, and create-documentation for new modules/APIs on software projects), run validation via @executor, request review, handle feedback with fix loops, and update plan status. Use when implementing the next sub-task from plan.md, continuing an in-progress sub-task, or when the user says 'execute next task', 'implement sub-task', 'work on the plan', or 'next step' — not for full plan orchestration (use execute-plan) or ad-hoc work without a plan.",
+          "license": "MIT",
+          "compatibility": "opencode, copilot, antigravity",
+          "allowed-tools": "read, write, edit, bash",
+          "metadata": "audience: developers workflow: development"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "skills/final-review/SKILL.md",
+      "kind": "skill",
+      "lines": 152,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "final-review",
+          "description": "Use this skill when performing final plan-level sign-off review — verify all sub-tasks are Completed, review the full diff against task.md requirements (falling back to plan.md if task.md is missing), delegate in-depth review to @final-reviewer, run artifact-check and preflight for release readiness plus a semver bump recommendation on software projects, and produce a binding verdict (Approve / Approve with comments / Request changes) written to tasks/review.md. Use when the plan is fully implemented and individually reviewed, before merge, or when asked to 'final review', 'sign off', or 'close the plan' — not for per-sub-task reviews (use review) or in-progress plans.",
+          "license": "MIT",
+          "compatibility": "opencode, copilot, antigravity",
+          "allowed-tools": "read, write, bash",
+          "metadata": "audience: developers workflow: development"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "skills/planning/SKILL.md",
+      "kind": "skill",
+      "lines": 147,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "planning",
+          "description": "Use this skill when writing clear, detailed, step-by-step implementation plans to ./docs/plans/<plan-slug>/plan.md so any human or agent can execute the task — breaking work into ordered sub-tasks with objectives, requirements mapping (stable IDs), in-scope/out-of-scope items, acceptance criteria, validation guidance, and a requirements snapshot, then updating index.md. Use when planning implementation work, breaking down tasks, or when the user says 'plan this' or 'create a plan' — not for purely advisory, exploratory, or review-only requests; ask structured questions when the request lacks detail.",
+          "license": "MIT",
+          "compatibility": "opencode, copilot, antigravity",
+          "allowed-tools": "read, write, edit",
+          "metadata": "audience: developers workflow: development"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "skills/preflight/SKILL.md",
+      "kind": "skill",
+      "lines": 61,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "preflight",
+          "description": "Execute the complete test suite, linters, and static analysis tools as a formal pre-release gate — auto-detecting the project's tooling, checking for uncommitted changes or dirty state, and producing a single pass/fail verdict with per-tool results and actionable failure details (blocking release on any failure without auto-fixing). Use when preparing a release, running CI checks locally, invoked by /release as step 2, or when the user asks \"run preflight\", \"pre-release check\", \"validate before release\", \"gate check\", \"is this ready to release?\", or \"run all checks\".",
+          "license": "MIT",
+          "compatibility": "opencode, copilot, antigravity",
+          "allowed-tools": "bash, read",
+          "metadata": "audience: developers workflow: development"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "skills/review/SKILL.md",
+      "kind": "skill",
+      "lines": 144,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "review",
+          "description": "Use this skill when reviewing a single plan sub-task result against its acceptance criteria, scope boundaries, and done-when conditions — reviewing the implementation diff for acceptance criteria fulfillment, scope compliance, validation/testing, and regression risk, delegating code quality review to @reviewer and architecture validation to domain-check for software projects, then producing a structured verdict with actionable findings in tasks/review.md. Use after a sub-task is implemented before marking it Complete, when asked to 'review the task' or 'verify the sub-task', or during plan execution — not for full-plan sign-off (use final-review) or ad-hoc code review (use code-review).",
+          "license": "MIT",
+          "compatibility": "opencode, copilot, antigravity",
+          "allowed-tools": "read, write, bash",
+          "metadata": "audience: developers workflow: development"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "skills/simplify/SKILL.md",
+      "kind": "skill",
+      "lines": 61,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "simplify",
+          "description": "Use this skill when reviewing changed code for reuse, quality, and efficiency, then fixing any issues found — launching three parallel review agents (code reuse, code quality, efficiency) on the full diff and aggregating their findings into direct fixes. Use after making changes or when asked to 'clean up', 'refactor', 'simplify', or 'improve this code'.",
+          "license": "MIT",
+          "compatibility": "opencode, copilot, antigravity",
+          "allowed-tools": "bash, read, write, edit",
+          "metadata": "audience: developers workflow: development"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "skills/index.md",
+      "kind": "index",
+      "lines": 93,
+      "frontmatter": {
+        "status": "none-expected"
+      },
+      "findings": []
+    }
+  ]
+}

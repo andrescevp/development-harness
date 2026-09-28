@@ -1,0 +1,169 @@
+{
+  "$comment": "Dev Harness V2 plugin — scoped include/exclude + expectations manifest. Single source of truth reused by scripts/extract.mjs and scripts/audit.mjs (and, in ST5, the plugin asset builder). USER-MANDATED SCOPE: 6 agents + 11 existing loop skills (+ NEW coding in ST3); NO commands, NO prompts. Scope revision applied 2026-09-27: the earlier full extraction (14 agents / 37 skills / 11 commands / 9 prompts) was pruned to this manifest (see docs/EXTRACTION.md 'Scope revision' and tasks/review.md addendum).",
+  "sections": {
+    "agents": { "src": "agents", "dest": "agents", "kind": "files", "expectedItems": 6 },
+    "skills": { "src": "skills", "dest": "skills", "kind": "dirs", "expectedItems": 11 },
+    "skillsIndex": { "src": "skills", "dest": "skills", "kind": "index-file", "expectedItems": 1 }
+  },
+  "include": {
+    "agents": [
+      "senior-architect.md",
+      "senior-engineer.md",
+      "reviewer.md",
+      "final-reviewer.md",
+      "executor.md",
+      "explorer.md"
+    ],
+    "skills": [
+      "artifact-check",
+      "simplify",
+      "domain-check",
+      "code-review",
+      "execute-plan",
+      "execute-plan-task",
+      "final-review",
+      "planning",
+      "preflight",
+      "review",
+      "create-documentation"
+    ]
+  },
+  "bundledSkillMdCount": {
+    "now": 11,
+    "afterSt3": 12,
+    "afterSt3Note": "11 extracted SKILL.md + the new `coding` skill created in ST3. The audit, ST5 asset builder, and ST7 docs must use 12 AFTER ST3; 11 now (coding expected-pending)."
+  },
+  "agentRenames": {
+    "senior-architect.md": { "to": "software-architect.md", "newName": "software-architect" },
+    "senior-engineer.md": { "to": "software-engineer.md", "newName": "software-engineer" }
+  },
+  "agentAliases": {
+    "senior-architect": "software-architect",
+    "senior-engineer": "software-engineer"
+  },
+  "lineLimits": {
+    "skill": 250,
+    "agent": 300
+  },
+  "skillNameRegex": "^[a-z0-9]+(-[a-z0-9]+)*$",
+  "loop": {
+    "skills": [
+      "planning",
+      "domain-check",
+      "execute-plan",
+      "execute-plan-task",
+      "simplify",
+      "review",
+      "code-review",
+      "preflight",
+      "artifact-check",
+      "final-review",
+      "create-documentation",
+      "coding"
+    ],
+    "expectedPendingSkills": ["coding"],
+    "agents": [
+      "software-architect",
+      "software-engineer",
+      "reviewer",
+      "final-reviewer",
+      "executor",
+      "explorer"
+    ]
+  },
+  "junk": {
+    "anySegmentDirNames": ["node_modules", ".git", "__pycache__", ".pytest_cache"],
+    "secretsFileNames": [".env", ".env."],
+    "filePatterns": [
+      { "pattern": "\\.bak(\\.|$)", "reason": "backup file (.bak)" },
+      { "pattern": "\\.swp$|\\.swo$|~$", "reason": "editor swap file" },
+      { "pattern": "^\\.DS_Store$", "reason": "OS junk" },
+      { "pattern": "^org\\.SKILL\\.md$", "reason": "source-side leftover backup of speak/SKILL.md" }
+    ]
+  },
+  "secrets": {
+    "lowSignaturePattern": "api[_-]?key|secret|password|bearer\\s|token",
+    "highSignaturePatterns": [
+      "sk-[A-Za-z0-9]{16,}",
+      "AKIA[0-9A-Z]{16}",
+      "ghp_[A-Za-z0-9]{20,}",
+      "github_pat_[A-Za-z0-9_]{20,}",
+      "xox[baprs]-[A-Za-z0-9-]{10,}",
+      "-----BEGIN [A-Z ]*PRIVATE KEY",
+      "Bearer\\s+[A-Za-z0-9._~+/-]{20,}"
+    ],
+    "proseAllowlist": [
+      "max_tokens",
+      "total_tokens",
+      "prompt_tokens",
+      "completion_tokens",
+      "input_tokens",
+      "output_tokens",
+      "NVIDIA_API_KEY",
+      "GEMINI_API_KEY",
+      "OPENAI_API_KEY",
+      "ANTHROPIC_API_KEY",
+      "COPILOT_GITHUB_TOKEN",
+      "GITHUB_TOKEN",
+      "HF_TOKEN",
+      "sk-...",
+      "sk-proj-.",
+      "your-key",
+      "your_api_key",
+      "never expose",
+      "redact",
+      "placeholder"
+    ]
+  },
+  "crossReference": {
+    "allowedAtMentions": [
+      "opencode",
+      "opencode-ai",
+      "opentui",
+      "example",
+      "acme",
+      "pytest",
+      "class",
+      "json",
+      "html",
+      "csv",
+      "base64",
+      "uri",
+      "text",
+      "base"
+    ],
+    "allowedKebabProse": [
+      "sub-task", "sub-tasks", "plan-slug", "allowed-tools", "save-as",
+      "allow-all-tools", "sign-off", "cherry-pick", "non-software", "claude-plugin",
+      "minicpm-v4", "self-contained", "multi-file", "in-scope", "z0-9", "pure-white",
+      "out-of-scope", "dangerously-skip-permissions", "create-unit", "auto-detected",
+      "search-content", "pytest-playwright", "non-interactive", "in-depth",
+      "getting-started", "address-review", "skill-name", "review-subtask",
+      "print-timeout", "plan-level", "next-subtask", "list-vaults", "follow-up",
+      "done-when", "deploy-staging", "cross-module", "commit-short-hash",
+      "comfyui-setup", "allow-all", "ad-hoc", "add-dir", "test-patterns",
+      "show-toplevel", "rev-parse", "re-run", "project-specific", "plugin-dir",
+      "plugin-development", "opencode-acme-plugin", "multi-line", "kebab-case",
+      "frame-prompt", "fire-related", "end-to-end", "commit-hash", "codex-plugin",
+      "notesmd-cli", "stickman-videos", "stickman-video", "frame-client",
+      "matrix-pixel", "jetson-monitor", "tesla", "nanos", "pytest", "page-get",
+      "content-type", "max-retries", "timeout-ms", "no-sandbox", "headless",
+      "base-url", "test-id", "data-testid", "to-have", "not-to-be", "to-be",
+      "json-server", "flatpak", "krita", "aseprite", "sprite-sheet", "sprite-sheets",
+      "json-metadata", "multi-resolution", "color-mode", "palette-swap", "layer",
+      "frame-tag", "slice-extraction", "dithering", "command-line", "batch-mode",
+      "step-by-step", "plan-driven", "test-first", "code-first", "red-green",
+      "green-refactor", "trade-off", "trade-offs", "plan-b", "plan-c", "fail-fast",
+      "code-review", "hand-off", "handoff", "on-boarding", "check-in", "check-out",
+      "login-flow", "sign-in", "sign-up", "log-out", "set-up", "triage", "work-flow",
+      "look-up", "clean-up", "roll-back", "roll-forward", "cut-over", "go-live",
+      "buy-in", "run-book", "run-books", "play-book", "how-to", "best-practice",
+      "best-practices", "code-quality", "quality-gate", "quality-gates",
+      "regression-risk", "user-facing", "end-user", "key-value", "one-off",
+      "two-phase", "three-tier", "micro-service", "micro-services", "well-known",
+      "state-of-the-art", "cutting-edge", "long-running", "short-lived",
+      "high-signal", "low-friction", "open-source", "source-control", "version-control",
+      "opencode-ai", "opencode-ai-plugin", "agent-bodies", "agent-frontmatter", "askpass"
+    ]
+  }
+}

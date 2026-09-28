@@ -1,0 +1,9 @@
+allowBuilds:
+  esbuild: true
+  msgpackr-extract: true
+# pnpm 11 workspace/settings file — build-script approval for deps that need
+# a postinstall step (esbuild platform binary check via tsup; msgpackr-extract
+# optional native accelerator used by vitest).
+onlyBuiltDependencies:
+  - esbuild
+  - msgpackr-extract

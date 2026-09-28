@@ -1,0 +1,29 @@
+{
+  // Example opencode.jsonc — enable the dev-harness-skills V2 plugin.
+  // NOTE (verified against opencode v2.0.18): `plugins` entries that are
+  // `file://` URLs must point to a DIRECTORY, not a plugin.js file — the
+  // file form is rejected with "configured plugin path must be a directory".
+  "$schema": "https://opencode.ai/config.json",
+  "plugins": [
+    // Local package directory form (works after `pnpm build` in the repo):
+    "file:///home/andres/workspace/dev-harness-skills"
+
+    // Alternatives (pick ONE at a time):
+    // - Installed package form (after `pnpm pack` / install):
+    //   "dev-harness-skills"
+    // - Relative directory form from your project root:
+    //   "../shared/dev-harness-skills"
+  ],
+  // Verification checklist after loading:
+  //   opencode debug agents   → software-architect, software-engineer,
+  //                             reviewer, final-reviewer, executor, explorer
+  //                             must appear alongside existing agents
+  //   opencode debug skills   → artifact-check, simplify, domain-check,
+  //                             coding, code-review, execute-plan,
+  //                             execute-plan-task, final-review, planning,
+  //                             preflight, review, create-documentation
+  //   opencode debug commands → none added by this plugin (commands are out
+  //                             of scope)
+  //
+  // Troubleshooting: see docs/LOADING.md.
+}
