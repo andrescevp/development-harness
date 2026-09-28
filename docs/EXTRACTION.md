@@ -155,3 +155,10 @@ Source `~/.agents` stays untouched and read-only.
 same script's `--check` fails if `^permission:` reappears in `agents/`). The
 source agent files still carry `permission`; bundled agents register with
 `tools`-derived permission rules only.
+
+**Manual removal: `tools` frontmatter (2026-09-28, user edit):** the `tools:`
+blocks were removed from all 6 bundled agents directly in the repo (they now
+ship with no `tools` and no `permission` — registration carries no static
+tool rules). This removal is NOT part of the extraction pipeline: re-running
+`node scripts/extract.mjs` restores the source `tools` blocks (the `permission`
+strip still applies). Promote to a declarative patch if persistence is wanted.

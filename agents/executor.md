@@ -5,9 +5,6 @@ description: >
   Use for any command execution, test running, or build task.
 mode: subagent
 model: opencode-go/deepseek-v4-flash
-tools:
-  bash: true
-  read: true
 ---
 
 # Executor Agent Guidelines

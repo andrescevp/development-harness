@@ -76,11 +76,14 @@ describe("corpus parsing (real bundled set)", () => {
     expect(String(data.description)).toMatch(/TDD/i)
   })
 
-  it("no bundled agent carries the permission frontmatter key (M3 strip)", () => {
+  it("no bundled agent carries the permission or tools frontmatter keys", () => {
+    // Policy: bundled agents ship without `permission` (M3 strip) AND without
+    // `tools` (user mandate 2026-09-28) — they register with no static tool
+    // rules; re-extract from ~/.agents restores both unless patched.
     for (const file of AGENT_FILES) {
       const { data } = parseFrontmatter(fs.readFileSync(file, "utf8"))
       expect(data["permission"], file).toBeUndefined()
-      expect(data["tools"], file).toBeDefined() // tools survive the strip
+      expect(data["tools"], file).toBeUndefined()
     }
   })
 })

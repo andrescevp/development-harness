@@ -6,10 +6,6 @@ description: >
 mode: subagent
 model: opencode-go/deepseek-v4-flash
 variant: max
-tools:
-  bash: true
-  read: true
-  write: true
 ---
 
 

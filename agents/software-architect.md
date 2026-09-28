@@ -6,11 +6,6 @@ description: >
 mode: all
 model: opencode-go/deepseek-v4-flash
 variant: max
-tools:
-  bash: true
-  read: true
-  write: true
-  edit: true
 ---
 
 

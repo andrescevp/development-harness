@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T07:36:01.365Z",
+    "generated": "2026-09-28T07:42:42.698Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -682,7 +682,7 @@
     {
       "file": "agents/executor.md",
       "kind": "agent",
-      "lines": 39,
+      "lines": 36,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -690,8 +690,7 @@
           "name": "executor",
           "description": "Execute commands, run tests, builds, formatters, linters, and validation on behalf of other agents. Use for any command execution, test running, or build task.",
           "mode": "subagent",
-          "model": "opencode-go/deepseek-v4-flash",
-          "tools": "bash: true read: true"
+          "model": "opencode-go/deepseek-v4-flash"
         }
       },
       "findings": []
@@ -699,7 +698,7 @@
     {
       "file": "agents/explorer.md",
       "kind": "agent",
-      "lines": 38,
+      "lines": 36,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -707,8 +706,7 @@
           "name": "explorer",
           "description": "Explore codebases quickly using glob, grep, and targeted reads. Use for codebase exploration, file search, and pattern discovery.",
           "mode": "subagent",
-          "model": "opencode-go/deepseek-v4-flash",
-          "tools": "read: true"
+          "model": "opencode-go/deepseek-v4-flash"
         }
       },
       "findings": []
@@ -716,7 +714,7 @@
     {
       "file": "agents/final-reviewer.md",
       "kind": "agent",
-      "lines": 36,
+      "lines": 32,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -725,8 +723,7 @@
           "description": "Final in-depth reviewer — performs full diff review against task requirements and plan. Use via @final-reviewer for sign-off review.",
           "mode": "subagent",
           "model": "opencode-go/deepseek-v4-flash",
-          "variant": "max",
-          "tools": "bash: true read: true write: true"
+          "variant": "max"
         }
       },
       "findings": []
@@ -734,7 +731,7 @@
     {
       "file": "agents/reviewer.md",
       "kind": "agent",
-      "lines": 34,
+      "lines": 30,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -743,8 +740,7 @@
           "description": "Scoped code reviewer — reviews changed code against sub-task acceptance criteria. Use via @reviewer for implementation review.",
           "mode": "subagent",
           "model": "opencode-go/deepseek-v4-flash",
-          "variant": "max",
-          "tools": "bash: true read: true write: true"
+          "variant": "max"
         }
       },
       "findings": []
@@ -752,7 +748,7 @@
     {
       "file": "agents/software-architect.md",
       "kind": "agent",
-      "lines": 87,
+      "lines": 82,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -761,8 +757,7 @@
           "description": "Senior Architect Architect — solutions creator before coding, expert in arcitectural patterns. Use it to planify creation or updates of software features.",
           "mode": "all",
           "model": "opencode-go/deepseek-v4-flash",
-          "variant": "max",
-          "tools": "bash: true read: true write: true edit: true"
+          "variant": "max"
         }
       },
       "findings": []
@@ -770,7 +765,7 @@
     {
       "file": "agents/software-engineer.md",
       "kind": "agent",
-      "lines": 106,
+      "lines": 101,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -779,8 +774,7 @@
           "description": "Senior Software Engineer — main coder agent to update or create new features. Use it for any software development tasks.",
           "mode": "all",
           "model": "opencode-go/deepseek-v4-flash",
-          "variant": "max",
-          "tools": "bash: true read: true write: true edit: true"
+          "variant": "max"
         }
       },
       "findings": []
