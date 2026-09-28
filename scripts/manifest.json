@@ -117,6 +117,126 @@
       ],
       "from": "./docs/plans/<plan-slug>/task.md",
       "to": "./docs/plans/<plan-slug>/sdd.md"
+    },
+    {
+      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `code-review`; kept across re-extracts.",
+      "scope": "agents",
+      "action": "replace-body-text",
+      "files": [
+        "dh-final-reviewer.md"
+      ],
+      "from": "`code-review`",
+      "to": "`dh-code-review`"
+    },
+    {
+      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `code-review`; kept across re-extracts.",
+      "scope": "agents",
+      "action": "replace-body-text",
+      "files": [
+        "dh-reviewer.md"
+      ],
+      "from": "`code-review`",
+      "to": "`dh-code-review`"
+    },
+    {
+      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `artifact-check`; kept across re-extracts.",
+      "scope": "agents",
+      "action": "replace-body-text",
+      "files": [
+        "dh-software-architect.md"
+      ],
+      "from": "`artifact-check`",
+      "to": "`dh-artifact-check`"
+    },
+    {
+      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `contingency`; kept across re-extracts.",
+      "scope": "agents",
+      "action": "replace-body-text",
+      "files": [
+        "dh-software-architect.md"
+      ],
+      "from": "`contingency`",
+      "to": "`dh-contingency`"
+    },
+    {
+      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `create-documentation`; kept across re-extracts.",
+      "scope": "agents",
+      "action": "replace-body-text",
+      "files": [
+        "dh-software-architect.md"
+      ],
+      "from": "`create-documentation`",
+      "to": "`dh-create-documentation`"
+    },
+    {
+      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `domain-check`; kept across re-extracts.",
+      "scope": "agents",
+      "action": "replace-body-text",
+      "files": [
+        "dh-software-architect.md"
+      ],
+      "from": "`domain-check`",
+      "to": "`dh-domain-check`"
+    },
+    {
+      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `planning`; kept across re-extracts.",
+      "scope": "agents",
+      "action": "replace-body-text",
+      "files": [
+        "dh-software-architect.md"
+      ],
+      "from": "`planning`",
+      "to": "`dh-planning`"
+    },
+    {
+      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `preflight`; kept across re-extracts.",
+      "scope": "agents",
+      "action": "replace-body-text",
+      "files": [
+        "dh-software-architect.md"
+      ],
+      "from": "`preflight`",
+      "to": "`dh-preflight`"
+    },
+    {
+      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `code-review`; kept across re-extracts.",
+      "scope": "agents",
+      "action": "replace-body-text",
+      "files": [
+        "dh-software-engineer.md"
+      ],
+      "from": "`code-review`",
+      "to": "`dh-code-review`"
+    },
+    {
+      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `coding`; kept across re-extracts.",
+      "scope": "agents",
+      "action": "replace-body-text",
+      "files": [
+        "dh-software-engineer.md"
+      ],
+      "from": "`coding`",
+      "to": "`dh-coding`"
+    },
+    {
+      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `create-documentation`; kept across re-extracts.",
+      "scope": "agents",
+      "action": "replace-body-text",
+      "files": [
+        "dh-software-engineer.md"
+      ],
+      "from": "`create-documentation`",
+      "to": "`dh-create-documentation`"
+    },
+    {
+      "$comment": "dh-prefix (2026-09-28): bundled agent bodies reference the dh-prefixed skill `simplify`; kept across re-extracts.",
+      "scope": "agents",
+      "action": "replace-body-text",
+      "files": [
+        "dh-software-engineer.md"
+      ],
+      "from": "`simplify`",
+      "to": "`dh-simplify`"
     }
   ],
   "repoAuthored": {

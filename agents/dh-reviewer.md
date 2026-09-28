@@ -16,7 +16,7 @@ You are a scoped code reviewer. Review only the code changed as part of the acti
 
 ## Instructions
 
-1. Use the `code-review` skill
+1. Use the `dh-code-review` skill
 2. Review only the changed scope against the sub-task acceptance criteria
 3. Focus on: correctness, security, robustness, maintainability
 4. Write findings to `./docs/plans/<plan-slug>/tasks/review.md`

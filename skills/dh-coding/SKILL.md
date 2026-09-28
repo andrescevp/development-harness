@@ -63,6 +63,21 @@ Detect the project type before delegating or implementing. Check the project roo
 - **Software projects:** delegate ALL implementation to `@senior-engineer` (bundled as `dh-software-engineer` — the harness's single task executor); run validation through `@dh-executor`. When invoked from the skills loop, `dh-domain-check` runs before complex implementation and `dh-simplify` runs after validation.
 - **Non-software projects** (docs, config, design assets — no marker files): delegate implementation to `@senior-engineer` as well; skip the `dh-simplify`, `dh-domain-check`, and `dh-create-documentation` steps.
 
+## Coding Best Practices
+
+Everyday coding-quality guidance, applied to every change alongside TDD:
+
+- **Clarity over cleverness:** write code a junior engineer can follow — explicit, readable, and direct. Prefer the simplest approach that fully solves the task; do not add premature abstractions or speculative generality.
+- **Naming:** use descriptive, intent-revealing names and language-standard conventions; booleans read as predicates (`isValid`, `hasPermission`); no cryptic abbreviations.
+- **Structure:** keep functions and modules focused on one responsibility; extract helpers only when they remove real duplication; keep related code close; no dead code (remove unused branches/exports — knip-style checks).
+- **Inputs and errors:** validate inputs at boundaries and fail with clear, actionable errors; handle every expected failure mode explicitly — never silently swallow errors or hide them in empty catches; propagate errors with context (what failed, what was attempted).
+- **Determinism and testability:** prefer pure functions and explicit inputs; avoid hidden global state, implicit timing, or environment-dependent behavior; make behavior reproducible in tests.
+- **Consistency:** match the project's existing patterns, naming, architecture, and tooling; follow `CODE_RULES.md` and the project's configured linters/formatters (biome, etc.) — do not introduce a parallel style.
+- **DRY with judgment:** no duplicated logic (jscpd-style checks), but never DRY at the cost of clarity — two clear occurrences beat one obscure abstraction.
+- **Type discipline:** prefer explicit typed contracts over loose `any`; keep public interfaces stable unless the task requires a change; model the domain in the types.
+- **Comments:** prefer comments on *why* (decisions, constraints, gotchas); avoid restating *what* the code already shows; keep comments accurate when code changes.
+- **Documentation-adjacent:** when a change affects setup, behavior, or interfaces, note it in the project docs (README/AGENTS.md) as part of the change.
+
 ## Hard Constraints
 
 - **The 300-line limit applies ONLY to code files** (source and test files).

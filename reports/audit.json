@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T08:42:58.461Z",
+    "generated": "2026-09-28T08:47:22.024Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 7,
         "sev": "WARN",
-        "note": "237 resolved; 0 code-context; 0 allowlisted; 96 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+        "note": "249 resolved; 0 code-context; 0 allowlisted; 99 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
       },
       {
         "name": "Loop membership",
@@ -122,14 +122,6 @@
       ]
     },
     {
-      "token": "domain-check",
-      "count": 4,
-      "files": [
-        "agents/dh-software-architect.md",
-        "skills/dh-domain-check/SKILL.md"
-      ]
-    },
-    {
       "token": "state-sync",
       "count": 3,
       "files": [
@@ -162,6 +154,13 @@
       ]
     },
     {
+      "token": "dh-contingency",
+      "count": 2,
+      "files": [
+        "agents/dh-software-architect.md"
+      ]
+    },
+    {
       "token": "bounded-context",
       "count": 2,
       "files": [
@@ -170,11 +169,11 @@
       ]
     },
     {
-      "token": "create-documentation",
+      "token": "language-standard",
       "count": 2,
       "files": [
-        "agents/dh-software-architect.md",
-        "agents/dh-software-engineer.md"
+        "agents/dh-software-engineer.md",
+        "skills/dh-coding/SKILL.md"
       ]
     },
     {
@@ -186,10 +185,24 @@
       ]
     },
     {
+      "token": "knip-style",
+      "count": 2,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
       "token": "per-item",
       "count": 2,
       "files": [
         "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "domain-check",
+      "count": 2,
+      "files": [
+        "skills/dh-domain-check/SKILL.md"
       ]
     },
     {
@@ -272,13 +285,6 @@
       ]
     },
     {
-      "token": "artifact-check",
-      "count": 1,
-      "files": [
-        "agents/dh-software-architect.md"
-      ]
-    },
-    {
       "token": "at-least-once",
       "count": 1,
       "files": [
@@ -321,13 +327,6 @@
       ]
     },
     {
-      "token": "language-standard",
-      "count": 1,
-      "files": [
-        "agents/dh-software-engineer.md"
-      ]
-    },
-    {
       "token": "hard-code",
       "count": 1,
       "files": [
@@ -364,6 +363,34 @@
     },
     {
       "token": "coding-guideline",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "coding-quality",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "intent-revealing",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "environment-dependent",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "jscpd-style",
       "count": 1,
       "files": [
         "skills/dh-coding/SKILL.md"
@@ -476,13 +503,6 @@
     },
     {
       "token": "per-project",
-      "count": 1,
-      "files": [
-        "skills/dh-coding/SKILL.md"
-      ]
-    },
-    {
-      "token": "knip-style",
       "count": 1,
       "files": [
         "skills/dh-coding/SKILL.md"
@@ -1019,7 +1039,7 @@
     {
       "file": "skills/dh-coding/SKILL.md",
       "kind": "skill",
-      "lines": 117,
+      "lines": 132,
       "frontmatter": {
         "status": "ok",
         "errors": [],

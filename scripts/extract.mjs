@@ -283,11 +283,23 @@ function collectJunk(root) {
   return hits;
 }
 
+/** Apply declaration-driven replace-body-text patches FORWARD to a source body. */
+function applyBodyPatches(body, destName) {
+  let out = body;
+  for (const p of M.patches ?? []) {
+    if (p.action === 'replace-body-text' && (p.files ?? []).includes(destName) && p.from && out.includes(p.from)) {
+      out = out.split(p.from).join(p.to ?? '');
+    }
+  }
+  return out;
+}
+
 function verifyAliasBodyIntegrity() {
   const problems = [];
-  // Sanctioned body-patch markers are stripped/normalized before comparison:
-  // plan-tools note (M2) and the task.md -> sdd.md contract-path rename (SMD).
-  const bodyNorm = (b) => b.split('sdd.md').join('task.md');
+  // Sanctioned body patches are accounted for: append-body-note markers are
+  // stripped from the dest side; replace-body-text patches (sdd rename,
+  // dh-prefix renames) are applied FORWARD to the source side, so the
+  // invariant is: source + patches == dest.
   const noteMarkers = (M.patches ?? [])
     .filter((p) => p.action === 'append-body-note')
     .map((p) => p.marker)
@@ -295,14 +307,9 @@ function verifyAliasBodyIntegrity() {
   for (const [from, r] of Object.entries(AGENT_RENAMES)) {
     const srcText = fs.readFileSync(path.join(SOURCE_ROOT, 'agents', from), 'utf8');
     const destText = fs.readFileSync(path.join(REPO_ROOT, 'agents', r.to), 'utf8');
-    let srcBody = splitFrontmatter(srcText, from).body;
+    const srcBody = applyBodyPatches(splitFrontmatter(srcText, from).body, r.to);
     let destBody = splitFrontmatter(destText, r.to).body;
-    srcBody = bodyNorm(srcBody);
-    destBody = bodyNorm(destBody);
-    for (const m of noteMarkers) {
-      srcBody = stripBodyNote(srcBody, m);
-      destBody = stripBodyNote(destBody, m);
-    }
+    for (const m of noteMarkers) destBody = stripBodyNote(destBody, m);
     // Normalize trailing newlines: sanctioned appends and EOF differences
     // must not count as body drift (only real content changes do).
     const norm = (b) => b.replace(/\n+\s*$/, '\n');
