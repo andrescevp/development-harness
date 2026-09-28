@@ -8,8 +8,8 @@ description: >
   "create docs for", "generate documentation", "write a README", "document the API",
   "make docs for", or similar, or after creating substantial code that needs
   documentation. Supports Markdown (default), HTML, and Mermaid diagram formats.
-  The Obsidian vault IS the project root (`{project_root}`): documents are
-  written into the root (folder structure per design) with frontmatter metadata
+  The Obsidian vault IS the project root (`{project_root}`) and ALL documentation
+  lives under `{project_root}/docs`, with frontmatter metadata
   (tags, project, created, stack, updated, feature, epic).
 license: MIT
 compatibility: opencode, copilot, antigravity
@@ -41,10 +41,10 @@ Before writing, clarify with the user (or infer from context):
 |---------------------------------------|-------------------------------------------------------------------|
 | What are we documenting?              | Current project, recent changes, or user-specified topic          |
 | Output format?                        | `markdown` (also supports `html`, `mermaid`)                     |
-| Output location?                      | `{project_root}` (the Obsidian vault — folders per design)      |
+| Output location?                      | `{project_root}/docs` (ALL documentation lives here)            |
 | Single file or multi-file?            | Multi-file for >3 sections, single otherwise                      |
-| Obsidian vault path?                  | The vault IS the project root — `git rev-parse --show-toplevel` (no extra `/docs` wrapper) |
-| Existing docs to extend?              | Check the project root (`README.md`, existing folders) first, extend if found |
+| Obsidian vault path?                  | The vault IS the project root — `git rev-parse --show-toplevel`; docs are a folder inside it (`{project_root}/docs`) |
+| Existing docs to extend?              | Check `{project_root}/docs/` first, extend if found               |
 
 Ask if critical info is missing. For simple requests ("document this function"), infer defaults and proceed.
 
@@ -78,20 +78,21 @@ Content.
 
 ### Multi-file structure
 
-For broad topics (full API, architecture, project handbook). Always create an index at the vault root (the project root):
+For broad topics (full API, architecture, project handbook). Always create an index. All documentation lives under `{project_root}/docs` (a folder of the Obsidian vault):
 
 ```
-{project_root}/                  ← Obsidian vault — the project root itself
-  index.md              ← Entry point with links to all sections
-  getting-started.md    ← Quickstart guide
-  architecture.md       ← System design
-  api/
-    index.md            ← API overview
-    endpoints.md        ← Endpoint reference
-    authentication.md   ← Auth flow
-  guides/
-    deployment.md       ← How to deploy
-    troubleshooting.md  ← Common issues
+{project_root}/                ← Obsidian vault (the project root)
+  docs/                        ← ALL documentation goes here
+    index.md              ← Entry point with links to all sections
+    getting-started.md    ← Quickstart guide
+    architecture.md       ← System design
+    api/
+      index.md            ← API overview
+      endpoints.md        ← Endpoint reference
+      authentication.md   ← Auth flow
+    guides/
+      deployment.md       ← How to deploy
+      troubleshooting.md  ← Common issues
 ```
 
 **Index file template:**
@@ -166,7 +167,7 @@ For Obsidian compatibility, also include `[[wikilinks]]` as comments:
 - **Nested directories**: Create parent directories first (`mkdir -p`) before writing files.
 - **Frontmatter conflicts**: If source Markdown already has frontmatter, merge the Obsidian metadata into the existing block — don't create two `---` blocks.
 - **Obsidian not running**: The Obsidian push is best-effort. If `obsidian` CLI fails, write files directly to the vault path and tell the user to open Obsidian to see them.
-- **Vault path**: The Obsidian vault IS the project root (`{project_root}`, auto-detected via `git rev-parse --show-toplevel`). No `/docs` wrapper and no `{vault}/{project}/` nesting — documents land in the root at their designed relative path. Override the vault with the `OBSIDIAN_VAULT` environment variable (e.g., for a dedicated notes vault).
+- **Vault path**: The Obsidian vault IS the project root (`{project_root}`, auto-detected via `git rev-parse --show-toplevel`). **ALL documentation must be written under `{project_root}/docs`** — Obsidian sees it as a `docs/` folder inside the vault; there is no `{vault}/{project}/` nesting. Override the vault with the `OBSIDIAN_VAULT` environment variable (e.g., for a dedicated notes vault) — docs still land in `{vault}/docs`.
 - **Large docs**: For 20+ files, batch the push and report progress per batch.
 - **HTML docs in Obsidian**: Obsidian primarily renders Markdown. If HTML is requested, still push a `.md` version with an embedded `<iframe>` or link to the HTML version.
 - **Mermaid in Obsidian**: Obsidian renders Mermaid natively inside code blocks. No conversion needed — Mermaid syntax works directly in `.md` files.
@@ -175,9 +176,9 @@ For Obsidian compatibility, also include `[[wikilinks]]` as comments:
 
 After generating documentation:
 
-- [ ] All files exist in `{project_root}` (the vault, or the user-specified location)
+- [ ] All files exist in `{project_root}/docs/` (the documentation folder of the vault)
 - [ ] Index file (`index.md`) links to every document
 - [ ] Cross-references between documents resolve correctly
-- [ ] Every document inside the vault has complete frontmatter (tags, project, created, stack, updated)
+- [ ] Every document inside `{project_root}/docs/` has complete frontmatter (tags, project, created, stack, updated)
 - [ ] Mermaid diagrams render correctly (check syntax)
 - [ ] HTML files have proper structure with embedded styles

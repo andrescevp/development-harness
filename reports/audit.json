@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T07:59:16.947Z",
+    "generated": "2026-09-28T08:01:46.507Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -108,13 +108,6 @@
       "files": [
         "skills/artifact-check/SKILL.md",
         "skills/preflight/SKILL.md"
-      ]
-    },
-    {
-      "token": "user-specified",
-      "count": 2,
-      "files": [
-        "skills/create-documentation/SKILL.md"
       ]
     },
     {
@@ -296,6 +289,13 @@
     },
     {
       "token": "cross-referenced",
+      "count": 1,
+      "files": [
+        "skills/create-documentation/SKILL.md"
+      ]
+    },
+    {
+      "token": "user-specified",
       "count": 1,
       "files": [
         "skills/create-documentation/SKILL.md"
@@ -836,13 +836,13 @@
     {
       "file": "skills/create-documentation/SKILL.md",
       "kind": "skill",
-      "lines": 184,
+      "lines": 185,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "create-documentation",
-          "description": "Use this skill when asked to create, generate, write, or produce documentation — project docs, API references, architecture overviews, README files, technical guides, or any structured document, as single-file or multi-file sets with cross-references. Use when the user says \"document this\", \"create docs for\", \"generate documentation\", \"write a README\", \"document the API\", \"make docs for\", or similar, or after creating substantial code that needs documentation. Supports Markdown (default), HTML, and Mermaid diagram formats. The Obsidian vault IS the project root (`{project_root}`): documents are written into the root (folder structure per design) with frontmatter metadata (tags, project, created, stack, updated, feature, epic).",
+          "description": "Use this skill when asked to create, generate, write, or produce documentation — project docs, API references, architecture overviews, README files, technical guides, or any structured document, as single-file or multi-file sets with cross-references. Use when the user says \"document this\", \"create docs for\", \"generate documentation\", \"write a README\", \"document the API\", \"make docs for\", or similar, or after creating substantial code that needs documentation. Supports Markdown (default), HTML, and Mermaid diagram formats. The Obsidian vault IS the project root (`{project_root}`) and ALL documentation lives under `{project_root}/docs`, with frontmatter metadata (tags, project, created, stack, updated, feature, epic).",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "bash, read, write, edit, glob",

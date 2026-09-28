@@ -1,6 +1,6 @@
 # Audit Report — Dev Harness V2 Plugin (ST2)
 
-Generated 2026-09-28T07:59:16.947Z by `scripts/audit.mjs`.
+Generated 2026-09-28T08:01:46.507Z by `scripts/audit.mjs`.
 
 ## Verdict
 
@@ -63,7 +63,6 @@ Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; f
 - `architect-skills` × 2
 - `bounded-context` × 2
 - `system-wide` × 2
-- `user-specified` × 2
 - `anti-corruption` × 2
 - `re-running` × 2
 - `code-level` × 2
@@ -83,6 +82,7 @@ Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; f
 - `bash-based` × 1
 - `language-standard` × 1
 - `hard-code` × 1
+- `non-zero` × 1
 
 ## Secret scan
 
