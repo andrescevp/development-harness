@@ -4,16 +4,17 @@ description: >
   Apply TDD coding best practices when implementing, writing, or fixing code —
   write a failing test first, implement the minimal change to make it pass,
   then refactor, running validation via @dh-executor and stopping after 3
-  consecutive failures. Read and enforce project-specific rules from
-  CODE_RULES.md at the project root when present, falling back to the harness
-  global coding guidelines by convention otherwise, and stay project type
-  aware (software vs non-software, uv/pnpm/npm/poetry toolchains) when
-  delegating and implementing. Also applies performance directives
-  (webservices, data operations, scripting), security directives
-  (webservices, pipelines), and setup best practices. Use when asked to
-  implement, write code, or fix a bug, or during execute-plan-task sub-task
-  2.1 of the skills loop — not for plan orchestration (use execute-plan) or
-  review-only requests (use review).
+  consecutive failures. Code rules ALWAYS live at project level in
+  CODE_RULES.md at the project root: enforce it when present; when absent,
+  analyze the codebase and CREATE it before implementing. Do not rely on
+  global guideline files — keep CODE_RULES.md updated via
+  dh-create-documentation. Stay project type aware (software vs non-software,
+  uv/pnpm/npm/poetry toolchains) when delegating and implementing. Also
+  applies performance directives (webservices, data operations, scripting),
+  security directives (webservices, pipelines), and setup best practices.
+  Use when asked to implement, write code, or fix a bug, or during
+  execute-plan-task sub-task 2.1 of the skills loop — not for plan
+  orchestration (use execute-plan) or review-only requests (use review).
 license: MIT
 compatibility: opencode
 allowed-tools: read, write, edit, bash
@@ -22,12 +23,12 @@ metadata:
   workflow: development
 ---
 
-Apply test-first TDD and clean code best practices when implementing or fixing code, honoring project-specific rules from `CODE_RULES.md` at the project root when present, and defaulting to the harness global coding guidelines by convention otherwise.
+Apply test-first TDD and clean code best practices when implementing or fixing code. Code rules are always project-level: enforce `CODE_RULES.md` at the project root when present; analyze the code and CREATE it when absent (then keep it updated via `dh-create-documentation`).
 
 ## Core Rules
 
 - **Test-first, always:** write a failing test before any implementation; then implement the minimal change that makes it pass; then refactor. Repeat the red → green → refactor loop until the change is complete.
-- **Rules precedence:** `CODE_RULES.md` at the project root overrides generic defaults for naming, structure, and style; the harness global coding guidelines apply everywhere else.
+- **Rules precedence:** code rules are always project-level — `CODE_RULES.md` at the project root is the only rule source; when absent, analyze the code and CREATE it before implementing (see Resolution Order); kept updated via `dh-create-documentation`. No dependency on global guideline files.
 - **Project type aware:** detect software vs non-software before choosing how to implement and which builder agent to delegate to.
 - **Validation through `@dh-executor`:** never run bash, tests, or builds directly — delegate to `@dh-executor` and act on its summarized output.
 - **Tight scope:** change only what the active sub-task requires; do not add extra features, abstractions, or refactors beyond the task.
@@ -36,11 +37,30 @@ Apply test-first TDD and clean code best practices when implementing or fixing c
 
 ## CODE_RULES.md Resolution Order
 
-1. **If `CODE_RULES.md` exists at the project root:** read it before touching any code and treat it as the primary rule set for this project — it overrides generic defaults for naming, structure, and style. Enforce it for every file you create or modify.
-2. **If `CODE_RULES.md` is absent:** fall back to the harness global coding guidelines by convention — correct, secure, simple, maintainable code; match existing project patterns and tooling; change only what is needed; keep changes tightly scoped. Do not invent project rules that are not documented anywhere.
-3. **Regardless of which rules apply:** always work test-first. Project rules refine *how* you code, never *whether* you test.
+Code rules are ALWAYS at project level — the only rule source is
+`CODE_RULES.md` at the project root. Never delegate to global guideline
+files (including the user's `~/.agents/prompts/*`).
 
-> Convention note: the harness global coding guideline lives at `~/.agents/prompts/coding-guideline.md` (the source of the principle above) and is not bundled with this plugin — state the principle, do not treat the file path as a local dependency.
+1. **If `CODE_RULES.md` exists at the project root:** read it before touching
+   any code and treat it as the primary rule set for this project — it
+   overrides generic defaults for naming, structure, and style. Enforce it
+   for every file you create or modify.
+2. **If `CODE_RULES.md` is absent:** analyze the code first, then CREATE it.
+   - Inspect existing modules, tests, configs, and tooling to extract the
+     de-facto conventions: naming, structure, import style, error handling,
+     test patterns, lint/format configs, and the stack's directives.
+   - Write `CODE_RULES.md` at the project root capturing (a) the observed
+     conventions, (b) the directives from this skill (test-first TDD, the
+     300-line code-only limit, performance/security/setup guidance), keeping
+     it concise and enforceable — do not invent rules unsupported by the
+     codebase and do not copy whole guideline documents.
+   - Then implement with the created file as the rule set.
+3. **Maintenance:** keep `CODE_RULES.md` always updated via
+   `dh-create-documentation` — whenever the codebase conventions evolve, a
+   significant change lands, or the documentation pass runs, refresh the file
+   (and have it reviewed) so it never drifts from reality.
+4. **Regardless of which rules apply:** always work test-first. Project rules
+   refine *how* you code, never *whether* you test.
 
 ## Test-First TDD Workflow
 
@@ -129,4 +149,4 @@ Apply where the change touches these areas:
 
 - `dh-execute-plan-task` skill: the loop entry point that delegates implementation work to this skill (loop 2.1).
 - Loop steps after implementation: `dh-simplify` after validation, then `dh-review` + `dh-code-review` (software projects).
-- Harness global coding guideline convention: see CODE_RULES.md Resolution Order above.
+- `CODE_RULES.md` maintenance: created from code analysis when absent and kept updated via `dh-create-documentation` — see Resolution Order above.
