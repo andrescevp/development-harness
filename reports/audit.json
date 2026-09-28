@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T15:52:03.630Z",
+    "generated": "2026-09-28T16:09:34.936Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -35,9 +35,9 @@
       },
       {
         "name": "Cross-references",
-        "count": 26,
+        "count": 27,
         "sev": "WARN",
-        "note": "303 resolved; 1 code-context; 0 allowlisted; 130 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+        "note": "300 resolved; 1 code-context; 0 allowlisted; 131 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
       },
       {
         "name": "Loop membership",
@@ -244,9 +244,28 @@
       "mention": "@build",
       "severity": "warn",
       "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
+    },
+    {
+      "file": "skills/dh-setup/SKILL.md",
+      "line": 87,
+      "mention": "@graphify",
+      "severity": "warn",
+      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
     }
   ],
   "kebabList": [
+    {
+      "token": "project-name",
+      "count": 21,
+      "files": [
+        "agents/dh-executor.md",
+        "agents/dh-explorer.md",
+        "agents/dh-final-reviewer.md",
+        "agents/dh-reviewer.md",
+        "agents/dh-software-architect.md",
+        "agents/dh-software-engineer.md"
+      ]
+    },
     {
       "token": "senior-engineer",
       "count": 17,
@@ -255,18 +274,6 @@
         "skills/dh-coding/SKILL.md",
         "skills/dh-execute-plan/SKILL.md",
         "skills/dh-execute-plan-task/SKILL.md"
-      ]
-    },
-    {
-      "token": "project-name",
-      "count": 15,
-      "files": [
-        "skills/dh-artifact-check/SKILL.md",
-        "skills/dh-code-review/SKILL.md",
-        "skills/dh-code-ruler/SKILL.md",
-        "skills/dh-coding/SKILL.md",
-        "skills/dh-create-documentation/SKILL.md",
-        "skills/dh-domain-check/SKILL.md"
       ]
     },
     {
@@ -1039,6 +1046,13 @@
       ]
     },
     {
+      "token": "graphify-out",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
       "token": "project-appropriate",
       "count": 1,
       "files": [
@@ -1297,7 +1311,7 @@
     {
       "file": "agents/dh-executor.md",
       "kind": "agent",
-      "lines": 76,
+      "lines": 75,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1363,7 +1377,7 @@
     {
       "file": "agents/dh-software-architect.md",
       "kind": "agent",
-      "lines": 88,
+      "lines": 85,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1631,7 +1645,7 @@
     {
       "file": "skills/dh-setup/SKILL.md",
       "kind": "skill",
-      "lines": 137,
+      "lines": 147,
       "frontmatter": {
         "status": "ok",
         "errors": [],

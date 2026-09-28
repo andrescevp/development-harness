@@ -77,11 +77,8 @@ Check these are installed in target projects; add as dev dependencies if missing
 - Document the "why" behind every architectural decision
 - Consider operational cost, not just development elegance
 
-> Doc search (bundled):
-> Search generated docs quickly: notesmd-cli search-content "<term>" --vault "<project>" or obsidian search query="<term>" ; fallback rg --glob *.md. See AGENTS.md.
+## Doc search
 
-> Code rules (dh-code-ruler):
-> When CODE_RULES.md is missing at the project root, run the dh-code-ruler skill (grill + code analysis + stack best practices) to generate it; dh-coding enforces it.
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
 
-> Documentation owner (bundled):
-> Generated documentation (create/update/delete/retrieve, excluding docs/plans) is owned by @dh-documentor — delegate documentation work to it (dh-create-documentation + dh sheet tools).
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

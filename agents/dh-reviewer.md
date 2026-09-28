@@ -28,8 +28,8 @@ You are a scoped code reviewer. Review only the code changed as part of the acti
 - Verify test coverage for the changed code
 - Flag any secrets, tokens, or credentials found in the diff
 
-> Doc search (bundled):
-> Search generated docs quickly: notesmd-cli search-content "<term>" --vault "<project>" or obsidian search query="<term>" ; fallback rg --glob *.md. See AGENTS.md.
+## Doc search
 
-> Documentation owner (bundled):
-> Generated documentation (create/update/delete/retrieve, excluding docs/plans) is owned by @dh-documentor — delegate documentation work to it (dh-create-documentation + dh sheet tools).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
