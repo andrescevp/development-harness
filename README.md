@@ -3,14 +3,14 @@
 > **Git Flow:** managed with `main` (production) + `develop` (integration) and `feature/`, `bugfix/`, `release/`, `hotfix/` branches — see `AGENTS.md` → Git Flow.
 
 **OpenCode V2 plugin** that bundles a scoped personal dev harness for
-plan-driven development: **6 agents** and **15 skills** wired into a
+plan-driven development: **7 agents** and **15 skills** wired into a
 planning → execution → review → release loop.
 
 | | |
 |---|---|
 | Platform | OpenCode V2 (`@opencode/plugin`, `Plugin.define`) |
 | Source harness | `~/.agents` (read-only; opencode-only) |
-| Manifest | 6 agents · 15 skills · **no commands/prompts** (user-mandated scope + dh-grill-sdd) |
+| Manifest | 7 agents · 15 skills · **no commands/prompts** (user-mandated scope + dh-grill-sdd) |
 | Toolchain | TypeScript + tsup + vitest (pnpm) |
 
 ## Manifest
@@ -18,7 +18,7 @@ planning → execution → review → release loop.
 **Agents (6):** `dh-software-architect` (planning, execute-plan,
 create-documentation), `dh-software-engineer` (execute-plan-task, coding),
 `dh-reviewer` (simplify, review, code-review), `dh-final-reviewer` (final-review),
-`dh-executor`, `dh-explorer`.
+`dh-executor`, `dh-explorer`, `dh-documentor`.
 
 **Skills (12):** `dh-artifact-check`, `dh-simplify`, `dh-domain-check`, `dh-coding`,
 `dh-code-review`, `dh-execute-plan`, `dh-execute-plan-task`, `dh-final-review`,
@@ -49,6 +49,7 @@ The plugin registers a `harness` namespace with three V2 custom tools
 | `dh_plan_update_status` | Update a phase or sub-task status marker (phase → Completed only when all its sub-tasks are Completed) |
 | `dh_plan_create` | Scaffold a new phased plan from a title + objective + phases/sub-tasks |
 | `dh_logged_command` | Run a command with its log in the OS temp dir, returning head/tail + log path (executor strategy) |
+| `dh_read_sheet` / `dh_update_sheet` / `dh_sheet_schema` | DuckDB-backed csv/xlsx management (read, update, describe) |
 
 The loop skills (`dh-planning`, `dh-execute-plan`, `dh-execute-plan-task`, `dh-review`,
 `dh-final-review`) and the `dh-software-architect` / `dh-software-engineer` agents use

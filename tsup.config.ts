@@ -20,7 +20,7 @@ export default defineConfig({
   format: ["esm"],
   platform: "node",
   target: "node20",
-  external: ["@opencode/plugin", "yaml"],
+  external: ["@opencode/plugin", "yaml", "duckdb"],
   outDir: "dist",
   clean: true,
   sourcemap: false,

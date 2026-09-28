@@ -14,6 +14,28 @@ metadata:
 
 Generate structured, cross-referenced documentation in any format, at any location, then push a copy to Obsidian with complete metadata for vault discoverability.
 
+## Documentation Contract (mandatory)
+
+- **Owner:** `@dh-documentor` is the main and only responsible agent for
+  create/update/delete/retrieve of generated documents (EXCLUDING
+  `docs/plans/`). All document work is delegated to it; this skill is the
+  tool it uses.
+- **Format:** Markdown is the PRIMARY format for every document.
+  Complementary information and tables may use `csv`, `xml`, `yaml`, or
+  `json`.
+- **Mermaid:** every complex workflow or design MUST include a mermaid
+  diagram (native in Obsidian — no conversion needed).
+- **ASCII wireframes:** every UI representation MUST include an ASCII
+  wireframe (code block).
+- **Obsidian frontmatter:** REQUIRED on every document (`title`, `tags`,
+  `project`, `created`, `updated`, `stack`, `feature`, `epic`).
+- **Retrieval:** use `notesmd-cli search-content "<term>" --vault
+  "<project>"` (preferred) or `obsidian search query="<term>"` to retrieve
+  information from documents; `rg` as fallback.
+- **Parsing extra formats:** use `jq` (json), `yq` (yaml), `xq` (xml), and
+  DuckDB (`dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`) for
+  tabular data.
+
 ## Workflow
 
 Follow this sequence for every documentation request:

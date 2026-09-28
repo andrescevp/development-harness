@@ -203,3 +203,17 @@ grills the user and analyzes the code to generate strict rules at
 constraints and checks, performance constraints and checks, stack best
 practices (websearch when possible). `dh-coding` now delegates CODE_RULES.md
 creation to it when the file is absent. Repo-authored (preserved).
+
+## Patch: dh-documentor agent + doc contract + DuckDB sheet tools (2026-09-28)
+
+- NEW repo-authored agent `dh-documentor` (7th agent): main and ONLY owner
+  of generated documentation outside docs/plans (create/update/delete/
+  retrieve). Extraction preserves it (manifest repoAuthoredAgents).
+- Documentation contract (dh-create-documentation + all skills/agents):
+  markdown primary; csv/xml/yaml/json complementary; mermaid for complex
+  workflows; ASCII wireframes for UI; obsidian frontmatter mandatory;
+  retrieval via notesmd-cli/obsidian; parsing via jq/yq/xq/DuckDB.
+- All skills + agents delegate doc work to @dh-documentor (skills carry the
+  directive in Doc search; agents via sanitized append-body-note patch).
+- NEW plugin tools: dh_read_sheet, dh_update_sheet, dh_sheet_schema
+  (DuckDB npm backend; tsup-external; BigInt-normalized JSON output).

@@ -29,6 +29,7 @@ import type { AgentRecord, SkillRecord } from './lib/records.js';
 import { runLoggedCommand } from './tools/logged-command.js';
 import type { PhaseStatus } from './tools/plan-lifecycle.js';
 import { buildPlanTemplate, parsePlan, resolvePlanPath, setStatus } from './tools/plan-lifecycle.js';
+import { readSheet, sheetSchema, updateSheet } from './tools/sheet-tools.js';
 
 const PLUGIN_ID = 'dev-harness-skills';
 const LOG_PREFIX = '[dev-harness-skills]';
@@ -197,6 +198,65 @@ async function registerPlanTools(ctx: Plugin.Context, workspaceRoot: string): Pr
         }
         const contents = readPlanFile(file);
         return { content: JSON.stringify({ ok: true, path: file, plan: parsePlan(contents) }) };
+      },
+    });
+
+    editor.add({
+      name: 'read_sheet',
+      description:
+        'Read tabular data (csv/xlsx) with DuckDB: returns columns, rows (JSON) and row count. csv read via read_csv_auto; xlsx via read_xlsx when the extension loads. Optional query (SELECT/WITH/DESCRIBE/SHOW) and limit. Use to retrieve data from generated sheets/documents.',
+      input: {
+        type: 'object',
+        properties: {
+          path: { type: 'string', description: 'Absolute path to the csv/xlsx file' },
+          query: { type: 'string', description: 'Optional SQL (SELECT/WITH/DESCRIBE/SHOW) — can use read_csv_auto(?)' },
+          limit: { type: 'number', description: 'Max rows to return' },
+        },
+        required: ['path'],
+      },
+      options: { namespace: 'dh', codemode: true },
+      execute: async (input: unknown) => {
+        const { path: sheetPath, query, limit } = input as { path: string; query?: string; limit?: number };
+        const result = await readSheet(sheetPath, query, limit);
+        return { content: JSON.stringify(result) };
+      },
+    });
+
+    editor.add({
+      name: 'update_sheet',
+      description:
+        "Apply an UPDATE/INSERT/DELETE query to a csv file via DuckDB and write the result back as CSV (HEADER, OVERWRITE_OR_IGNORE). Reads the file into a temp table named t — reference it in the query (e.g. UPDATE t SET col='x' WHERE id=1). Returns the updated rows + row count.",
+      input: {
+        type: 'object',
+        properties: {
+          path: { type: 'string', description: 'Absolute path to the csv file' },
+          query: { type: 'string', description: 'UPDATE/INSERT/DELETE SQL against temp table t' },
+        },
+        required: ['path', 'query'],
+      },
+      options: { namespace: 'dh', codemode: true },
+      execute: async (input: unknown) => {
+        const { path: sheetPath, query } = input as { path: string; query: string };
+        const result = await updateSheet(sheetPath, query);
+        return { content: JSON.stringify(result) };
+      },
+    });
+
+    editor.add({
+      name: 'sheet_schema',
+      description: 'Describe a csv/xlsx file with DuckDB: returns column names + inferred types (column:type).',
+      input: {
+        type: 'object',
+        properties: {
+          path: { type: 'string' },
+        },
+        required: ['path'],
+      },
+      options: { namespace: 'dh', codemode: true },
+      execute: async (input: unknown) => {
+        const { path: sheetPath } = input as { path: string };
+        const result = await sheetSchema(sheetPath);
+        return { content: JSON.stringify(result) };
       },
     });
 
