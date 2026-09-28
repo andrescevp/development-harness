@@ -90,7 +90,7 @@ export default Plugin.define({
 /** Registration for the M2 plan-lifecycle toolset (namespace `harness`). */
 async function registerPlanTools(ctx: Plugin.Context, workspaceRoot: string): Promise<void> {
   await ctx.tool.transform((editor) => {
-    editor.namespace({ name: "harness", description: "Plan lifecycle tools for phased plans under docs/plans (phases + sub-tasks with statuses)" })
+    editor.namespace({ name: "dh", description: "Plan lifecycle tools for phased plans under docs/plans (phases + sub-tasks with statuses)" })
     editor.add({
       name: "plan_read",
       description: "Parse a phased plan (docs/plans/<slug>/plan.md) into structured JSON: meta, phases[] with status, subTasks[] with phase/status/relatedRequirements. Input: slug (or path relative to docs/plans). Errors clearly when missing or unparseable.",
@@ -101,7 +101,7 @@ async function registerPlanTools(ctx: Plugin.Context, workspaceRoot: string): Pr
           path: { type: "string", description: "Explicit path relative to docs/plans (overrides slug)" },
         },
       },
-      options: { namespace: "harness", codemode: true },
+      options: { namespace: "dh", codemode: true },
       execute: async (input: unknown) => {
         const { slug, path: relPath } = input as { slug?: string; path?: string }
         const file = resolvePlanPath(workspaceRoot, slug, relPath)
@@ -124,7 +124,7 @@ async function registerPlanTools(ctx: Plugin.Context, workspaceRoot: string): Pr
         },
         required: ["target", "index", "status"],
       },
-      options: { namespace: "harness", codemode: true },
+      options: { namespace: "dh", codemode: true },
       execute: async (input: unknown) => {
         const { slug, path: relPath, target, index, status } = input as { slug?: string; path?: string; target: "phase" | "subtask"; index: string; status: PhaseStatus }
         const file = resolvePlanPath(workspaceRoot, slug, relPath)
@@ -152,7 +152,7 @@ async function registerPlanTools(ctx: Plugin.Context, workspaceRoot: string): Pr
         },
         required: ["slug", "title", "objective", "phases"],
       },
-      options: { namespace: "harness", codemode: true },
+      options: { namespace: "dh", codemode: true },
       execute: async (input: unknown) => {
         const { slug, title, objective, phases, updateIndex } = input as { slug: string; title: string; objective: string; phases: { title: string; subTasks: { title: string }[] }[]; updateIndex?: boolean }
         const file = resolvePlanPath(workspaceRoot, slug)
@@ -185,7 +185,7 @@ async function registerPlanTools(ctx: Plugin.Context, workspaceRoot: string): Pr
         },
         required: ["command"],
       },
-      options: { namespace: "harness", codemode: true },
+      options: { namespace: "dh", codemode: true },
       execute: async (input: unknown) => {
         const { command, logName, timeoutMs } = input as { command: string; logName?: string; timeoutMs?: number }
         const result = await runLoggedCommand({ command, logName, timeoutMs })

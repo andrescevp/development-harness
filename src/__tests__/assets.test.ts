@@ -12,20 +12,20 @@ import { loadHarnessAssets } from "../lib/assets.js"
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..")
 
-const MANIFEST_AGENTS = ["software-architect", "software-engineer", "reviewer", "final-reviewer", "executor", "explorer"].sort()
+const MANIFEST_AGENTS = ["dh-software-architect", "dh-software-engineer", "dh-reviewer", "dh-final-reviewer", "dh-executor", "dh-explorer"].sort()
 const MANIFEST_SKILLS = [
-  "artifact-check",
-  "simplify",
-  "domain-check",
-  "coding",
-  "code-review",
-  "execute-plan",
-  "execute-plan-task",
-  "final-review",
-  "planning",
-  "preflight",
-  "review",
-  "create-documentation",
+  "dh-artifact-check",
+  "dh-simplify",
+  "dh-domain-check",
+  "dh-coding",
+  "dh-code-review",
+  "dh-execute-plan",
+  "dh-execute-plan-task",
+  "dh-final-review",
+  "dh-planning",
+  "dh-preflight",
+  "dh-review",
+  "dh-create-documentation",
 ].sort()
 
 describe("loadHarnessAssets on the real repo layout", () => {
@@ -37,7 +37,7 @@ describe("loadHarnessAssets on the real repo layout", () => {
 
   it("loads exactly the 12 manifest skills including coding", () => {
     expect(assets.skills.map((s) => s.name).sort()).toEqual(MANIFEST_SKILLS)
-    expect(assets.skills.some((s) => s.name === "coding")).toBe(true)
+    expect(assets.skills.some((s) => s.name === "dh-coding")).toBe(true)
   })
 
   it("captures the index and reports zero errors on the clean corpus", () => {

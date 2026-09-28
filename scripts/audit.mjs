@@ -191,7 +191,7 @@ function scanJunk() {
 
 // ---------- loop, inventory checks, aggregation ----------
 function checkLoop(records) {
-  const skillSet = new Set(records.filter((r) => r.kind === 'skill').map((r) => r.frontmatter?.fields?.name).concat(MANIFEST.loop.skills.filter((s) => s !== 'coding' && fs.existsSync(jp('skills', s, 'SKILL.md')))))
+  const skillSet = new Set(records.filter((r) => r.kind === 'skill').map((r) => r.frontmatter?.fields?.name).concat(MANIFEST.loop.skills.filter((s) => s !== 'dh-coding' && fs.existsSync(jp('skills', s, 'SKILL.md')))))
   const agentSet = new Set(records.filter((r) => r.kind === 'agent').map((r) => r.frontmatter?.fields?.name).concat(MANIFEST.loop.agents.filter((a) => fs.existsSync(jp('agents', `${a}.md`)))))
   return {
     skills: MANIFEST.loop.skills.map((s) => ({ name: s, status: skillSet.has(s) ? 'present' : MANIFEST.loop.expectedPendingSkills.includes(s) ? 'expected-pending (ST3)' : 'missing' })),
@@ -204,7 +204,7 @@ function checkInventory(inv) {
   if (inv.agents.length !== exp.agents.expectedItems) problems.push(`agents ${inv.agents.length} != ${exp.agents.expectedItems}`)
   // Expected skill dirs grow when ST3 adds `coding` — derive from the manifest's
   // bundledSkillMdCount so the audit does not hard-fail once coding exists (P2-2 fix).
-  const expectedSkills = fs.existsSync(jp('skills', 'coding', 'SKILL.md'))
+  const expectedSkills = fs.existsSync(jp('skills', 'dh-coding', 'SKILL.md'))
     ? MANIFEST.bundledSkillMdCount.afterSt3
     : MANIFEST.bundledSkillMdCount.now
   if (inv.skillDirs.length !== expectedSkills) problems.push(`skill dirs ${inv.skillDirs.length} != ${expectedSkills}`)

@@ -68,10 +68,10 @@ describe("corpus parsing (real bundled set)", () => {
   })
 
   it("the coding skill is present and parses", () => {
-    const coding = path.join(REPO_ROOT, "skills", "coding", "SKILL.md")
+    const coding = path.join(REPO_ROOT, "skills", "dh-coding", "SKILL.md")
     expect(fs.existsSync(coding)).toBe(true)
     const { data } = parseFrontmatter(fs.readFileSync(coding, "utf8"))
-    expect(data.name).toBe("coding")
+    expect(data.name).toBe("dh-coding")
     expect(String(data.description)).toMatch(/CODE_RULES\.md/)
     expect(String(data.description)).toMatch(/TDD/i)
   })
@@ -91,7 +91,7 @@ describe("corpus parsing (real bundled set)", () => {
 describe("multi-line > description folding", () => {
   it("folds folded descriptions into a single string", () => {
     // execute-plan-task uses `description: >` multi-line in the harness.
-    const file = path.join(REPO_ROOT, "skills", "execute-plan-task", "SKILL.md")
+    const file = path.join(REPO_ROOT, "skills", "dh-execute-plan-task", "SKILL.md")
     const { data } = parseFrontmatter(fs.readFileSync(file, "utf8"))
     const desc = data.description as string
     expect(desc).toContain("single sub-task")

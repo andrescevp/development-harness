@@ -65,7 +65,7 @@ function verifyInventory(skipped) {
     .filter((e) => e.isDirectory())
     .filter((d) => fs.existsSync(path.join(ASSETS_ROOT, "skills", d.name, "SKILL.md")))
   const hasIndex = fs.existsSync(path.join(ASSETS_ROOT, "skills", "index.md"))
-  const expectedSkills = fs.existsSync(path.join(REPO_ROOT, "skills", "coding", "SKILL.md"))
+  const expectedSkills = fs.existsSync(path.join(REPO_ROOT, "skills", "dh-coding", "SKILL.md"))
     ? M.bundledSkillMdCount.afterSt3
     : M.bundledSkillMdCount.now
   if (agentFiles.length !== M.sections.agents.expectedItems) {

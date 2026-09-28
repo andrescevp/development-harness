@@ -22,7 +22,7 @@ observations, distilled into 6 evolution units, clustered into 2 proposals.
 One `scripts/manifest.json` (include lists + expected-pending counts) drove
 `extract --check`, the audit, and `copy-assets`. It made a mid-plan user scope
 reduction (14/37 → 6/12) a small include-list edit, kept counts drift-free
-across all 7 sub-tasks, and self-adjusted when the new `coding` skill landed
+across all 7 sub-tasks, and self-adjusted when the new `dh-coding` skill landed
 (`bundledSkillMdCount {now, afterSt3}`) with zero hand-bumped expectations.
 Promotion target: a reusable **skill** for manifest-driven asset pipelines
 (extraction + audit + build), evidence: `evu-20260928-66b223`,

@@ -13,28 +13,28 @@ planning → execution → review → release loop.
 
 ## Manifest
 
-**Agents (6):** `software-architect` (planning, execute-plan,
-create-documentation), `software-engineer` (execute-plan-task, coding),
-`reviewer` (simplify, review, code-review), `final-reviewer` (final-review),
-`executor`, `explorer`.
+**Agents (6):** `dh-software-architect` (planning, execute-plan,
+create-documentation), `dh-software-engineer` (execute-plan-task, coding),
+`dh-reviewer` (simplify, review, code-review), `dh-final-reviewer` (final-review),
+`dh-executor`, `dh-explorer`.
 
-**Skills (12):** `artifact-check`, `simplify`, `domain-check`, `coding`,
-`code-review`, `execute-plan`, `execute-plan-task`, `final-review`,
-`planning`, `preflight`, `review`, `create-documentation`.
-`coding` is the NEW skill — TDD coding best practices that reads project
+**Skills (12):** `dh-artifact-check`, `dh-simplify`, `dh-domain-check`, `dh-coding`,
+`dh-code-review`, `dh-execute-plan`, `dh-execute-plan-task`, `dh-final-review`,
+`dh-planning`, `dh-preflight`, `dh-review`, `dh-create-documentation`.
+`dh-coding` is the NEW skill — TDD coding best practices that reads project
 rules from `CODE_RULES.md` at the project root when present.
 
 **The skills loop** (see [`AGENTS.md`](AGENTS.md)) — plans are **phased**
 (phases → sub-tasks with dual status markers; format contract in
 `skills/planning/references/phased-plan-template.md`):
 
-1. `planning` → use `domain-check` while planning
-2. `execute-plan` → 2.1 `execute-plan-task` (uses `coding`) · 2.2 `simplify`
-   · 2.3 `review` + `code-review` · 2.4 hard blockers → stop and ask guidance
+1. `dh-planning` → use `dh-domain-check` while planning
+2. `dh-execute-plan` → 2.1 `dh-execute-plan-task` (uses `dh-coding`) · 2.2 `dh-simplify`
+   · 2.3 `dh-review` + `dh-code-review` · 2.4 hard blockers → stop and ask guidance
    (otherwise loop back to 2.1)
-3. `preflight` + `artifact-check`
-4. `final-review`
-5. `create-documentation`
+3. `dh-preflight` + `dh-artifact-check`
+4. `dh-final-review`
+5. `dh-create-documentation`
 
 ## Plan lifecycle tools (bundled)
 
@@ -43,13 +43,13 @@ The plugin registers a `harness` namespace with three V2 custom tools
 
 | Tool | Purpose |
 |---|---|
-| `harness_plan_read` | Parse a phased plan into structured JSON (meta, phases, sub-tasks with statuses) |
-| `harness_plan_update_status` | Update a phase or sub-task status marker (phase → Completed only when all its sub-tasks are Completed) |
-| `harness_plan_create` | Scaffold a new phased plan from a title + objective + phases/sub-tasks |
-| `harness_logged_command` | Run a command with its log in the OS temp dir, returning head/tail + log path (executor strategy) |
+| `dh_plan_read` | Parse a phased plan into structured JSON (meta, phases, sub-tasks with statuses) |
+| `dh_plan_update_status` | Update a phase or sub-task status marker (phase → Completed only when all its sub-tasks are Completed) |
+| `dh_plan_create` | Scaffold a new phased plan from a title + objective + phases/sub-tasks |
+| `dh_logged_command` | Run a command with its log in the OS temp dir, returning head/tail + log path (executor strategy) |
 
-The loop skills (`planning`, `execute-plan`, `execute-plan-task`, `review`,
-`final-review`) and the `software-architect` / `software-engineer` agents use
+The loop skills (`dh-planning`, `dh-execute-plan`, `dh-execute-plan-task`, `dh-review`,
+`dh-final-review`) and the `dh-software-architect` / `dh-software-engineer` agents use
 these tools instead of manual plan.md edits (fallback to manual edits when the
 tools are unavailable).
 
@@ -57,15 +57,15 @@ tools are unavailable).
 
 - Harness content is extracted from `~/.agents` (read-only source; nothing
   there is modified). See [`docs/EXTRACTION.md`](docs/EXTRACTION.md).
-- Alias mapping on copy: `senior-architect` → `software-architect`,
-  `senior-engineer` → `software-engineer` (frontmatter `name` only; bodies
+- Alias mapping on copy: `senior-architect` → `dh-software-architect`,
+  `senior-engineer` → `dh-software-engineer` (frontmatter `name` only; bodies
   byte-identical modulo the sanctioned plan-tools note).
 - Bundled agents ship **without the `permission` frontmatter key** (M3
   mandate) — permission rules derive from `tools` only; the strip is a
   declarative patch applied on extraction and verified by `extract --check`.
 - Runtime delegation normalization (the plugin registers only the 6 manifest
-  agents): `@build`/`@senior-engineer` → `@software-engineer`,
-  `@senior-architect`/`@plan` → `@software-architect` — see AGENTS.md table.
+  agents): `@build`/`@senior-engineer` → `@dh-software-engineer`,
+  `@senior-architect`/`@plan` → `@dh-software-architect` — see AGENTS.md table.
 
 ## Quickstart
 

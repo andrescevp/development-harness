@@ -26,7 +26,7 @@ Add ONE of the following entries to `"plugins"` in `opencode.jsonc`:
 After loading, confirm the manifest is registered:
 
 ```
-opencode debug agents   → look for: software-architect, software-engineer,
+opencode debug agents   → look for: dh-software-architect, dh-software-engineer,
                           reviewer, final-reviewer, executor, explorer
 opencode debug skills   → look for: artifact-check, simplify, domain-check,
                           coding, code-review, execute-plan, execute-plan-task,
@@ -41,10 +41,10 @@ The plugin also registers three V2 custom tools (codemode) for phased plans:
 
 | Tool | Input | Returns |
 |---|---|---|
-| `harness_plan_read` | `{ slug }` or `{ path }` (relative to `docs/plans`) | `{ ok, path, plan }` — parsed phases/sub-tasks with statuses |
-| `harness_plan_update_status` | `{ slug?, path?, target: phase\|subtask, index: "N"\|"N.M", status }` | `{ ok, path, plan }` — line-aware status edit |
-| `harness_plan_create` | `{ slug, title, objective, phases: [{title, subTasks:[{title}]}], updateIndex? }` | `{ ok, path, plan }` — scaffolds a phased plan |
-| `harness_logged_command` | `{ command, logName?, timeoutMs? }` | `{ ok, exitCode, logPath, head, tail, truncated }` — runs a command with its log in the OS temp dir and returns a head/tail window + log path |
+| `dh_plan_read` | `{ slug }` or `{ path }` (relative to `docs/plans`) | `{ ok, path, plan }` — parsed phases/sub-tasks with statuses |
+| `dh_plan_update_status` | `{ slug?, path?, target: phase\|subtask, index: "N"\|"N.M", status }` | `{ ok, path, plan }` — line-aware status edit |
+| `dh_plan_create` | `{ slug, title, objective, phases: [{title, subTasks:[{title}]}], updateIndex? }` | `{ ok, path, plan }` — scaffolds a phased plan |
+| `dh_logged_command` | `{ command, logName?, timeoutMs? }` | `{ ok, exitCode, logPath, head, tail, truncated }` — runs a command with its log in the OS temp dir and returns a head/tail window + log path |
 
 Phase → `Completed` is gated: it fails while any sub-task of the phase is not
 `Completed`. Reads/writes are anchored under `<workspace>/docs/plans`;

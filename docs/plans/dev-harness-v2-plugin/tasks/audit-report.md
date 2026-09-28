@@ -1,10 +1,10 @@
 # Audit Report — Dev Harness V2 Plugin (ST2)
 
-Generated 2026-09-28T08:01:46.507Z by `scripts/audit.mjs`.
+Generated 2026-09-28T08:07:29.909Z by `scripts/audit.mjs`.
 
 ## Verdict
 
-**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 75. Documented schema deviations: 0.
+**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 87. Documented schema deviations: 0.
 
 ## Summary verdict table
 
@@ -14,7 +14,7 @@ Generated 2026-09-28T08:01:46.507Z by `scripts/audit.mjs`.
 | Frontmatter parse | 19 | PASS | 19 files on audit surface |
 | Name regex | 18 | PASS | ^[a-z0-9]+(-[a-z0-9]+)*$ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 1 | WARN | 193 resolved; 0 code-context; 0 allowlisted; 74 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented) |
+| Cross-references | 7 | WARN | 228 resolved; 0 code-context; 0 allowlisted; 80 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented) |
 | Loop membership | 18 | PASS | 12/12 skills present + coding expected-pending (ST3); 6/6 agents present |
 | Secret scan | 16 | PASS | 16 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
@@ -31,37 +31,47 @@ _None._
 
 | Kind | Name | Status |
 |---|---|---|
-| skill | planning | present |
-| skill | domain-check | present |
-| skill | execute-plan | present |
-| skill | execute-plan-task | present |
-| skill | simplify | present |
-| skill | review | present |
-| skill | code-review | present |
-| skill | preflight | present |
-| skill | artifact-check | present |
-| skill | final-review | present |
-| skill | create-documentation | present |
-| skill | coding | present |
-| agent | software-architect | present |
-| agent | software-engineer | present |
-| agent | reviewer | present |
-| agent | final-reviewer | present |
-| agent | executor | present |
-| agent | explorer | present |
+| skill | dh-artifact-check | present |
+| skill | dh-simplify | present |
+| skill | dh-domain-check | present |
+| skill | dh-code-review | present |
+| skill | dh-execute-plan | present |
+| skill | dh-execute-plan-task | present |
+| skill | dh-final-review | present |
+| skill | dh-planning | present |
+| skill | dh-preflight | present |
+| skill | dh-review | present |
+| skill | dh-create-documentation | present |
+| skill | dh-coding | present |
+| agent | dh-software-architect | present |
+| agent | dh-software-engineer | present |
+| agent | dh-reviewer | present |
+| agent | dh-final-reviewer | present |
+| agent | dh-executor | present |
+| agent | dh-explorer | present |
 
 ## Cross-reference failures
 
 | File | Line | Mention | Note |
 |---|---|---|---|
-| skills/planning/SKILL.md | 29 | @build | unresolved @mention (external role/product or prose) — warn-only per plan |
+| agents/dh-software-engineer.md | 53 | @executor | unresolved @mention (external role/product or prose) — warn-only per plan |
+| agents/dh-software-engineer.md | 54 | @reviewer | unresolved @mention (external role/product or prose) — warn-only per plan |
+| agents/dh-software-engineer.md | 56 | @executor | unresolved @mention (external role/product or prose) — warn-only per plan |
+| agents/dh-software-engineer.md | 63 | @executor | unresolved @mention (external role/product or prose) — warn-only per plan |
+| agents/dh-software-engineer.md | 83 | @executor | unresolved @mention (external role/product or prose) — warn-only per plan |
+| agents/dh-software-engineer.md | 83 | @executor | unresolved @mention (external role/product or prose) — warn-only per plan |
+| skills/dh-planning/SKILL.md | 29 | @build | unresolved @mention (external role/product or prose) — warn-only per plan |
 
 Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; full list in reports/audit.json):
 
+- `domain-check` × 6
 - `state-sync` × 5
 - `phased-plan-template` × 5
+- `create-documentation` × 4
+- `final-review` × 3
 - `architect-skills` × 2
 - `bounded-context` × 2
+- `artifact-check` × 2
 - `system-wide` × 2
 - `anti-corruption` × 2
 - `re-running` × 2
@@ -79,10 +89,6 @@ Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; f
 - `stop-and-start` × 1
 - `framework-native` × 1
 - `third-party` × 1
-- `bash-based` × 1
-- `language-standard` × 1
-- `hard-code` × 1
-- `non-zero` × 1
 
 ## Secret scan
 

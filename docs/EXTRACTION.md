@@ -7,7 +7,7 @@ The source `~/.agents` is **read-only** — nothing there was modified.
 ## Scope revision (user-mandated, 2026-09-27)
 
 The plugin scope is **limited by user mandate** to exactly **6 agents** and
-**12 skills** (11 existing + the NEW `coding` skill created later in ST3).
+**12 skills** (11 existing + the NEW `dh-coding` skill created later in ST3).
 **No commands, no prompts, no other agents/skills, no multi-CLI variants**.
 
 The initial extraction in ST1 copied the **full harness** (14 agents, 37 skill
@@ -33,15 +33,15 @@ Scoped inventory verified on 2026-09-27: **6 agents, 11 skill dirs +
 
 Scoped agents: `senior-architect.md`, `senior-engineer.md` (renamed, see
 below), `reviewer.md`, `final-reviewer.md`, `executor.md`, `explorer.md`.
-Scoped skills: `artifact-check`, `simplify`, `domain-check`, `code-review`,
-`execute-plan`, `execute-plan-task`, `final-review`, `planning`, `preflight`,
-`review`, `create-documentation` — plus the NEW `coding` skill authored in ST3
+Scoped skills: `dh-artifact-check`, `dh-simplify`, `dh-domain-check`, `dh-code-review`,
+`dh-execute-plan`, `dh-execute-plan-task`, `dh-final-review`, `dh-planning`, `dh-preflight`,
+`dh-review`, `dh-create-documentation` — plus the NEW `dh-coding` skill authored in ST3
 (`skills/index.md` is the source copy; it is adapted to the 12-skill manifest
 in ST7).
 
 > **Count deviation vs earlier plan text:** earlier plan drafts stated "38
 > skills" / "39 SKILL.md". The scoped manifest supersedes those numbers: **11
-> extracted SKILL.md now, 12 after ST3** (11 + `coding`). `scripts/extract.mjs
+> extracted SKILL.md now, 12 after ST3** (11 + `dh-coding`). `scripts/extract.mjs
 > --check` and `scripts/audit.mjs` enforce the scoped inventory.
 
 ## Agent alias mapping
@@ -52,11 +52,11 @@ source (verified by `--check`).
 
 | Source file | Copied as | Frontmatter `name` |
 |---|---|---|
-| `agents/senior-architect.md` | `agents/software-architect.md` | `senior-architect` → `software-architect` |
-| `agents/senior-engineer.md` | `agents/software-engineer.md` | `senior-engineer` → `software-engineer` |
+| `agents/senior-architect.md` | `agents/dh-software-architect.md` | `senior-architect` → `dh-software-architect` |
+| `agents/senior-engineer.md` | `agents/dh-software-engineer.md` | `senior-engineer` → `dh-software-engineer` |
 
 **Rationale:** the user's plugin manifest calls the primary agents
-`software-architect` and `software-engineer` (see plan.md "Primary agent
+`dh-software-architect` and `dh-software-engineer` (see plan.md "Primary agent
 manifest"), so the bundled files carry those names. The source files keep their
 original names in `~/.agents`. The body text of both files may still reference
 `senior-architect` / `senior-engineer` internally — those occurrences are
@@ -143,7 +143,7 @@ in `src/__tests__/fixtures/plans/phased-plan.md`.
 
 **Repo-authored preservation:** the bundled skill set is this repo's
 distribution — `scripts/manifest.json` `repoAuthored.skills` lists every
-bundled skill dir (incl. `coding`, `planning`, and the loop skills that are
+bundled skill dir (incl. `dh-coding`, `dh-planning`, and the loop skills that are
 patched in dev-harness-phases-and-tools). `extract.mjs` merge-preserves them:
 re-running extraction never wipes these dirs, never overwrites the adapted
 `skills/index.md`, and keeps dest-only files such as `planning/references/`.
@@ -170,5 +170,5 @@ command runs with a log file in the SYSTEM TEMP directory, reporting
 bundled copy in-repo AND (b) guarded by an `append-body-note` patch entry in
 `scripts/manifest.json` (`> Command execution strategy (bundled):`), so a
 re-extract re-applies it idempotently. The plugin also registers
-`harness_logged_command` which implements the same strategy (see
+`dh_logged_command` which implements the same strategy (see
 `src/tools/logged-command.ts`).

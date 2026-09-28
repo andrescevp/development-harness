@@ -1,5 +1,5 @@
 /**
- * logged-command.ts — logged command execution strategy (harness_logged_command).
+ * logged-command.ts — logged command execution strategy (dh_logged_command).
  *
  * Encodes the executor agent's mandatory strategy: run the command with its
  * output written to a log file in the SYSTEM TEMP directory, then return a

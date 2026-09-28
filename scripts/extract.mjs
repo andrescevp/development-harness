@@ -174,7 +174,8 @@ function extractSection(src, dest, kind) {
     // Merge-preserve: never wipe; remove only stale/out-of-scope entries, keep
     // repo-authored dirs, adapted index.md, and dest-only files (references/).
     fs.mkdirSync(destAbs, { recursive: true })
-    const protectedNames = new Set([...(M.include.skills ?? []), ...(M.repoAuthored?.skills ?? []), 'index.md'])
+    const destNames = (M.include.skills ?? []).map((n) => M.skillRenames?.[n] ?? n)
+    const protectedNames = new Set([...destNames, ...(M.repoAuthored?.skills ?? []), 'index.md'])
     for (const e of fs.readdirSync(destAbs, { withFileTypes: true })) {
       if (!protectedNames.has(e.name)) {
         fs.rmSync(path.join(destAbs, e.name), { recursive: true, force: true })
@@ -207,13 +208,14 @@ function extractSection(src, dest, kind) {
       copyAgent(path.join(srcAbs, entry.name), path.join(destAbs, entry.name))
       stats.copied.agents += 1
     } else if (kind === 'skills') {
+      const destName = M.skillRenames?.[entry.name] ?? entry.name
       if (entry.name === 'index.md') {
         // Repo keeps the adapted index; copy source only when none exists.
         if (!fs.existsSync(path.join(destAbs, 'index.md'))) {
           fs.copyFileSync(path.join(srcAbs, entry.name), path.join(destAbs, entry.name))
         }
         indexCopied = true
-      } else if ((M.repoAuthored?.skills ?? []).includes(entry.name)) {
+      } else if ((M.repoAuthored?.skills ?? []).includes(destName)) {
         stats.skipped.push({ rel: `${dest}/${entry.name}`, reason: 'repo-authored preserved (not re-copied)' })
       } else {
         const srcDir = path.join(srcAbs, entry.name)
@@ -322,7 +324,7 @@ function check() {
   const { agents, skillDirs, hasIndex } = countItems()
   // Expected skill dirs grow when ST3 adds `coding` — derive from the manifest's
   // bundledSkillMdCount so --check does not fail once coding exists (P2-2 fix).
-  const expectedSkills = fs.existsSync(path.join(REPO_ROOT, 'skills', 'coding', 'SKILL.md'))
+  const expectedSkills = fs.existsSync(path.join(REPO_ROOT, 'skills', 'dh-coding', 'SKILL.md'))
     ? M.bundledSkillMdCount.afterSt3
     : M.bundledSkillMdCount.now
   const expectations = {
@@ -336,9 +338,9 @@ function check() {
   for (const out of ['commands', 'prompts']) {
     if (fs.existsSync(path.join(REPO_ROOT, out))) problems.push(`out-of-scope directory present: ${out}/`)
   }
-  if (!fs.existsSync(path.join(REPO_ROOT, 'agents', 'software-architect.md')) ||
-      !fs.existsSync(path.join(REPO_ROOT, 'agents', 'software-engineer.md'))) {
-    problems.push('alias files software-architect.md / software-engineer.md missing')
+  if (!fs.existsSync(path.join(REPO_ROOT, 'agents', 'dh-software-architect.md')) ||
+      !fs.existsSync(path.join(REPO_ROOT, 'agents', 'dh-software-engineer.md'))) {
+    problems.push('alias files dh-software-architect.md / dh-software-engineer.md missing')
   }
   // M3: `permission` must be stripped from every bundled agent frontmatter.
   for (const f of fs.readdirSync(path.join(REPO_ROOT, 'agents'))) {

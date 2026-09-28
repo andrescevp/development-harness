@@ -14,20 +14,20 @@ import { fileURLToPath } from "node:url"
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..")
 const DIST_PLUGIN = path.join(REPO_ROOT, "dist", "plugin.js")
 
-const MANIFEST_AGENTS = ["software-architect", "software-engineer", "reviewer", "final-reviewer", "executor", "explorer"].sort()
+const MANIFEST_AGENTS = ["dh-software-architect", "dh-software-engineer", "dh-reviewer", "dh-final-reviewer", "dh-executor", "dh-explorer"].sort()
 const MANIFEST_SKILLS = [
-  "artifact-check",
-  "simplify",
-  "domain-check",
-  "coding",
-  "code-review",
-  "execute-plan",
-  "execute-plan-task",
-  "final-review",
-  "planning",
-  "preflight",
-  "review",
-  "create-documentation",
+  "dh-artifact-check",
+  "dh-simplify",
+  "dh-domain-check",
+  "dh-coding",
+  "dh-code-review",
+  "dh-execute-plan",
+  "dh-execute-plan-task",
+  "dh-final-review",
+  "dh-planning",
+  "dh-preflight",
+  "dh-review",
+  "dh-create-documentation",
 ].sort()
 
 interface CapturedUpdate {
@@ -102,12 +102,12 @@ describe("plugin setup registration (built bundle)", () => {
     expect(agents).toEqual(MANIFEST_AGENTS)
     expect(skills).toEqual(MANIFEST_SKILLS)
     expect(tools).toEqual(MANIFEST_TOOLS)
-    // One harness namespace registered; all 3 tools are codemode.
+    // One dh namespace registered; all 4 tools are codemode.
     const namespaces = captured.filter((c) => c.domain === "tool" && c.kind === "namespace")
-    expect(namespaces.map((c) => c.name)).toEqual(["harness"])
+    expect(namespaces.map((c) => c.name)).toEqual(["dh"])
     const toolAdds = captured.filter((c) => c.domain === "tool" && c.kind === "add")
     expect(toolAdds.every((c) => c.codemode === true)).toBe(true)
-    expect(toolAdds.every((c) => c.namespace === "harness")).toBe(true)
+    expect(toolAdds.every((c) => c.namespace === "dh")).toBe(true)
     // No command domain is ever touched (stub throws if invoked).
     expect(captured.some((c) => c.domain === "command")).toBe(false)
     expect(captured.every((c) => c.domain === "agent" || c.domain === "skill" || c.domain === "tool")).toBe(true)
