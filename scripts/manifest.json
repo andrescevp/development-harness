@@ -1,9 +1,24 @@
 {
   "$comment": "Dev Harness V2 plugin — scoped include/exclude + expectations manifest. Single source of truth reused by scripts/extract.mjs and scripts/audit.mjs (and, in ST5, the plugin asset builder). USER-MANDATED SCOPE: 6 agents + 11 existing loop skills (+ NEW coding in ST3); NO commands, NO prompts. Scope revision applied 2026-09-27: the earlier full extraction (14 agents / 37 skills / 11 commands / 9 prompts) was pruned to this manifest (see docs/EXTRACTION.md 'Scope revision' and tasks/review.md addendum).",
   "sections": {
-    "agents": { "src": "agents", "dest": "agents", "kind": "files", "expectedItems": 6 },
-    "skills": { "src": "skills", "dest": "skills", "kind": "dirs", "expectedItems": 11 },
-    "skillsIndex": { "src": "skills", "dest": "skills", "kind": "index-file", "expectedItems": 1 }
+    "agents": {
+      "src": "agents",
+      "dest": "agents",
+      "kind": "files",
+      "expectedItems": 6
+    },
+    "skills": {
+      "src": "skills",
+      "dest": "skills",
+      "kind": "dirs",
+      "expectedItems": 11
+    },
+    "skillsIndex": {
+      "src": "skills",
+      "dest": "skills",
+      "kind": "index-file",
+      "expectedItems": 1
+    }
   },
   "include": {
     "agents": [
@@ -34,8 +49,14 @@
     "afterSt3Note": "11 extracted SKILL.md + the new `coding` skill created in ST3. The audit, ST5 asset builder, and ST7 docs must use 12 AFTER ST3; 11 now (coding expected-pending)."
   },
   "agentRenames": {
-    "senior-architect.md": { "to": "software-architect.md", "newName": "software-architect" },
-    "senior-engineer.md": { "to": "software-engineer.md", "newName": "software-engineer" }
+    "senior-architect.md": {
+      "to": "software-architect.md",
+      "newName": "software-architect"
+    },
+    "senior-engineer.md": {
+      "to": "software-engineer.md",
+      "newName": "software-engineer"
+    }
   },
   "patches": [
     {
@@ -48,9 +69,22 @@
       "$comment": "M2 wiring: prime the two planner agents to use the harness plan-lifecycle tools. Sanctioned append to the agent BODY — verifyAliasBodyIntegrity strips this exact marker block before comparing bodies.",
       "scope": "agents",
       "action": "append-body-note",
-      "files": ["software-architect.md", "software-engineer.md"],
+      "files": [
+        "software-architect.md",
+        "software-engineer.md"
+      ],
       "marker": "> Harness plan tools (bundled):",
       "note": "> Harness plan tools (bundled):\n> Use harness_plan_read / harness_plan_update_status / harness_plan_create for reading, updating, and scaffolding phased plans (docs/plans). Fall back to direct plan.md edits only when the tools are unavailable."
+    },
+    {
+      "$comment": "Executor directive (user mandate 2026-09-28): the logged-command strategy (log file in SYSTEM TEMP + head/tail window) survives re-extraction. Idempotent via marker.",
+      "scope": "agents",
+      "action": "append-body-note",
+      "files": [
+        "executor.md"
+      ],
+      "marker": "> Command execution strategy (bundled):",
+      "note": "> Command execution strategy (bundled):\n> ## Command Execution Strategy (MANDATORY)\n> \n> Every command you run must be logged and summarized with a head/tail window:\n> \n> - **Always** run the command with a log file so it can be explored if needed.\n> - **Log files live in the system temporary directory** (never in the project).\n> - After the command finishes, print the **start** of the log (`head`), a\n>   `...[TRUNCATED]...` marker, and the **end** of the log (`tail`) so the\n>   caller sees both the beginning and the outcome of the execution.\n> - Keep the log path in your report so the caller (or you) can explore the\n>   full log on demand. Only delete logs after the session ends or when the\n>   caller confirms they are no longer needed.\n> - Prefer the bundled `harness_logged_command` tool when available — it\n>   implements exactly this strategy (temp log + head/tail window + log path).\n>   Fall back to the manual patterns below when the tool is unavailable.\n> \n> **Linux / macOS** (unique log name via `mktemp` in the temp dir):\n> \n> ```bash\n> LOG=$(mktemp ${TMPDIR:-/tmp}/exec-XXXXXX.log); ./script.sh > \"$LOG\" 2>&1; EXIT=$?; echo \"exit=$EXIT\"; head -n 20 \"$LOG\"; echo -e \"\\n...[TRUNCATED]...\\n\"; tail -n 30 \"$LOG\"; echo \"log=$LOG\"\n> ```\n> \n> **Windows PowerShell**:\n> \n> ```powershell\n> $log = Join-Path $env:TEMP (\"exec-\" + [guid]::NewGuid().ToString(\"N\") + \".log\"); .\\script.ps1 *>&1 > $log; $exit = $LASTEXITCODE; Write-Output \"exit=$exit\"; Get-Content $log -TotalCount 20; Write-Host \"`n...[TRUNCATED]...`n\"; Get-Content $log -Tail 30; Write-Output \"log=$log\"\n> ```\n> \n> - If the command produces no output, `head`/`tail` will be empty — report\n>   `exit=$EXIT` and the log path, and note that the log is empty.\n> - For interactive or long-running commands, keep the same pattern; use a\n>   reasonable timeout and report the timeout as the failure reason."
     }
   ],
   "repoAuthored": {
@@ -94,7 +128,9 @@
       "create-documentation",
       "coding"
     ],
-    "expectedPendingSkills": ["coding"],
+    "expectedPendingSkills": [
+      "coding"
+    ],
     "agents": [
       "software-architect",
       "software-engineer",
@@ -105,13 +141,33 @@
     ]
   },
   "junk": {
-    "anySegmentDirNames": ["node_modules", ".git", "__pycache__", ".pytest_cache"],
-    "secretsFileNames": [".env", ".env."],
+    "anySegmentDirNames": [
+      "node_modules",
+      ".git",
+      "__pycache__",
+      ".pytest_cache"
+    ],
+    "secretsFileNames": [
+      ".env",
+      ".env."
+    ],
     "filePatterns": [
-      { "pattern": "\\.bak(\\.|$)", "reason": "backup file (.bak)" },
-      { "pattern": "\\.swp$|\\.swo$|~$", "reason": "editor swap file" },
-      { "pattern": "^\\.DS_Store$", "reason": "OS junk" },
-      { "pattern": "^org\\.SKILL\\.md$", "reason": "source-side leftover backup of speak/SKILL.md" }
+      {
+        "pattern": "\\.bak(\\.|$)",
+        "reason": "backup file (.bak)"
+      },
+      {
+        "pattern": "\\.swp$|\\.swo$|~$",
+        "reason": "editor swap file"
+      },
+      {
+        "pattern": "^\\.DS_Store$",
+        "reason": "OS junk"
+      },
+      {
+        "pattern": "^org\\.SKILL\\.md$",
+        "reason": "source-side leftover backup of speak/SKILL.md"
+      }
     ]
   },
   "secrets": {
@@ -166,38 +222,166 @@
       "base"
     ],
     "allowedKebabProse": [
-      "sub-task", "sub-tasks", "plan-slug", "allowed-tools", "save-as",
-      "allow-all-tools", "sign-off", "cherry-pick", "non-software", "claude-plugin",
-      "minicpm-v4", "self-contained", "multi-file", "in-scope", "z0-9", "pure-white",
-      "out-of-scope", "dangerously-skip-permissions", "create-unit", "auto-detected",
-      "search-content", "pytest-playwright", "non-interactive", "in-depth",
-      "getting-started", "address-review", "skill-name", "review-subtask",
-      "print-timeout", "plan-level", "next-subtask", "list-vaults", "follow-up",
-      "done-when", "deploy-staging", "cross-module", "commit-short-hash",
-      "comfyui-setup", "allow-all", "ad-hoc", "add-dir", "test-patterns",
-      "show-toplevel", "rev-parse", "re-run", "project-specific", "plugin-dir",
-      "plugin-development", "opencode-acme-plugin", "multi-line", "kebab-case",
-      "frame-prompt", "fire-related", "end-to-end", "commit-hash", "codex-plugin",
-      "notesmd-cli", "stickman-videos", "stickman-video", "frame-client",
-      "matrix-pixel", "jetson-monitor", "tesla", "nanos", "pytest", "page-get",
-      "content-type", "max-retries", "timeout-ms", "no-sandbox", "headless",
-      "base-url", "test-id", "data-testid", "to-have", "not-to-be", "to-be",
-      "json-server", "flatpak", "krita", "aseprite", "sprite-sheet", "sprite-sheets",
-      "json-metadata", "multi-resolution", "color-mode", "palette-swap", "layer",
-      "frame-tag", "slice-extraction", "dithering", "command-line", "batch-mode",
-      "step-by-step", "plan-driven", "test-first", "code-first", "red-green",
-      "green-refactor", "trade-off", "trade-offs", "plan-b", "plan-c", "fail-fast",
-      "code-review", "hand-off", "handoff", "on-boarding", "check-in", "check-out",
-      "login-flow", "sign-in", "sign-up", "log-out", "set-up", "triage", "work-flow",
-      "look-up", "clean-up", "roll-back", "roll-forward", "cut-over", "go-live",
-      "buy-in", "run-book", "run-books", "play-book", "how-to", "best-practice",
-      "best-practices", "code-quality", "quality-gate", "quality-gates",
-      "regression-risk", "user-facing", "end-user", "key-value", "one-off",
-      "two-phase", "three-tier", "micro-service", "micro-services", "well-known",
-      "state-of-the-art", "cutting-edge", "long-running", "short-lived",
-      "high-signal", "low-friction", "open-source", "source-control", "version-control",
-      "opencode-ai", "opencode-ai-plugin", "agent-bodies", "agent-frontmatter", "askpass",
-      "phase-aware", "phase-completion", "repo-root"
+      "sub-task",
+      "sub-tasks",
+      "plan-slug",
+      "allowed-tools",
+      "save-as",
+      "allow-all-tools",
+      "sign-off",
+      "cherry-pick",
+      "non-software",
+      "claude-plugin",
+      "minicpm-v4",
+      "self-contained",
+      "multi-file",
+      "in-scope",
+      "z0-9",
+      "pure-white",
+      "out-of-scope",
+      "dangerously-skip-permissions",
+      "create-unit",
+      "auto-detected",
+      "search-content",
+      "pytest-playwright",
+      "non-interactive",
+      "in-depth",
+      "getting-started",
+      "address-review",
+      "skill-name",
+      "review-subtask",
+      "print-timeout",
+      "plan-level",
+      "next-subtask",
+      "list-vaults",
+      "follow-up",
+      "done-when",
+      "deploy-staging",
+      "cross-module",
+      "commit-short-hash",
+      "comfyui-setup",
+      "allow-all",
+      "ad-hoc",
+      "add-dir",
+      "test-patterns",
+      "show-toplevel",
+      "rev-parse",
+      "re-run",
+      "project-specific",
+      "plugin-dir",
+      "plugin-development",
+      "opencode-acme-plugin",
+      "multi-line",
+      "kebab-case",
+      "frame-prompt",
+      "fire-related",
+      "end-to-end",
+      "commit-hash",
+      "codex-plugin",
+      "notesmd-cli",
+      "stickman-videos",
+      "stickman-video",
+      "frame-client",
+      "matrix-pixel",
+      "jetson-monitor",
+      "tesla",
+      "nanos",
+      "pytest",
+      "page-get",
+      "content-type",
+      "max-retries",
+      "timeout-ms",
+      "no-sandbox",
+      "headless",
+      "base-url",
+      "test-id",
+      "data-testid",
+      "to-have",
+      "not-to-be",
+      "to-be",
+      "json-server",
+      "flatpak",
+      "krita",
+      "aseprite",
+      "sprite-sheet",
+      "sprite-sheets",
+      "json-metadata",
+      "multi-resolution",
+      "color-mode",
+      "palette-swap",
+      "layer",
+      "frame-tag",
+      "slice-extraction",
+      "dithering",
+      "command-line",
+      "batch-mode",
+      "step-by-step",
+      "plan-driven",
+      "test-first",
+      "code-first",
+      "red-green",
+      "green-refactor",
+      "trade-off",
+      "trade-offs",
+      "plan-b",
+      "plan-c",
+      "fail-fast",
+      "code-review",
+      "hand-off",
+      "handoff",
+      "on-boarding",
+      "check-in",
+      "check-out",
+      "login-flow",
+      "sign-in",
+      "sign-up",
+      "log-out",
+      "set-up",
+      "triage",
+      "work-flow",
+      "look-up",
+      "clean-up",
+      "roll-back",
+      "roll-forward",
+      "cut-over",
+      "go-live",
+      "buy-in",
+      "run-book",
+      "run-books",
+      "play-book",
+      "how-to",
+      "best-practice",
+      "best-practices",
+      "code-quality",
+      "quality-gate",
+      "quality-gates",
+      "regression-risk",
+      "user-facing",
+      "end-user",
+      "key-value",
+      "one-off",
+      "two-phase",
+      "three-tier",
+      "micro-service",
+      "micro-services",
+      "well-known",
+      "state-of-the-art",
+      "cutting-edge",
+      "long-running",
+      "short-lived",
+      "high-signal",
+      "low-friction",
+      "open-source",
+      "source-control",
+      "version-control",
+      "opencode-ai",
+      "opencode-ai-plugin",
+      "agent-bodies",
+      "agent-frontmatter",
+      "askpass",
+      "phase-aware",
+      "phase-completion",
+      "repo-root"
     ],
     "$commentKebab": "ST4 (dev-harness-phases-and-tools): phase-aware resume/selection, phase-completion tracking, and repo-root AGENTS.md pointer are intentional prose in the loop skills. Tool ids (harness_plan_*) contain underscores, so they never trip the kebab check."
   }

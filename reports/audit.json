@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T07:42:42.698Z",
+    "generated": "2026-09-28T07:49:30.382Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -682,7 +682,7 @@
     {
       "file": "agents/executor.md",
       "kind": "agent",
-      "lines": 36,
+      "lines": 72,
       "frontmatter": {
         "status": "ok",
         "errors": [],

@@ -27,6 +27,7 @@ import { loadHarnessAssets } from "./lib/assets.js"
 import type { AgentRecord, SkillRecord } from "./lib/records.js"
 import { parsePlan, setStatus, buildPlanTemplate, resolvePlanPath } from "./tools/plan-lifecycle.js"
 import type { PhaseStatus } from "./tools/plan-lifecycle.js"
+import { runLoggedCommand } from "./tools/logged-command.js"
 
 const PLUGIN_ID = "dev-harness-skills"
 const LOG_PREFIX = "[dev-harness-skills]"
@@ -169,6 +170,26 @@ async function registerPlanTools(ctx: Plugin.Context, workspaceRoot: string): Pr
         }
         const contents = readPlanFile(file)
         return { content: JSON.stringify({ ok: true, path: file, plan: parsePlan(contents) }) }
+      },
+    })
+
+    editor.add({
+      name: "logged_command",
+      description: "Run a command under the logged-execution strategy: output is written to a log file in the SYSTEM TEMP directory, then the first 20 and last 30 lines are returned with a TRUNCATED marker plus the log path for full exploration. Intended for the executor agent; command runs locally with the plugin server's permissions.",
+      input: {
+        type: "object",
+        properties: {
+          command: { type: "string", description: "The shell command to run (POSIX shell on linux/macOS; PowerShell on Windows)" },
+          logName: { type: "string", description: "Optional base name for the log file (always placed in the OS temp dir)" },
+          timeoutMs: { type: "number", description: "Kill after this many milliseconds (default 120000)" },
+        },
+        required: ["command"],
+      },
+      options: { namespace: "harness", codemode: true },
+      execute: async (input: unknown) => {
+        const { command, logName, timeoutMs } = input as { command: string; logName?: string; timeoutMs?: number }
+        const result = await runLoggedCommand({ command, logName, timeoutMs })
+        return { content: JSON.stringify(result) }
       },
     })
   })

@@ -44,6 +44,7 @@ The plugin also registers three V2 custom tools (codemode) for phased plans:
 | `harness_plan_read` | `{ slug }` or `{ path }` (relative to `docs/plans`) | `{ ok, path, plan }` — parsed phases/sub-tasks with statuses |
 | `harness_plan_update_status` | `{ slug?, path?, target: phase\|subtask, index: "N"\|"N.M", status }` | `{ ok, path, plan }` — line-aware status edit |
 | `harness_plan_create` | `{ slug, title, objective, phases: [{title, subTasks:[{title}]}], updateIndex? }` | `{ ok, path, plan }` — scaffolds a phased plan |
+| `harness_logged_command` | `{ command, logName?, timeoutMs? }` | `{ ok, exitCode, logPath, head, tail, truncated }` — runs a command with its log in the OS temp dir and returns a head/tail window + log path |
 
 Phase → `Completed` is gated: it fails while any sub-task of the phase is not
 `Completed`. Reads/writes are anchored under `<workspace>/docs/plans`;

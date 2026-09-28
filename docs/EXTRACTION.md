@@ -162,3 +162,13 @@ ship with no `tools` and no `permission` — registration carries no static
 tool rules). This removal is NOT part of the extraction pipeline: re-running
 `node scripts/extract.mjs` restores the source `tools` blocks (the `permission`
 strip still applies). Promote to a declarative patch if persistence is wanted.
+
+**Patch: executor command-logging strategy (2026-09-28, user mandate):**
+`agents/executor.md` carries a mandatory "Command Execution Strategy": every
+command runs with a log file in the SYSTEM TEMP directory, reporting
+`head`/`tail` windows + the log path. The directive is (a) edited into the
+bundled copy in-repo AND (b) guarded by an `append-body-note` patch entry in
+`scripts/manifest.json` (`> Command execution strategy (bundled):`), so a
+re-extract re-applies it idempotently. The plugin also registers
+`harness_logged_command` which implements the same strategy (see
+`src/tools/logged-command.ts`).

@@ -78,7 +78,7 @@ function createStubContext() {
   return { ctx, captured }
 }
 
-const MANIFEST_TOOLS = ["plan_read", "plan_update_status", "plan_create"].sort()
+const MANIFEST_TOOLS = ["plan_read", "plan_update_status", "plan_create", "logged_command"].sort()
 
 describe("plugin setup registration (built bundle)", () => {
   it("dist is built (run `pnpm build` first)", () => {

@@ -46,6 +46,7 @@ The plugin registers a `harness` namespace with three V2 custom tools
 | `harness_plan_read` | Parse a phased plan into structured JSON (meta, phases, sub-tasks with statuses) |
 | `harness_plan_update_status` | Update a phase or sub-task status marker (phase → Completed only when all its sub-tasks are Completed) |
 | `harness_plan_create` | Scaffold a new phased plan from a title + objective + phases/sub-tasks |
+| `harness_logged_command` | Run a command with its log in the OS temp dir, returning head/tail + log path (executor strategy) |
 
 The loop skills (`planning`, `execute-plan`, `execute-plan-task`, `review`,
 `final-review`) and the `software-architect` / `software-engineer` agents use
