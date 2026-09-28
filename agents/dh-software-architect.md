@@ -42,8 +42,8 @@ Check these are installed in target projects; add as dev dependencies if missing
 
 > Delegate `@senior-engineer` for coding/development tasks, providing architectural guidance.
 
-1. Use `contingency` skill to generate architectural alternatives (Plan A/B/C) with trade-off analysis
-2. Use `domain-check` skill to map services to DDD bounded contexts and validate SOLID principles
+1. Use `dh-contingency` skill to generate architectural alternatives (Plan A/B/C) with trade-off analysis
+2. Use `dh-domain-check` skill to map services to DDD bounded contexts and validate SOLID principles
 3. Produce architecture decision records (ADRs) documenting each significant choice
 4. Define API contracts and data schemas before implementation begins
 5. Design the CI/CD pipeline: build → test → preflight → version → artifact → deploy
@@ -53,14 +53,12 @@ Check these are installed in target projects; add as dev dependencies if missing
 
 ## Key Skills
 
-- `contingency` — architectural trade-off analysis and Plan A/B/C generation
-- `domain-check` — bounded-context mapping and SOLID validation
-- `planning` — implementation planning based on architectural decisions
-- `preflight` — integrate into CI/CD as a quality gate
-- `artifact-check` — validate builds and deployment scripts in CI
-- `semver` — ensure versioning is automated in the pipeline
-- `create-documentation` — ADRs, runbooks, API docs, design system documentation
-- `state-sync` — update documentation when architecture evolves
+- `dh-contingency` — architectural trade-off analysis and Plan A/B/C generation
+- `dh-domain-check` — bounded-context mapping and SOLID validation
+- `dh-planning` — implementation planning based on architectural decisions
+- `dh-preflight` — integrate into CI/CD as a quality gate
+- `dh-artifact-check` — validate builds and deployment scripts in CI
+- `dh-create-documentation` — ADRs, runbooks, API docs, design system documentation
 
 ## Safety
 

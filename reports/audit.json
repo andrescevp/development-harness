@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T08:35:33.127Z",
+    "generated": "2026-09-28T08:42:58.461Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 7,
         "sev": "WARN",
-        "note": "237 resolved; 0 code-context; 0 allowlisted; 78 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+        "note": "237 resolved; 0 code-context; 0 allowlisted; 96 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
       },
       {
         "name": "Loop membership",
@@ -47,9 +47,9 @@
       },
       {
         "name": "Secret scan",
-        "count": 16,
+        "count": 21,
         "sev": "PASS",
-        "note": "16 low-signature prose hits (instructional), 0 high-signature"
+        "note": "21 low-signature prose hits (instructional), 0 high-signature"
       },
       {
         "name": "Junk scan",
@@ -138,6 +138,15 @@
       ]
     },
     {
+      "token": "non-blocking",
+      "count": 3,
+      "files": [
+        "skills/dh-code-review/SKILL.md",
+        "skills/dh-coding/SKILL.md",
+        "skills/dh-grill-sdd/SKILL.md"
+      ]
+    },
+    {
       "token": "implementation-agnostic",
       "count": 3,
       "files": [
@@ -177,11 +186,10 @@
       ]
     },
     {
-      "token": "non-blocking",
+      "token": "per-item",
       "count": 2,
       "files": [
-        "skills/dh-code-review/SKILL.md",
-        "skills/dh-grill-sdd/SKILL.md"
+        "skills/dh-coding/SKILL.md"
       ]
     },
     {
@@ -356,6 +364,125 @@
     },
     {
       "token": "coding-guideline",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "per-user",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "keep-alive",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "round-trip",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "set-based",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "row-by-row",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "client-side",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "memory-bounded",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "logged-command",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "built-ins",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "string-built",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "state-changing",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "cookie-based",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "rate-limit",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "auto-run",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "tool-versions",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "per-project",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "knip-style",
       "count": 1,
       "files": [
         "skills/dh-coding/SKILL.md"
@@ -670,7 +797,7 @@
       ]
     }
   ],
-  "secretLow": 16,
+  "secretLow": 21,
   "secretHigh": [],
   "junkList": [],
   "symlinkCount": 0,
@@ -892,13 +1019,13 @@
     {
       "file": "skills/dh-coding/SKILL.md",
       "kind": "skill",
-      "lines": 88,
+      "lines": 117,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-coding",
-          "description": "Apply TDD coding best practices when implementing, writing, or fixing code — write a failing test first, implement the minimal change to make it pass, then refactor, running validation via @dh-executor and stopping after 3 consecutive failures. Read and enforce project-specific rules from CODE_RULES.md at the project root when present, falling back to the harness global coding guidelines by convention otherwise, and stay project type aware (software vs non-software, uv/pnpm/npm/poetry toolchains) when delegating and implementing. Use when asked to implement, write code, or fix a bug, or during execute-plan-task sub-task 2.1 of the skills loop — not for plan orchestration (use execute-plan) or review-only requests (use review).",
+          "description": "Apply TDD coding best practices when implementing, writing, or fixing code — write a failing test first, implement the minimal change to make it pass, then refactor, running validation via @dh-executor and stopping after 3 consecutive failures. Read and enforce project-specific rules from CODE_RULES.md at the project root when present, falling back to the harness global coding guidelines by convention otherwise, and stay project type aware (software vs non-software, uv/pnpm/npm/poetry toolchains) when delegating and implementing. Also applies performance directives (webservices, data operations, scripting), security directives (webservices, pipelines), and setup best practices. Use when asked to implement, write code, or fix a bug, or during execute-plan-task sub-task 2.1 of the skills loop — not for plan orchestration (use execute-plan) or review-only requests (use review).",
           "license": "MIT",
           "compatibility": "opencode",
           "allowed-tools": "read, write, edit, bash",

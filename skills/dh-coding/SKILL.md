@@ -8,9 +8,12 @@ description: >
   CODE_RULES.md at the project root when present, falling back to the harness
   global coding guidelines by convention otherwise, and stay project type
   aware (software vs non-software, uv/pnpm/npm/poetry toolchains) when
-  delegating and implementing. Use when asked to implement, write code, or fix
-  a bug, or during execute-plan-task sub-task 2.1 of the skills loop — not for
-  plan orchestration (use execute-plan) or review-only requests (use review).
+  delegating and implementing. Also applies performance directives
+  (webservices, data operations, scripting), security directives
+  (webservices, pipelines), and setup best practices. Use when asked to
+  implement, write code, or fix a bug, or during execute-plan-task sub-task
+  2.1 of the skills loop — not for plan orchestration (use execute-plan) or
+  review-only requests (use review).
 license: MIT
 compatibility: opencode
 allowed-tools: read, write, edit, bash
@@ -62,11 +65,37 @@ Detect the project type before delegating or implementing. Check the project roo
 
 ## Hard Constraints
 
-- Files must stay under 300 lines (global rule).
+- **The 300-line limit applies ONLY to code files** (source and test files).
+  Documentation, configuration, and markdown are exempt; skill files follow
+  the ≤ 250-line convention.
 - Follow SOLID and clean code practices: focused functions and modules, descriptive names, no duplicated logic.
 - Keep changes tightly scoped to the active sub-task.
 - Never expose secrets, tokens, or credentials in code, logs, or output.
 - Run all bash commands, tests, and builds through `@dh-executor`.
+
+## Performance Directives
+
+Apply where the change touches these areas:
+
+- **Webservices (APIs, servers, HTTP handlers):** keep request handlers lean — no blocking or CPU-heavy work in the hot path; offload work that does not need to block the response. Use non-blocking/async I/O for network, DB, and files. Paginate list endpoints and batch instead of per-item calls. Cache expensive reads when invalidation is understood (bounded TTLs; never cache per-user sensitive data in shared caches without proper keying/encryption). Reuse connections (pooling, keep-alive) with bounded timeouts and retries/backoff. Avoid N+1: fetch related data in one query or round-trip. Stream large payloads and compress responses (gzip/br). Bound concurrency and apply backpressure instead of unbounded queues.
+- **Data operations (databases, files, bulk processing):** prefer set-based/bulk operations over row-by-row loops (batch inserts/updates). Use indexes on filter/join/sort columns and explain/analyze slow queries. Paginate or stream large result sets — never load whole tables into memory. Keep transactions short and scoped; do not hold locks during slow I/O. Push aggregation into the database (GROUP BY/SUM/COUNT) instead of pulling rows and reducing client-side. Process data in chunks/streams (memory-bounded); validate and normalize data once at the boundary.
+- **Scripting in general (CLI, batch scripts, automation):** batch commands and I/O — avoid repeated spawns and repeated reads of the same resource; reuse connections and parsed data. Stream where possible (pipes/`tail`/`awk`) instead of loading whole files into memory. Bound parallelism (`xargs -P`, worker pools) and handle per-item failures (continue with a clear exit code). Make scripts idempotent where sensible, use explicit exit codes, and follow the logged-command strategy for long output (log file + head/tail window). Clean up temp files and processes in ALL exit paths (`trap`/`finally`). Prefer built-ins over spawning new processes for simple transforms.
+
+## Security Directives
+
+Apply where the change touches these areas:
+
+- **Webservices:** validate and sanitize ALL external input at the boundary (query, body, headers, files) — reject unexpected shapes, never trust client data. Enforce authentication AND authorization (ownership/roles/permissions) on every handler; fail closed. Prevent injection — parameterized queries, no string-built SQL/shell; encode output for the context (XSS-safe rendering); guard SSRF (validate URLs/hosts); protect state-changing cookie-based endpoints against CSRF. Deserialize safely — validate schemas, never `eval`/exec untrusted input, cap upload sizes and check file types. Never hardcode, log, or return secrets — read from env/secret store; run dependency scanners (osv) and security scanners (semgrep). Use TLS in production, set security headers (CSP, HSTS, X-Content-Type-Options), rate-limit auth endpoints, and return errors without leaking internals (no stack traces to clients).
+- **Pipelines (CI/CD, build, deploy, automation):** inject secrets exclusively via the secret store/env — never in code, logs, artifacts, env files, or built images. Pin dependencies and toolchain versions (lockfiles, pinned base images, `.nvmrc`/`engines`); run dependency (osv) and code (semgrep) scans in the pipeline. Least privilege for runners and service accounts — no broad credentials committed anywhere. Keep builds reproducible and immutable; verify artifact integrity (digests/signatures) before deploy. Guard the pipeline itself — protected branches, required reviews, signed commits; never let untrusted PRs auto-run privileged steps without approval gates.
+
+## Setup Best Practices
+
+- **Reproducible environment:** commit lockfiles and pin the toolchain (`packageManager`, `engines`, `.nvmrc`/`.tool-versions`); provide a documented setup path (README or AGENTS.md) — nothing may depend on undocumented global state.
+- **Project-local tooling:** use the project's own package manager and configs (linters, formatters, dependency checks, test runners) instead of ad-hoc global tools; keep per-project IDE settings in the repo.
+- **Minimal dependency footprint:** add dependencies deliberately — prefer maintained, small, typed packages; remove unused ones (knip-style checks).
+- **Configuration hygiene:** keep configs small and explicit; no magic values — typed env parsing with validation; commit `.env.example`, never `.env*`; real secrets never land in the repo.
+- **Environment parity:** dev/test/CI/stage differ only by configuration, not code paths; no "works on my machine" — use containers when parity matters.
+- **Verify on first run:** after setup (installs, configs), run the project's own gate (`qa:check`/lint/typecheck/build/tests) before writing feature code — the environment is part of the change.
 
 ## When to Use
 
