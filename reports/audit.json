@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T16:09:34.936Z",
+    "generated": "2026-09-28T16:28:23.431Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -247,7 +247,7 @@
     },
     {
       "file": "skills/dh-setup/SKILL.md",
-      "line": 87,
+      "line": 90,
       "mention": "@graphify",
       "severity": "warn",
       "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
@@ -305,6 +305,13 @@
       "count": 4,
       "files": [
         "skills/dh-execute-plan-task/SKILL.md"
+      ]
+    },
+    {
+      "token": "mobile-mcp",
+      "count": 4,
+      "files": [
+        "skills/dh-setup/SKILL.md"
       ]
     },
     {
@@ -466,13 +473,6 @@
     },
     {
       "token": "user-level",
-      "count": 2,
-      "files": [
-        "skills/dh-setup/SKILL.md"
-      ]
-    },
-    {
-      "token": "mobile-mcp",
       "count": 2,
       "files": [
         "skills/dh-setup/SKILL.md"
@@ -1645,7 +1645,7 @@
     {
       "file": "skills/dh-setup/SKILL.md",
       "kind": "skill",
-      "lines": 147,
+      "lines": 150,
       "frontmatter": {
         "status": "ok",
         "errors": [],

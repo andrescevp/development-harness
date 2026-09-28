@@ -79,11 +79,14 @@ the configuration, but let the user decide whether to enable each.
   "playwright": { "type": "local", "enabled": true, "command": ["npx", "-y", "@playwright/mcp@latest"] }
   ```
 - mobile-mcp — https://github.com/mobile-next/mobile-mcp
-  (mobile device control MCP; follow that repository's install instructions)
+  ```jsonc
+  "mobile-mcp": { "type": "local", "enabled": true, "command": ["npx", "-y", "mobile-mcp@latest"] }
+  ```
 
-**OpenCode plugin:** `opencode-rules` **>= v2** — https://github.com/frap129/opencode-rules
-- Add to `opencode.jsonc` `"plugins"`: `"opencode-rules@latest"` (verify the
-  installed version is v2+; `opencode plugin list` shows the loaded version).
+**OpenCode plugin:** `opencode-rules` **latest v2 tag, beta versions for opencode v2** — https://github.com/frap129/opencode-rules
+```jsonc
+  "plugin": ["opencode-rules@v2.0.0-beta.3"]
+```
 
 **External tool:** graphify — https://github.com/Graphify-Labs/graphify (v8)
 - Install (Step 1): `uv tool install graphifyy` (or `pipx install graphifyy`).
