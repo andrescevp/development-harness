@@ -1,7 +1,7 @@
 ---
 name: dh-coding
 description: >
-  TDD coding best practices: failing test first, minimal implementation, refactor; enforce CODE_RULES.md at project root (create from code analysis when absent). Use when implementing code, fixing bugs, or during execute-plan-task 2.1.
+  TDD coding best practices: failing test first, minimal implementation, refactor; enforce CODE_RULES.md at project root (create via dh-code-ruler when absent). Use when implementing code, fixing bugs, or during execute-plan-task 2.1.
 license: MIT
 compatibility: opencode
 allowed-tools: read, write, edit, bash
@@ -32,16 +32,12 @@ files (including the user's `~/.agents/prompts/*`).
    any code and treat it as the primary rule set for this project — it
    overrides generic defaults for naming, structure, and style. Enforce it
    for every file you create or modify.
-2. **If `CODE_RULES.md` is absent:** analyze the code first, then CREATE it.
-   - Inspect existing modules, tests, configs, and tooling to extract the
-     de-facto conventions: naming, structure, import style, error handling,
-     test patterns, lint/format configs, and the stack's directives.
-   - Write `CODE_RULES.md` at the project root capturing (a) the observed
-     conventions, (b) the directives from this skill (test-first TDD, the
-     300-line code-only limit, performance/security/setup guidance), keeping
-     it concise and enforceable — do not invent rules unsupported by the
-     codebase and do not copy whole guideline documents.
-   - Then implement with the created file as the rule set.
+2. **If `CODE_RULES.md` is absent:** invoke the `dh-code-ruler` skill — it
+   interviews the user, analyzes the code, and researches stack best
+   practices (websearch when possible) to generate strict rules at
+   `{project_root}/CODE_RULES.md` (style guide, design patterns, security and
+   performance constraints with checks, stack best practices). Then implement
+   with the created file as the rule set.
 3. **Maintenance:** keep `CODE_RULES.md` always updated via
    `dh-create-documentation` — whenever the codebase conventions evolve, a
    significant change lands, or the documentation pass runs, refresh the file

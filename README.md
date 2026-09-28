@@ -3,14 +3,14 @@
 > **Git Flow:** managed with `main` (production) + `develop` (integration) and `feature/`, `bugfix/`, `release/`, `hotfix/` branches — see `AGENTS.md` → Git Flow.
 
 **OpenCode V2 plugin** that bundles a scoped personal dev harness for
-plan-driven development: **6 agents** and **14 skills** wired into a
+plan-driven development: **6 agents** and **15 skills** wired into a
 planning → execution → review → release loop.
 
 | | |
 |---|---|
 | Platform | OpenCode V2 (`@opencode/plugin`, `Plugin.define`) |
 | Source harness | `~/.agents` (read-only; opencode-only) |
-| Manifest | 6 agents · 14 skills · **no commands/prompts** (user-mandated scope + dh-grill-sdd) |
+| Manifest | 6 agents · 15 skills · **no commands/prompts** (user-mandated scope + dh-grill-sdd) |
 | Toolchain | TypeScript + tsup + vitest (pnpm) |
 
 ## Manifest
@@ -22,7 +22,7 @@ create-documentation), `dh-software-engineer` (execute-plan-task, coding),
 
 **Skills (12):** `dh-artifact-check`, `dh-simplify`, `dh-domain-check`, `dh-coding`,
 `dh-code-review`, `dh-execute-plan`, `dh-execute-plan-task`, `dh-final-review`,
-`dh-planning`, `dh-preflight`, `dh-review`, `dh-create-documentation`, `dh-grill-sdd`, `dh-setup`.
+`dh-planning`, `dh-preflight`, `dh-review`, `dh-create-documentation`, `dh-grill-sdd`, `dh-setup`, `dh-code-ruler`.
 `dh-coding` is the NEW skill — TDD coding best practices that reads project
 rules from `CODE_RULES.md` at the project root when present.
 
