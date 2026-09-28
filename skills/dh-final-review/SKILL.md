@@ -142,3 +142,9 @@ Return the sign-off verdict to the caller. If P0/P1 findings exist, recommend fi
 - `dh-artifact-check` skill: build validation for release readiness (software projects only).
 - `dh-preflight` skill: full test/lint gate for release readiness (software projects only).
 - `@dh-final-reviewer` agent: the agent that performs deep code review with a premium model.
+
+## Doc search
+
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
+or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
+Convention: AGENTS.md → Generated documentation search.

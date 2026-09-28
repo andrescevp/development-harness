@@ -247,6 +247,21 @@
       ],
       "from": "| JS/TS | `biome`, `tsc`, `jscpd` |",
       "to": "| JS/TS | `biome`, `tsc`, `jscpd`, `knip`, `semgrep`, `dependency-cruiser` |"
+    },
+    {
+      "$comment": "Doc search directive (2026-09-28): all bundled agents should search generated docs via notesmd-cli/obsidian (fallback rg).",
+      "scope": "agents",
+      "action": "append-body-note",
+      "files": [
+        "dh-executor.md",
+        "dh-explorer.md",
+        "dh-final-reviewer.md",
+        "dh-reviewer.md",
+        "dh-software-architect.md",
+        "dh-software-engineer.md"
+      ],
+      "marker": "> Doc search (bundled):",
+      "note": "> Doc search (bundled):\n> Search generated docs quickly: notesmd-cli search-content \"<term>\" --vault \"<project>\" or obsidian search query=\"<term>\" ; fallback rg --glob *.md. See AGENTS.md."
     }
   ],
   "repoAuthored": {

@@ -40,7 +40,26 @@ For anything missing, do NOT silently skip (except the optional items —
 `phpenv`, `obsidian`, `notesmd-cli`): install it or report the blocker with
 the exact command the user must run. `notesmd-cli` / `obsidian` support the
 Obsidian vault workflow used by `dh-create-documentation` (vault = project
-root, docs under `{project_root}/docs`).
+root, docs under `{project_root}/docs`) and the doc-search convention
+(AGENTS.md → Generated documentation search).
+
+**Vault check (project root):** a project root is an Obsidian vault when it
+contains the `.obsidian/` folder. In Step 3, check for it; when absent,
+INITIALIZE the vault at the project root:
+
+```bash
+# Initialize the vault (Obsidian marks a folder as a vault via .obsidian/)
+mkdir -p .obsidian
+printf '{}\n' > .obsidian/app.json
+# Optional: full workspace file on first open; Obsidian CLI can open it:
+obsidian open path="$PWD" 2>/dev/null || true
+# Verify: notesmd-cli sees the vault without Obsidian running
+notesmd-cli search-content "health" --vault "$(basename "$PWD")" 2>&1 | head -3 || true
+```
+
+Only initialize with the user's consent (adding `.obsidian/` to a repo
+affects the project); add `.obsidian/` to `.gitignore` when it should stay
+local.
 
 ## Step 2: User-Level Integrations (config choices — up to the user)
 
@@ -108,3 +127,9 @@ them instead of silently disabling rules.
 - [ ] Step 2: user-level MCPs/plugins verified and enabled per user decision
 - [ ] Step 3: hooks installed with documented rules; QA toolset wired and gate green
 - [ ] Report produced: per-tool status table + any blockers with exact commands
+
+## Doc search
+
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
+or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
+Convention: AGENTS.md → Generated documentation search.

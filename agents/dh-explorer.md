@@ -33,3 +33,6 @@ model: opencode-go/deepseek-v4-flash
 - Do not attempt to read secrets, credentials, or sensitive config outside the allowed workspace.
 - Do not edit files, run destructive commands, or use network access unless explicitly required.
 - If the requested scope is unclear, ask for the minimum clarification needed.
+
+> Doc search (bundled):
+> Search generated docs quickly: notesmd-cli search-content "<term>" --vault "<project>" or obsidian search query="<term>" ; fallback rg --glob *.md. See AGENTS.md.

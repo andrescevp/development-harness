@@ -173,3 +173,9 @@ After generating documentation:
 - [ ] Every document inside `{project_root}/docs/` has complete frontmatter (tags, project, created, stack, updated)
 - [ ] Mermaid diagrams render correctly (check syntax)
 - [ ] HTML files have proper structure with embedded styles
+
+## Doc search
+
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
+or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
+Convention: AGENTS.md → Generated documentation search.

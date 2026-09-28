@@ -73,3 +73,9 @@ Clear to proceed / Proceed with caution / Architecture concern (blocking)
 - Write only to `./docs/plans/<plan-slug>/tasks/domain-check.md`
 - If no plan exists, ask the user to run `/plan` first
 - A "proceed with caution" verdict is not a failure — it means be aware of the noted risks
+
+## Doc search
+
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
+or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
+Convention: AGENTS.md → Generated documentation search.

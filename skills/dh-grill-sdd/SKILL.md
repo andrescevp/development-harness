@@ -123,3 +123,9 @@ status: proposed
 - [ ] Requirements R1…Rn with stable IDs
 - [ ] Scope in/out, constraints, risks, acceptance criteria present
 - [ ] No implementation details smuggled into requirements
+
+## Doc search
+
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
+or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
+Convention: AGENTS.md → Generated documentation search.

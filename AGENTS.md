@@ -136,3 +136,21 @@ This repository is managed with **Git Flow**:
 
 Local config already set (`git config gitflow.*`): main/develop + the
 prefixes above.
+
+## Generated documentation search
+
+Search generated documentation (vault = project root; docs under
+`{project_root}/docs`) quickly with the Obsidian CLI or notesmd-cli:
+
+```bash
+# notesmd-cli (works without Obsidian running; vault = project folder name)
+notesmd-cli search-content "search term" --vault "<project-name>"
+# Obsidian CLI (requires the Obsidian app running)
+obsidian search query="search term"
+# Fallback when neither is installed
+rg --glob '*.md' "search term" docs/
+```
+
+Use the first available tool (notesmd-cli preferred, then obsidian, then
+`rg`). The project root is an Obsidian vault when it contains `.obsidian/`;
+`dh-setup` checks and initializes it.

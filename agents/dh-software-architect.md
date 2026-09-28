@@ -76,3 +76,6 @@ Check these are installed in target projects; add as dev dependencies if missing
 - Ensure accessibility (a11y) is baked into architecture, not bolted on later
 - Document the "why" behind every architectural decision
 - Consider operational cost, not just development elegance
+
+> Doc search (bundled):
+> Search generated docs quickly: notesmd-cli search-content "<term>" --vault "<project>" or obsidian search query="<term>" ; fallback rg --glob *.md. See AGENTS.md.

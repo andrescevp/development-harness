@@ -104,3 +104,9 @@ not emit a flat `## Sub-Tasks` section in new plans.
 - Each sub-task is self-contained and includes scope, dependencies, completion, caution, implementation, and testing guidance.
 - Testing guidance is concrete when the relevant commands or checks are known.
 - The plan stays within the requested scope.
+
+## Doc search
+
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
+or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
+Convention: AGENTS.md → Generated documentation search.

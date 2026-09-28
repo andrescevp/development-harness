@@ -136,3 +136,9 @@ Apply where the change touches these areas:
 - `dh-execute-plan-task` skill: the loop entry point that delegates implementation work to this skill (loop 2.1).
 - Loop steps after implementation: `dh-simplify` after validation, then `dh-review` + `dh-code-review` (software projects).
 - `CODE_RULES.md` maintenance: created from code analysis when absent and kept updated via `dh-create-documentation` — see Resolution Order above.
+
+## Doc search
+
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
+or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
+Convention: AGENTS.md → Generated documentation search.
