@@ -1,9 +1,10 @@
 # Skills Index — dev-harness-skills plugin
 
-> The plugin bundles exactly **12 skills** (user-mandated scoped manifest).
+> The plugin bundles **13 skills** (user-mandated scoped manifest + the
+> `dh-grill-sdd` SDD interviewer).
 > Loading a skill injects its instructions and resources into the current
 > conversation. Plans are **phased** (phases → sub-tasks, dual status
-> markers); plan lifecycle is managed via the bundled `harness` tools
+> markers); plan lifecycle is managed via the bundled `dh` tools
 > (`dh_plan_read`, `dh_plan_update_status`, `dh_plan_create` —
 > see `docs/LOADING.md`). All plan execution follows the skills loop below.
 
@@ -86,7 +87,8 @@ edits only when the tools are unavailable.
 | [`dh-preflight`](dh-preflight/SKILL.md) | Step 3 — run full test/lint/static-analysis gate |
 | [`dh-artifact-check`](dh-artifact-check/SKILL.md) | Step 3 — validate build artifacts + deploy scripts |
 | [`dh-final-review`](dh-final-review/SKILL.md) | Step 4 — plan-level sign-off verdict |
-| [`dh-create-documentation`](dh-create-documentation/SKILL.md) | Step 5 — generate/update project docs |
+| [`dh-create-documentation`](dh-create-documentation/SKILL.md) | Step 5 — generate/update project docs (vault = `{project_root}`, docs under `{project_root}/docs`) |
+| [`dh-grill-sdd`](dh-grill-sdd/SKILL.md) | Pre-planning — interviews the user and produces `./docs/plans/<slug>/sdd.md` (the requirements contract `dh-planning` consumes) |
 
 ## Agents
 

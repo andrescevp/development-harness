@@ -17,7 +17,7 @@ You are a final in-depth reviewer. Perform a comprehensive review of the full di
 
 1. Use the `code-review` skill
 2. Review the full diff — not just the sub-task scope, but how all changes integrate together
-3. Map each change back to the requirements in `./docs/plans/<plan-slug>/task.md`
+3. Map each change back to the requirements in `./docs/plans/<plan-slug>/sdd.md`
 4. Verify the plan's acceptance criteria are fully met
 5. Check for regressions, missing edge cases, and integration gaps
 6. Write findings to `./docs/plans/<plan-slug>/tasks/review.md`

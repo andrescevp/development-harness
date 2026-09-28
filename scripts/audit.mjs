@@ -202,11 +202,10 @@ function checkInventory(inv) {
   const exp = MANIFEST.sections
   const problems = []
   if (inv.agents.length !== exp.agents.expectedItems) problems.push(`agents ${inv.agents.length} != ${exp.agents.expectedItems}`)
-  // Expected skill dirs grow when ST3 adds `coding` — derive from the manifest's
-  // bundledSkillMdCount so the audit does not hard-fail once coding exists (P2-2 fix).
-  const expectedSkills = fs.existsSync(jp('skills', 'dh-coding', 'SKILL.md'))
-    ? MANIFEST.bundledSkillMdCount.afterSt3
-    : MANIFEST.bundledSkillMdCount.now
+  // Bundled skill count derives from the manifest's repoAuthored list (all
+  // bundled skills are repo-authored) — fallback to the legacy probe pair.
+  const expectedSkills = (MANIFEST.repoAuthored?.skills?.length || 0) ||
+    (fs.existsSync(jp('skills', 'dh-coding', 'SKILL.md')) ? MANIFEST.bundledSkillMdCount.afterSt3 : MANIFEST.bundledSkillMdCount.now)
   if (inv.skillDirs.length !== expectedSkills) problems.push(`skill dirs ${inv.skillDirs.length} != ${expectedSkills}`)
   if (!fs.existsSync(jp('skills', 'index.md'))) problems.push('skills/index.md missing')
   for (const out of ['commands', 'prompts']) {

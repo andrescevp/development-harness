@@ -2,8 +2,8 @@
 name: dh-final-review
 description: >
   Use this skill when performing final plan-level sign-off review — verify all
-  sub-tasks are Completed, review the full diff against task.md requirements
-  (falling back to plan.md if task.md is missing), delegate in-depth review to
+  sub-tasks are Completed, review the full diff against sdd.md requirements
+  (falling back to plan.md if sdd.md is missing), delegate in-depth review to
   @dh-final-reviewer, run artifact-check and preflight for release readiness plus
   a semver bump recommendation on software projects, and produce a binding
   verdict (Approve / Approve with comments / Request changes) written to
@@ -19,11 +19,11 @@ metadata:
   workflow: development
 ---
 
-Produce a comprehensive final sign-off review for a completed plan. Verify all sub-tasks are done, review the full diff against `task.md` requirements, delegate in-depth review to `@dh-final-reviewer`, and issue a binding verdict.
+Produce a comprehensive final sign-off review for a completed plan. Verify all sub-tasks are done, review the full diff against `sdd.md` requirements, delegate in-depth review to `@dh-final-reviewer`, and issue a binding verdict.
 
 ## Core Rules
 
-- Read `./docs/plans/<plan-slug>/task.md` as the source of truth for requirements.
+- Read `./docs/plans/<plan-slug>/sdd.md` as the source of truth for requirements.
 - Read the plan (via `dh_plan_read` when available; fallback: manual read of `./docs/plans/<plan-slug>/plan.md`) to verify sub-task AND phase completion.
 - If any sub-task is not `Completed` (and therefore any phase is not `Completed`), stop and report which tasks remain — do not proceed to full review.
 - This skill is loop step 4 (`dh-final-review`); the full loop 1–5 lives in repo-root AGENTS.md (pointer only, no duplication).
@@ -32,7 +32,7 @@ Produce a comprehensive final sign-off review for a completed plan. Verify all s
 - Write the final report to `./docs/plans/<plan-slug>/tasks/review.md`.
 - Use severity levels: P0 (blocking), P1 (high), P2 (medium), P3 (low).
 - Do not modify any implementation files — this skill is review-only.
-- If task.md does not exist, use plan.md's requirements snapshot as the fallback requirements source.
+- If sdd.md does not exist, use plan.md's requirements snapshot as the fallback requirements source.
 - **For software projects:** run `dh-artifact-check` and `dh-preflight` for release readiness validation, and recommend a `semver` version bump in the final report.
 
 ## Workflow
@@ -46,14 +46,14 @@ Read the plan (via `dh_plan_read` when available; fallback: manual read) and che
 
 ### Step 2: Read the requirements
 
-Read `./docs/plans/<plan-slug>/task.md` and extract:
+Read `./docs/plans/<plan-slug>/sdd.md` and extract:
 
 - All requirements with their IDs (R1, R2, ...)
 - Acceptance criteria (AC1, AC2, ...)
 - Scope boundaries (in-scope and out-of-scope items)
 - Constraints and edge cases
 
-If task.md does not exist, fall back to the Requirements Snapshot section in plan.md.
+If sdd.md does not exist, fall back to the Requirements Snapshot section in plan.md.
 
 ### Step 3: Plan-level completion scan
 
@@ -69,7 +69,7 @@ Generate the full diff (`git diff main...HEAD` or `git diff $(git merge-base mai
 
 Ask `@dh-final-reviewer` to perform the comprehensive final review using the `dh-code-review` skill — this is where requirements mapping, AC verification, and code-quality checks happen. Provide:
 
-- The full requirements from task.md
+- The full requirements from sdd.md
 - The plan's acceptance criteria
 - The full diff context
 
@@ -95,7 +95,7 @@ Consolidate your own full-scope findings (Steps 1–3), the release readiness re
 # Final Plan Review: [Plan title]
 
 **Plan slug:** [plan-slug]
-**Review against:** task.md requirements
+**Review against:** sdd.md requirements
 **Overall risk:** High / Medium / Low
 **Verdict:** Approve / Approve with comments / Request changes
 

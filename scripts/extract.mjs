@@ -90,6 +90,8 @@ function applyPatches(contents, fileName) {
     if (p.scope === 'agents' && fileName.endsWith('.md') && p.action === 'strip-frontmatter-key' && p.key) {
       const r = stripFrontmatterKey(out, p.key)
       if (r.stripped) { out = r.contents; applied.push(`strip:${p.key}`) }
+    } else if (p.action === 'replace-body-text' && (p.files ?? []).includes(fileName) && p.from) {
+      if (out.includes(p.from)) { out = out.split(p.from).join(p.to ?? ''); applied.push('replace:' + p.from.split('/').pop()) }
     } else if (p.action === 'append-body-note' && (p.files ?? []).includes(fileName) && p.note) {
       if (!out.includes(p.marker ?? p.note)) {
         const { fm, body } = splitFrontmatter(out, fileName)
@@ -257,13 +259,17 @@ function collectJunk(root) {
 
 function verifyAliasBodyIntegrity() {
   const problems = []
-  // Sanctioned body-patch markers (M2 plan-tools note) are stripped before comparison.
+  // Sanctioned body-patch markers are stripped/normalized before comparison:
+  // plan-tools note (M2) and the task.md -> sdd.md contract-path rename (SMD).
+  const bodyNorm = (b) => b.split('sdd.md').join('task.md')
   const noteMarkers = (M.patches ?? []).filter((p) => p.action === 'append-body-note').map((p) => p.marker).filter(Boolean)
   for (const [from, r] of Object.entries(AGENT_RENAMES)) {
     const srcText = fs.readFileSync(path.join(SOURCE_ROOT, 'agents', from), 'utf8')
     const destText = fs.readFileSync(path.join(REPO_ROOT, 'agents', r.to), 'utf8')
     let srcBody = splitFrontmatter(srcText, from).body
     let destBody = splitFrontmatter(destText, r.to).body
+    srcBody = bodyNorm(srcBody)
+    destBody = bodyNorm(destBody)
     for (const m of noteMarkers) {
       srcBody = stripBodyNote(srcBody, m)
       destBody = stripBodyNote(destBody, m)
@@ -322,11 +328,11 @@ function check() {
   if (!fs.existsSync(SOURCE_ROOT)) throw new Error(`source root not found: ${SOURCE_ROOT}`)
   const problems = []
   const { agents, skillDirs, hasIndex } = countItems()
-  // Expected skill dirs grow when ST3 adds `coding` — derive from the manifest's
-  // bundledSkillMdCount so --check does not fail once coding exists (P2-2 fix).
-  const expectedSkills = fs.existsSync(path.join(REPO_ROOT, 'skills', 'dh-coding', 'SKILL.md'))
-    ? M.bundledSkillMdCount.afterSt3
-    : M.bundledSkillMdCount.now
+  // Bundled skill count derives from the manifest's repoAuthored list (all
+  // bundled skills are repo-authored; grows with new bundled skills like
+  // dh-grill-sdd) — fallback to the legacy coding-probe pair.
+  const expectedSkills = (M.repoAuthored?.skills?.length || 0) ||
+    (fs.existsSync(path.join(REPO_ROOT, 'skills', 'dh-coding', 'SKILL.md')) ? M.bundledSkillMdCount.afterSt3 : M.bundledSkillMdCount.now)
   const expectations = {
     agents: M.sections.agents.expectedItems,
     skillDirs: expectedSkills,

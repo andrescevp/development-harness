@@ -38,7 +38,7 @@ const SKILL_FILES = listSkillMd()
 describe("corpus parsing (real bundled set)", () => {
   it("finds the scoped manifest on disk (6 agents + 12 skills)", () => {
     expect(AGENT_FILES).toHaveLength(6)
-    expect(SKILL_FILES).toHaveLength(12)
+    expect(SKILL_FILES).toHaveLength(13)
   })
 
   it.each(AGENT_FILES)("parses agent %s with name + description", (file) => {
@@ -64,7 +64,7 @@ describe("corpus parsing (real bundled set)", () => {
     for (const file of AGENT_FILES) names.push(parseFrontmatter(fs.readFileSync(file, "utf8")).data.name as string)
     for (const file of SKILL_FILES) names.push(parseFrontmatter(fs.readFileSync(file, "utf8")).data.name as string)
     for (const n of names) expect(n).toMatch(NAME_REGEX)
-    expect(new Set(names)).toHaveLength(18) // 6 agents + 12 skills, no duplicates
+    expect(new Set(names)).toHaveLength(19) // 6 agents + 13 skills, no duplicates
   })
 
   it("the coding skill is present and parses", () => {

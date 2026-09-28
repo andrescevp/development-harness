@@ -172,3 +172,16 @@ bundled copy in-repo AND (b) guarded by an `append-body-note` patch entry in
 re-extract re-applies it idempotently. The plugin also registers
 `dh_logged_command` which implements the same strategy (see
 `src/tools/logged-command.ts`).
+
+## Patch: SDD requirements contract + dh-grill-sdd (2026-09-28, user mandate)
+
+- `./docs/plans/<plan-slug>/task.md` (legacy requirements contract) is
+  replaced by `./docs/plans/<plan-slug>/sdd.md` across the bundled loop
+  skills and agents (dh-planning, dh-execute-plan, dh-execute-plan-task,
+  dh-final-review, dh-review, dh-domain-check, dh-code-review,
+  dh-final-reviewer, dh-reviewer).
+- NEW bundled skill `dh-grill-sdd`: interviews the user and produces
+  `./docs/plans/<plan-slug>/sdd.md` (requirements contract with stable IDs).
+  `dh-planning` runs the **SDD gate** (invoke dh-grill-sdd) when the SDD does
+  not exist before creating the plan. It is the 13th bundled skill
+  (repo-authored; preserved by extraction).

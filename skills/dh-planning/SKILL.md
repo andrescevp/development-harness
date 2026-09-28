@@ -1,6 +1,6 @@
 ---
 name: dh-planning
-description: Use this skill when writing clear, detailed, step-by-step implementation plans to ./docs/plans/<plan-slug>/plan.md so any human or agent can execute the task — breaking work into ordered phases (each phase with sub-tasks), with objectives, requirements mapping (stable IDs), in-scope/out-of-scope items, acceptance criteria, validation guidance, and a requirements snapshot, then updating index.md; the phased template and parser contract live in references/phased-plan-template.md and the harness plan tools (dh_plan_create / dh_plan_read) may scaffold and verify plans when installed. Use when planning implementation work, breaking down tasks, or when the user says 'plan this' or 'create a plan' — not for purely advisory, exploratory, or review-only requests; ask structured questions when the request lacks detail.
+description: Use this skill when writing clear, detailed, step-by-step implementation plans to ./docs/plans/<plan-slug>/plan.md so any human or agent can execute the task — breaking work into ordered phases (each phase with sub-tasks), with objectives, requirements mapping (stable IDs), in-scope/out-of-scope items, acceptance criteria, validation guidance, and a requirements snapshot, then updating index.md; before planning it runs the SDD gate — if ./docs/plans/<plan-slug>/sdd.md does not exist it invokes dh-grill-sdd to interview the user and produce the requirements contract, then maps plan sub-tasks to the SDD's stable IDs; the phased template and parser contract live in references/phased-plan-template.md and the harness plan tools (dh_plan_create / dh_plan_read) may scaffold and verify plans when installed. Use when planning implementation work, breaking down tasks, or when the user says 'plan this' or 'create a plan' — not for purely advisory, exploratory, or review-only requests; ask structured questions when the request lacks detail.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: read, write, edit
@@ -16,12 +16,12 @@ Create a practical execution plan in `./docs/plans/<plan-slug>/plan.md`, not imp
 - Plan only when the request needs implementation work or a formal plan.
 - Do not modify any file other than `./docs/plans/<plan-slug>/plan.md`.
 - Do not invent scope, requirements, or constraints.
-- Treat `./docs/plans/<plan-slug>/task.md` as the implementation-agnostic requirements contract when it exists.
-- Preserve explicit problem statements, in-scope items, acceptance criteria, edge cases, out-of-scope items, constraints, and open questions from `./docs/plans/<plan-slug>/task.md` when present.
-- If `./docs/plans/<plan-slug>/task.md` includes implementation ideas, separate them from binding requirements instead of promoting speculative details into scope.
+- Treat `./docs/plans/<plan-slug>/sdd.md` as the implementation-agnostic requirements contract when it exists.
+- Preserve explicit problem statements, in-scope items, acceptance criteria, edge cases, out-of-scope items, constraints, and open questions from `./docs/plans/<plan-slug>/sdd.md` when present.
+- If `./docs/plans/<plan-slug>/sdd.md` includes implementation ideas, separate them from binding requirements instead of promoting speculative details into scope.
 - Ask only the minimum clarification questions needed for correctness or scope.
 - Keep the plan proportional: concise for simple work, detailed for complex work.
-- Treat `./docs/plans/<plan-slug>/task.md` as the source of truth for requirements when it exists.
+- Treat `./docs/plans/<plan-slug>/sdd.md` as the source of truth for requirements when it exists.
 - Include a concise requirements snapshot in the plan so each sub-task preserves the original intent.
 - Map each sub-task to the specific requirements, constraints, or acceptance criteria it addresses.
 - Use stable requirement IDs such as `R1`, `R2`, and `R3` in the Requirements Snapshot so sub-tasks can refer to them unambiguously.
@@ -63,9 +63,13 @@ Before leaving interview mode, confirm the collected answers provide enough info
 
 ### Standard Workflow
 
+0. **SDD gate:** if `./docs/plans/<plan-slug>/sdd.md` does NOT exist, invoke
+   the `dh-grill-sdd` skill FIRST — it interviews the user and produces the
+   requirements contract (SDD). Do not start plan creation without an SDD
+   unless the user explicitly waives the gate.
 1. Identify the goal, requirements, constraints, risks, dependencies, and out-of-scope items from the request (or interview answers).
 2. If critical information is still missing (interview mode was skipped or partial), ask focused numbered questions before proceeding.
-3. If `./docs/plans/<plan-slug>/task.md` exists extract a short requirements snapshot from it, including acceptance criteria, edge cases, out-of-scope boundaries, and constraints relevant to implementation, and assign stable IDs such as `R1`, `R2`, and `R3`. If it is an update request, preserve the original requirements and acceptance criteria from `./docs/plans/<plan-slug>/task.md` in the requirements snapshot, and call out any new requirements or changes as additions or modifications to the original requirements.
+3. If `./docs/plans/<plan-slug>/sdd.md` exists extract a short requirements snapshot from it, including acceptance criteria, edge cases, out-of-scope boundaries, and constraints relevant to implementation, and assign stable IDs such as `R1`, `R2`, and `R3`. If it is an update request, preserve the original requirements and acceptance criteria from `./docs/plans/<plan-slug>/sdd.md` in the requirements snapshot, and call out any new requirements or changes as additions or modifications to the original requirements.
 4. **For software projects only:** If the scope involves architectural decisions or cross-module changes, run the `dh-domain-check` skill to validate bounded contexts and SOLID principles, and incorporate findings into the plan structure. If multiple plausible approaches exist, run the `contingency` skill to explore alternatives before committing to a single path.
 5. Break the work into **ordered phases**, and within each phase into
    **sub-tasks** with clear outcomes. Group phases by logical workstream; keep
@@ -93,7 +97,7 @@ not emit a flat `## Sub-Tasks` section in new plans.
 
 - The plan is complete, ordered, and actionable.
 - The requirements snapshot preserves the approved task context and uses stable IDs.
-- Explicit scope limits, acceptance criteria, and important edge cases from `./docs/plans/<plan-slug>/task.md` are preserved without inventing missing details.
+- Explicit scope limits, acceptance criteria, and important edge cases from `./docs/plans/<plan-slug>/sdd.md` are preserved without inventing missing details.
 - Each sub-task is explicitly mapped to the relevant requirements.
 - Each newly created sub-task starts as `Pending`.
 - Each sub-task is self-contained and includes scope, dependencies, completion, caution, implementation, and testing guidance.

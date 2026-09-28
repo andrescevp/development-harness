@@ -44,9 +44,9 @@
     ]
   },
   "bundledSkillMdCount": {
-    "now": 11,
-    "afterSt3": 12,
-    "afterSt3Note": "11 extracted SKILL.md + the new `dh-coding` skill created in ST3. The audit, ST5 asset builder, and ST7 docs must use 12 AFTER ST3; 11 now (coding expected-pending)."
+    "now": 12,
+    "afterSt3": 13,
+    "afterSt3Note": "11 extracted SKILL.md + the new `dh-coding` skill created in ST3. The audit, ST5 asset builder, and ST7 docs must use 12 AFTER ST3; 11 now (coding expected-pending). dh-grill-sdd (SDD interviewer) added 2026-09-28."
   },
   "agentRenames": {
     "senior-architect.md": {
@@ -107,6 +107,16 @@
       "scope": "agents",
       "action": "strip-frontmatter-key",
       "key": "tools"
+    },
+    {
+      "$comment": "User mandate (2026-09-28): the plan requirements contract file renamed task.md -> sdd.md; dh-final-reviewer's body references the contract path and must keep the renamed path across re-extracts.",
+      "scope": "agents",
+      "action": "replace-body-text",
+      "files": [
+        "dh-final-reviewer.md"
+      ],
+      "from": "./docs/plans/<plan-slug>/task.md",
+      "to": "./docs/plans/<plan-slug>/sdd.md"
     }
   ],
   "repoAuthored": {
@@ -123,7 +133,8 @@
       "dh-preflight",
       "dh-review",
       "dh-create-documentation",
-      "dh-coding"
+      "dh-coding",
+      "dh-grill-sdd"
     ]
   },
   "agentAliases": {

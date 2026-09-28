@@ -153,5 +153,5 @@ around a blocker.
 - `dh-create-documentation` skill: `~/.agents/skills/create-documentation/SKILL.md` — generates docs after plan completion (software projects only).
 - `semver` skill: `~/.agents/skills/semver/SKILL.md` — applies semantic versioning after plan completion (software projects only).
 - `plan.md` command: `~/.agents/commands/plan.md` — for creating new plans.
-- `next-subtask.md` command: `~/.agents/commands/next-subtask.md` — the single-task execution pattern.
+- `next-subsdd.md` command: `~/.agents/commands/next-subsdd.md` — the single-task execution pattern.
 - `address-review.md` command: `~/.agents/commands/address-review.md` — the pattern for addressing and re-reviewing findings.

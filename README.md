@@ -1,14 +1,14 @@
 # dev-harness-skills
 
 **OpenCode V2 plugin** that bundles a scoped personal dev harness for
-plan-driven development: **6 agents** and **12 skills** wired into a
+plan-driven development: **6 agents** and **13 skills** wired into a
 planning → execution → review → release loop.
 
 | | |
 |---|---|
 | Platform | OpenCode V2 (`@opencode/plugin`, `Plugin.define`) |
 | Source harness | `~/.agents` (read-only; opencode-only) |
-| Manifest | 6 agents · 12 skills · **no commands/prompts** (user-mandated scope) |
+| Manifest | 6 agents · 13 skills · **no commands/prompts** (user-mandated scope + dh-grill-sdd) |
 | Toolchain | TypeScript + tsup + vitest (pnpm) |
 
 ## Manifest
@@ -20,7 +20,7 @@ create-documentation), `dh-software-engineer` (execute-plan-task, coding),
 
 **Skills (12):** `dh-artifact-check`, `dh-simplify`, `dh-domain-check`, `dh-coding`,
 `dh-code-review`, `dh-execute-plan`, `dh-execute-plan-task`, `dh-final-review`,
-`dh-planning`, `dh-preflight`, `dh-review`, `dh-create-documentation`.
+`dh-planning`, `dh-preflight`, `dh-review`, `dh-create-documentation`, `dh-grill-sdd`.
 `dh-coding` is the NEW skill — TDD coding best practices that reads project
 rules from `CODE_RULES.md` at the project root when present.
 

@@ -173,6 +173,6 @@ section. Executing a sub-task sits inside loop step 2:
 - `dh-domain-check` skill: `~/.agents/skills/domain-check/SKILL.md` — validates architecture against DDD bounded contexts and SOLID principles before complex implementation (software projects only).
 - `dh-simplify` skill: `~/.agents/skills/simplify/SKILL.md` — reviews changed code for reuse, quality, and efficiency after validation (software projects only).
 - `dh-create-documentation` skill: `~/.agents/skills/create-documentation/SKILL.md` — generates docs for new modules, APIs, and interfaces after simplify (software projects only).
-- `next-subtask.md` command: `~/.agents/commands/next-subtask.md` — the execution pattern this skill formalizes.
+- `next-subsdd.md` command: `~/.agents/commands/next-subsdd.md` — the execution pattern this skill formalizes.
 - `address-review.md` command: `~/.agents/commands/address-review.md` — the review feedback loop pattern.
-- `review-subtask.md` command: `~/.agents/commands/review-subtask.md` — the scoped review pattern.
+- `review-subsdd.md` command: `~/.agents/commands/review-subsdd.md` — the scoped review pattern.

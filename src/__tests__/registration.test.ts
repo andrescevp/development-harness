@@ -28,6 +28,7 @@ const MANIFEST_SKILLS = [
   "dh-preflight",
   "dh-review",
   "dh-create-documentation",
+  "dh-grill-sdd",
 ].sort()
 
 interface CapturedUpdate {

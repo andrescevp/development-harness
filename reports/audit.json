@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T08:07:29.909Z",
+    "generated": "2026-09-28T08:13:46.614Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -11,19 +11,19 @@
     "dimensions": [
       {
         "name": "Inventory & structure",
-        "count": 18,
+        "count": 19,
         "sev": "PASS",
         "note": "counts match manifest (6 agents, 11 skill dirs + index.md; no commands/, no prompts/)"
       },
       {
         "name": "Frontmatter parse",
-        "count": 19,
+        "count": 20,
         "sev": "PASS",
-        "note": "19 files on audit surface"
+        "note": "20 files on audit surface"
       },
       {
         "name": "Name regex",
-        "count": 18,
+        "count": 19,
         "sev": "PASS",
         "note": "^[a-z0-9]+(-[a-z0-9]+)*$"
       },
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 7,
         "sev": "WARN",
-        "note": "228 resolved; 0 code-context; 0 allowlisted; 80 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+        "note": "237 resolved; 0 code-context; 0 allowlisted; 85 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
       },
       {
         "name": "Loop membership",
@@ -150,11 +150,27 @@
       ]
     },
     {
+      "token": "next-subsdd",
+      "count": 4,
+      "files": [
+        "skills/dh-execute-plan/SKILL.md",
+        "skills/dh-execute-plan-task/SKILL.md"
+      ]
+    },
+    {
       "token": "final-review",
       "count": 3,
       "files": [
         "skills/dh-execute-plan/SKILL.md",
         "skills/dh-final-review/SKILL.md"
+      ]
+    },
+    {
+      "token": "implementation-agnostic",
+      "count": 3,
+      "files": [
+        "skills/dh-grill-sdd/SKILL.md",
+        "skills/dh-planning/SKILL.md"
       ]
     },
     {
@@ -189,6 +205,14 @@
       ]
     },
     {
+      "token": "non-blocking",
+      "count": 2,
+      "files": [
+        "skills/dh-code-review/SKILL.md",
+        "skills/dh-grill-sdd/SKILL.md"
+      ]
+    },
+    {
       "token": "anti-corruption",
       "count": 2,
       "files": [
@@ -216,6 +240,13 @@
       "files": [
         "skills/dh-execute-plan-task/SKILL.md",
         "skills/dh-final-review/SKILL.md"
+      ]
+    },
+    {
+      "token": "review-subsdd",
+      "count": 2,
+      "files": [
+        "skills/dh-execute-plan-task/SKILL.md"
       ]
     },
     {
@@ -339,13 +370,6 @@
     },
     {
       "token": "high-confidence",
-      "count": 1,
-      "files": [
-        "skills/dh-code-review/SKILL.md"
-      ]
-    },
-    {
-      "token": "non-blocking",
       "count": 1,
       "files": [
         "skills/dh-code-review/SKILL.md"
@@ -562,10 +586,24 @@
       ]
     },
     {
-      "token": "implementation-agnostic",
+      "token": "obsidian-style",
       "count": 1,
       "files": [
-        "skills/dh-planning/SKILL.md"
+        "skills/dh-grill-sdd/SKILL.md"
+      ]
+    },
+    {
+      "token": "one-line",
+      "count": 1,
+      "files": [
+        "skills/dh-grill-sdd/SKILL.md"
+      ]
+    },
+    {
+      "token": "tech-stack",
+      "count": 1,
+      "files": [
+        "skills/dh-grill-sdd/SKILL.md"
       ]
     },
     {
@@ -1006,7 +1044,7 @@
         "errors": [],
         "fields": {
           "name": "dh-final-review",
-          "description": "Use this skill when performing final plan-level sign-off review — verify all sub-tasks are Completed, review the full diff against task.md requirements (falling back to plan.md if task.md is missing), delegate in-depth review to @dh-final-reviewer, run artifact-check and preflight for release readiness plus a semver bump recommendation on software projects, and produce a binding verdict (Approve / Approve with comments / Request changes) written to tasks/review.md. Use when the plan is fully implemented and individually reviewed, before merge, or when asked to 'final review', 'sign off', or 'close the plan' — not for per-sub-task reviews (use review) or in-progress plans.",
+          "description": "Use this skill when performing final plan-level sign-off review — verify all sub-tasks are Completed, review the full diff against sdd.md requirements (falling back to plan.md if sdd.md is missing), delegate in-depth review to @dh-final-reviewer, run artifact-check and preflight for release readiness plus a semver bump recommendation on software projects, and produce a binding verdict (Approve / Approve with comments / Request changes) written to tasks/review.md. Use when the plan is fully implemented and individually reviewed, before merge, or when asked to 'final review', 'sign off', or 'close the plan' — not for per-sub-task reviews (use review) or in-progress plans.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "read, write, bash",
@@ -1016,15 +1054,33 @@
       "findings": []
     },
     {
+      "file": "skills/dh-grill-sdd/SKILL.md",
+      "kind": "skill",
+      "lines": 136,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-grill-sdd",
+          "description": "Interview the user and produce a proper Software Design Document (SDD) at ./docs/plans/<plan-slug>/sdd.md — the requirements contract that the dh-planning skill consumes before creating a plan. Use when starting plan work and the SDD does not exist yet, when the user asks to \"write the sdd\", \"grill the requirements\", \"document the design\", or when dh-planning detects ./docs/plans/<plan-slug>/sdd.md is missing. Interview-first: ask focused numbered questions (goal, scope, constraints, acceptance criteria, risks, existing assets), then synthesize the SDD with stable requirement IDs, scope boundaries, edge cases, and open questions. Not for reviewing existing SDDs (use dh-review) or writing implementation plans (use dh-planning).",
+          "license": "MIT",
+          "compatibility": "opencode",
+          "allowed-tools": "read, write, edit, bash",
+          "metadata": "audience: developers workflow: design"
+        }
+      },
+      "findings": []
+    },
+    {
       "file": "skills/dh-planning/SKILL.md",
       "kind": "skill",
-      "lines": 102,
+      "lines": 106,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-planning",
-          "description": "Use this skill when writing clear, detailed, step-by-step implementation plans to ./docs/plans/<plan-slug>/plan.md so any human or agent can execute the task — breaking work into ordered phases (each phase with sub-tasks), with objectives, requirements mapping (stable IDs), in-scope/out-of-scope items, acceptance criteria, validation guidance, and a requirements snapshot, then updating index.md; the phased template and parser contract live in references/phased-plan-template.md and the harness plan tools (dh_plan_create / dh_plan_read) may scaffold and verify plans when installed. Use when planning implementation work, breaking down tasks, or when the user says 'plan this' or 'create a plan' — not for purely advisory, exploratory, or review-only requests; ask structured questions when the request lacks detail.",
+          "description": "Use this skill when writing clear, detailed, step-by-step implementation plans to ./docs/plans/<plan-slug>/plan.md so any human or agent can execute the task — breaking work into ordered phases (each phase with sub-tasks), with objectives, requirements mapping (stable IDs), in-scope/out-of-scope items, acceptance criteria, validation guidance, and a requirements snapshot, then updating index.md; before planning it runs the SDD gate — if ./docs/plans/<plan-slug>/sdd.md does not exist it invokes dh-grill-sdd to interview the user and produce the requirements contract, then maps plan sub-tasks to the SDD's stable IDs; the phased template and parser contract live in references/phased-plan-template.md and the harness plan tools (dh_plan_create / dh_plan_read) may scaffold and verify plans when installed. Use when planning implementation work, breaking down tasks, or when the user says 'plan this' or 'create a plan' — not for purely advisory, exploratory, or review-only requests; ask structured questions when the request lacks detail.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "read, write, edit",
@@ -1090,7 +1146,7 @@
     {
       "file": "skills/index.md",
       "kind": "index",
-      "lines": 106,
+      "lines": 108,
       "frontmatter": {
         "status": "none-expected"
       },
