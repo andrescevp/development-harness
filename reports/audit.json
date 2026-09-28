@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T15:42:48.263Z",
+    "generated": "2026-09-28T15:52:03.630Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 26,
         "sev": "WARN",
-        "note": "303 resolved; 1 code-context; 0 allowlisted; 129 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+        "note": "303 resolved; 1 code-context; 0 allowlisted; 130 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
       },
       {
         "name": "Loop membership",
@@ -465,7 +465,7 @@
       ]
     },
     {
-      "token": "android-remote-control-mcp",
+      "token": "mobile-mcp",
       "count": 2,
       "files": [
         "skills/dh-setup/SKILL.md"
@@ -1026,6 +1026,13 @@
     },
     {
       "token": "getting-started-mcp",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "mobile-next",
       "count": 1,
       "files": [
         "skills/dh-setup/SKILL.md"

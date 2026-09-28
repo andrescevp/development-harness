@@ -78,8 +78,8 @@ the configuration, but let the user decide whether to enable each.
   ```jsonc
   "playwright": { "type": "local", "enabled": true, "command": ["npx", "-y", "@playwright/mcp@latest"] }
   ```
-- android-remote-control-mcp — https://github.com/danielealbano/android-remote-control-mcp
-  (follow that repository's install instructions)
+- mobile-mcp — https://github.com/mobile-next/mobile-mcp
+  (mobile device control MCP; follow that repository's install instructions)
 
 **OpenCode plugin:** `opencode-rules` **>= v2** — https://github.com/frap129/opencode-rules
 - Add to `opencode.jsonc` `"plugins"`: `"opencode-rules@latest"` (verify the
