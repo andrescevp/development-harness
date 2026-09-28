@@ -133,3 +133,9 @@ Return the review verdict to the caller. If P0/P1 findings exist, recommend fixe
 
 - `dh-code-review` skill: the detailed code review methodology delegated to `@dh-reviewer`.
 - `dh-domain-check` skill: architecture validation for cross-module changes (software projects only).
+
+## Doc search
+
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
+or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
+Convention: AGENTS.md → Generated documentation search.

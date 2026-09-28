@@ -141,3 +141,9 @@ around a blocker.
 - `dh-review` skill: verifies a single sub-task result.
 - `dh-final-review` skill: produces plan-level sign-off.
 - `dh-create-documentation` skill: generates docs after plan completion (software projects only).
+
+## Doc search
+
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
+or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
+Convention: AGENTS.md → Generated documentation search.

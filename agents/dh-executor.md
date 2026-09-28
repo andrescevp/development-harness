@@ -33,3 +33,6 @@ model: opencode-go/deepseek-v4-flash
 - If execution failed, report the exit code, the key failure reason, and the exact files and lines involved when available.
 - For tests or builds, report only the overall result, pass/fail counts, and the relevant errors with exact file and line references when available.
 - If a raw excerpt is necessary, include only the shortest excerpt that supports the summary.
+
+> Doc search (bundled):
+> Search generated docs quickly: notesmd-cli search-content "<term>" --vault "<project>" or obsidian search query="<term>" ; fallback rg --glob *.md. See AGENTS.md.

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T12:03:28.063Z",
+    "generated": "2026-09-28T13:28:41.712Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 7,
         "sev": "WARN",
-        "note": "258 resolved; 1 code-context; 0 allowlisted; 120 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+        "note": "258 resolved; 1 code-context; 0 allowlisted; 122 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
       },
       {
         "name": "Loop membership",
@@ -114,6 +114,18 @@
     }
   ],
   "kebabList": [
+    {
+      "token": "project-name",
+      "count": 14,
+      "files": [
+        "skills/dh-artifact-check/SKILL.md",
+        "skills/dh-code-review/SKILL.md",
+        "skills/dh-coding/SKILL.md",
+        "skills/dh-create-documentation/SKILL.md",
+        "skills/dh-domain-check/SKILL.md",
+        "skills/dh-execute-plan/SKILL.md"
+      ]
+    },
     {
       "token": "osv-scanner",
       "count": 7,
@@ -813,6 +825,13 @@
       ]
     },
     {
+      "token": "doc-search",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
       "token": "chrome-devtools",
       "count": 1,
       "files": [
@@ -1053,7 +1072,7 @@
     {
       "file": "agents/dh-executor.md",
       "kind": "agent",
-      "lines": 36,
+      "lines": 39,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1069,7 +1088,7 @@
     {
       "file": "agents/dh-explorer.md",
       "kind": "agent",
-      "lines": 36,
+      "lines": 39,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1085,7 +1104,7 @@
     {
       "file": "agents/dh-final-reviewer.md",
       "kind": "agent",
-      "lines": 32,
+      "lines": 35,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1102,7 +1121,7 @@
     {
       "file": "agents/dh-reviewer.md",
       "kind": "agent",
-      "lines": 30,
+      "lines": 33,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1119,7 +1138,7 @@
     {
       "file": "agents/dh-software-architect.md",
       "kind": "agent",
-      "lines": 79,
+      "lines": 82,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1136,7 +1155,7 @@
     {
       "file": "agents/dh-software-engineer.md",
       "kind": "agent",
-      "lines": 98,
+      "lines": 101,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1153,7 +1172,7 @@
     {
       "file": "skills/dh-artifact-check/SKILL.md",
       "kind": "skill",
-      "lines": 65,
+      "lines": 71,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1171,7 +1190,7 @@
     {
       "file": "skills/dh-code-review/SKILL.md",
       "kind": "skill",
-      "lines": 89,
+      "lines": 95,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1189,7 +1208,7 @@
     {
       "file": "skills/dh-coding/SKILL.md",
       "kind": "skill",
-      "lines": 138,
+      "lines": 145,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1207,7 +1226,7 @@
     {
       "file": "skills/dh-create-documentation/SKILL.md",
       "kind": "skill",
-      "lines": 176,
+      "lines": 182,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1225,7 +1244,7 @@
     {
       "file": "skills/dh-domain-check/SKILL.md",
       "kind": "skill",
-      "lines": 76,
+      "lines": 82,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1243,7 +1262,7 @@
     {
       "file": "skills/dh-execute-plan/SKILL.md",
       "kind": "skill",
-      "lines": 144,
+      "lines": 150,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1261,7 +1280,7 @@
     {
       "file": "skills/dh-execute-plan-task/SKILL.md",
       "kind": "skill",
-      "lines": 166,
+      "lines": 172,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1279,7 +1298,7 @@
     {
       "file": "skills/dh-final-review/SKILL.md",
       "kind": "skill",
-      "lines": 145,
+      "lines": 151,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1297,7 +1316,7 @@
     {
       "file": "skills/dh-grill-sdd/SKILL.md",
       "kind": "skill",
-      "lines": 126,
+      "lines": 132,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1315,7 +1334,7 @@
     {
       "file": "skills/dh-planning/SKILL.md",
       "kind": "skill",
-      "lines": 107,
+      "lines": 113,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1333,7 +1352,7 @@
     {
       "file": "skills/dh-preflight/SKILL.md",
       "kind": "skill",
-      "lines": 54,
+      "lines": 60,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1351,7 +1370,7 @@
     {
       "file": "skills/dh-review/SKILL.md",
       "kind": "skill",
-      "lines": 136,
+      "lines": 142,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1369,7 +1388,7 @@
     {
       "file": "skills/dh-setup/SKILL.md",
       "kind": "skill",
-      "lines": 110,
+      "lines": 136,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1387,7 +1406,7 @@
     {
       "file": "skills/dh-simplify/SKILL.md",
       "kind": "skill",
-      "lines": 62,
+      "lines": 68,
       "frontmatter": {
         "status": "ok",
         "errors": [],

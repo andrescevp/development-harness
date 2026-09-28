@@ -86,3 +86,9 @@ If there are no actionable issues, say so directly and approve.
 - Every finding has evidence and a clear impact.
 - Severities are justified.
 - Duplicate or weak comments are removed.
+
+## Doc search
+
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
+or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
+Convention: AGENTS.md → Generated documentation search.

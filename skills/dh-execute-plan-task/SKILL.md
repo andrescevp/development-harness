@@ -163,3 +163,9 @@ section. Executing a sub-task sits inside loop step 2:
 - `dh-domain-check` skill: validates architecture against DDD bounded contexts and SOLID principles before complex implementation (software projects only).
 - `dh-simplify` skill: reviews changed code for reuse, quality, and efficiency after validation (software projects only).
 - `dh-create-documentation` skill: generates docs for new modules, APIs, and interfaces after simplify (software projects only).
+
+## Doc search
+
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
+or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
+Convention: AGENTS.md → Generated documentation search.

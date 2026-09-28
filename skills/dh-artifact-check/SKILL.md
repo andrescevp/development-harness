@@ -62,3 +62,9 @@ metadata:
 - Do not install build tools system-wide
 - If no build system is detected, report it — do not guess
 - Do not run deployment scripts — validate them statically only
+
+## Doc search
+
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
+or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
+Convention: AGENTS.md → Generated documentation search.

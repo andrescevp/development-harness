@@ -51,3 +51,9 @@ metadata:
 - Do not modify code to fix failures
 - Do not install tools system-wide without asking
 - Report timeouts as failures with the tool name
+
+## Doc search
+
+Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
+or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
+Convention: AGENTS.md → Generated documentation search.
