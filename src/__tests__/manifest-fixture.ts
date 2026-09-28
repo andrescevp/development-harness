@@ -13,6 +13,7 @@ export const MANIFEST_AGENTS = [
   'dh-final-reviewer',
   'dh-executor',
   'dh-explorer',
+  'dh-documentor',
 ] as const;
 
 export const MANIFEST_SKILLS = [

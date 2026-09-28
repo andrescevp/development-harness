@@ -36,3 +36,6 @@ model: opencode-go/deepseek-v4-flash
 
 > Doc search (bundled):
 > Search generated docs quickly: notesmd-cli search-content "<term>" --vault "<project>" or obsidian search query="<term>" ; fallback rg --glob *.md. See AGENTS.md.
+
+> Documentation owner (bundled):
+> Generated documentation (create/update/delete/retrieve, excluding docs/plans) is owned by @dh-documentor — delegate documentation work to it (dh-create-documentation + dh sheet tools).

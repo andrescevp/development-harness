@@ -101,7 +101,7 @@ manifest names):
 `dh-software-architect` (planning, execute-plan, create-documentation) ·
 `dh-software-engineer` (execute-plan-task, coding) · `dh-reviewer` (simplify,
 review, code-review) · `dh-final-reviewer` (final-review) · `dh-executor` (all
-validation/execution) · `dh-explorer` (codebase exploration).
+validation/execution) · `dh-explorer` (codebase exploration), `dh-documentor` (documentation owner).
 
 ## Out of scope
 

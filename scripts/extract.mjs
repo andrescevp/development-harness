@@ -193,7 +193,15 @@ function walkCopy(srcAbs, destAbs, relPrefix) {
 /** Clear-and-copy one section. Repo-authored skill dirs are preserved. */
 function extractSection(src, dest, kind) {
   const destAbs = path.join(REPO_ROOT, dest);
-  if (kind === 'skills') {
+  if (kind === 'agents') {
+    // Merge-preserve: keep repo-authored agent files (e.g. dh-documentor.md).
+    fs.mkdirSync(destAbs, { recursive: true });
+    const preserved = new Set(M.repoAuthoredAgents ?? []);
+    for (const e of fs.readdirSync(destAbs, { withFileTypes: true })) {
+      if (preserved.has(e.name)) continue;
+      fs.rmSync(path.join(destAbs, e.name), { recursive: true, force: true });
+    }
+  } else if (kind === 'skills') {
     // Merge-preserve: never wipe; remove only stale/out-of-scope entries, keep
     // repo-authored dirs, adapted index.md, and dest-only files (references/).
     fs.mkdirSync(destAbs, { recursive: true });

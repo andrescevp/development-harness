@@ -82,3 +82,6 @@ Check these are installed in target projects; add as dev dependencies if missing
 
 > Code rules (dh-code-ruler):
 > When CODE_RULES.md is missing at the project root, run the dh-code-ruler skill (grill + code analysis + stack best practices) to generate it; dh-coding enforces it.
+
+> Documentation owner (bundled):
+> Generated documentation (create/update/delete/retrieve, excluding docs/plans) is owned by @dh-documentor — delegate documentation work to it (dh-create-documentation + dh sheet tools).

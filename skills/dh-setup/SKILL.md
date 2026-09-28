@@ -34,6 +34,7 @@ where they differ) and re-verify.
 | graphify | yes | `graphify --version` | https://github.com/Graphify-Labs/graphify — follow repo install (CLI/npm/deno) |
 | obsidian | optional | `command -v obsidian` (app + best-effort CLI) | https://obsidian.md — recommended when the project vault flow (dh-create-documentation) should sync live |
 | notesmd-cli | optional | `notesmd --version` / `command -v notesmd` | https://github.com/Yakitrak/notesmd-cli — `yay -S notesmd-cli-bin` (Arch) / `brew install yakitrak/yakitrak/notesmd-cli` / release binary; used by dh-create-documentation for vault operations without Obsidian running |
+| duckdb (CLI, optional) | optional | `duckdb --version` | https://duckdb.org — native CLI alternative to the plugin's bundled sheet tools (dh_read_sheet/dh_update_sheet use the duckdb npm package) |
 | phpenv | optional | `phpenv --version` / `phpenv versions` | https://github.com/phpenv/phpenv — skip with a note when absent |
 
 For anything missing, do NOT silently skip (except the optional items —
@@ -129,6 +130,10 @@ them instead of silently disabling rules.
 - [ ] Report produced: per-tool status table + any blockers with exact commands
 
 ## Doc search
+
+- **Documentation management:** delegate create / update / delete / retrieve
+  of generated documents (excluding docs/plans) to `@dh-documentor` — the
+  main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
 or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

@@ -5,7 +5,7 @@
       "src": "agents",
       "dest": "agents",
       "kind": "files",
-      "expectedItems": 6
+      "expectedItems": 7
     },
     "skills": {
       "src": "skills",
@@ -272,6 +272,21 @@
       ],
       "marker": "> Code rules (dh-code-ruler):",
       "note": "> Code rules (dh-code-ruler):\n> When CODE_RULES.md is missing at the project root, run the dh-code-ruler skill (grill + code analysis + stack best practices) to generate it; dh-coding enforces it."
+    },
+    {
+      "$comment": "Doc owner delegation (2026-09-28): all agents delegate documentation work to @dh-documentor.",
+      "scope": "agents",
+      "action": "append-body-note",
+      "files": [
+        "dh-executor.md",
+        "dh-explorer.md",
+        "dh-final-reviewer.md",
+        "dh-reviewer.md",
+        "dh-software-architect.md",
+        "dh-software-engineer.md"
+      ],
+      "marker": "> Documentation owner (bundled):",
+      "note": "> Documentation owner (bundled):\n> Generated documentation (create/update/delete/retrieve, excluding docs/plans) is owned by @dh-documentor — delegate documentation work to it (dh-create-documentation + dh sheet tools)."
     }
   ],
   "repoAuthored": {
@@ -327,7 +342,8 @@
       "dh-reviewer",
       "dh-final-reviewer",
       "dh-executor",
-      "dh-explorer"
+      "dh-explorer",
+      "dh-documentor"
     ]
   },
   "junk": {
@@ -588,5 +604,8 @@
     "review": "dh-review",
     "create-documentation": "dh-create-documentation",
     "coding": "dh-coding"
-  }
+  },
+  "repoAuthoredAgents": [
+    "dh-documentor.md"
+  ]
 }

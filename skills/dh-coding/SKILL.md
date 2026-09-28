@@ -135,6 +135,10 @@ Apply where the change touches these areas:
 
 ## Doc search
 
+- **Documentation management:** delegate create / update / delete / retrieve
+  of generated documents (excluding docs/plans) to `@dh-documentor` — the
+  main and only documentation owner (see dh-create-documentation).
+
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"`
 or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
 Convention: AGENTS.md → Generated documentation search.

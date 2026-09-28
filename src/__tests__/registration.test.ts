@@ -82,7 +82,15 @@ function createStubContext() {
   return { ctx, captured };
 }
 
-const MANIFEST_TOOLS = ['plan_read', 'plan_update_status', 'plan_create', 'logged_command'].sort();
+const MANIFEST_TOOLS = [
+  'plan_read',
+  'plan_update_status',
+  'plan_create',
+  'logged_command',
+  'read_sheet',
+  'update_sheet',
+  'sheet_schema',
+].sort();
 
 describe('plugin setup registration (built bundle)', () => {
   it('dist is built (run `pnpm build` first)', () => {
