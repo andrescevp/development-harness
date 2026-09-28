@@ -227,3 +227,15 @@ documentation only.
   directive in Doc search; agents via sanitized append-body-note patch).
 - NEW plugin tools: dh_read_sheet, dh_update_sheet, dh_sheet_schema
   (DuckDB npm backend; tsup-external; BigInt-normalized JSON output).
+
+## REPO-AUTHORED transition (2026-09-29)
+
+The harness is now **fully repo-authored**: `agents/` (7) and `skills/`
+(15 + index.md) are owned by this repository; nothing is extracted from
+`~/.agents` anymore. `scripts/extract.mjs` was repurposed from the
+extraction pipeline into a **repo-integrity check** (counts vs manifest,
+no out-of-scope dirs, no junk, no symlinks, no permission/tools keys);
+`scripts/manifest.json` drops all source-copy machinery (include,
+renames, patches, repoAuthored lists) and keeps expectations + audit
+allowlists + loop membership. All history above documents the original
+extraction era.

@@ -131,7 +131,7 @@ function scanMentions(records) {
   );
   for (const d of MANIFEST.loop.skills)
     if (d !== 'coding' && !skills.has(d) && fs.existsSync(jp('skills', d, 'SKILL.md'))) skills.add(d);
-  const aliases = MANIFEST.agentAliases;
+  const aliases = MANIFEST.agentAliases ?? {};
   const atAllow = new Set(MANIFEST.crossReference.allowedAtMentions);
   const kebabAllow = new Set(MANIFEST.crossReference.allowedKebabProse);
   const atFindings = [];
@@ -276,7 +276,7 @@ function checkLoop(records) {
       name: s,
       status: skillSet.has(s)
         ? 'present'
-        : MANIFEST.loop.expectedPendingSkills.includes(s)
+        : (MANIFEST.loop.expectedPendingSkills ?? []).includes(s)
           ? 'expected-pending (ST3)'
           : 'missing',
     })),
@@ -288,10 +288,10 @@ function checkInventory(inv) {
   const problems = [];
   if (inv.agents.length !== exp.agents.expectedItems)
     problems.push(`agents ${inv.agents.length} != ${exp.agents.expectedItems}`);
-  // Bundled skill count derives from the manifest's repoAuthored list (all
+  // Bundled skill count = manifest expectation (repo-authored tree)
   // bundled skills are repo-authored) — fallback to the legacy probe pair.
   const expectedSkills =
-    MANIFEST.repoAuthored?.skills?.length ||
+    MANIFEST.sections.skills.expectedItems ||
     0 ||
     (fs.existsSync(jp('skills', 'dh-coding', 'SKILL.md'))
       ? MANIFEST.bundledSkillMdCount.afterSt3

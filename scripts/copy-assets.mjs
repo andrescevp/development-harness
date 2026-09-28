@@ -62,7 +62,7 @@ function verifyInventory(skipped) {
     .filter((d) => fs.existsSync(path.join(ASSETS_ROOT, 'skills', d.name, 'SKILL.md')));
   const hasIndex = fs.existsSync(path.join(ASSETS_ROOT, 'skills', 'index.md'));
   const expectedSkills =
-    M.repoAuthored?.skills?.length ||
+    M.sections.skills.expectedItems ||
     0 ||
     (fs.existsSync(path.join(REPO_ROOT, 'skills', 'dh-coding', 'SKILL.md'))
       ? M.bundledSkillMdCount.afterSt3
