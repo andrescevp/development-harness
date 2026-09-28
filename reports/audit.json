@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T13:28:41.712Z",
+    "generated": "2026-09-28T13:42:43.146Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -11,19 +11,19 @@
     "dimensions": [
       {
         "name": "Inventory & structure",
-        "count": 20,
+        "count": 21,
         "sev": "PASS",
         "note": "counts match manifest (6 agents, 11 skill dirs + index.md; no commands/, no prompts/)"
       },
       {
         "name": "Frontmatter parse",
-        "count": 21,
+        "count": 22,
         "sev": "PASS",
-        "note": "21 files on audit surface"
+        "note": "22 files on audit surface"
       },
       {
         "name": "Name regex",
-        "count": 20,
+        "count": 21,
         "sev": "PASS",
         "note": "^[a-z0-9]+(-[a-z0-9]+)*$"
       },
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 7,
         "sev": "WARN",
-        "note": "258 resolved; 1 code-context; 0 allowlisted; 122 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+        "note": "270 resolved; 1 code-context; 0 allowlisted; 124 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
       },
       {
         "name": "Loop membership",
@@ -47,9 +47,9 @@
       },
       {
         "name": "Secret scan",
-        "count": 21,
+        "count": 23,
         "sev": "PASS",
-        "note": "21 low-signature prose hits (instructional), 0 high-signature"
+        "note": "23 low-signature prose hits (instructional), 0 high-signature"
       },
       {
         "name": "Junk scan",
@@ -142,6 +142,15 @@
       ]
     },
     {
+      "token": "bounded-context",
+      "count": 4,
+      "files": [
+        "agents/dh-software-architect.md",
+        "skills/dh-code-ruler/SKILL.md",
+        "skills/dh-domain-check/SKILL.md"
+      ]
+    },
+    {
       "token": "state-sync",
       "count": 3,
       "files": [
@@ -207,14 +216,6 @@
       "count": 2,
       "files": [
         "agents/dh-software-architect.md"
-      ]
-    },
-    {
-      "token": "bounded-context",
-      "count": 2,
-      "files": [
-        "agents/dh-software-architect.md",
-        "skills/dh-domain-check/SKILL.md"
       ]
     },
     {
@@ -433,17 +434,31 @@
       ]
     },
     {
+      "token": "anti-patterns",
+      "count": 1,
+      "files": [
+        "skills/dh-code-ruler/SKILL.md"
+      ]
+    },
+    {
       "token": "de-facto",
       "count": 1,
       "files": [
-        "skills/dh-coding/SKILL.md"
+        "skills/dh-code-ruler/SKILL.md"
       ]
     },
     {
       "token": "code-only",
       "count": 1,
       "files": [
-        "skills/dh-coding/SKILL.md"
+        "skills/dh-code-ruler/SKILL.md"
+      ]
+    },
+    {
+      "token": "stack-specific",
+      "count": 1,
+      "files": [
+        "skills/dh-code-ruler/SKILL.md"
       ]
     },
     {
@@ -986,7 +1001,7 @@
       ]
     }
   ],
-  "secretLow": 21,
+  "secretLow": 23,
   "secretHigh": [],
   "junkList": [],
   "symlinkCount": 0,
@@ -1138,7 +1153,7 @@
     {
       "file": "agents/dh-software-architect.md",
       "kind": "agent",
-      "lines": 82,
+      "lines": 85,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1206,15 +1221,33 @@
       "findings": []
     },
     {
+      "file": "skills/dh-code-ruler/SKILL.md",
+      "kind": "skill",
+      "lines": 103,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-code-ruler",
+          "description": "Interview + code analysis to generate {project_root}/CODE_RULES.md (style guide, design patterns, security/performance constraints, stack best practices; websearch allowed). Executed by dh-software-architect; dh-coding runs it when absent. Use to create or refresh code rules.",
+          "license": "MIT",
+          "compatibility": "opencode",
+          "allowed-tools": "read, write, edit, bash, glob, websearch",
+          "metadata": "audience: developers workflow: design"
+        }
+      },
+      "findings": []
+    },
+    {
       "file": "skills/dh-coding/SKILL.md",
       "kind": "skill",
-      "lines": 145,
+      "lines": 141,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-coding",
-          "description": "TDD coding best practices: failing test first, minimal implementation, refactor; enforce CODE_RULES.md at project root (create from code analysis when absent). Use when implementing code, fixing bugs, or during execute-plan-task 2.1.",
+          "description": "TDD coding best practices: failing test first, minimal implementation, refactor; enforce CODE_RULES.md at project root (create via dh-code-ruler when absent). Use when implementing code, fixing bugs, or during execute-plan-task 2.1.",
           "license": "MIT",
           "compatibility": "opencode",
           "allowed-tools": "read, write, edit, bash",
@@ -1424,7 +1457,7 @@
     {
       "file": "skills/index.md",
       "kind": "index",
-      "lines": 109,
+      "lines": 110,
       "frontmatter": {
         "status": "none-expected"
       },

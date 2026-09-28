@@ -9,9 +9,9 @@ agent-name normalization required for runtime delegation.
 The `dev-harness-skills` OpenCode V2 plugin bundles a scoped dev harness for
 plan-driven development: **6 agents** — `dh-software-architect`,
 `dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-executor`, `dh-explorer` —
-and **14 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
+and **15 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
 `dh-execute-plan-task`, `dh-coding`, `dh-simplify`, `dh-review`, `dh-code-review`, `dh-preflight`,
-`dh-artifact-check`, `dh-final-review`, `dh-create-documentation`, `dh-grill-sdd`, `dh-setup`. The plugin registers
+`dh-artifact-check`, `dh-final-review`, `dh-create-documentation`, `dh-grill-sdd`, `dh-setup`, `dh-code-ruler`. The plugin registers
 agents and skills only; **no commands, no prompts** are bundled or registered.
 All plan execution inside the plugin runs the skills loop below.
 
@@ -82,14 +82,14 @@ delegation with this mapping:
 - Alias mapping on copy: `senior-architect` → `dh-software-architect`,
   `senior-engineer` → `dh-software-engineer` (frontmatter `name` only; bodies
   byte-identical).
-- User-mandated scoped manifest: exactly 6 agents + 14 skills. Commands,
+- User-mandated scoped manifest: exactly 6 agents + 15 skills. Commands,
   prompts, and all other harness content are intentionally NOT bundled.
 - Full extraction record, exclusions, and copy rules:
   [`docs/EXTRACTION.md`](docs/EXTRACTION.md).
 
 ## Plugin registration and loading
 
-- The V2 plugin (`Plugin.define`) registers the 6 agents and 14 skills via
+- The V2 plugin (`Plugin.define`) registers the 6 agents and 15 skills via
   synchronous domain transforms (`ctx.agent.transform`, `ctx.skill.transform`)
   from frontmatter-parsed assets in `dist/assets/`. Zero command transforms
   (commands are out of scope).
@@ -98,7 +98,7 @@ delegation with this mapping:
   a `plugin.js` file:
   `"plugins": ["file:///home/andres/workspace/dev-harness-skills"]`.
   See [`docs/LOADING.md`](docs/LOADING.md) for alternatives + verification.
-- **Verify:** launch opencode and confirm the 6 agents and 14 skills appear
+- **Verify:** launch opencode and confirm the 6 agents and 15 skills appear
   (including `dh-coding`) and no commands are registered.
 ## QA tooling
 

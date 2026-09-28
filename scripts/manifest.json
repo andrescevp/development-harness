@@ -44,8 +44,8 @@
     ]
   },
   "bundledSkillMdCount": {
-    "now": 13,
-    "afterSt3": 14,
+    "now": 14,
+    "afterSt3": 15,
     "afterSt3Note": "11 extracted SKILL.md + the new `dh-coding` skill created in ST3. The audit, ST5 asset builder, and ST7 docs must use 12 AFTER ST3; 11 now (coding expected-pending). dh-grill-sdd (SDD interviewer) added 2026-09-28."
   },
   "agentRenames": {
@@ -262,6 +262,16 @@
       ],
       "marker": "> Doc search (bundled):",
       "note": "> Doc search (bundled):\n> Search generated docs quickly: notesmd-cli search-content \"<term>\" --vault \"<project>\" or obsidian search query=\"<term>\" ; fallback rg --glob *.md. See AGENTS.md."
+    },
+    {
+      "$comment": "dh-code-ruler wiring (2026-09-28): architect agent runs dh-code-ruler to create/refresh CODE_RULES.md.",
+      "scope": "agents",
+      "action": "append-body-note",
+      "files": [
+        "dh-software-architect.md"
+      ],
+      "marker": "> Code rules (dh-code-ruler):",
+      "note": "> Code rules (dh-code-ruler):\n> When CODE_RULES.md is missing at the project root, run the dh-code-ruler skill (grill + code analysis + stack best practices) to generate it; dh-coding enforces it."
     }
   ],
   "repoAuthored": {
@@ -280,7 +290,8 @@
       "dh-create-documentation",
       "dh-coding",
       "dh-grill-sdd",
-      "dh-setup"
+      "dh-setup",
+      "dh-code-ruler"
     ]
   },
   "agentAliases": {

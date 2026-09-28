@@ -32,7 +32,7 @@ opencode debug skills   → look for: dh-artifact-check, dh-simplify,
                           dh-domain-check, dh-coding, dh-code-review,
                           dh-execute-plan, dh-execute-plan-task, dh-final-review,
                           dh-planning, dh-preflight, dh-review,
-                          dh-create-documentation, dh-grill-sdd, dh-setup
+                          dh-create-documentation, dh-grill-sdd, dh-setup, dh-code-ruler
 opencode debug commands → no new commands (commands are out of scope)
 ```
 

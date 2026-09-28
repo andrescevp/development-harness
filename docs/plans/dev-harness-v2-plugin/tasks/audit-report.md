@@ -1,22 +1,22 @@
 # Audit Report — Dev Harness V2 Plugin (ST2)
 
-Generated 2026-09-28T13:28:41.712Z by `scripts/audit.mjs`.
+Generated 2026-09-28T13:42:43.146Z by `scripts/audit.mjs`.
 
 ## Verdict
 
-**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 129. Documented schema deviations: 0.
+**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 131. Documented schema deviations: 0.
 
 ## Summary verdict table
 
 | Dimension | Count | Status | Notes |
 |---|---|---|---|
-| Inventory & structure | 20 | PASS | counts match manifest (6 agents, 11 skill dirs + index.md; no commands/, no prompts/) |
-| Frontmatter parse | 21 | PASS | 21 files on audit surface |
-| Name regex | 20 | PASS | ^[a-z0-9]+(-[a-z0-9]+)*$ |
+| Inventory & structure | 21 | PASS | counts match manifest (6 agents, 11 skill dirs + index.md; no commands/, no prompts/) |
+| Frontmatter parse | 22 | PASS | 22 files on audit surface |
+| Name regex | 21 | PASS | ^[a-z0-9]+(-[a-z0-9]+)*$ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 7 | WARN | 258 resolved; 1 code-context; 0 allowlisted; 122 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented) |
+| Cross-references | 7 | WARN | 270 resolved; 1 code-context; 0 allowlisted; 124 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented) |
 | Loop membership | 18 | PASS | 12/12 skills present + coding expected-pending (ST3); 6/6 agents present |
-| Secret scan | 21 | PASS | 21 low-signature prose hits (instructional), 0 high-signature |
+| Secret scan | 23 | PASS | 23 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
 
 ## Deviations (warn, per file)
@@ -67,6 +67,7 @@ Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; f
 - `project-name` × 14
 - `osv-scanner` × 7
 - `phased-plan-template` × 5
+- `bounded-context` × 4
 - `state-sync` × 3
 - `non-blocking` × 3
 - `implementation-agnostic` × 3
@@ -76,7 +77,6 @@ Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; f
 - `architect-skills` × 2
 - `dependency-cruiser` × 2
 - `dh-contingency` × 2
-- `bounded-context` × 2
 - `language-standard` × 2
 - `system-wide` × 2
 - `project-level` × 2
@@ -92,7 +92,7 @@ Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; f
 
 ## Secret scan
 
-- Low-signature prose hits (instructional): **21** (env-var names, max_tokens, "never expose" rules).
+- Low-signature prose hits (instructional): **23** (env-var names, max_tokens, "never expose" rules).
 - High-signature matches: **0** _none_.
 
 ## Junk scan

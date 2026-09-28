@@ -79,3 +79,6 @@ Check these are installed in target projects; add as dev dependencies if missing
 
 > Doc search (bundled):
 > Search generated docs quickly: notesmd-cli search-content "<term>" --vault "<project>" or obsidian search query="<term>" ; fallback rg --glob *.md. See AGENTS.md.
+
+> Code rules (dh-code-ruler):
+> When CODE_RULES.md is missing at the project root, run the dh-code-ruler skill (grill + code analysis + stack best practices) to generate it; dh-coding enforces it.

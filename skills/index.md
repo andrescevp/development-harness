@@ -1,6 +1,6 @@
 # Skills Index — dev-harness-skills plugin
 
-> The plugin bundles **14 skills** (user-mandated scoped manifest + the
+> The plugin bundles **15 skills** (user-mandated scoped manifest + the
 > `dh-grill-sdd` SDD interviewer + `dh-setup` harness setup).
 > Loading a skill injects its instructions and resources into the current
 > conversation. Plans are **phased** (phases → sub-tasks, dual status
@@ -90,6 +90,7 @@ edits only when the tools are unavailable.
 | [`dh-create-documentation`](dh-create-documentation/SKILL.md) | Step 5 — generate/update project docs (vault = `{project_root}`, docs under `{project_root}/docs`) |
 | [`dh-grill-sdd`](dh-grill-sdd/SKILL.md) | Pre-planning — interviews the user and produces `./docs/plans/<slug>/sdd.md` (the requirements contract `dh-planning` consumes) |
 | [`dh-setup`](dh-setup/SKILL.md) | Environment — audits system software (chrome/uv/nvm/osv-scanner/docker/jq/xq/yq/graphify/phpenv), user MCPs + plugins, and scaffolds project QA (hooks + stack tools) |
+| [`dh-code-ruler`](dh-code-ruler/SKILL.md) | Rules — grills the user + analyzes code to generate `{project_root}/CODE_RULES.md` (style, patterns, security/perf constraints, stack best practices); run by dh-software-architect |
 
 ## Agents
 

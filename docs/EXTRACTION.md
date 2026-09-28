@@ -194,3 +194,12 @@ optional phpenv), user-level integrations (chrome-devtools-mcp, playwright
 MCP, android-remote-control-mcp, opencode-rules >= v2 plugin, graphify),
 and project-level quality gates (pre-commit/husky hooks with clear rules +
 stack QA tools matrix). Repo-authored (preserved by extraction).
+
+## Patch: dh-code-ruler skill (2026-09-28, user mandate)
+
+NEW 15th bundled skill `dh-code-ruler` (executed by `dh-software-architect`):
+grills the user and analyzes the code to generate strict rules at
+`{project_root}/CODE_RULES.md` — code style guide, design patterns, security
+constraints and checks, performance constraints and checks, stack best
+practices (websearch when possible). `dh-coding` now delegates CODE_RULES.md
+creation to it when the file is absent. Repo-authored (preserved).
