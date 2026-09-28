@@ -19,8 +19,13 @@ exercise the bundled harness (7 agents, 15 skills, `dh_*` tools).
 ```bash
 cd demo-project
 ./demo.sh          # opencode TUI with the plugin loaded
-./demo.sh validate # assert agents/skills/tools registration (non-interactive)
+./demo.sh validate # config resolution + load status + in-process registration gate
 ```
+
+> Note: opencode v2.0.18 does not load directory/local plugins (documented
+> host limitation) — `validate` reports the load status transparently and
+> gates plugin behavior via the harness test suite (89 tests, in-process
+> registration of the 7 agents / 15 skills / dh_* tools).
 
 ## How it is wired
 
