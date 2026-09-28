@@ -117,3 +117,22 @@ Full QA stack wired through `pnpm qa:check` (fails on any finding):
 
 Full gate: `pnpm qa:check:full` = qa:check + test + typecheck + audit + build + smoke-load.
 Note: `pnpm audit` collides with pnpm's security audit — the harness audit is `pnpm run audit`.
+
+## Git Flow (repository workflow)
+
+This repository is managed with **Git Flow**:
+
+- `main` — production branch; every commit is releasable. Accepts ONLY
+  merges from `release/*` and `hotfix/*` (no direct feature merges).
+- `develop` — integration branch; the default base for all new work.
+- `feature/*` — branched from `develop` for planned work
+  (`feat`/`fix`/`refactor`/`docs` commits); merged back with `--no-ff`.
+- `bugfix/*` — branched from `develop` for fixes to in-development work.
+- `release/*` — branched from `develop` when a release is cut; merged to
+  `main` AND back to `develop`; tagged on `main`.
+- `hotfix/*` — branched from `main` for production fixes; merged to `main`
+  AND `develop`; tagged on `main`.
+- Tags: semver (`vX.Y.Z`) on `main` only (see dh-semver guidance).
+
+Local config already set (`git config gitflow.*`): main/develop + the
+prefixes above.

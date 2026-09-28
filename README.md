@@ -1,5 +1,7 @@
 # dev-harness-skills
 
+> **Git Flow:** managed with `main` (production) + `develop` (integration) and `feature/`, `bugfix/`, `release/`, `hotfix/` branches — see `AGENTS.md` → Git Flow.
+
 **OpenCode V2 plugin** that bundles a scoped personal dev harness for
 plan-driven development: **6 agents** and **14 skills** wired into a
 planning → execution → review → release loop.
