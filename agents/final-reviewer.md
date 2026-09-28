@@ -10,10 +10,6 @@ tools:
   bash: true
   read: true
   write: true
-permission:
-  edit:
-    '*': deny
-    './docs/plans/<plan-slug>/tasks/*': allow
 ---
 
 

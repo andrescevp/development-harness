@@ -7,9 +7,6 @@ mode: subagent
 model: opencode-go/deepseek-v4-flash
 tools:
   read: true
-permission:
-  edit: deny
-  task: deny
 ---
 
 # Exploration Guidelines

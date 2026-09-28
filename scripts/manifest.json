@@ -37,6 +37,39 @@
     "senior-architect.md": { "to": "software-architect.md", "newName": "software-architect" },
     "senior-engineer.md": { "to": "software-engineer.md", "newName": "software-engineer" }
   },
+  "patches": [
+    {
+      "$comment": "M3 (user mandate): strip the `permission` frontmatter key from bundled agents. Idempotent; extracted agents register with tools-derived permission rules only.",
+      "scope": "agents",
+      "action": "strip-frontmatter-key",
+      "key": "permission"
+    },
+    {
+      "$comment": "M2 wiring: prime the two planner agents to use the harness plan-lifecycle tools. Sanctioned append to the agent BODY — verifyAliasBodyIntegrity strips this exact marker block before comparing bodies.",
+      "scope": "agents",
+      "action": "append-body-note",
+      "files": ["software-architect.md", "software-engineer.md"],
+      "marker": "> Harness plan tools (bundled):",
+      "note": "> Harness plan tools (bundled):\n> Use harness_plan_read / harness_plan_update_status / harness_plan_create for reading, updating, and scaffolding phased plans (docs/plans). Fall back to direct plan.md edits only when the tools are unavailable."
+    }
+  ],
+  "repoAuthored": {
+    "$comment": "Dirs fully preserved on re-extract (never wiped/overwritten from source). The bundled skills are this repo's distribution: ST1+ST4 patch their content, so source-fresh copies would clobber the patches. Agents stay source-derived (renames + M3 strip only).",
+    "skills": [
+      "coding",
+      "planning",
+      "execute-plan",
+      "execute-plan-task",
+      "review",
+      "final-review",
+      "simplify",
+      "domain-check",
+      "code-review",
+      "preflight",
+      "artifact-check",
+      "create-documentation"
+    ]
+  },
   "agentAliases": {
     "senior-architect": "software-architect",
     "senior-engineer": "software-engineer"
@@ -163,7 +196,9 @@
       "two-phase", "three-tier", "micro-service", "micro-services", "well-known",
       "state-of-the-art", "cutting-edge", "long-running", "short-lived",
       "high-signal", "low-friction", "open-source", "source-control", "version-control",
-      "opencode-ai", "opencode-ai-plugin", "agent-bodies", "agent-frontmatter", "askpass"
-    ]
+      "opencode-ai", "opencode-ai-plugin", "agent-bodies", "agent-frontmatter", "askpass",
+      "phase-aware", "phase-completion", "repo-root"
+    ],
+    "$commentKebab": "ST4 (dev-harness-phases-and-tools): phase-aware resume/selection, phase-completion tracking, and repo-root AGENTS.md pointer are intentional prose in the loop skills. Tool ids (harness_plan_*) contain underscores, so they never trip the kebab check."
   }
 }

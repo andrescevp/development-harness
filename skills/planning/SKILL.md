@@ -1,6 +1,6 @@
 ---
 name: planning
-description: Use this skill when writing clear, detailed, step-by-step implementation plans to ./docs/plans/<plan-slug>/plan.md so any human or agent can execute the task — breaking work into ordered sub-tasks with objectives, requirements mapping (stable IDs), in-scope/out-of-scope items, acceptance criteria, validation guidance, and a requirements snapshot, then updating index.md. Use when planning implementation work, breaking down tasks, or when the user says 'plan this' or 'create a plan' — not for purely advisory, exploratory, or review-only requests; ask structured questions when the request lacks detail.
+description: Use this skill when writing clear, detailed, step-by-step implementation plans to ./docs/plans/<plan-slug>/plan.md so any human or agent can execute the task — breaking work into ordered phases (each phase with sub-tasks), with objectives, requirements mapping (stable IDs), in-scope/out-of-scope items, acceptance criteria, validation guidance, and a requirements snapshot, then updating index.md; the phased template and parser contract live in references/phased-plan-template.md and the harness plan tools (harness_plan_create / harness_plan_read) may scaffold and verify plans when installed. Use when planning implementation work, breaking down tasks, or when the user says 'plan this' or 'create a plan' — not for purely advisory, exploratory, or review-only requests; ask structured questions when the request lacks detail.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: read, write, edit
@@ -9,7 +9,7 @@ metadata:
   workflow: development
 ---
 
-Create a practical execution plan in `./docs/plans/<plan-slug>/plan.md`, not implementation code.
+Create a practical execution plan in `./docs/plans/<plan-slug>/plan.md`, not implementation code. Plans use the **phased model** (M1): a plan is an ordered set of **phases**, and each phase contains **sub-tasks** with explicit status markers for both levels. The canonical format contract + full template live in [`references/phased-plan-template.md`](references/phased-plan-template.md) — follow it exactly (the harness `plan_read`/`plan_update_status` tools parse this shape).
 
 ## Core Rules
 
@@ -67,72 +67,27 @@ Before leaving interview mode, confirm the collected answers provide enough info
 2. If critical information is still missing (interview mode was skipped or partial), ask focused numbered questions before proceeding.
 3. If `./docs/plans/<plan-slug>/task.md` exists extract a short requirements snapshot from it, including acceptance criteria, edge cases, out-of-scope boundaries, and constraints relevant to implementation, and assign stable IDs such as `R1`, `R2`, and `R3`. If it is an update request, preserve the original requirements and acceptance criteria from `./docs/plans/<plan-slug>/task.md` in the requirements snapshot, and call out any new requirements or changes as additions or modifications to the original requirements.
 4. **For software projects only:** If the scope involves architectural decisions or cross-module changes, run the `domain-check` skill to validate bounded contexts and SOLID principles, and incorporate findings into the plan structure. If multiple plausible approaches exist, run the `contingency` skill to explore alternatives before committing to a single path.
-5. Break the work into ordered sub-tasks with clear outcomes.
+5. Break the work into **ordered phases**, and within each phase into
+   **sub-tasks** with clear outcomes. Group phases by logical workstream; keep
+   each phase independently completable.
 6. For each sub-task, list the related requirements so downstream agents can trace the work back to the approved task.
 7. For each sub-task, include its objective, dependencies, in-scope work, explicit non-goals, key risks, implementation suggestions, and validation guidance.
 8. **For software projects:** Include a documentation sub-task that references the `create-documentation` skill for any new modules, APIs, or public interfaces introduced by the plan.
-9. Initialize each newly created sub-task as `Pending` and use explicit status markers such as `Pending`, `In Progress`, and `Completed` so agents can reliably pick the next sub-task.
+9. Initialize each newly created sub-task as `Pending` and each phase as `Pending`, and use explicit status markers such as `Pending`, `In Progress`, and `Completed` so agents can reliably pick the next sub-task. Status lines go immediately after the phase/sub-task header (parser contract).
 10. Prefer concrete validation commands or checks when known.
 11. Explain core concepts with appropriate code example when necessary.
 12. Write a self-contained plan that can be executed without the conversation.
-13. Update `./docs/plans/index.md` to add the new plan or reflect the update, including title, slug, description, timestamps and status.
-14. Optionally use chrome mcp tools to validate the work via web if it is possible to do so, and include the results in the plan.
+13. **Tools:** create the plan scaffold with the `harness_plan_create` tool when available (then fill details), and read/verify with `harness_plan_read`; fall back to manual writes using `references/phased-plan-template.md` when the tools are not installed.
+14. Update `./docs/plans/index.md` to add the new plan or reflect the update, including title, slug, description, timestamps and status.
+15. Optionally use chrome mcp tools to validate the work via web if it is possible to do so, and include the results in the plan.
 
 ## Required Output Template
 
-```markdown
-# Plan: [Clear task title]
-
-## Objective
-
-[Goal and intended outcome]
-
-## Requirements Snapshot
-
-- **R1:** [Relevant requirement, acceptance criterion, or constraint from task.md]
-
-## Scope
-
-- [In-scope work]
-
-## Assumptions and Constraints
-
-- [Known assumptions, dependencies, constraints]
-
-## Risks and Areas Requiring Care
-
-- [Key risks, compatibility concerns, or failure modes]
-
-## Core concepts
-
-Explain core concepts with code level example if necessary.
-
-## Sub-Tasks
-
-### Sub-Task 1: [Clear title]
-
-- **Status:** Pending
-- **Objective:** [What this sub-task should accomplish]
-- **Related Requirements:** [Requirement IDs or short labels from the Requirements Snapshot]
-- **Dependencies and Preconditions:** [Earlier sub-task, existing behavior, migration state, or prerequisite]
-- **In Scope for This Sub-Task:** [Concrete work this implementation should include]
-- **Out of Scope for This Sub-Task:** [Nearby work that must not be included]
-- **Instructions:** [Specific actions]
-- **Acceptance Criteria:** [How to know it is done]
-- **Cautionary Points (Risks & Edge Cases):** [Where to be careful]
-- **Implementation Suggestions:** [Practical guidance if helpful]
-- **Testing Suggestions:** [Concrete commands, checks, or verification steps]
-- **Done When:** [Observable conditions that mean this sub-task is complete]
-
-## Final Integration & Verification
-
-- **System-Wide Test:** [End-to-end verification]
-- **Completion Checklist:** [Final checks]
-
-## Open Questions
-
-- [Only if important non-blocking uncertainty remains]
-```
+The output template is the phased template in
+[`references/phased-plan-template.md`](references/phased-plan-template.md) —
+use it verbatim (`## Phases` → `### Phase N: <title>` + `- **Status:**` →
+`#### Sub-Task N.M: <title>` + full sub-task fields + `- **Status:**`). Do
+not emit a flat `## Sub-Tasks` section in new plans.
 
 ## Final Check
 

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T06:59:39.139Z",
+    "generated": "2026-09-28T07:00:15.746Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -35,9 +35,9 @@
       },
       {
         "name": "Cross-references",
-        "count": 12,
+        "count": 8,
         "sev": "WARN",
-        "note": "202 resolved; 0 code-context; 0 allowlisted; 74 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+        "note": "178 resolved; 0 code-context; 0 allowlisted; 73 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
       },
       {
         "name": "Loop membership",
@@ -63,20 +63,6 @@
   "deviations": [],
   "fails": [],
   "atMentions": [
-    {
-      "file": "skills/execute-plan/SKILL.md",
-      "line": 130,
-      "mention": "@build",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/execute-plan/SKILL.md",
-      "line": 131,
-      "mention": "@plan",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
     {
       "file": "skills/execute-plan-task/SKILL.md",
       "line": 10,
@@ -114,29 +100,15 @@
     },
     {
       "file": "skills/execute-plan-task/SKILL.md",
-      "line": 126,
+      "line": 127,
       "mention": "@build",
       "severity": "warn",
       "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
     },
     {
       "file": "skills/execute-plan-task/SKILL.md",
-      "line": 135,
+      "line": 136,
       "mention": "@build",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/execute-plan-task/SKILL.md",
-      "line": 166,
-      "mention": "@build",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/execute-plan-task/SKILL.md",
-      "line": 167,
-      "mention": "@plan",
       "severity": "warn",
       "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
     },
@@ -155,6 +127,13 @@
       "files": [
         "agents/software-architect.md",
         "skills/execute-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "phased-plan-template",
+      "count": 5,
+      "files": [
+        "skills/planning/SKILL.md"
       ]
     },
     {
@@ -181,14 +160,6 @@
       ]
     },
     {
-      "token": "non-blocking",
-      "count": 2,
-      "files": [
-        "skills/code-review/SKILL.md",
-        "skills/planning/SKILL.md"
-      ]
-    },
-    {
       "token": "user-specified",
       "count": 2,
       "files": [
@@ -207,14 +178,6 @@
       "count": 2,
       "files": [
         "skills/execute-plan/SKILL.md"
-      ]
-    },
-    {
-      "token": "repo-root",
-      "count": 2,
-      "files": [
-        "skills/execute-plan/SKILL.md",
-        "skills/execute-plan-task/SKILL.md"
       ]
     },
     {
@@ -354,6 +317,13 @@
     },
     {
       "token": "high-confidence",
+      "count": 1,
+      "files": [
+        "skills/code-review/SKILL.md"
+      ]
+    },
+    {
+      "token": "non-blocking",
       "count": 1,
       "files": [
         "skills/code-review/SKILL.md"
@@ -563,13 +533,6 @@
       ]
     },
     {
-      "token": "to-end",
-      "count": 1,
-      "files": [
-        "skills/planning/SKILL.md"
-      ]
-    },
-    {
       "token": "golangci-lint",
       "count": 1,
       "files": [
@@ -761,7 +724,7 @@
     {
       "file": "agents/executor.md",
       "kind": "agent",
-      "lines": 44,
+      "lines": 39,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -770,8 +733,7 @@
           "description": "Execute commands, run tests, builds, formatters, linters, and validation on behalf of other agents. Use for any command execution, test running, or build task.",
           "mode": "subagent",
           "model": "opencode-go/deepseek-v4-flash",
-          "tools": "bash: true read: true",
-          "permission": "external_directory: '/tmp': allow '/tmp/**': allow task: deny"
+          "tools": "bash: true read: true"
         }
       },
       "findings": []
@@ -779,7 +741,7 @@
     {
       "file": "agents/explorer.md",
       "kind": "agent",
-      "lines": 41,
+      "lines": 38,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -788,8 +750,7 @@
           "description": "Explore codebases quickly using glob, grep, and targeted reads. Use for codebase exploration, file search, and pattern discovery.",
           "mode": "subagent",
           "model": "opencode-go/deepseek-v4-flash",
-          "tools": "read: true",
-          "permission": "edit: deny task: deny"
+          "tools": "read: true"
         }
       },
       "findings": []
@@ -797,7 +758,7 @@
     {
       "file": "agents/final-reviewer.md",
       "kind": "agent",
-      "lines": 40,
+      "lines": 36,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -807,8 +768,7 @@
           "mode": "subagent",
           "model": "opencode-go/deepseek-v4-flash",
           "variant": "max",
-          "tools": "bash: true read: true write: true",
-          "permission": "edit: '*': deny './docs/plans/<plan-slug>/tasks/*': allow"
+          "tools": "bash: true read: true write: true"
         }
       },
       "findings": []
@@ -816,7 +776,7 @@
     {
       "file": "agents/reviewer.md",
       "kind": "agent",
-      "lines": 38,
+      "lines": 34,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -826,8 +786,7 @@
           "mode": "subagent",
           "model": "opencode-go/deepseek-v4-flash",
           "variant": "max",
-          "tools": "bash: true read: true write: true",
-          "permission": "edit: '*': deny './docs/plans/<plan-slug>/tasks/*': allow"
+          "tools": "bash: true read: true write: true"
         }
       },
       "findings": []
@@ -835,7 +794,7 @@
     {
       "file": "agents/software-architect.md",
       "kind": "agent",
-      "lines": 89,
+      "lines": 87,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -845,8 +804,7 @@
           "mode": "all",
           "model": "opencode-go/deepseek-v4-flash",
           "variant": "max",
-          "tools": "bash: true read: true write: true edit: true",
-          "permission": "external_directory: '/tmp': allow '/tmp/**': allow task: allow"
+          "tools": "bash: true read: true write: true edit: true"
         }
       },
       "findings": []
@@ -854,7 +812,7 @@
     {
       "file": "agents/software-engineer.md",
       "kind": "agent",
-      "lines": 103,
+      "lines": 106,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -962,7 +920,7 @@
     {
       "file": "skills/execute-plan/SKILL.md",
       "kind": "skill",
-      "lines": 152,
+      "lines": 158,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -980,13 +938,13 @@
     {
       "file": "skills/execute-plan-task/SKILL.md",
       "kind": "skill",
-      "lines": 189,
+      "lines": 185,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "execute-plan-task",
-          "description": "Execute a single sub-task from a plan — select the active sub-task (In Progress or first Pending) from plan.md, implement it following TDD with project-type-aware agent delegation (domain-check before complex implementation, simplify after validation, and create-documentation for new modules/APIs on software projects), run validation via @executor, request review, handle feedback with fix loops, and update plan status. Use when implementing the next sub-task from plan.md, continuing an in-progress sub-task, or when the user says 'execute next task', 'implement sub-task', 'work on the plan', or 'next step' — not for full plan orchestration (use execute-plan) or ad-hoc work without a plan.",
+          "description": "Execute a single sub-task from a plan — select the active sub-task (the first In Progress phase's In Progress/Pending sub-task) from plan.md, implement it following TDD with project-type-aware agent delegation (domain-check before complex implementation, simplify after validation, and create-documentation for new modules/APIs on software projects), run validation via @executor, request review, handle feedback with fix loops, and update plan status. Use when implementing the next sub-task from plan.md, continuing an in-progress sub-task, or when the user says 'execute next task', 'implement sub-task', 'work on the plan', or 'next step' — not for full plan orchestration (use execute-plan) or ad-hoc work without a plan.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "read, write, edit, bash",
@@ -998,7 +956,7 @@
     {
       "file": "skills/final-review/SKILL.md",
       "kind": "skill",
-      "lines": 152,
+      "lines": 156,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1016,13 +974,13 @@
     {
       "file": "skills/planning/SKILL.md",
       "kind": "skill",
-      "lines": 147,
+      "lines": 102,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "planning",
-          "description": "Use this skill when writing clear, detailed, step-by-step implementation plans to ./docs/plans/<plan-slug>/plan.md so any human or agent can execute the task — breaking work into ordered sub-tasks with objectives, requirements mapping (stable IDs), in-scope/out-of-scope items, acceptance criteria, validation guidance, and a requirements snapshot, then updating index.md. Use when planning implementation work, breaking down tasks, or when the user says 'plan this' or 'create a plan' — not for purely advisory, exploratory, or review-only requests; ask structured questions when the request lacks detail.",
+          "description": "Use this skill when writing clear, detailed, step-by-step implementation plans to ./docs/plans/<plan-slug>/plan.md so any human or agent can execute the task — breaking work into ordered phases (each phase with sub-tasks), with objectives, requirements mapping (stable IDs), in-scope/out-of-scope items, acceptance criteria, validation guidance, and a requirements snapshot, then updating index.md; the phased template and parser contract live in references/phased-plan-template.md and the harness plan tools (harness_plan_create / harness_plan_read) may scaffold and verify plans when installed. Use when planning implementation work, breaking down tasks, or when the user says 'plan this' or 'create a plan' — not for purely advisory, exploratory, or review-only requests; ask structured questions when the request lacks detail.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "read, write, edit",
@@ -1052,7 +1010,7 @@
     {
       "file": "skills/review/SKILL.md",
       "kind": "skill",
-      "lines": 144,
+      "lines": 146,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1088,7 +1046,7 @@
     {
       "file": "skills/index.md",
       "kind": "index",
-      "lines": 93,
+      "lines": 106,
       "frontmatter": {
         "status": "none-expected"
       },

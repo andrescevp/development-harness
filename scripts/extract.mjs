@@ -49,6 +49,7 @@ const stats = {
   copied: { agents: 0, skills: 0 },
   renamed: [],
   dereferenced: [],
+  patched: [],
   skipped: [],
 }
 
@@ -62,21 +63,74 @@ function splitFrontmatter(text, file) {
   return { fm, body }
 }
 
-/** Copy an agent file, applying the alias rename to the frontmatter `name` only. */
+/** Copy an agent file: apply alias rename + sanctioned pipeline patches. */
 function copyAgent(srcFile, destFile, rename) {
-  const text = fs.readFileSync(srcFile, 'utf8')
-  const { fm, body } = splitFrontmatter(text, srcFile)
+  let text = fs.readFileSync(srcFile, 'utf8')
+  const { body } = splitFrontmatter(text, srcFile)
   if (rename) {
     const oldName = path.basename(srcFile, '.md') // source frontmatter name == source filename
     const re = new RegExp(`^name:\\s*${oldName}\\s*$`, 'm')
+    const fm = splitFrontmatter(text, srcFile).fm
     const fm2 = fm.replace(re, `name: ${rename.newName}`)
     if (fm2 === fm) throw new Error(`frontmatter 'name' not found in ${srcFile}`)
-    fs.writeFileSync(destFile, fm2 + body, 'utf8')
+    text = fm2 + body
     stats.renamed.push({ from: path.basename(srcFile), to: rename.to })
-  } else {
-    fs.copyFileSync(srcFile, destFile)
   }
+  const { contents, patched } = applyPatches(text, path.basename(destFile))
+  fs.writeFileSync(destFile, contents, 'utf8')
+  if (patched) stats.patched.push({ file: path.basename(destFile), patch: patched })
   return body
+}
+
+/** Apply declarative PATCHES from manifest.json (post-copy, idempotent). */
+function applyPatches(contents, fileName) {
+  let out = contents
+  const applied = []
+  for (const p of M.patches ?? []) {
+    if (p.scope === 'agents' && fileName.endsWith('.md') && p.action === 'strip-frontmatter-key' && p.key) {
+      const r = stripFrontmatterKey(out, p.key)
+      if (r.stripped) { out = r.contents; applied.push(`strip:${p.key}`) }
+    } else if (p.action === 'append-body-note' && (p.files ?? []).includes(fileName) && p.note) {
+      if (!out.includes(p.marker ?? p.note)) {
+        const { fm, body } = splitFrontmatter(out, fileName)
+        out = fm + body + '\n' + p.note + '\n'
+        applied.push('append:plan-tools-note')
+      }
+    }
+  }
+  return { contents: out, patched: applied.join(', ') || undefined }
+}
+
+/** Remove the sanctioned appended note block (M2) so alias-body comparisons stay honest. */
+function stripBodyNote(body, marker) {
+  if (!marker) return body
+  const idx = body.indexOf(marker)
+  return idx === -1 ? body : body.slice(0, idx).replace(/\n+\s*$/, '\n')
+}
+
+/** Remove a top-level frontmatter key block (key line through next top-level key). */
+function stripFrontmatterKey(contents, key) {
+  if (!contents.startsWith('---\n')) return { contents, stripped: false }
+  const lines = contents.split('\n')
+  let close = -1
+  for (let i = 1; i < lines.length; i++) if (lines[i] === '---') { close = i; break }
+  if (close === -1) return { contents, stripped: false }
+  const out = []
+  let inBlock = false
+  let stripped = false
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i]
+    if (i === 0 || i === close) { out.push(l); continue }
+    if (i > close) { out.push(l); continue } // body: never stripped
+    if (!inBlock && l.trimStart() === `${key}:`) { inBlock = true; stripped = true; continue }
+    if (inBlock) {
+      // A non-indented top-level key ends the block; blank lines inside it are dropped.
+      if (/^[A-Za-z0-9_-]+:\s*$/.test(l) && !l.startsWith(' ') && !l.startsWith('\t')) { inBlock = false; out.push(l) }
+      continue
+    }
+    out.push(l)
+  }
+  return { contents: out.join('\n'), stripped }
 }
 
 /** Recursive copy skipping junk; dereferences symlinks so the repo is self-contained. */
@@ -113,11 +167,24 @@ function walkCopy(srcAbs, destAbs, relPrefix) {
   }
 }
 
-/** Clear-and-copy one section. */
+/** Clear-and-copy one section. Repo-authored skill dirs are preserved. */
 function extractSection(src, dest, kind) {
   const destAbs = path.join(REPO_ROOT, dest)
-  fs.rmSync(destAbs, { recursive: true, force: true })
-  fs.mkdirSync(destAbs, { recursive: true })
+  if (kind === 'skills') {
+    // Merge-preserve: never wipe; remove only stale/out-of-scope entries, keep
+    // repo-authored dirs, adapted index.md, and dest-only files (references/).
+    fs.mkdirSync(destAbs, { recursive: true })
+    const protectedNames = new Set([...(M.include.skills ?? []), ...(M.repoAuthored?.skills ?? []), 'index.md'])
+    for (const e of fs.readdirSync(destAbs, { withFileTypes: true })) {
+      if (!protectedNames.has(e.name)) {
+        fs.rmSync(path.join(destAbs, e.name), { recursive: true, force: true })
+        stats.skipped.push({ rel: `${dest}/${e.name}`, reason: 'stale/out-of-scope removed' })
+      }
+    }
+  } else {
+    fs.rmSync(destAbs, { recursive: true, force: true })
+    fs.mkdirSync(destAbs, { recursive: true })
+  }
   const srcAbs = path.join(SOURCE_ROOT, src)
   if (!fs.existsSync(srcAbs)) throw new Error(`source missing: ${srcAbs}`)
   const items = fs.readdirSync(srcAbs, { withFileTypes: true })
@@ -136,12 +203,18 @@ function extractSection(src, dest, kind) {
       copyAgent(path.join(srcAbs, entry.name), path.join(destAbs, r.to), r)
       stats.copied.agents += 1
     } else if (kind === 'agents' && entry.isFile()) {
-      fs.copyFileSync(path.join(srcAbs, entry.name), path.join(destAbs, entry.name))
+      // Route through copyAgent so M3 patches (permission strip) apply to all agents.
+      copyAgent(path.join(srcAbs, entry.name), path.join(destAbs, entry.name))
       stats.copied.agents += 1
     } else if (kind === 'skills') {
       if (entry.name === 'index.md') {
-        fs.copyFileSync(path.join(srcAbs, entry.name), path.join(destAbs, entry.name))
+        // Repo keeps the adapted index; copy source only when none exists.
+        if (!fs.existsSync(path.join(destAbs, 'index.md'))) {
+          fs.copyFileSync(path.join(srcAbs, entry.name), path.join(destAbs, entry.name))
+        }
         indexCopied = true
+      } else if ((M.repoAuthored?.skills ?? []).includes(entry.name)) {
+        stats.skipped.push({ rel: `${dest}/${entry.name}`, reason: 'repo-authored preserved (not re-copied)' })
       } else {
         const srcDir = path.join(srcAbs, entry.name)
         const st = fs.lstatSync(srcDir)
@@ -182,12 +255,21 @@ function collectJunk(root) {
 
 function verifyAliasBodyIntegrity() {
   const problems = []
+  // Sanctioned body-patch markers (M2 plan-tools note) are stripped before comparison.
+  const noteMarkers = (M.patches ?? []).filter((p) => p.action === 'append-body-note').map((p) => p.marker).filter(Boolean)
   for (const [from, r] of Object.entries(AGENT_RENAMES)) {
     const srcText = fs.readFileSync(path.join(SOURCE_ROOT, 'agents', from), 'utf8')
     const destText = fs.readFileSync(path.join(REPO_ROOT, 'agents', r.to), 'utf8')
-    const srcBody = splitFrontmatter(srcText, from).body
-    const destBody = splitFrontmatter(destText, r.to).body
-    if (srcBody !== destBody) problems.push(`${from} body differs from ${r.to}`)
+    let srcBody = splitFrontmatter(srcText, from).body
+    let destBody = splitFrontmatter(destText, r.to).body
+    for (const m of noteMarkers) {
+      srcBody = stripBodyNote(srcBody, m)
+      destBody = stripBodyNote(destBody, m)
+    }
+    // Normalize trailing newlines: sanctioned appends and EOF differences
+    // must not count as body drift (only real content changes do).
+    const norm = (b) => b.replace(/\n+\s*$/, '\n')
+    if (norm(srcBody) !== norm(destBody)) problems.push(`${from} body differs from ${r.to}`)
     const destFm = splitFrontmatter(destText, r.to).fm
     if (!destFm.includes(`name: ${r.newName}`)) problems.push(`${r.to} frontmatter name missing`)
   }
@@ -210,6 +292,7 @@ function extract() {
   console.log(`Extracted from ${SOURCE_ROOT} -> ${REPO_ROOT}`)
   console.log(`  agents: ${agents} files  | skills: ${skillDirs} dirs + index.md ${hasIndex ? 'yes' : 'NO'} | commands/prompts: out of scope (removed)`)
   console.log(`  renames: ${stats.renamed.map((r) => `${r.from} -> ${r.to}`).join(', ') || 'none'}`)
+  console.log(`  patches: ${stats.patched.map((p) => `${p.file} [${p.patch}]`).join('; ') || 'none'}`)
   console.log(`  symlinks dereferenced: ${stats.dereferenced.map((d) => `${d.link} -> ${d.real}`).join('; ') || 'none'}`)
   if (stats.skipped.length) {
     console.log(`  skipped (${stats.skipped.length}):`)
@@ -257,7 +340,12 @@ function check() {
       !fs.existsSync(path.join(REPO_ROOT, 'agents', 'software-engineer.md'))) {
     problems.push('alias files software-architect.md / software-engineer.md missing')
   }
-
+  // M3: `permission` must be stripped from every bundled agent frontmatter.
+  for (const f of fs.readdirSync(path.join(REPO_ROOT, 'agents'))) {
+    if (!f.endsWith('.md')) continue
+    const t = fs.readFileSync(path.join(REPO_ROOT, 'agents', f), 'utf8')
+    if (t.split('\n').some((l) => /^permission:/.test(l))) problems.push(`agent ${f} still has permission key (M3 strip)`)
+  }
   problems.push(...verifyAliasBodyIntegrity())
   for (const dir of ['agents', 'skills']) {
     for (const hit of collectJunk(path.join(REPO_ROOT, dir))) problems.push(`junk in ${dir}/: ${hit}`)

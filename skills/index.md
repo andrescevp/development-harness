@@ -2,7 +2,10 @@
 
 > The plugin bundles exactly **12 skills** (user-mandated scoped manifest).
 > Loading a skill injects its instructions and resources into the current
-> conversation. All plan execution follows the skills loop below.
+> conversation. Plans are **phased** (phases → sub-tasks, dual status
+> markers); plan lifecycle is managed via the bundled `harness` tools
+> (`harness_plan_read`, `harness_plan_update_status`, `harness_plan_create` —
+> see `docs/LOADING.md`). All plan execution follows the skills loop below.
 
 ```mermaid
 graph TB
@@ -43,20 +46,30 @@ graph TB
 
 ## The skills loop (verbatim)
 
-1. `planning` → use `domain-check` while planning
-2. `execute-plan`
+Plans are **phased**: `## Phases` → `### Phase N: <title>` (with `- **Status:**`)
+→ `#### Sub-Task N.M: <title>` (with full fields + `- **Status:**`). Format
+contract: `skills/planning/references/phased-plan-template.md`.
+
+1. `planning` → use `domain-check` while planning (creates phased plans)
+2. `execute-plan` (iterates phases in order → their sub-tasks)
    2.1 `execute-plan-task` → use `coding`
    2.2 `simplify`
    2.3 `review` + `code-review`
    2.4 IF hard blockers → stop and ask guidance; otherwise keep `execute-plan-task` loop
 3. `preflight` + `artifact-check`
-4. `final-review`
+4. `final-review` (reports per-phase completion)
 5. `create-documentation`
 
 **Step 2.4 halts automation.** On a hard blocker (3 consecutive validation
 failures, unresolved P0/P1 review findings, or missing preconditions), report
 it and ask the user for guidance — never silently continue or mark sub-tasks
-Complete around a blocker (see repo-root `AGENTS.md`).
+Complete around a blocker (see repo-root `AGENTS.md`). A blocked sub-task
+blocks its phase.
+
+**Plan lifecycle tools:** use `harness_plan_read` to parse a phased plan,
+`harness_plan_update_status` to flip phase/sub-task status markers, and
+`harness_plan_create` to scaffold a new plan — fall back to direct plan.md
+edits only when the tools are unavailable.
 
 ## The 12 bundled skills
 

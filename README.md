@@ -24,7 +24,9 @@ create-documentation), `software-engineer` (execute-plan-task, coding),
 `coding` is the NEW skill — TDD coding best practices that reads project
 rules from `CODE_RULES.md` at the project root when present.
 
-**The skills loop** (see [`AGENTS.md`](AGENTS.md)):
+**The skills loop** (see [`AGENTS.md`](AGENTS.md)) — plans are **phased**
+(phases → sub-tasks with dual status markers; format contract in
+`skills/planning/references/phased-plan-template.md`):
 
 1. `planning` → use `domain-check` while planning
 2. `execute-plan` → 2.1 `execute-plan-task` (uses `coding`) · 2.2 `simplify`
@@ -34,13 +36,32 @@ rules from `CODE_RULES.md` at the project root when present.
 4. `final-review`
 5. `create-documentation`
 
+## Plan lifecycle tools (bundled)
+
+The plugin registers a `harness` namespace with three V2 custom tools
+(codemode) for managing phased plans under `docs/plans`:
+
+| Tool | Purpose |
+|---|---|
+| `harness_plan_read` | Parse a phased plan into structured JSON (meta, phases, sub-tasks with statuses) |
+| `harness_plan_update_status` | Update a phase or sub-task status marker (phase → Completed only when all its sub-tasks are Completed) |
+| `harness_plan_create` | Scaffold a new phased plan from a title + objective + phases/sub-tasks |
+
+The loop skills (`planning`, `execute-plan`, `execute-plan-task`, `review`,
+`final-review`) and the `software-architect` / `software-engineer` agents use
+these tools instead of manual plan.md edits (fallback to manual edits when the
+tools are unavailable).
+
 ## Provenance
 
 - Harness content is extracted from `~/.agents` (read-only source; nothing
   there is modified). See [`docs/EXTRACTION.md`](docs/EXTRACTION.md).
 - Alias mapping on copy: `senior-architect` → `software-architect`,
   `senior-engineer` → `software-engineer` (frontmatter `name` only; bodies
-  byte-identical).
+  byte-identical modulo the sanctioned plan-tools note).
+- Bundled agents ship **without the `permission` frontmatter key** (M3
+  mandate) — permission rules derive from `tools` only; the strip is a
+  declarative patch applied on extraction and verified by `extract --check`.
 - Runtime delegation normalization (the plugin registers only the 6 manifest
   agents): `@build`/`@senior-engineer` → `@software-engineer`,
   `@senior-architect`/`@plan` → `@software-architect` — see AGENTS.md table.

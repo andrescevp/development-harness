@@ -80,6 +80,8 @@ function auditFile(rel) {
     if (kind === 'agent' || kind === 'skill') {
       for (const f of ['name', 'description']) if (fields[f] === undefined) add(rec, 'frontmatter', 'fail', `missing required field '${f}'`)
       if (kind === 'agent') for (const f of ['mode', 'model']) if (fields[f] === undefined) add(rec, 'frontmatter', 'warn', `agent missing '${f}' (plugin registration impact)`)
+      // M3 mandate: bundled agents must NOT carry the `permission` frontmatter key.
+      if (kind === 'agent' && fields['permission'] !== undefined) add(rec, 'frontmatter', 'fail', 'permission key present (M3: strip from bundled agents)')
     }
     if ((kind === 'skill' || kind === 'agent') && fields.name !== undefined) {
       if (!new RegExp(MANIFEST.skillNameRegex).test(fields.name)) add(rec, 'name', 'fail', `'${fields.name}' violates ${MANIFEST.skillNameRegex}`)

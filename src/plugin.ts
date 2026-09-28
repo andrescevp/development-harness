@@ -21,8 +21,12 @@
  */
 import { Plugin } from "@opencode/plugin"
 import type { Agent, Skill } from "@opencode/plugin"
+import fs from "node:fs"
+import path from "node:path"
 import { loadHarnessAssets } from "./lib/assets.js"
 import type { AgentRecord, SkillRecord } from "./lib/records.js"
+import { parsePlan, setStatus, buildPlanTemplate, resolvePlanPath } from "./tools/plan-lifecycle.js"
+import type { PhaseStatus } from "./tools/plan-lifecycle.js"
 
 const PLUGIN_ID = "dev-harness-skills"
 const LOG_PREFIX = "[dev-harness-skills]"
@@ -74,6 +78,107 @@ export default Plugin.define({
       }
     })
 
+    // 3. Plan-lifecycle tools (M2) — harness namespace, codemode, workspace-anchored.
+    const workspaceRoot = ctx.location?.directory ?? ""
+    await registerPlanTools(ctx, workspaceRoot)
+
     logSummary(agents, skills, errors.length)
   },
 })
+
+/** Registration for the M2 plan-lifecycle toolset (namespace `harness`). */
+async function registerPlanTools(ctx: Plugin.Context, workspaceRoot: string): Promise<void> {
+  await ctx.tool.transform((editor) => {
+    editor.namespace({ name: "harness", description: "Plan lifecycle tools for phased plans under docs/plans (phases + sub-tasks with statuses)" })
+    editor.add({
+      name: "plan_read",
+      description: "Parse a phased plan (docs/plans/<slug>/plan.md) into structured JSON: meta, phases[] with status, subTasks[] with phase/status/relatedRequirements. Input: slug (or path relative to docs/plans). Errors clearly when missing or unparseable.",
+      input: {
+        type: "object",
+        properties: {
+          slug: { type: "string", description: "Plan slug (docs/plans/<slug>/plan.md)" },
+          path: { type: "string", description: "Explicit path relative to docs/plans (overrides slug)" },
+        },
+      },
+      options: { namespace: "harness", codemode: true },
+      execute: async (input: unknown) => {
+        const { slug, path: relPath } = input as { slug?: string; path?: string }
+        const file = resolvePlanPath(workspaceRoot, slug, relPath)
+        const contents = readPlanFile(file)
+        return { content: JSON.stringify({ ok: true, path: file, plan: parsePlan(contents) }) }
+      },
+    })
+
+    editor.add({
+      name: "plan_update_status",
+      description: "Update a phase or sub-task status marker in a phased plan and return the re-parsed plan. target=phase→index \"N\"; target=subtask→index \"N.M\". status ∈ Pending | In Progress | Completed. A phase cannot be Completed while any of its sub-tasks is not Completed.",
+      input: {
+        type: "object",
+        properties: {
+          slug: { type: "string" },
+          path: { type: "string", description: "Explicit path relative to docs/plans (overrides slug)" },
+          target: { type: "string", enum: ["phase", "subtask"] },
+          index: { type: "string", description: "Phase \"N\" or sub-task \"N.M\"" },
+          status: { type: "string", enum: ["Pending", "In Progress", "Completed"] },
+        },
+        required: ["target", "index", "status"],
+      },
+      options: { namespace: "harness", codemode: true },
+      execute: async (input: unknown) => {
+        const { slug, path: relPath, target, index, status } = input as { slug?: string; path?: string; target: "phase" | "subtask"; index: string; status: PhaseStatus }
+        const file = resolvePlanPath(workspaceRoot, slug, relPath)
+        const contents = readPlanFile(file)
+        const result = setStatus(contents, target, index, status)
+        fs.writeFileSync(file, result.contents, "utf8")
+        return { content: JSON.stringify({ ok: true, path: file, plan: result.plan }) }
+      },
+    })
+
+    editor.add({
+      name: "plan_create",
+      description: "Scaffold a new phased plan (docs/plans/<slug>/plan.md) from a title, objective, and phases with sub-task titles; all statuses start Pending. Optionally append the index.md row.",
+      input: {
+        type: "object",
+        properties: {
+          slug: { type: "string" },
+          title: { type: "string" },
+          objective: { type: "string" },
+          phases: {
+            type: "array",
+            items: { type: "object", properties: { title: { type: "string" }, subTasks: { type: "array", items: { type: "object", properties: { title: { type: "string" } } } } } },
+          },
+          updateIndex: { type: "boolean", description: "Append a row to docs/plans/index.md" },
+        },
+        required: ["slug", "title", "objective", "phases"],
+      },
+      options: { namespace: "harness", codemode: true },
+      execute: async (input: unknown) => {
+        const { slug, title, objective, phases, updateIndex } = input as { slug: string; title: string; objective: string; phases: { title: string; subTasks: { title: string }[] }[]; updateIndex?: boolean }
+        const file = resolvePlanPath(workspaceRoot, slug)
+        if (fs.existsSync(file)) throw new Error(`plan already exists: ${file}`)
+        fs.mkdirSync(path.dirname(file), { recursive: true })
+        fs.writeFileSync(file, buildPlanTemplate({ slug, title, objective, phases }), "utf8")
+        if (updateIndex && workspaceRoot) {
+          const indexFile = path.join(workspaceRoot, "docs", "plans", "index.md")
+          if (fs.existsSync(indexFile)) {
+            const today = new Date().toISOString().slice(0, 10)
+            const desc = title.replace(/\|/g, "\\|")
+            const row = `| ${title.replace(/\|/g, "\\|")} | ${slug} | ${desc} | ${today} | ${today} | Pending | Yes |`
+            fs.appendFileSync(indexFile, `${row}\n`, "utf8")
+          }
+        }
+        const contents = readPlanFile(file)
+        return { content: JSON.stringify({ ok: true, path: file, plan: parsePlan(contents) }) }
+      },
+    })
+  })
+}
+
+/** Read a plan file with a descriptive error when missing/unreadable. */
+function readPlanFile(file: string): string {
+  try {
+    return fs.readFileSync(file, "utf8")
+  } catch {
+    throw new Error(`plan file not readable: ${file}`)
+  }
+}

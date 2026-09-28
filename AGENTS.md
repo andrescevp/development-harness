@@ -17,22 +17,41 @@ All plan execution inside the plugin runs the skills loop below.
 
 ## The skills loop (harness runtime contract)
 
-1. `planning` → use `domain-check` while planning
-2. `execute-plan`
+Plans are **phased**: a plan is an ordered set of phases, each containing
+sub-tasks, with status markers at BOTH levels (Pending | In Progress |
+Completed). The loop:
+
+1. `planning` → use `domain-check` while planning (creates phased plans)
+2. `execute-plan` (iterates phases in order → their sub-tasks)
    2.1 `execute-plan-task` → use `coding`
    2.2 `simplify`
    2.3 `review` + `code-review`
    2.4 IF hard blockers → stop and ask guidance; otherwise keep `execute-plan-task` loop
 3. `preflight` + `artifact-check`
-4. `final-review`
+4. `final-review` (reports per-phase completion)
 5. `create-documentation`
+
+**Phase lifecycle:** a phase becomes `In Progress` when its first sub-task
+starts and `Completed` only when ALL its sub-tasks are `Completed`. Resume
+mode continues the first `In Progress` phase → its first `In Progress` /
+`Pending` sub-task.
 
 **Step 2.4 halts automation.** When `execute-plan-task` (or any loop step)
 hits a hard blocker — repeated validation failures (3 consecutive strikes),
 unresolved P0/P1 review findings, or missing preconditions that cannot be
 worked around — the loop STOPS: report the blocker and ask the user for
 guidance. Never silently continue, never skip the blocked step, and never mark
-sub-tasks Complete around a blocker.
+sub-tasks Complete around a blocker. The rule applies at phase boundaries too:
+a blocked sub-task blocks its phase — do not mark the phase `Completed` around
+a blocker.
+
+**Plan lifecycle tools (bundled harness namespace):** `harness_plan_read`,
+`harness_plan_update_status`, `harness_plan_create` — read/parse phased plans,
+update phase/sub-task status markers, and scaffold new phased plans from
+`docs/plans`. Loop skills and the planner agents prefer these tools over
+manual plan.md edits (fall back to manual edits only when the tools are
+unavailable). Format contract:
+`skills/planning/references/phased-plan-template.md`.
 
 ## Agent-name normalization (runtime delegation)
 

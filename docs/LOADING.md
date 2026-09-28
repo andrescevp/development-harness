@@ -35,6 +35,21 @@ opencode debug skills   → look for: artifact-check, simplify, domain-check,
 opencode debug commands → no new commands (commands are out of scope)
 ```
 
+## Plan lifecycle tools (harness namespace)
+
+The plugin also registers three V2 custom tools (codemode) for phased plans:
+
+| Tool | Input | Returns |
+|---|---|---|
+| `harness_plan_read` | `{ slug }` or `{ path }` (relative to `docs/plans`) | `{ ok, path, plan }` — parsed phases/sub-tasks with statuses |
+| `harness_plan_update_status` | `{ slug?, path?, target: phase\|subtask, index: "N"\|"N.M", status }` | `{ ok, path, plan }` — line-aware status edit |
+| `harness_plan_create` | `{ slug, title, objective, phases: [{title, subTasks:[{title}]}], updateIndex? }` | `{ ok, path, plan }` — scaffolds a phased plan |
+
+Phase → `Completed` is gated: it fails while any sub-task of the phase is not
+`Completed`. Reads/writes are anchored under `<workspace>/docs/plans`;
+`..` escapes, absolute paths outside the anchor, symlinks, and missing
+workspace roots are rejected with descriptive errors.
+
 The in-repo gate that proves the plugin logic is the registration test:
 
 ```sh

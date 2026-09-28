@@ -8,11 +8,6 @@ model: opencode-go/deepseek-v4-flash
 tools:
   bash: true
   read: true
-permission:
-  external_directory:
-    '/tmp': allow
-    '/tmp/**': allow
-  task: deny
 ---
 
 # Executor Agent Guidelines

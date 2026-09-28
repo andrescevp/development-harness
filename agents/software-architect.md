@@ -11,11 +11,6 @@ tools:
   read: true
   write: true
   edit: true
-permission:
-  external_directory:
-    '/tmp': allow
-    '/tmp/**': allow
-  task: allow
 ---
 
 
@@ -86,3 +81,6 @@ Check these are installed in target projects; add as dev dependencies if missing
 - Ensure accessibility (a11y) is baked into architecture, not bolted on later
 - Document the "why" behind every architectural decision
 - Consider operational cost, not just development elegance
+
+> Harness plan tools (bundled):
+> Use harness_plan_read / harness_plan_update_status / harness_plan_create for reading, updating, and scaffolding phased plans (docs/plans). Fall back to direct plan.md edits only when the tools are unavailable.

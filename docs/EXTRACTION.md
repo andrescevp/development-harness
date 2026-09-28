@@ -133,13 +133,25 @@ directories, so it can be re-run at any time. `--check` enforces the scoped
 manifest from `scripts/manifest.json` (6 agents, 11 skill dirs + `index.md`,
 no commands/prompts dirs, zero junk, zero symlinks, and byte-identical alias
 bodies).
-## Patch: phased plan format (2026-09-28)
+## Patch: phased plan format + repo-authored skills (2026-09-28)
 
-The bundled `skills/planning` copy is a **patched** version of the source
-skill: it now creates **phased plans** (`## Phases` → `### Phase N` →
-`#### Sub-Task N.M` with dual status markers) per the new harness format
-contract. The canonical template lives in
-`skills/planning/references/phased-plan-template.md`; the canonical fixture in
-`src/__tests__/fixtures/plans/phased-plan.md`. The source `~/.agents` skill is
-untouched — re-extraction re-applies this patch via the pipeline (see
-`scripts/manifest.json` PATCHES when implemented).
+The bundled `skills/planning` copy is **patched**: it creates **phased plans**
+(`## Phases` → `### Phase N` → `#### Sub-Task N.M` with dual status markers)
+per the new harness format contract; the canonical template lives in
+`skills/planning/references/phased-plan-template.md` and the canonical fixture
+in `src/__tests__/fixtures/plans/phased-plan.md`.
+
+**Repo-authored preservation:** the bundled skill set is this repo's
+distribution — `scripts/manifest.json` `repoAuthored.skills` lists every
+bundled skill dir (incl. `coding`, `planning`, and the loop skills that are
+patched in dev-harness-phases-and-tools). `extract.mjs` merge-preserves them:
+re-running extraction never wipes these dirs, never overwrites the adapted
+`skills/index.md`, and keeps dest-only files such as `planning/references/`.
+Source `~/.agents` stays untouched and read-only.
+
+**Patch: permission strip (M3, user mandate):** `scripts/manifest.json`
+`patches` carries a declarative `strip-frontmatter-key` entry for `permission`;
+`extract.mjs` applies it post-copy to every bundled agent (idempotent — the
+same script's `--check` fails if `^permission:` reappears in `agents/`). The
+source agent files still carry `permission`; bundled agents register with
+`tools`-derived permission rules only.

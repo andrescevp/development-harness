@@ -24,8 +24,9 @@ Produce a comprehensive final sign-off review for a completed plan. Verify all s
 ## Core Rules
 
 - Read `./docs/plans/<plan-slug>/task.md` as the source of truth for requirements.
-- Read `./docs/plans/<plan-slug>/plan.md` to verify sub-task completion.
-- If any sub-task is not `Completed`, stop and report which tasks remain — do not proceed to full review.
+- Read the plan (via `harness_plan_read` when available; fallback: manual read of `./docs/plans/<plan-slug>/plan.md`) to verify sub-task AND phase completion.
+- If any sub-task is not `Completed` (and therefore any phase is not `Completed`), stop and report which tasks remain — do not proceed to full review.
+- This skill is loop step 4 (`final-review`); the full loop 1–5 lives in repo-root AGENTS.md (pointer only, no duplication).
 - Perform full-diff review against the entire scope, not just individual sub-tasks.
 - Delegate in-depth code review to `@final-reviewer` agent (which uses `code-review` skill).
 - Write the final report to `./docs/plans/<plan-slug>/tasks/review.md`.
@@ -38,9 +39,9 @@ Produce a comprehensive final sign-off review for a completed plan. Verify all s
 
 ### Step 1: Verify plan completion
 
-Read `./docs/plans/<plan-slug>/plan.md` and check every sub-task status:
+Read the plan (via `harness_plan_read` when available; fallback: manual read) and check every sub-task AND phase status:
 
-- All sub-tasks must be `Completed`. If any are `Pending` or `In Progress`, list them and stop — do not proceed.
+- All sub-tasks must be `Completed` and every phase must be `Completed` (a phase is `Completed` only when all its sub-tasks are). If any sub-task is `Pending` or `In Progress`, list them, note their phase, and stop — do not proceed.
 - If the plan has no sub-tasks at all, report that the plan is empty and stop.
 
 ### Step 2: Read the requirements
@@ -61,6 +62,7 @@ Generate the full diff (`git diff main...HEAD` or `git diff $(git merge-base mai
 - Are all files listed in each sub-task present?
 - Are there any missing deliverables (empty files, stubs where real implementation was expected)?
 - Are there cross-sub-task integration gaps (e.g., Sub-Task 2 expects a file Sub-Task 3 was supposed to create)?
+- **Per-phase completion:** list each `Phase N` with its status and confirm no phase was marked `Completed` with open sub-tasks (blocker rule 2.4: never mark a phase around a blocker).
 - Are there obvious scope violations (out-of-scope items implemented)?
 
 ### Step 4: Delegate in-depth review
@@ -99,9 +101,11 @@ Consolidate your own full-scope findings (Steps 1–3), the release readiness re
 
 ## Plan Completion Status
 
-| Sub-task | Status | Notes |
-|---|---|---|
-| [Sub-task 1] | Completed | [Brief note] |
+| Phase | Sub-task | Status | Notes |
+|---|---|---|---|
+| [Phase 1] | [Sub-task 1.1] | Completed | [Brief note] |
+
+Per-phase completion: [Phase 1: Completed — N/N sub-tasks; Phase 2: Completed — M/M sub-tasks; …]
 
 ## Requirements Verification
 

@@ -75,6 +75,14 @@ describe("corpus parsing (real bundled set)", () => {
     expect(String(data.description)).toMatch(/CODE_RULES\.md/)
     expect(String(data.description)).toMatch(/TDD/i)
   })
+
+  it("no bundled agent carries the permission frontmatter key (M3 strip)", () => {
+    for (const file of AGENT_FILES) {
+      const { data } = parseFrontmatter(fs.readFileSync(file, "utf8"))
+      expect(data["permission"], file).toBeUndefined()
+      expect(data["tools"], file).toBeDefined() // tools survive the strip
+    }
+  })
 })
 
 describe("multi-line > description folding", () => {

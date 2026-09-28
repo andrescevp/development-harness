@@ -18,7 +18,7 @@ metadata:
   workflow: development
 ---
 
-Orchestrate the complete execution of a plan from start to finish. Iterate through all sub-tasks, delegate execution and review, handle interruptions, and produce a final sign-off.
+Orchestrate the complete execution of a plan from start to finish. Iterate through all phases and their sub-tasks in order, delegate execution and review, handle interruptions, and produce a final sign-off.
 
 ## Core Rules
 
@@ -26,15 +26,18 @@ Orchestrate the complete execution of a plan from start to finish. Iterate throu
   - Check you are in main branch and create the feature branch.
   - If not in feature branch, ask user permission to continue before any change.
   - if working in monorepos with git submodules create a branch per submodule along with the branch of the main repository to align and trace commints between repositories.
-- Read `./docs/plans/<plan-slug>/plan.md` to identify sub-tasks and their statuses.
+- Read the plan with the `harness_plan_read` tool (`{ slug }` → structured JSON: meta, phases[].title/status, subTasks[].phase/title/status). Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually, following the phased template markers (`## Phases` → `### Phase N: <title>` → `#### Sub-Task N.M: <title>` with `- **Status:**` bullets).
 - If the plan file does not exist, stop and report — suggest running the `planning` skill first.
+- Iterate **phases in order**; within each phase, iterate its sub-tasks in order.
+- Phase lifecycle: a phase becomes `In Progress` when its first sub-task starts; it becomes `Completed` only when ALL its sub-tasks are `Completed`.
 - Do not re-execute sub-tasks already marked `Completed`.
 - If a sub-task is marked `In Progress`, resume from it (don't restart from the beginning).
+- Update statuses with the `harness_plan_update_status` tool (`{ slug, target: "phase"|"subtask", index: "N"|"N.M", status }`): mark a sub-task `In Progress` before execution, `Completed` after its review passes, and a phase `Completed` only when all its sub-tasks are `Completed`. Fallback when the tool is unavailable: manual plan.md edits following the marker rules (only blank lines precede status bullets).
 - After each sub-task execution, run the `review` skill before proceeding to the next.
-- If a review produces P0/P1 findings, stop and report — do not continue to the next sub-task.
+- If a review produces P0/P1 findings, stop and report — do not continue to the next sub-task (a blocked sub-task blocks its phase).
 - After the final sub-task, run the `final-review` skill for sign-off.
 - Update `./docs/plans/index.md` when the plan is fully complete.
-- **Project type awareness is delegated to `execute-plan-task`.** The orchestrator does not re-detect project type — it relies on `execute-plan-task` to handle agent selection based on whether the project is software or non-software. Do not hardcode agent choices (e.g., `@software-engineer`) in the orchestration loop that would conflict with this.
+- **Project type awareness is delegated to `execute-plan-task`.** The orchestrator does not re-detect project type — it relies on `execute-plan-task` to handle agent selection based on whether the project is software or non-software. Do not hardcode agent choices (e.g., `@senior-engineer`) in the orchestration loop that would conflict with this.
 - **After plan completion (all projects):** invokes `evolve` and `state-sync` to capture what was learned and update documentation. This ensures knowledge persists beyond the active session.
 - **After plan completion (software projects only):** invokes `create-documentation` for generating/updating project docs, and `semver` for determining the next version bump.
 
@@ -42,28 +45,30 @@ Orchestrate the complete execution of a plan from start to finish. Iterate throu
 
 ### Step 1: Read plan and assess state
 
-Read `./docs/plans/<plan-slug>/plan.md` and determine the starting point using this ordered priority:
+Read the plan (via `harness_plan_read`; fallback: manual read) and determine the starting point using this ordered priority:
 
-1. If all sub-tasks are `Completed`, run `final-review` skill only and proceed to Step 3. Skip the execution loop.
-2. If one or more sub-tasks are `In Progress`, start from the first `In Progress` sub-task (resume mode).
-3. If all sub-tasks are `Pending`, start from the first sub-task.
-4. If the plan has no sub-tasks, or every sub-task has an unrecognized status, report the ambiguous state and stop.
+1. If all sub-tasks are `Completed` (every phase `Completed`), run `final-review` skill only and proceed to Step 3. Skip the execution loop.
+2. Resume mode: if one or more phases are `In Progress`, start from the FIRST `In Progress` phase, then its FIRST sub-task marked `In Progress` or `Pending`.
+3. If all phases are `Pending` (all sub-tasks `Pending`), start from Phase 1's first sub-task.
+4. If the plan has no phases/sub-tasks, or every phase/sub-task has an unrecognized status, report the ambiguous state and stop.
 
 ### Step 2: Execution loop
 
-For each sub-task starting from the determined starting point:
+Iterate **phases in order** (skip phases already `Completed`); within each phase, iterate its sub-tasks starting from the determined starting point:
 
-0. **Mark In Progress**: Ensure the sub-task is marked `In Progress` in plan.md. If it is already `In Progress` (resume), leave the state. If it is `Pending`, mark it `In Progress` now. This ensures resume works if interrupted.
+0. **Mark In Progress**: Ensure the active sub-task is marked `In Progress` via `harness_plan_update_status` (`target: "subtask"`). If it is already `In Progress` (resume), leave the state. Marking the first sub-task of a phase also moves that phase to `In Progress` (phase lifecycle). Fallback: manual plan.md edit per the marker rules. This ensures resume works if interrupted.
 
 1. **Execute**: Follow the `execute-plan-task` skill to implement this sub-task. Since this is called from the orchestrator, `execute-plan-task` skips its internal review and completion steps (per its orchestration guard).
 
 2. **Verify**: Run the `review` skill to verify the sub-task result against its acceptance criteria and produce findings in `./docs/plans/<plan-slug>/tasks/review.md`.
 
 3. **Check findings**: Read the review output:
-   - If P0/P1 findings exist: stop the execution loop and report the blocking issues. Do not mark this sub-task `Completed`. Recommend fixing findings and re-running.
-   - If no P0/P1 findings: mark the sub-task `Completed` in plan.md.
+   - If P0/P1 findings exist: stop the execution loop and report the blocking issues. Do not mark this sub-task `Completed` — a blocked sub-task blocks its phase (loop rule 2.4). Recommend fixing findings and re-running.
+   - If no P0/P1 findings: mark the sub-task `Completed` via `harness_plan_update_status` (`target: "subtask"`, status `Completed`). Fallback: manual edit.
 
-4. **Repeat**: Continue to the next sub-task until all are completed.
+3a. **Close the phase**: When ALL sub-tasks of the current phase are `Completed`, mark the phase `Completed` via `harness_plan_update_status` (`target: "phase"`, status `Completed`; the tool refuses phase → `Completed` while any sub-task is open) and report the phase completion. Fallback: manual edit.
+
+4. **Repeat**: Continue to the next sub-task, then the next phase, until all phases are completed.
 
 ### Step 3: Final sign-off
 
@@ -103,15 +108,40 @@ After final sign-off passes and before marking the plan complete:
 
 The execution loop automatically handles interruptions:
 
-- Step 2.0 explicitly marks the current sub-task as `In Progress` before delegating to `execute-plan-task`. If the tool is interrupted, the next invocation reads plan.md and finds this `In Progress` sub-task.
-- Resume from Step 1, which detects the `In Progress` state (priority 2) and continues the loop from that sub-task.
+- Step 2.0 explicitly marks the current sub-task as `In Progress` before delegating to `execute-plan-task`. If the tool is interrupted, the next invocation reads the plan and finds this `In Progress` sub-task.
+- Resume from Step 1, which detects the phase-aware state (priority 2: first `In Progress` phase → its first `In Progress`/`Pending` sub-task) and continues the loop from there.
 - If interruption occurs after review but before the `Completed` mark, the sub-task remains `In Progress` on resume — re-run the review to verify before marking Complete.
 
 ## Error Handling
 
-- **Sub-task execution fails** (validation keeps failing): `execute-plan-task` stops after 3 validation attempts and reports the failure. Do not proceed to the next sub-task.
+- **Sub-task execution fails** (validation keeps failing): `execute-plan-task` stops after 3 validation attempts and reports the failure. Do not proceed to the next sub-task — the blocked sub-task blocks its phase (loop rule 2.4: never mark the phase `Completed` around a blocker).
 - **Review produces blocking findings**: Stop the execution loop. Recommend fixing the findings (using the `address-review` pattern) and re-running `execute-plan`.
 - **Final review fails**: Report the verdict — do not mark the plan complete until findings are addressed.
+
+## Loop Integration (bundled)
+
+This copy is bundled in the plugin; the loop below is the harness runtime
+contract (full text in repo-root AGENTS.md). Plan execution follows it in
+order — do not skip steps and never silently continue past a blocker:
+
+1. `planning` (use `domain-check` while planning)
+2. `execute-plan`
+   2.1 `execute-plan-task` (delegate code implementation through the `coding` skill)
+   2.2 `simplify`
+   2.3 `review` + `code-review`
+   2.4 IF hard blockers → stop and ask guidance; otherwise keep the `execute-plan-task` loop
+3. `preflight` + `artifact-check`
+4. `final-review`
+5. `create-documentation`
+
+**Step 2.4 halts automation.** When `execute-plan-task` (or any loop step)
+hits a hard blocker — repeated validation failures (3 consecutive strikes),
+unresolved P0/P1 review findings, or missing preconditions that cannot be
+worked around — the loop STOPS: report the blocker and ask the user for
+guidance. Never silently continue, never skip the blocked step, and never mark
+sub-tasks Complete around a blocker. The rule applies at phase boundaries
+too: a blocked sub-task blocks its phase — do not mark the phase `Completed`
+around a blocker.
 
 ## References
 
@@ -125,27 +155,3 @@ The execution loop automatically handles interruptions:
 - `plan.md` command: `~/.agents/commands/plan.md` — for creating new plans.
 - `next-subtask.md` command: `~/.agents/commands/next-subtask.md` — the single-task execution pattern.
 - `address-review.md` command: `~/.agents/commands/address-review.md` — the pattern for addressing and re-reviewing findings.
-
-## Loop Integration (bundled)
-
-The full harness skills loop (1..5) lives in the repo-root `AGENTS.md`. Key
-binding rules for this skill:
-
-- **2.1 — `execute-plan-task` → use `coding`:** sub-task implementation is
-  delegated through the `coding` skill (test-first TDD; reads project rules
-  from `CODE_RULES.md` at the project root), with heavy work via
-  `@software-engineer` and validation via `@executor`.
-- **2.2 — `simplify`:** after a sub-task passes validation, run the
-  `simplify` skill over the changed code (software projects only).
-- **2.3 — `review` + `code-review`:** verify the sub-task against
-  acceptance criteria (`review`) and review code quality (`code-review`),
-  delegating the deep review to `@reviewer`.
-- **2.4 — Hard blockers stop the loop:** on 3 consecutive validation failures,
-  unresolved P0/P1 review findings, or missing preconditions, STOP, report the
-  blocker, and ask the user for guidance — do not silently continue or mark
-  sub-tasks Complete around a blocker.
-- **Agent names:** delegation references resolve at runtime via the manifest
-  mapping in the repo `AGENTS.md` — `@build`/`@senior-engineer` →
-  `@software-engineer`, `@senior-architect`/`@plan` →
-  `@software-architect`; `@reviewer`, `@final-reviewer`, `@executor`,
-  `@explorer` unchanged.

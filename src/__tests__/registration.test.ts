@@ -31,15 +31,18 @@ const MANIFEST_SKILLS = [
 ].sort()
 
 interface CapturedUpdate {
-  domain: "agent" | "skill"
-  kind: "update" | "add"
-  name: string
+  domain: "agent" | "skill" | "tool" | "command"
+  kind: "update" | "add" | "namespace"
+  name?: string
+  namespace?: string
+  codemode?: boolean
 }
 
 /** Minimal stub ctx capturing transform registrations (mirrors the V2 contract). */
 function createStubContext() {
   const captured: CapturedUpdate[] = []
   const ctx = {
+    location: { directory: process.cwd() },
     agent: {
       transform: async (fn: (editor: { update: (id: string, mutate: (agent: Record<string, unknown>) => void) => void }) => void) => {
         fn({
@@ -58,9 +61,24 @@ function createStubContext() {
         })
       },
     },
+    tool: {
+      transform: async (fn: (editor: { namespace: (ns: { name: string }) => void; add: (info: { name: string; options?: { namespace?: string; codemode?: boolean }; execute?: unknown }) => void }) => void) => {
+        fn({
+          namespace: (ns) => captured.push({ domain: "tool", kind: "namespace", name: ns.name, namespace: ns.name }),
+          add: (info) => captured.push({ domain: "tool", kind: "add", name: info.name, namespace: info.options?.namespace, codemode: info.options?.codemode ?? false }),
+        })
+      },
+    },
+    command: {
+      transform: async () => {
+        throw new Error("command domain must never be touched (commands out of scope)")
+      },
+    },
   }
   return { ctx, captured }
 }
+
+const MANIFEST_TOOLS = ["plan_read", "plan_update_status", "plan_create"].sort()
 
 describe("plugin setup registration (built bundle)", () => {
   it("dist is built (run `pnpm build` first)", () => {
@@ -79,10 +97,19 @@ describe("plugin setup registration (built bundle)", () => {
 
     const agents = captured.filter((c) => c.domain === "agent" && c.kind === "update").map((c) => c.name).sort()
     const skills = captured.filter((c) => c.domain === "skill" && c.kind === "add").map((c) => c.name).sort()
+    const tools = captured.filter((c) => c.domain === "tool" && c.kind === "add").map((c) => c.name).sort()
 
     expect(agents).toEqual(MANIFEST_AGENTS)
     expect(skills).toEqual(MANIFEST_SKILLS)
-    // No command domain exists in the stub → every capture must be agent/skill.
-    expect(captured.every((c) => c.domain === "agent" || c.domain === "skill")).toBe(true)
+    expect(tools).toEqual(MANIFEST_TOOLS)
+    // One harness namespace registered; all 3 tools are codemode.
+    const namespaces = captured.filter((c) => c.domain === "tool" && c.kind === "namespace")
+    expect(namespaces.map((c) => c.name)).toEqual(["harness"])
+    const toolAdds = captured.filter((c) => c.domain === "tool" && c.kind === "add")
+    expect(toolAdds.every((c) => c.codemode === true)).toBe(true)
+    expect(toolAdds.every((c) => c.namespace === "harness")).toBe(true)
+    // No command domain is ever touched (stub throws if invoked).
+    expect(captured.some((c) => c.domain === "command")).toBe(false)
+    expect(captured.every((c) => c.domain === "agent" || c.domain === "skill" || c.domain === "tool")).toBe(true)
   })
 })
