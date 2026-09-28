@@ -7,5 +7,54 @@
     // within this repository clone; the absolute form also works:
     // "file:///home/andres/workspace/dev-harness-skills"
     "../"
-  ]
+  ],
+  // Native agent registration — hosts that do not load local directory
+  // plugins (opencode v2.0.18 limitation) still register config agents.
+  // The plugin ALSO registers these agents when it loads; the config map
+  // guarantees visibility on this host. Prompt files live in the harness
+  // repo (frontmatter + body; the plugin's assets mirror them).
+  "agent": {
+    "dh-software-architect": {
+      "description": "Software architect agent — planning, execute-plan, create-documentation; runs dh-code-ruler for CODE_RULES.md.",
+      "mode": "all",
+      "model": "opencode-go/deepseek-v4-flash",
+      "prompt": "{file:../agents/dh-software-architect.md}"
+    },
+    "dh-software-engineer": {
+      "description": "Software engineer agent — execute-plan-task and coding; single task executor of the harness.",
+      "mode": "all",
+      "model": "opencode-go/deepseek-v4-flash",
+      "prompt": "{file:../agents/dh-software-engineer.md}"
+    },
+    "dh-reviewer": {
+      "description": "Scoped code reviewer — reviews changed code against sub-task acceptance criteria (simplify/review/code-review).",
+      "mode": "subagent",
+      "model": "opencode-go/deepseek-v4-flash",
+      "prompt": "{file:../agents/dh-reviewer.md}"
+    },
+    "dh-final-reviewer": {
+      "description": "Final in-depth reviewer — full diff review against requirements and plan (final-review sign-off).",
+      "mode": "subagent",
+      "model": "opencode-go/deepseek-v4-flash",
+      "prompt": "{file:../agents/dh-final-reviewer.md}"
+    },
+    "dh-executor": {
+      "description": "Executes commands/tests/builds on behalf of other agents (logged-command strategy).",
+      "mode": "subagent",
+      "model": "opencode-go/deepseek-v4-flash",
+      "prompt": "{file:../agents/dh-executor.md}"
+    },
+    "dh-explorer": {
+      "description": "Fast codebase exploration via glob, grep, targeted reads (quick/medium/very thorough).",
+      "mode": "subagent",
+      "model": "opencode-go/deepseek-v4-flash",
+      "prompt": "{file:../agents/dh-explorer.md}"
+    },
+    "dh-documentor": {
+      "description": "Documentation owner — create/update/delete/retrieve generated documents (excluding docs/plans).",
+      "mode": "subagent",
+      "model": "opencode-go/deepseek-v4-flash",
+      "prompt": "{file:../agents/dh-documentor.md}"
+    }
+  }
 }
