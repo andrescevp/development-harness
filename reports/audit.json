@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T09:08:57.055Z",
+    "generated": "2026-09-28T12:00:54.631Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 7,
         "sev": "WARN",
-        "note": "255 resolved; 1 code-context; 0 allowlisted; 119 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+        "note": "258 resolved; 1 code-context; 0 allowlisted; 120 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
       },
       {
         "name": "Loop membership",
@@ -240,6 +240,14 @@
       "count": 2,
       "files": [
         "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "best-effort",
+      "count": 2,
+      "files": [
+        "skills/dh-create-documentation/SKILL.md",
+        "skills/dh-setup/SKILL.md"
       ]
     },
     {
@@ -623,13 +631,6 @@
       ]
     },
     {
-      "token": "best-effort",
-      "count": 1,
-      "files": [
-        "skills/dh-create-documentation/SKILL.md"
-      ]
-    },
-    {
       "token": "force-fit",
       "count": 1,
       "files": [
@@ -799,6 +800,13 @@
     },
     {
       "token": "nvm-sh",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "notesmd-cli-bin",
       "count": 1,
       "files": [
         "skills/dh-setup/SKILL.md"
@@ -1361,13 +1369,13 @@
     {
       "file": "skills/dh-setup/SKILL.md",
       "kind": "skill",
-      "lines": 118,
+      "lines": 123,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-setup",
-          "description": "Verify and prepare everything the dev-harness needs to run properly: audit system software (chrome, uv, nvm, osv-scanner, docker, jq, xq, yq, graphify, optional phpenv) and guide installation for anything missing; list and configure user-level integrations — MCP servers (chrome-devtools-mcp, playwright MCP, android-remote-control-mcp), the opencode-rules plugin (>= v2), and the graphify external tool — as config choices left to the user; and scaffold project-level quality gates: pre-commit/husky or equivalent hooks with clear rules, plus the QA toolset for the project's stack (All: osv-scanner; Python: ruff/mypy/pyupgrade/bandit/copydetect; JS/TS: biome/tsc/jscpd/knip/semgrep/dependency-cruiser; PHP: phpstan/deptrac/rector/phpcs/phpcpd; other stacks: research equivalents). Use when asked to \"check system requirements\", \"install the harness prerequisites\", \"setup the environment\", \"configure mcp/plugins\", \"add pre-commit/husky\", or before first use of the harness on a new machine.",
+          "description": "Verify and prepare everything the dev-harness needs to run properly: audit system software (chrome, uv, nvm, osv-scanner, docker, jq, xq, yq, graphify, optional phpenv, obsidian, notesmd-cli) and guide installation for anything missing; list and configure user-level integrations — MCP servers (chrome-devtools-mcp, playwright MCP, android-remote-control-mcp), the opencode-rules plugin (>= v2), and the graphify external tool — as config choices left to the user; and scaffold project-level quality gates: pre-commit/husky or equivalent hooks with clear rules, plus the QA toolset for the project's stack (All: osv-scanner; Python: ruff/mypy/pyupgrade/bandit/copydetect; JS/TS: biome/tsc/jscpd/knip/semgrep/dependency-cruiser; PHP: phpstan/deptrac/rector/phpcs/phpcpd; other stacks: research equivalents). Use when asked to \"check system requirements\", \"install the harness prerequisites\", \"setup the environment\", \"configure mcp/plugins\", \"add pre-commit/husky\", or before first use of the harness on a new machine.",
           "license": "MIT",
           "compatibility": "opencode",
           "allowed-tools": "read, write, edit, bash, websearch",
