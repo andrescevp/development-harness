@@ -1,9 +1,8 @@
 {
   "name": "dev-harness-skills",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
-  "description": "OpenCode V2 plugin bundling the scoped dev harness manifest (6 agents, 12 skills) from the personal harness at ~/.agents",
+  "description": "OpenCode V2 plugin with an opinionated development harness based in plan execution loop architecture",
   "main": "./dist/plugin.js",
   "types": "./dist/plugin.d.ts",
   "exports": {
