@@ -34,9 +34,9 @@ Create a practical execution plan in `./docs/plans/<plan-slug>/plan.md`, not imp
   - For **software projects**:
     - Run the `dh-domain-check` skill to validate the proposed scope against DDD bounded contexts and SOLID principles before writing the plan.
     - Run the `contingency` skill when there are multiple plausible architectural approaches — generate Plan A/B/C with trade-off analysis to inform the plan structure.
-    - Delegate to `@*-architect` agents for architectural patterns and `@*-engineer` agents for implementation suggestions.
+    - Delegate to `@dh-software-architect` for architectural patterns and `@dh-software-engineer` for implementation suggestions.
     - Include a documentation sub-task (referencing `dh-create-documentation`) in the plan for any new modules, APIs, or public interfaces.
-  - For **non-software projects**: skip delegation to `@*-architect` and `@*-engineer` agents — these produce software-specific output that is not applicable. Use `@build` if builder input is needed.
+  - For **non-software projects**: skip delegation to `@dh-software-architect` and `@dh-software-engineer` — these produce software-specific output that is not applicable. Use `@dh-software-engineer` if builder input is needed.
 - Delegate to `@*-qa` agents for concrete languages or frameworks if available to get testing suggestions.
 - Set properly obsidian frontmatter metadata in all files
 

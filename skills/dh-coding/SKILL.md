@@ -63,8 +63,8 @@ Detect the project type before delegating or implementing. Check the project roo
 
 - **Software project markers** (any present at the project root): `package.json`, `pyproject.toml`, `Cargo.toml`, `composer.json`, `go.mod`, `CMakeLists.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `pubspec.yaml`, `build.gradle`, `*.csproj`, `*.sln`, and similar language build files.
 - **Language/toolkit detection:** infer the stack and its tooling from the marker — for example `package.json` → npm/pnpm/bun, `pyproject.toml` → uv/poetry/pip, `Cargo.toml` → cargo, `composer.json` → composer. Use the project's own tooling and lockfiles; do not introduce a different package manager or toolchain.
-- **Software projects:** delegate ALL implementation to `@senior-engineer` (bundled as `dh-software-engineer` — the harness's single task executor); run validation through `@dh-executor`. When invoked from the skills loop, `dh-domain-check` runs before complex implementation and `dh-simplify` runs after validation.
-- **Non-software projects** (docs, config, design assets — no marker files): delegate implementation to `@senior-engineer` as well; skip the `dh-simplify`, `dh-domain-check`, and `dh-create-documentation` steps.
+- **Software projects:** delegate ALL implementation to `@dh-software-engineer` (the harness's single task executor); run validation through `@dh-executor`. When invoked from the skills loop, `dh-domain-check` runs before complex implementation and `dh-simplify` runs after validation.
+- **Non-software projects** (docs, config, design assets — no marker files): delegate implementation to `@dh-software-engineer` as well; skip the `dh-simplify`, `dh-domain-check`, and `dh-create-documentation` steps.
 
 ## Coding Best Practices
 

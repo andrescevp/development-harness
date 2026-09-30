@@ -64,9 +64,9 @@ tools are unavailable).
 - The `dh-` names are canonical in the repo files. Bundled agents ship
   **without the `permission` and `tools` frontmatter keys** — registration
   carries no static tool rules; enforced by the audit.
-- Runtime delegation normalization (the plugin registers the 7 bundled
-  agents): `@build`/`@senior-engineer` → `@dh-software-engineer`,
-  `@senior-architect`/`@plan` → `@dh-software-architect` — see AGENTS.md table.
+- Runtime delegation uses the bundled agent names directly:
+  `@dh-software-engineer` for implementation, `@dh-software-architect` for
+  architecture — see AGENTS.md → Runtime delegation.
 
 ## Quickstart
 
@@ -110,7 +110,7 @@ dist/            build output (plugin.js + assets) — generated, git-ignored
 ## Documentation
 
 - [`AGENTS.md`](AGENTS.md) — harness runtime contract: loop, provenance,
-  agent-name normalization, loading.
+  runtime delegation, loading.
 - [`docs/LOADING.md`](docs/LOADING.md) — how to load the plugin, verification,
   troubleshooting.
 - [`docs/plans/dev-harness-v2-plugin/`](docs/plans/dev-harness-v2-plugin/) —

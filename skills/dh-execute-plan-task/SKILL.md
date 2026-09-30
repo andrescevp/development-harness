@@ -16,10 +16,10 @@ Execute one self-contained sub-task from `./docs/plans/<plan-slug>/plan.md`.
 
 - Read the plan with the `dh_plan_read` tool (`{ slug }` → structured JSON: meta, phases[].title/status, subTasks[].phase/title/status) to find the active sub-task. Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually, following the phased template markers (`## Phases` → `### Phase N: <title>` → `#### Sub-Task N.M: <title>` with `- **Status:**` bullets). If the plan does not exist, stop and report that no plan was found — suggest running the `dh-planning` skill first.
 - Treat the sub-task entry in plan.md as the full implementation brief.
-- **ALL sub-task execution is delegated to `@senior-engineer`** (the harness's task executor; bundled/registered in this plugin as `software-engineer` — same agent, alias per AGENTS.md). There is no complexity- or type-based builder split: simple, standard, complex, and non-software work ALL go to `@senior-engineer`.
+- **ALL sub-task execution is delegated to `@dh-software-engineer`** (the harness's single task executor). There is no complexity- or type-based builder split: simple, standard, complex, and non-software work ALL go to `@dh-software-engineer`.
 - **Detect project type** before the post-steps: it determines whether `dh-domain-check`, `dh-simplify`, and `dh-create-documentation` run (software projects only) — it does NOT change who implements.
 - For **software projects**: run `dh-domain-check` before complex implementation, `dh-simplify` after validation, and `dh-create-documentation` for new modules/APIs.
-- For **non-software projects**: skip the `dh-simplify`, `dh-domain-check`, and `dh-create-documentation` steps entirely; implementation still goes to `@senior-engineer`.
+- For **non-software projects**: skip the `dh-simplify`, `dh-domain-check`, and `dh-create-documentation` steps entirely; implementation still goes to `@dh-software-engineer`.
 - Delegate validation to `@dh-executor` for tests, linters, and builds.
 - Delegate review to `@dh-reviewer` for code quality and acceptance criteria checks.
 - Do not modify files outside the sub-task scope.
@@ -40,7 +40,7 @@ Check the project root for software marker files to determine project type. This
 4. If uncertain (e.g., a `Makefile` with no other code), check for source code directories (`src/`, `lib/`, `app/`) as secondary indicators.
 
 Implementation delegation is IDENTICAL for both types: **every sub-task is
-implemented by `@senior-engineer`** (bundled as `software-engineer`).
+implemented by `@dh-software-engineer`**.
 
 > **Why this matters:** Non-software projects (docs repos, config repos, design assets) don't benefit from architecture/engineering agents or code-level simplification. Using the wrong agent type wastes context and produces irrelevant findings.
 
@@ -57,12 +57,12 @@ Read the plan with the `dh_plan_read` tool (`{ slug }`) and find exactly one sub
 
 ### Step 2: Implement the sub-task
 
-Follow the sub-task's instructions, in-scope list, and implementation suggestions. **Every sub-task is delegated to `@senior-engineer`** (bundled as `software-engineer`):
+Follow the sub-task's instructions, in-scope list, and implementation suggestions. **Every sub-task is delegated to `@dh-software-engineer`**:
 
-- Delegate the FULL sub-task brief to `@senior-engineer` — for complex work (multi-file, architectural decisions, new modules), run the `dh-domain-check` skill first and include its findings in the delegation.
-- The implementation follows the `dh-coding` skill through `@senior-engineer` (test-first TDD; `CODE_RULES.md` at project root when present).
-- **TDD**: the failing test is written first, then the minimal change to make it pass — performed inside the `@senior-engineer` implementation pass.
-- Do NOT implement sub-task work directly and do NOT seek another builder: `@senior-engineer` is the single task executor in this harness.
+- Delegate the FULL sub-task brief to `@dh-software-engineer` — for complex work (multi-file, architectural decisions, new modules), run the `dh-domain-check` skill first and include its findings in the delegation.
+- The implementation follows the `dh-coding` skill through `@dh-software-engineer` (test-first TDD; `CODE_RULES.md` at project root when present).
+- **TDD**: the failing test is written first, then the minimal change to make it pass — performed inside the `@dh-software-engineer` implementation pass.
+- Do NOT implement sub-task work directly and do NOT seek another builder: `@dh-software-engineer` is the single task executor in this harness.
 
 **General rules:**
 - Stay within the sub-task's in-scope boundaries. Do not widen scope.
@@ -129,14 +129,13 @@ Read the review and address findings:
 ## Execution Delegation Guide
 
 **Single executor policy:** every sub-task — software, non-software, simple,
-standard, complex — is implemented by `@senior-engineer` (bundled as
-`software-engineer`).
+standard, complex — is implemented by `@dh-software-engineer`.
 
 | Work | Delegate to | Post-steps |
 |---|---|---|
-| Software (complex, architectural) | `@senior-engineer` | `dh-domain-check` first, then `dh-simplify` + `dh-create-documentation` |
-| Software (other) | `@senior-engineer` | `dh-simplify` after validation |
-| Non-software | `@senior-engineer` | none (skip `dh-simplify`/`dh-domain-check`/`dh-create-documentation`) |
+| Software (complex, architectural) | `@dh-software-engineer` | `dh-domain-check` first, then `dh-simplify` + `dh-create-documentation` |
+| Software (other) | `@dh-software-engineer` | `dh-simplify` after validation |
+| Non-software | `@dh-software-engineer` | none (skip `dh-simplify`/`dh-domain-check`/`dh-create-documentation`) |
 
 Validation always runs through `@dh-executor`; review through `@dh-reviewer`.
 

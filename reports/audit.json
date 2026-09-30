@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-30T21:19:48.375Z",
+    "generated": "2026-09-30T21:22:20.418Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -35,9 +35,9 @@
       },
       {
         "name": "Cross-references",
-        "count": 27,
+        "count": 7,
         "sev": "WARN",
-        "note": "300 resolved; 1 code-context; 0 allowlisted; 131 prose tokens (warn)"
+        "note": "347 resolved; 1 code-context; 0 allowlisted; 128 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
@@ -64,20 +64,6 @@
   "fails": [],
   "atMentions": [
     {
-      "file": "agents/dh-software-architect.md",
-      "line": 35,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "agents/dh-software-engineer.md",
-      "line": 24,
-      "mention": "@senior-architect",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
       "file": "agents/dh-software-engineer.md",
       "line": 53,
       "mention": "@executor",
@@ -95,13 +81,6 @@
       "file": "agents/dh-software-engineer.md",
       "line": 56,
       "mention": "@executor",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "agents/dh-software-engineer.md",
-      "line": 57,
-      "mention": "@senior-architect",
       "severity": "warn",
       "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
     },
@@ -127,125 +106,6 @@
       "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
     },
     {
-      "file": "skills/dh-coding/SKILL.md",
-      "line": 56,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-coding/SKILL.md",
-      "line": 57,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-execute-plan/SKILL.md",
-      "line": 22,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-execute-plan-task/SKILL.md",
-      "line": 9,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-execute-plan-task/SKILL.md",
-      "line": 9,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-execute-plan-task/SKILL.md",
-      "line": 12,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-execute-plan-task/SKILL.md",
-      "line": 33,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-execute-plan-task/SKILL.md",
-      "line": 50,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-execute-plan-task/SKILL.md",
-      "line": 52,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-execute-plan-task/SKILL.md",
-      "line": 53,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-execute-plan-task/SKILL.md",
-      "line": 54,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-execute-plan-task/SKILL.md",
-      "line": 55,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-execute-plan-task/SKILL.md",
-      "line": 122,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-execute-plan-task/SKILL.md",
-      "line": 127,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-execute-plan-task/SKILL.md",
-      "line": 128,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-execute-plan-task/SKILL.md",
-      "line": 129,
-      "mention": "@senior-engineer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-planning/SKILL.md",
-      "line": 29,
-      "mention": "@build",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
       "file": "skills/dh-setup/SKILL.md",
       "line": 90,
       "mention": "@graphify",
@@ -264,16 +124,6 @@
         "agents/dh-reviewer.md",
         "agents/dh-software-architect.md",
         "agents/dh-software-engineer.md"
-      ]
-    },
-    {
-      "token": "senior-engineer",
-      "count": 17,
-      "files": [
-        "agents/dh-software-architect.md",
-        "skills/dh-coding/SKILL.md",
-        "skills/dh-execute-plan/SKILL.md",
-        "skills/dh-execute-plan-task/SKILL.md"
       ]
     },
     {
@@ -298,13 +148,6 @@
         "agents/dh-software-architect.md",
         "skills/dh-code-ruler/SKILL.md",
         "skills/dh-domain-check/SKILL.md"
-      ]
-    },
-    {
-      "token": "software-engineer",
-      "count": 4,
-      "files": [
-        "skills/dh-execute-plan-task/SKILL.md"
       ]
     },
     {
@@ -380,13 +223,6 @@
       "count": 2,
       "files": [
         "agents/dh-software-architect.md"
-      ]
-    },
-    {
-      "token": "senior-architect",
-      "count": 2,
-      "files": [
-        "agents/dh-software-engineer.md"
       ]
     },
     {
@@ -1537,7 +1373,7 @@
     {
       "file": "skills/dh-execute-plan-task/SKILL.md",
       "kind": "skill",
-      "lines": 172,
+      "lines": 171,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1681,7 +1517,7 @@
     {
       "file": "skills/index.md",
       "kind": "index",
-      "lines": 109,
+      "lines": 108,
       "frontmatter": {
         "status": "none-expected"
       },

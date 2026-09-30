@@ -40,7 +40,7 @@ Check these are installed in target projects; add as dev dependencies if missing
 
 ## Workflow
 
-> Delegate `@senior-engineer` for coding/development tasks, providing architectural guidance.
+> Delegate `@dh-software-engineer` for coding/development tasks, providing architectural guidance.
 
 1. Use `dh-contingency` skill to generate architectural alternatives (Plan A/B/C) with trade-off analysis
 2. Use `dh-domain-check` skill to map services to DDD bounded contexts and validate SOLID principles

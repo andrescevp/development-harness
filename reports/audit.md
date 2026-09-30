@@ -1,10 +1,10 @@
 # Audit Report — dev-harness-skills plugin
 
-Generated 2026-09-30T21:19:48.375Z by `scripts/audit.mjs`.
+Generated 2026-09-30T21:22:20.418Z by `scripts/audit.mjs`.
 
 ## Verdict
 
-**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 158. Documented schema deviations: 0.
+**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 135. Documented schema deviations: 0.
 
 ## Summary verdict table
 
@@ -14,7 +14,7 @@ Generated 2026-09-30T21:19:48.375Z by `scripts/audit.mjs`.
 | Frontmatter parse | 23 | PASS | 23 files on audit surface |
 | Name regex | 22 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 27 | WARN | 300 resolved; 1 code-context; 0 allowlisted; 131 prose tokens (warn) |
+| Cross-references | 7 | WARN | 347 resolved; 1 code-context; 0 allowlisted; 128 prose tokens (warn) |
 | Loop membership | 22 | PASS | 15/15 skills present; 7/7 agents present |
 | Secret scan | 24 | PASS | 24 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
@@ -58,35 +58,20 @@ _None._
 
 | File | Line | Mention | Note |
 |---|---|---|---|
-| agents/dh-software-architect.md | 35 | @senior-engineer | unresolved @mention (external role/product or prose) — warn-only per plan |
-| agents/dh-software-engineer.md | 24 | @senior-architect | unresolved @mention (external role/product or prose) — warn-only per plan |
 | agents/dh-software-engineer.md | 53 | @executor | unresolved @mention (external role/product or prose) — warn-only per plan |
 | agents/dh-software-engineer.md | 54 | @reviewer | unresolved @mention (external role/product or prose) — warn-only per plan |
 | agents/dh-software-engineer.md | 56 | @executor | unresolved @mention (external role/product or prose) — warn-only per plan |
-| agents/dh-software-engineer.md | 57 | @senior-architect | unresolved @mention (external role/product or prose) — warn-only per plan |
 | agents/dh-software-engineer.md | 63 | @executor | unresolved @mention (external role/product or prose) — warn-only per plan |
 | agents/dh-software-engineer.md | 83 | @executor | unresolved @mention (external role/product or prose) — warn-only per plan |
 | agents/dh-software-engineer.md | 83 | @executor | unresolved @mention (external role/product or prose) — warn-only per plan |
-| skills/dh-coding/SKILL.md | 56 | @senior-engineer | unresolved @mention (external role/product or prose) — warn-only per plan |
-| skills/dh-coding/SKILL.md | 57 | @senior-engineer | unresolved @mention (external role/product or prose) — warn-only per plan |
-| skills/dh-execute-plan/SKILL.md | 22 | @senior-engineer | unresolved @mention (external role/product or prose) — warn-only per plan |
-| skills/dh-execute-plan-task/SKILL.md | 9 | @senior-engineer | unresolved @mention (external role/product or prose) — warn-only per plan |
-| skills/dh-execute-plan-task/SKILL.md | 9 | @senior-engineer | unresolved @mention (external role/product or prose) — warn-only per plan |
-| skills/dh-execute-plan-task/SKILL.md | 12 | @senior-engineer | unresolved @mention (external role/product or prose) — warn-only per plan |
-| skills/dh-execute-plan-task/SKILL.md | 33 | @senior-engineer | unresolved @mention (external role/product or prose) — warn-only per plan |
-| skills/dh-execute-plan-task/SKILL.md | 50 | @senior-engineer | unresolved @mention (external role/product or prose) — warn-only per plan |
-| skills/dh-execute-plan-task/SKILL.md | 52 | @senior-engineer | unresolved @mention (external role/product or prose) — warn-only per plan |
-| skills/dh-execute-plan-task/SKILL.md | 53 | @senior-engineer | unresolved @mention (external role/product or prose) — warn-only per plan |
-| skills/dh-execute-plan-task/SKILL.md | 54 | @senior-engineer | unresolved @mention (external role/product or prose) — warn-only per plan |
+| skills/dh-setup/SKILL.md | 90 | @graphify | unresolved @mention (external role/product or prose) — warn-only per plan |
 
 Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; full list in reports/audit.json):
 
 - `project-name` × 21
-- `senior-engineer` × 17
 - `osv-scanner` × 7
 - `phased-plan-template` × 5
 - `bounded-context` × 4
-- `software-engineer` × 4
 - `mobile-mcp` × 4
 - `state-sync` × 3
 - `non-blocking` × 3
@@ -97,7 +82,6 @@ Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; f
 - `architect-skills` × 2
 - `dependency-cruiser` × 2
 - `dh-contingency` × 2
-- `senior-architect` × 2
 - `language-standard` × 2
 - `system-wide` × 2
 - `project-level` × 2
@@ -106,6 +90,9 @@ Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; f
 - `best-effort` × 2
 - `domain-check` × 2
 - `anti-corruption` × 2
+- `re-running` × 2
+- `code-level` × 2
+- `re-review` × 2
 
 ## Secret scan
 

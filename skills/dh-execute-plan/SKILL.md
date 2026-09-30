@@ -29,7 +29,7 @@ Orchestrate the complete execution of a plan from start to finish. Iterate throu
 - If a review produces P0/P1 findings, stop and report — do not continue to the next sub-task (a blocked sub-task blocks its phase).
 - After the final sub-task, run the `dh-final-review` skill for sign-off.
 - Update `./docs/plans/index.md` when the plan is fully complete.
-- **Project type awareness is delegated to `dh-execute-plan-task`.** The orchestrator does not re-detect project type — it relies on `dh-execute-plan-task` to handle agent selection based on whether the project is software or non-software. Do not hardcode agent choices (e.g., `@senior-engineer`) in the orchestration loop that would conflict with this.
+- **Project type awareness is delegated to `dh-execute-plan-task`.** The orchestrator does not re-detect project type — it relies on `dh-execute-plan-task` to handle agent selection based on whether the project is software or non-software. Do not hardcode agent choices (e.g., `@dh-software-engineer`) in the orchestration loop that would conflict with this.
 - **After plan completion (all projects):** invokes `evolve` and `state-sync` to capture what was learned and update documentation. This ensures knowledge persists beyond the active session.
 - **After plan completion (software projects only):** invokes `dh-create-documentation` for generating/updating project docs, and `semver` for determining the next version bump.
 

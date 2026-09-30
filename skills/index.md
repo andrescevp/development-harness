@@ -94,9 +94,8 @@ edits only when the tools are unavailable.
 
 ## Agents
 
-The 7 bundled agents used by the skills loop (see `AGENTS.md` for
-runtime delegation normalization — `@build`/`@senior-*`/`@plan` map to the
-bundled `dh-*` names):
+The 7 bundled agents used by the skills loop (see `AGENTS.md` → Runtime
+delegation):
 
 `dh-software-architect` (planning, execute-plan, create-documentation) ·
 `dh-software-engineer` (execute-plan-task, coding) · `dh-reviewer` (simplify,

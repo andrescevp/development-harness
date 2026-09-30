@@ -2,7 +2,7 @@
 
 Role summary, provenance, plugin registration, the 5-step skills loop that
 every agent executing plans inside this plugin must follow, and the
-agent-name normalization required for runtime delegation.
+runtime delegation routing.
 
 ## Role summary
 
@@ -53,27 +53,13 @@ manual plan.md edits (fall back to manual edits only when the tools are
 unavailable). Format contract:
 `skills/planning/references/phased-plan-template.md`.
 
-## Agent-name normalization (runtime delegation)
+## Runtime delegation
 
 **Single task executor:** ALL sub-task implementation in this harness is
-delegated to `@senior-engineer` (registered in the plugin as
-`dh-software-engineer` — same agent). There is no complexity- or type-based
+delegated to `@dh-software-engineer`. There is no complexity- or type-based
 builder split; `dh-execute-plan-task` and `dh-coding` route every task there.
-
-`@build`, `@senior-engineer`, `@senior-architect`, and `@plan` do NOT resolve
-in the plugin runtime — only the 7 bundled agents exist. Normalize every
-delegation with this mapping:
-
-| Reference (does not resolve) | Runtime agent to use |
-|---|---|
-| `@build` | `@dh-software-engineer` |
-| `@senior-engineer` | `@dh-software-engineer` |
-| `@senior-architect` | `@dh-software-architect` |
-| `@plan` (planning role) | `@dh-software-architect` |
-| `@dh-reviewer` | `@dh-reviewer` (as-is) |
-| `@dh-final-reviewer` | `@dh-final-reviewer` (as-is) |
-| `@dh-executor` | `@dh-executor` (as-is) |
-| `@dh-explorer` | `@dh-explorer` (as-is) |
+Architectural guidance comes from `@dh-software-architect`. These are the
+bundled agent names — no mapping is needed.
 
 ## Provenance
 
