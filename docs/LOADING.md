@@ -1,14 +1,14 @@
 # Loading the dev-harness-skills plugin
 
 How to enable the built plugin in OpenCode V2, verify it registered the
-manifest, and troubleshoot when agents/skills do not appear.
+harness, and troubleshoot when agents/skills do not appear.
 
 ## Build first
 
 ```sh
 cd /home/andres/workspace/dev-harness-skills
 pnpm install
-pnpm build        # produces dist/plugin.js + dist/assets (6 agents, 12 skills)
+pnpm build        # produces dist/plugin.js + dist/assets (7 agents, 15 skills)
 ```
 
 ## Load forms (opencode v2.0.18)
@@ -23,7 +23,7 @@ Add ONE of the following entries to `"plugins"` in `opencode.jsonc`:
 
 ## Verification checklist
 
-After loading, confirm the manifest is registered:
+After loading, confirm the harness is registered:
 
 ```
 opencode debug agents   → look for: dh-software-architect, dh-software-engineer,
@@ -56,14 +56,14 @@ The in-repo gate that proves the plugin logic is the registration test:
 
 ```sh
 pnpm test   # src/__tests__/registration.test.ts runs the real bundle setup
-            # against a stub ctx → exactly 6 agents + 12 skills registered
+            # against a stub ctx → exactly 7 agents + 15 skills registered
 ```
 
 ## Troubleshooting
 
 - **`pnpm audit` vs `pnpm run audit`** — `pnpm audit` is pnpm's **dependency
   security audit** (currently reports 1 low dev-only esbuild advisory and
-  exits 1). The **harness manifest audit** is `pnpm run audit` (aliases
+  exits 1). The **harness audit** is `pnpm run audit` (aliases
   `node scripts/audit.mjs`) — this is the release-gate audit for the harness;
   the security advisory is a dev-dependency note and does not block the gate.
 - **"configured plugin path must be a directory"** — a `file://` entry in
@@ -86,6 +86,5 @@ pnpm test   # src/__tests__/registration.test.ts runs the real bundle setup
 - **Version skew** — the plugin targets `@opencode/plugin@^2.0.18`; keep the
   host opencode ≥ that version and pin the package if the host is older.
 - **Audit fails after editing harness content** — run
-  `node scripts/extract.mjs --check` and `node scripts/audit.mjs`; new skills/
-  agents must match `scripts/manifest.json` expectations (counts, name regex,
-  loop membership, <250/<300 line limits, no secrets/junk).
+  `node scripts/audit.mjs`; new skills/agents must pass the audit rules
+  (name regex, loop membership, <250/<300 line limits, no secrets/junk).

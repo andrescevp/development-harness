@@ -1,7 +1,6 @@
 /**
  * lib/frontmatter.mjs — zero-dependency YAML-frontmatter splitter + tolerant
- * subset parser, shared by scripts/audit.mjs (ST2), the ST5 asset builder, and
- * the ST6 unit tests.
+ * subset parser, shared by scripts/audit.mjs and the plugin asset builder.
  *
  * Handles the shapes found in the harness corpus:
  *   - `key: value` scalars (quoted or not, inline lists `[a, b]`)
@@ -11,7 +10,7 @@
  *   - top-level `- item` lists joined with ", "
  *
  * It is intentionally lenient: exact nested YAML fidelity is not needed for
- * audit/registration; presence + scalar extraction is.
+ * audit/registration; presence + scalar parsing is.
  */
 
 /** Split leading `---` frontmatter block. Returns { fm, body } or null (no FM). */

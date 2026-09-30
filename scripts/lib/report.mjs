@@ -16,7 +16,7 @@ export function renderMarkdown(r) {
   const kebabTop = r.kebabList.slice(0, 25);
   const hiSec = r.secretHigh;
   const junkList = r.junkList;
-  return `# Audit Report — Dev Harness V2 Plugin (ST2)
+  return `# Audit Report — dev-harness-skills plugin
 
 Generated ${r.meta.generated} by \`${r.meta.script}\`.
 
@@ -34,7 +34,7 @@ ${r.summary.dimensions.map((d) => `| ${d.name} | ${d.count} | ${d.sev} | ${d.not
 
 ${warns.length ? '| File | Dimension | Severity | Note |\n|---|---|---|---|\n' + warns.map(rowMd).join('\n') : '_None._'}
 
-## Schema deviations (known source-content issues, documented in manifest.json)
+## Schema deviations (known content deviations)
 
 ${r.schemaDevs.length ? '| File | Severity | Note |\n|---|---|---|---|\n' + r.schemaDevs.map((d) => `| ${d.file} | ${d.severity} | ${d.note} |`).join('\n') : '_None._'}
 

@@ -1,6 +1,6 @@
-# Audit Report — Dev Harness V2 Plugin (ST2)
+# Audit Report — dev-harness-skills plugin
 
-Generated 2026-09-28T16:28:23.431Z by `scripts/audit.mjs`.
+Generated 2026-09-30T21:19:48.375Z by `scripts/audit.mjs`.
 
 ## Verdict
 
@@ -10,12 +10,12 @@ Generated 2026-09-28T16:28:23.431Z by `scripts/audit.mjs`.
 
 | Dimension | Count | Status | Notes |
 |---|---|---|---|
-| Inventory & structure | 22 | PASS | counts match manifest (6 agents, 11 skill dirs + index.md; no commands/, no prompts/) |
+| Inventory & structure | 22 | PASS | 7 agents, 15 skill dirs + index.md; no commands/, no prompts/ |
 | Frontmatter parse | 23 | PASS | 23 files on audit surface |
-| Name regex | 22 | PASS | ^[a-z0-9]+(-[a-z0-9]+)*$ |
+| Name regex | 22 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 27 | WARN | 300 resolved; 1 code-context; 0 allowlisted; 131 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented) |
-| Loop membership | 22 | FAIL | 15/12 skills present + coding expected-pending (ST3); 0/6 agents present |
+| Cross-references | 27 | WARN | 300 resolved; 1 code-context; 0 allowlisted; 131 prose tokens (warn) |
+| Loop membership | 22 | PASS | 15/15 skills present; 7/7 agents present |
 | Secret scan | 24 | PASS | 24 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
 
@@ -23,7 +23,7 @@ Generated 2026-09-28T16:28:23.431Z by `scripts/audit.mjs`.
 
 _None._
 
-## Schema deviations (known source-content issues, documented in manifest.json)
+## Schema deviations (known content deviations)
 
 _None._
 
@@ -46,13 +46,13 @@ _None._
 | skill | dh-review | present |
 | skill | dh-setup | present |
 | skill | dh-simplify | present |
-| agent | dh-documentor.md | missing |
-| agent | dh-executor.md | missing |
-| agent | dh-explorer.md | missing |
-| agent | dh-final-reviewer.md | missing |
-| agent | dh-reviewer.md | missing |
-| agent | dh-software-architect.md | missing |
-| agent | dh-software-engineer.md | missing |
+| agent | dh-documentor | present |
+| agent | dh-executor | present |
+| agent | dh-explorer | present |
+| agent | dh-final-reviewer | present |
+| agent | dh-reviewer | present |
+| agent | dh-software-architect | present |
+| agent | dh-software-engineer | present |
 
 ## Cross-reference failures
 

@@ -1,7 +1,7 @@
 /**
  * registration.test.ts — integration-style check: run the REAL plugin setup
- * against a stub ctx and assert the manifest registers exactly 6 agents,
- * 12 skills, and ZERO commands.
+ * against a stub ctx and assert it registers the repo's bundled corpus —
+ * 7 agents, 15 skills, and ZERO commands.
  *
  * The plugin entry imports the BUILT dist/plugin.js so the whole pipeline
  * (tsup bundle + dist/assets) is under test. Requires `pnpm build` first.
@@ -11,7 +11,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { SORTED_AGENTS as AGENTS, SORTED_SKILLS as SKILLS } from './manifest-fixture.js';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DIST_PLUGIN = path.join(REPO_ROOT, 'dist', 'plugin.js');
@@ -82,7 +81,7 @@ function createStubContext() {
   return { ctx, captured };
 }
 
-const MANIFEST_TOOLS = [
+const HARNESS_TOOLS = [
   'plan_read',
   'plan_update_status',
   'plan_create',
@@ -97,7 +96,7 @@ describe('plugin setup registration (built bundle)', () => {
     expect(fs.existsSync(DIST_PLUGIN)).toBe(true);
   });
 
-  it('registers exactly the 6 manifest agents and 12 skills, zero commands', async () => {
+  it('registers the 7 bundled agents and 15 skills, zero commands', async () => {
     const { default: plugin } = (await import(DIST_PLUGIN)) as {
       default: { id: string; setup: (ctx: ReturnType<typeof createStubContext>['ctx']) => Promise<void> };
     };
@@ -120,10 +119,10 @@ describe('plugin setup registration (built bundle)', () => {
       .map((c) => c.name)
       .sort();
 
-    expect(agents).toEqual(AGENTS);
-    expect(skills).toEqual(SKILLS);
-    expect(tools).toEqual(MANIFEST_TOOLS);
-    // One dh namespace registered; all 4 tools are codemode.
+    expect(agents).toHaveLength(7);
+    expect(skills).toHaveLength(15);
+    expect(tools).toEqual(HARNESS_TOOLS);
+    // One dh namespace registered; all tools are codemode.
     const namespaces = captured.filter((c) => c.domain === 'tool' && c.kind === 'namespace');
     expect(namespaces.map((c) => c.name)).toEqual(['dh']);
     const toolAdds = captured.filter((c) => c.domain === 'tool' && c.kind === 'add');

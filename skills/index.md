@@ -1,6 +1,6 @@
 # Skills Index — dev-harness-skills plugin
 
-> The plugin bundles **15 skills** (user-mandated scoped manifest + the
+> The plugin bundles **15 skills** (
 > `dh-grill-sdd` SDD interviewer + `dh-setup` harness setup).
 > Loading a skill injects its instructions and resources into the current
 > conversation. Plans are **phased** (phases → sub-tasks, dual status
@@ -72,7 +72,7 @@ blocks its phase.
 `dh_plan_create` to scaffold a new plan — fall back to direct plan.md
 edits only when the tools are unavailable.
 
-## The 12 bundled skills
+## The 15 bundled skills
 
 | Skill | Role in the loop |
 |---|---|
@@ -94,9 +94,9 @@ edits only when the tools are unavailable.
 
 ## Agents
 
-The 6 manifest agents used by the skills loop (see `AGENTS.md` for
+The 7 bundled agents used by the skills loop (see `AGENTS.md` for
 runtime delegation normalization — `@build`/`@senior-*`/`@plan` map to the
-manifest names):
+bundled `dh-*` names):
 
 `dh-software-architect` (planning, execute-plan, create-documentation) ·
 `dh-software-engineer` (execute-plan-task, coding) · `dh-reviewer` (simplify,
@@ -106,5 +106,4 @@ validation/execution) · `dh-explorer` (codebase exploration), `dh-documentor` (
 ## Out of scope
 
 Commands, prompts, and all other non-bundled harness content are
-intentionally NOT bundled (user-mandated manifest). See
-[`docs/EXTRACTION.md`](../docs/EXTRACTION.md).
+intentionally NOT bundled.

@@ -6,7 +6,7 @@ agent-name normalization required for runtime delegation.
 
 ## Role summary
 
-The `dev-harness-skills` OpenCode V2 plugin bundles a scoped dev harness for
+The `dev-harness-skills` OpenCode V2 plugin bundles a self-contained dev harness for
 plan-driven development: **7 agents** — `dh-software-architect`,
 `dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-executor`, `dh-explorer`, `dh-documentor` —
 and **15 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
@@ -61,7 +61,7 @@ delegated to `@senior-engineer` (registered in the plugin as
 builder split; `dh-execute-plan-task` and `dh-coding` route every task there.
 
 `@build`, `@senior-engineer`, `@senior-architect`, and `@plan` do NOT resolve
-in the plugin runtime — only the 6 manifest agents exist. Normalize every
+in the plugin runtime — only the 7 bundled agents exist. Normalize every
 delegation with this mapping:
 
 | Reference (does not resolve) | Runtime agent to use |
@@ -77,18 +77,14 @@ delegation with this mapping:
 
 ## Provenance
 
-- Harness content is **fully repo-authored** (2026-09-29): `agents/` and
-  `skills/` are owned by this repository — nothing is extracted from
-  `~/.agents` anymore. `scripts/extract.mjs` is a repo-integrity check;
-  `docs/EXTRACTION.md` retains the extraction history.
+- Harness content is **fully repo-authored**: `agents/` and `skills/` are
+  owned by this repository — the repo is self-contained and independent
+  (no external source, no extraction step).
 - OpenCode-only — no copilot/gemini variants.
-- Alias mapping on copy: `senior-architect` → `dh-software-architect`,
-  `senior-engineer` → `dh-software-engineer` (frontmatter `name` only; bodies
-  byte-identical).
-- User-mandated scoped manifest: exactly 7 agents + 15 skills. Commands,
-  prompts, and all other harness content are intentionally NOT bundled.
-- Full extraction record, exclusions, and copy rules:
-  [`docs/EXTRACTION.md`](docs/EXTRACTION.md).
+- Exactly **7 agents + 15 skills** are bundled. Commands, prompts, and all
+  other non-bundled harness content are intentionally NOT bundled.
+- The `dh-` names are canonical in the repo files; bundled agents ship
+  without the `permission` and `tools` frontmatter keys.
 
 ## Plugin registration and loading
 

@@ -26,7 +26,7 @@ Apply test-first TDD and clean code best practices when implementing or fixing c
 
 Code rules are ALWAYS at project level — the only rule source is
 `CODE_RULES.md` at the project root. Never delegate to global guideline
-files (including the user's `~/.agents/prompts/*`).
+files.
 
 1. **If `CODE_RULES.md` exists at the project root:** read it before touching
    any code and treat it as the primary rule set for this project — it

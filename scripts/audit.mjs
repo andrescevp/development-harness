@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 /**
- * audit.mjs — validate every extracted artifact (agents + skills, per the
- * user-mandated SCOPED manifest — NO commands/prompts) against the R2 audit
- * dimensions (plan.md Sub-Task 2).
+ * audit.mjs — validate the repo's harness corpus (agents/ + skills/) against
+ * the harness audit dimensions: frontmatter integrity, name regex, size
+ * limits, cross-references, loop membership, secrets, and junk. The repo is
+ * fully independent: rules live in scripts/lib/shared.mjs and expectations
+ * are derived from the corpus itself (no external manifest).
  *
  * Usage:
  *   node scripts/audit.mjs               # summary; writes reports/audit.json + tasks/audit-report.md; exit 0/1
@@ -10,21 +12,21 @@
  *   node scripts/audit.mjs --report <p>  # override the markdown report destination
  *
  * Exit: 0 = no FAIL findings (warn-only deviations OK); 1 = FAIL (secrets/junk/parse/loop).
- * Expectations live in scripts/manifest.json (single source, reused by extract.mjs and ST5).
- * Parser + markdown rendering live in scripts/lib/ for reuse by ST5/ST6.
+ * Parser + markdown rendering live in scripts/lib/.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseFrontmatter, splitFrontmatter } from './lib/frontmatter.mjs';
 import { renderMarkdown } from './lib/report.mjs';
+import { CROSS_REFERENCE, createJunkReason, LINE_LIMITS, LOOP, SECRETS, SKILL_NAME_REGEX } from './lib/shared.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const MANIFEST = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'scripts', 'manifest.json'), 'utf8'));
-const MD_TARGET = path.join(REPO_ROOT, 'docs', 'plans', 'dev-harness-v2-plugin', 'tasks', 'audit-report.md');
+const MD_TARGET = path.join(REPO_ROOT, 'reports', 'audit.md');
 const JSON_TARGET = path.join(REPO_ROOT, 'reports', 'audit.json');
 const raw = (a) => fs.readFileSync(a, 'utf8');
 const jp = (...p) => path.join(REPO_ROOT, ...p);
+const junkReason = createJunkReason();
 const failCount = { n: 0 };
 
 // ---------- inventory ----------
@@ -104,20 +106,14 @@ function auditFile(rel) {
         add(rec, 'frontmatter', 'fail', 'permission key present (M3: strip from bundled agents)');
     }
     if ((kind === 'skill' || kind === 'agent') && fields.name !== undefined) {
-      if (!new RegExp(MANIFEST.skillNameRegex).test(fields.name))
-        add(rec, 'name', 'fail', `'${fields.name}' violates ${MANIFEST.skillNameRegex}`);
+      if (!SKILL_NAME_REGEX.test(fields.name))
+        add(rec, 'name', 'fail', `'${fields.name}' violates ${SKILL_NAME_REGEX}`);
       if (kind === 'skill' && fields.name !== rel.split('/')[1])
         add(rec, 'name', 'warn', `frontmatter name '${fields.name}' != dir '${rel.split('/')[1]}'`);
     }
   }
-  const limit = MANIFEST.lineLimits[kind === 'agent' ? 'agent' : 'skill'];
-  if (limit && rec.lines > limit)
-    add(
-      rec,
-      'size',
-      'warn',
-      `${rec.lines} lines > ${limit} (extracted verbatim; splitting source content is out of scope — recorded as deviation)`
-    );
+  const limit = LINE_LIMITS[kind === 'agent' ? 'agent' : 'skill'];
+  if (limit && rec.lines > limit) add(rec, 'size', 'warn', `${rec.lines} lines > ${limit} (repo-authored; warn-only)`);
   return rec;
 }
 
@@ -129,14 +125,12 @@ function scanMentions(records) {
   const skills = new Set(
     records.filter((r) => r.kind === 'skill' && r.frontmatter?.fields?.name).map((r) => r.frontmatter.fields.name)
   );
-  for (const d of MANIFEST.loop.skills)
-    if (d !== 'coding' && !skills.has(d) && fs.existsSync(jp('skills', d, 'SKILL.md'))) skills.add(d);
-  const aliases = MANIFEST.agentAliases ?? {};
-  const atAllow = new Set(MANIFEST.crossReference.allowedAtMentions);
-  const kebabAllow = new Set(MANIFEST.crossReference.allowedKebabProse);
+  for (const d of LOOP.skills) if (!skills.has(d) && fs.existsSync(jp('skills', d, 'SKILL.md'))) skills.add(d);
+  const atAllow = new Set(CROSS_REFERENCE.allowedAtMentions);
+  const kebabAllow = new Set(CROSS_REFERENCE.allowedKebabProse);
   const atFindings = [];
   const kebabFindings = new Map();
-  const resolved = { agent: 0, skill: 0, alias: 0, code: 0, allow: 0 };
+  const resolved = { agent: 0, skill: 0, code: 0, allow: 0 };
   for (const rec of records) {
     if (rec.kind === 'index') continue;
     if (rec.frontmatter?.status === 'missing') continue; // crash-safety: file absent → skip mention scan
@@ -151,10 +145,6 @@ function scanMentions(records) {
       }
       for (const m of line.matchAll(/\B@([a-z][a-z0-9-]*)/gi)) {
         const tok = m[1].toLowerCase();
-        if (aliases[tok]) {
-          resolved.alias++;
-          continue;
-        }
         if (agents.has(tok)) {
           resolved.agent++;
           continue;
@@ -181,7 +171,7 @@ function scanMentions(records) {
       }
       for (const m of line.matchAll(/\b([a-z][a-z0-9]+(?:-[a-z0-9]+)+)\b/g)) {
         const tok = m[1];
-        if (agents.has(tok) || skills.has(tok) || aliases[tok]) {
+        if (agents.has(tok) || skills.has(tok)) {
           resolved.skill++;
           continue;
         }
@@ -201,9 +191,9 @@ function scanMentions(records) {
 
 // ---------- secrets & junk ----------
 function scanSecrets(records) {
-  const low = new RegExp(MANIFEST.secrets.lowSignaturePattern, 'gi');
-  const highs = MANIFEST.secrets.highSignaturePatterns.map((p) => new RegExp(p));
-  const allow = MANIFEST.secrets.proseAllowlist;
+  const low = new RegExp(SECRETS.lowSignaturePattern, 'gi');
+  const highs = SECRETS.highSignaturePatterns.map((p) => new RegExp(p));
+  const allow = SECRETS.proseAllowlist;
   const hits = [];
   let lowHits = 0;
   for (const rec of records) {
@@ -230,14 +220,6 @@ function scanSecrets(records) {
   failCount.n += fails.length;
   return { lowHits, highSignature: hits, fails };
 }
-function junkReason(rel, base, isDir) {
-  const seg = rel.split('/');
-  for (const d of MANIFEST.junk.anySegmentDirNames) if (seg.includes(d)) return `junk dir (${d})`;
-  for (const s of MANIFEST.junk.secretsFileNames) if (base === s || base.startsWith(s)) return 'secrets (.env*)';
-  if (isDir) return null;
-  for (const f of MANIFEST.junk.filePatterns) if (new RegExp(f.pattern).test(base)) return f.reason;
-  return null;
-}
 function scanJunk() {
   const hits = [];
   const symlinks = [];
@@ -263,40 +245,33 @@ function checkLoop(records) {
     records
       .filter((r) => r.kind === 'skill')
       .map((r) => r.frontmatter?.fields?.name)
-      .concat(MANIFEST.loop.skills.filter((s) => s !== 'dh-coding' && fs.existsSync(jp('skills', s, 'SKILL.md'))))
+      .concat(LOOP.skills.filter((s) => fs.existsSync(jp('skills', s, 'SKILL.md'))))
   );
   const agentSet = new Set(
     records
       .filter((r) => r.kind === 'agent')
       .map((r) => r.frontmatter?.fields?.name)
-      .concat(MANIFEST.loop.agents.filter((a) => fs.existsSync(jp('agents', `${a}.md`))))
+      .concat(LOOP.agents.filter((a) => fs.existsSync(jp('agents', `${a}.md`))))
   );
   return {
-    skills: MANIFEST.loop.skills.map((s) => ({
-      name: s,
-      status: skillSet.has(s)
-        ? 'present'
-        : (MANIFEST.loop.expectedPendingSkills ?? []).includes(s)
-          ? 'expected-pending (ST3)'
-          : 'missing',
-    })),
-    agents: MANIFEST.loop.agents.map((a) => ({ name: a, status: agentSet.has(a) ? 'present' : 'missing' })),
+    skills: LOOP.skills.map((s) => ({ name: s, status: skillSet.has(s) ? 'present' : 'missing' })),
+    agents: LOOP.agents.map((a) => ({ name: a, status: agentSet.has(a) ? 'present' : 'missing' })),
   };
 }
 function checkInventory(inv) {
-  const exp = MANIFEST.sections;
   const problems = [];
-  if (inv.agents.length !== exp.agents.expectedItems)
-    problems.push(`agents ${inv.agents.length} != ${exp.agents.expectedItems}`);
-  // Bundled skill count = manifest expectation (repo-authored tree)
-  // bundled skills are repo-authored) — fallback to the legacy probe pair.
-  const expectedSkills =
-    MANIFEST.sections.skills.expectedItems ||
-    0 ||
-    (fs.existsSync(jp('skills', 'dh-coding', 'SKILL.md'))
-      ? MANIFEST.bundledSkillMdCount.afterSt3
-      : MANIFEST.bundledSkillMdCount.now);
-  if (inv.skillDirs.length !== expectedSkills) problems.push(`skill dirs ${inv.skillDirs.length} != ${expectedSkills}`);
+  // Corpus is self-consistent (no external count contract): every skills/
+  // dir must carry SKILL.md and agents/ must contain only markdown files.
+  const skillDirsWithMd = fs
+    .readdirSync(jp('skills'), { withFileTypes: true })
+    .filter((e) => e.isDirectory() && fs.existsSync(jp('skills', e.name, 'SKILL.md')))
+    .map((e) => e.name)
+    .sort();
+  const agentEntries = fs.readdirSync(jp('agents'), { withFileTypes: true });
+  for (const e of agentEntries)
+    if (!e.isFile() || !e.name.endsWith('.md')) problems.push(`unexpected entry in agents/: ${e.name}`);
+  if (skillDirsWithMd.length !== inv.skillDirs.length)
+    problems.push(`${inv.skillDirs.length - skillDirsWithMd.length} skill dir(s) missing SKILL.md`);
   if (!fs.existsSync(jp('skills', 'index.md'))) problems.push('skills/index.md missing');
   for (const out of ['commands', 'prompts']) {
     if (fs.existsSync(jp(out))) problems.push(`out-of-scope directory present: ${out}/`);
@@ -306,7 +281,7 @@ function checkInventory(inv) {
     problems,
     counts: {
       agents: inv.agents.length,
-      skillDirs: inv.skillDirs.length,
+      skillDirs: skillDirsWithMd.length,
       indexMd: fs.existsSync(jp('skills', 'index.md')),
     },
   };
@@ -315,7 +290,7 @@ function summarize(records, mentions, secrets, junk, loop, inv) {
   const dims = (name, count, sev, note) => ({ name, count, sev, note });
   const fails = records.flatMap((r) => r.findings.filter((f) => f.severity === 'fail'));
   const devs = records.flatMap((r) => r.findings.filter((f) => f.severity === 'warn'));
-  const limit = (r) => MANIFEST.lineLimits[r.kind === 'agent' ? 'agent' : 'skill'];
+  const limit = (r) => LINE_LIMITS[r.kind === 'agent' ? 'agent' : 'skill'];
   return {
     summary: {
       verdict: failCount.n === 0 ? 'PASS' : 'FAIL',
@@ -325,7 +300,7 @@ function summarize(records, mentions, secrets, junk, loop, inv) {
           inv.counts.agents + inv.counts.skillDirs,
           inv.problems.length ? 'FAIL' : 'PASS',
           inv.problems.join('; ') ||
-            'counts match manifest (6 agents, 11 skill dirs + index.md; no commands/, no prompts/)'
+            `${inv.counts.agents} agents, ${inv.counts.skillDirs} skill dirs + index.md; no commands/, no prompts/`
         ),
         dims(
           'Frontmatter parse',
@@ -339,7 +314,7 @@ function summarize(records, mentions, secrets, junk, loop, inv) {
           'Name regex',
           records.filter((r) => (r.kind === 'skill' || r.kind === 'agent') && r.frontmatter?.fields?.name).length,
           fails.some((f) => f.dimension === 'name') ? 'FAIL' : 'PASS',
-          MANIFEST.skillNameRegex
+          SKILL_NAME_REGEX.toString()
         ),
         dims(
           'Size limits',
@@ -351,7 +326,7 @@ function summarize(records, mentions, secrets, junk, loop, inv) {
           'Cross-references',
           mentions.atFindings.length,
           mentions.atFindings.length || mentions.kebabList.length ? 'WARN' : 'PASS',
-          `${mentions.resolved.agent + mentions.resolved.skill + mentions.resolved.alias} resolved; ${mentions.resolved.code} code-context; ${mentions.resolved.allow} allowlisted; ${mentions.kebabList.length} prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)`
+          `${mentions.resolved.agent + mentions.resolved.skill} resolved; ${mentions.resolved.code} code-context; ${mentions.resolved.allow} allowlisted; ${mentions.kebabList.length} prose tokens (warn)`
         ),
         dims(
           'Loop membership',
@@ -359,7 +334,7 @@ function summarize(records, mentions, secrets, junk, loop, inv) {
           loop.skills.some((s) => s.status === 'missing') || loop.agents.some((a) => a.status === 'missing')
             ? 'FAIL'
             : 'PASS',
-          `${loop.skills.filter((s) => s.status === 'present').length}/12 skills present + coding expected-pending (ST3); ${loop.agents.filter((a) => a.status === 'present').length}/6 agents present`
+          `${loop.skills.filter((s) => s.status === 'present').length}/${LOOP.skills.length} skills present; ${loop.agents.filter((a) => a.status === 'present').length}/${LOOP.agents.length} agents present`
         ),
         dims(
           'Secret scan',

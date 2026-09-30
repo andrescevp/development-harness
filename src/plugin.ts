@@ -1,7 +1,7 @@
 /**
  * dev-harness-skills — OpenCode V2 plugin.
  *
- * Registers the scoped dev harness manifest (6 agents, 12 skills) via
+ * Registers the bundled dev harness (7 agents, 15 skills) via
  * synchronous domain transforms. Assets are loaded BEFORE the transforms run
  * (transforms are synchronous; external data must be pre-loaded), resolved
  * from the bundle location (`import.meta.dirname` → dist/assets), NOT from
@@ -17,7 +17,7 @@
  *   - `ctx.skill.transform(editor)`: `editor.add(skill)` needs the full
  *     Skill.Info shape { id, name, description, path, content }.
  *
- * NO command transforms, NO prompt registration (user-mandated scope).
+ * No command transforms, no prompt registration.
  */
 
 import fs from 'node:fs';
@@ -40,7 +40,7 @@ function logSummary(agents: AgentRecord[], skills: SkillRecord[], skipped: numbe
   );
 }
 
-/** Register the 6 manifest agents (upsert via the mutator editor). */
+/** Register the bundled agents (upsert via the mutator editor). */
 export default Plugin.define({
   id: PLUGIN_ID,
   async setup(ctx: Plugin.Context): Promise<void> {
@@ -83,7 +83,7 @@ export default Plugin.define({
       }
     });
 
-    // 3. Plan-lifecycle tools (M2) — harness namespace, codemode, workspace-anchored.
+    // 3. Plan-lifecycle tools — harness namespace, codemode, workspace-anchored.
     const workspaceRoot = ctx.location?.directory ?? '';
     await registerPlanTools(ctx, workspaceRoot);
 
@@ -91,7 +91,7 @@ export default Plugin.define({
   },
 });
 
-/** Registration for the M2 plan-lifecycle toolset (namespace `harness`). */
+/** Registration for the plan-lifecycle toolset (namespace `dh`). */
 async function registerPlanTools(ctx: Plugin.Context, workspaceRoot: string): Promise<void> {
   await ctx.tool.transform((editor) => {
     editor.namespace({

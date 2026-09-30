@@ -65,7 +65,7 @@ function listSkillFiles(dir: string): string[] {
 }
 
 /**
- * Load and parse the scoped manifest. Root layout:
+ * Load and parse the harness corpus. Root layout:
  *   <root>/agents/*.md                     → AgentRecord (name = filename stem)
  *   <root>/skills/<name>/SKILL.md          → SkillRecord (frontmatter name)
  *   <root>/skills/index.md                 → raw index content

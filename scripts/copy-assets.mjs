@@ -1,34 +1,33 @@
 #!/usr/bin/env node
 /**
- * copy-assets.mjs — sync the scoped harness assets (agents/ + skills/) into
+ * copy-assets.mjs — sync the harness corpus (agents/ + skills/) into
  * dist/assets/ so dist/plugin.js can resolve them at runtime via
  * `import.meta.dirname` (independent of CWD).
  *
  * Rules:
- *   - Only agents/ and skills/ are copied (NO commands/, NO prompts/).
- *   - Junk rules come from scripts/manifest.json (single source of truth,
- *     shared with extract.mjs and audit.mjs): dependency dirs, `.env*`
- *     secrets, `.bak`/swap/`.DS_Store` patterns. references/, scripts, and
- *     data files inside skill dirs ARE part of the skill and are kept.
+ *   - Only agents/ and skills/ are copied (no commands/, no prompts/).
+ *   - Junk classification comes from scripts/lib/shared.mjs (dependency
+ *     dirs, `.env*` secrets, `.bak`/swap/`.DS_Store` patterns). references/,
+ *     scripts, and data files inside skill dirs ARE part of the skill and
+ *     are kept.
  *   - dist/assets is cleaned first so stale content can never hide missing
  *     files (stale-dist guard).
- *   - Verifies the copied inventory against the manifest expectations
- *     (6 agent files, 12 SKILL.md incl. coding, skills/index.md); exits 1 on
- *     mismatch so a broken build fails loudly.
+ *   - Verifies the copied inventory against the source tree (agents count,
+ *     skill dirs with SKILL.md, skills/index.md); exits 1 on mismatch so a
+ *     broken build fails loudly.
  *
  * Usage:
  *   node scripts/copy-assets.mjs
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { createJunkReason, listEntries, loadManifest, projectRoot } from './lib/shared.mjs';
+import { createJunkReason, listEntries, projectRoot } from './lib/shared.mjs';
 
 const REPO_ROOT = projectRoot(import.meta.url);
-const M = loadManifest(REPO_ROOT);
 const ASSETS_ROOT = path.join(REPO_ROOT, 'dist', 'assets');
 const COPY_SECTIONS = ['agents', 'skills'];
 
-const junkReason = createJunkReason(M);
+const junkReason = createJunkReason();
 
 /** Recursive copy preserving relative layout; returns [{ rel, reason }] for skipped junk. */
 function walkCopy(srcAbs, destAbs, relPrefix, skipped) {
@@ -53,7 +52,18 @@ function walkCopy(srcAbs, destAbs, relPrefix, skipped) {
   }
 }
 
-function verifyInventory(skipped) {
+function srcAgentCount() {
+  return fs.readdirSync(path.join(REPO_ROOT, 'agents')).filter((f) => f.endsWith('.md')).length;
+}
+
+function srcSkillDirs() {
+  return fs
+    .readdirSync(path.join(REPO_ROOT, 'skills'), { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .filter((d) => fs.existsSync(path.join(REPO_ROOT, 'skills', d.name, 'SKILL.md'))).length;
+}
+
+function verifyInventory() {
   const problems = [];
   const agentFiles = fs.readdirSync(path.join(ASSETS_ROOT, 'agents')).filter((f) => f.endsWith('.md'));
   const skillMd = fs
@@ -61,17 +71,13 @@ function verifyInventory(skipped) {
     .filter((e) => e.isDirectory())
     .filter((d) => fs.existsSync(path.join(ASSETS_ROOT, 'skills', d.name, 'SKILL.md')));
   const hasIndex = fs.existsSync(path.join(ASSETS_ROOT, 'skills', 'index.md'));
-  const expectedSkills =
-    M.sections.skills.expectedItems ||
-    0 ||
-    (fs.existsSync(path.join(REPO_ROOT, 'skills', 'dh-coding', 'SKILL.md'))
-      ? M.bundledSkillMdCount.afterSt3
-      : M.bundledSkillMdCount.now);
-  if (agentFiles.length !== M.sections.agents.expectedItems) {
-    problems.push(`agents: ${agentFiles.length} != ${M.sections.agents.expectedItems}`);
+  const expectedAgents = srcAgentCount();
+  const expectedSkills = srcSkillDirs();
+  if (agentFiles.length !== expectedAgents) {
+    problems.push(`agents: ${agentFiles.length} copied != ${expectedAgents} source`);
   }
   if (skillMd.length !== expectedSkills) {
-    problems.push(`skills SKILL.md: ${skillMd.length} != ${expectedSkills}`);
+    problems.push(`skills SKILL.md: ${skillMd.length} copied != ${expectedSkills} source`);
   }
   if (!hasIndex) problems.push('skills/index.md missing');
   return { problems, counts: { agents: agentFiles.length, skills: skillMd.length, index: hasIndex } };
@@ -79,7 +85,7 @@ function verifyInventory(skipped) {
 
 function main() {
   if (!fs.existsSync(path.join(REPO_ROOT, 'agents')) || !fs.existsSync(path.join(REPO_ROOT, 'skills'))) {
-    console.error('[copy-assets] repo assets missing — run extraction first (node scripts/extract.mjs)');
+    console.error('[copy-assets] repo assets missing (agents/ or skills/ not found)');
     process.exit(1);
   }
   fs.rmSync(ASSETS_ROOT, { recursive: true, force: true });
@@ -88,7 +94,7 @@ function main() {
   for (const section of COPY_SECTIONS) {
     walkCopy(path.join(REPO_ROOT, section), path.join(ASSETS_ROOT, section), '', skipped);
   }
-  const { problems, counts } = verifyInventory(skipped);
+  const { problems, counts } = verifyInventory();
   console.log(
     `[copy-assets] agents ${counts.agents} | skills ${counts.skills} SKILL.md + index.md ${counts.index ? 'yes' : 'no'}`
   );

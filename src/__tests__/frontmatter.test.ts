@@ -37,7 +37,7 @@ const AGENT_FILES = listMd('agents');
 const SKILL_FILES = listSkillMd();
 
 describe('corpus parsing (real bundled set)', () => {
-  it('finds the scoped manifest on disk (6 agents + 12 skills)', () => {
+  it('finds the harness corpus on disk (7 agents + 15 skills)', () => {
     expect(AGENT_FILES).toHaveLength(7);
     expect(SKILL_FILES).toHaveLength(15);
   });
@@ -54,7 +54,7 @@ describe('corpus parsing (real bundled set)', () => {
     }
   );
 
-  it('every agent + skill name matches the manifest regex and equals the file identity', () => {
+  it('every agent + skill name matches the name regex and equals the file identity', () => {
     const names: string[] = [];
     for (const file of AGENT_FILES) names.push(parseFrontmatter(fs.readFileSync(file, 'utf8')).data.name as string);
     for (const file of SKILL_FILES) names.push(parseFrontmatter(fs.readFileSync(file, 'utf8')).data.name as string);
@@ -72,9 +72,8 @@ describe('corpus parsing (real bundled set)', () => {
   });
 
   it('no bundled agent carries the permission or tools frontmatter keys', () => {
-    // Policy: bundled agents ship without `permission` (M3 strip) AND without
-    // `tools` (user mandate 2026-09-28) — they register with no static tool
-    // rules; re-extract from ~/.agents restores both unless patched.
+    // Policy: bundled agents ship without the `permission` and `tools`
+    // frontmatter keys — they register with no static tool rules.
     for (const file of AGENT_FILES) {
       const { data } = parseFrontmatter(fs.readFileSync(file, 'utf8'));
       expect(data['permission'], file).toBeUndefined();

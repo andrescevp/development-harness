@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-28T16:28:23.431Z",
+    "generated": "2026-09-30T21:19:48.375Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -13,7 +13,7 @@
         "name": "Inventory & structure",
         "count": 22,
         "sev": "PASS",
-        "note": "counts match manifest (6 agents, 11 skill dirs + index.md; no commands/, no prompts/)"
+        "note": "7 agents, 15 skill dirs + index.md; no commands/, no prompts/"
       },
       {
         "name": "Frontmatter parse",
@@ -25,7 +25,7 @@
         "name": "Name regex",
         "count": 22,
         "sev": "PASS",
-        "note": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        "note": "/^[a-z0-9]+(-[a-z0-9]+)*$/"
       },
       {
         "name": "Size limits",
@@ -37,13 +37,13 @@
         "name": "Cross-references",
         "count": 27,
         "sev": "WARN",
-        "note": "300 resolved; 1 code-context; 0 allowlisted; 131 prose tokens (warn); out-of-bundle mentions warn-only (external harness refs documented)"
+        "note": "300 resolved; 1 code-context; 0 allowlisted; 131 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
         "count": 22,
-        "sev": "FAIL",
-        "note": "15/12 skills present + coding expected-pending (ST3); 0/6 agents present"
+        "sev": "PASS",
+        "note": "15/15 skills present; 7/7 agents present"
       },
       {
         "name": "Secret scan",
@@ -1262,32 +1262,32 @@
     ],
     "agents": [
       {
-        "name": "dh-documentor.md",
-        "status": "missing"
+        "name": "dh-documentor",
+        "status": "present"
       },
       {
-        "name": "dh-executor.md",
-        "status": "missing"
+        "name": "dh-executor",
+        "status": "present"
       },
       {
-        "name": "dh-explorer.md",
-        "status": "missing"
+        "name": "dh-explorer",
+        "status": "present"
       },
       {
-        "name": "dh-final-reviewer.md",
-        "status": "missing"
+        "name": "dh-final-reviewer",
+        "status": "present"
       },
       {
-        "name": "dh-reviewer.md",
-        "status": "missing"
+        "name": "dh-reviewer",
+        "status": "present"
       },
       {
-        "name": "dh-software-architect.md",
-        "status": "missing"
+        "name": "dh-software-architect",
+        "status": "present"
       },
       {
-        "name": "dh-software-engineer.md",
-        "status": "missing"
+        "name": "dh-software-engineer",
+        "status": "present"
       }
     ]
   },
@@ -1681,7 +1681,7 @@
     {
       "file": "skills/index.md",
       "kind": "index",
-      "lines": 110,
+      "lines": 109,
       "frontmatter": {
         "status": "none-expected"
       },

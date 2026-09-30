@@ -2,25 +2,25 @@
 
 > **Git Flow:** managed with `main` (production) + `develop` (integration) and `feature/`, `bugfix/`, `release/`, `hotfix/` branches — see `AGENTS.md` → Git Flow.
 
-**OpenCode V2 plugin** that bundles a scoped personal dev harness for
+**OpenCode V2 plugin** that bundles a self-contained dev harness for
 plan-driven development: **7 agents** and **15 skills** wired into a
 planning → execution → review → release loop.
 
 | | |
 |---|---|
 | Platform | OpenCode V2 (`@opencode/plugin`, `Plugin.define`) |
-| Source harness | Fully repo-authored (agents/ + skills/ owned by this repo) |
-| Manifest | 7 agents · 15 skills · **no commands/prompts** (user-mandated scope + dh-grill-sdd) |
+| Source | Fully repo-authored (agents/ + skills/ owned by this repo — independent, nothing external) |
+| Surface | 7 agents · 15 skills · **no commands/prompts** |
 | Toolchain | TypeScript + tsup + vitest (pnpm) |
 
-## Manifest
+## Agents & skills
 
-**Agents (6):** `dh-software-architect` (planning, execute-plan,
+**Agents (7):** `dh-software-architect` (planning, execute-plan,
 create-documentation), `dh-software-engineer` (execute-plan-task, coding),
 `dh-reviewer` (simplify, review, code-review), `dh-final-reviewer` (final-review),
 `dh-executor`, `dh-explorer`, `dh-documentor`.
 
-**Skills (12):** `dh-artifact-check`, `dh-simplify`, `dh-domain-check`, `dh-coding`,
+**Skills (15):** `dh-artifact-check`, `dh-simplify`, `dh-domain-check`, `dh-coding`,
 `dh-code-review`, `dh-execute-plan`, `dh-execute-plan-task`, `dh-final-review`,
 `dh-planning`, `dh-preflight`, `dh-review`, `dh-create-documentation`, `dh-grill-sdd`, `dh-setup`, `dh-code-ruler`.
 `dh-coding` is the NEW skill — TDD coding best practices that reads project
@@ -58,17 +58,13 @@ tools are unavailable).
 
 ## Provenance
 
-- Harness content is **fully repo-authored** (2026-09-29): `agents/` and
-  `skills/` are owned by this repository — nothing is extracted from
-  `~/.agents` anymore; `scripts/extract.mjs` is a repo-integrity check.
-  See [`docs/EXTRACTION.md`](docs/EXTRACTION.md) for the history.
-- The `dh-` naming is the canonical manifest (agents 7, skills 15; the
-  `senior-*` → `dh-software-*` mapping was applied once during the original
-  extraction and is now permanent in the repo files).
-- Bundled agents ship **without the `permission` and `tools` frontmatter
-  keys** — registration carries no static tool rules; enforced by
-  `extract --check` and the audit.
-- Runtime delegation normalization (the plugin registers only the 6 manifest
+- Harness content is **fully repo-authored**: `agents/` and `skills/` are
+  owned by this repository — the repo is self-contained and independent
+  (no external source, no extraction step).
+- The `dh-` names are canonical in the repo files. Bundled agents ship
+  **without the `permission` and `tools` frontmatter keys** — registration
+  carries no static tool rules; enforced by the audit.
+- Runtime delegation normalization (the plugin registers the 7 bundled
   agents): `@build`/`@senior-engineer` → `@dh-software-engineer`,
   `@senior-architect`/`@plan` → `@dh-software-architect` — see AGENTS.md table.
 
@@ -77,9 +73,9 @@ tools are unavailable).
 ```sh
 # install deps + build + audit
 pnpm install
-pnpm run audit      # harness manifest audit (FAIL findings must be 0)
+pnpm run audit      # harness audit (FAIL findings must be 0)
 pnpm build      # tsup ESM bundle + declarations + dist/assets copy
-pnpm test       # vitest suite (51 tests): parser, builders, registration
+pnpm test       # vitest suite: parser, builders, plan tools, registration
 
 # load into opencode: add to opencode.jsonc
 #   "plugins": ["file:///home/andres/workspace/dev-harness-skills"]
@@ -103,11 +99,11 @@ pnpm typecheck && pnpm run audit && pnpm test && pnpm build && node scripts/smok
 ## Repository layout
 
 ```
-agents/          bundled agent markdown (6) — frontmatter + system prompt body
-skills/          bundled skills (12) + index.md
+agents/          bundled agent markdown (7) — frontmatter + system prompt body
+skills/          bundled skills (15) + index.md
 src/             plugin entry + lib (assets loader, records, frontmatter)
-scripts/         extract.mjs, audit.mjs, copy-assets.mjs, smoke-load.mjs, manifest.json
-docs/            EXTRACTION.md, LOADING.md, plans/
+scripts/         audit.mjs, copy-assets.mjs, smoke-load.mjs
+docs/            LOADING.md, plans/
 dist/            build output (plugin.js + assets) — generated, git-ignored
 ```
 
@@ -115,7 +111,6 @@ dist/            build output (plugin.js + assets) — generated, git-ignored
 
 - [`AGENTS.md`](AGENTS.md) — harness runtime contract: loop, provenance,
   agent-name normalization, loading.
-- [`docs/EXTRACTION.md`](docs/EXTRACTION.md) — extraction record + exclusions.
 - [`docs/LOADING.md`](docs/LOADING.md) — how to load the plugin, verification,
   troubleshooting.
 - [`docs/plans/dev-harness-v2-plugin/`](docs/plans/dev-harness-v2-plugin/) —
