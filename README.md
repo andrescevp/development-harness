@@ -1,126 +1,208 @@
 # dev-harness-skills
 
-> **Git Flow:** managed with `main` (production) + `develop` (integration) and `feature/`, `bugfix/`, `release/`, `hotfix/` branches — see `AGENTS.md` → Git Flow.
+An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 7 agents and 15 skills.
 
-**OpenCode V2 plugin** that bundles a self-contained dev harness for
-plan-driven development: **7 agents** and **15 skills** wired into a
-planning → execution → review → release loop.
+## Features
 
-| | |
-|---|---|
-| Platform | OpenCode V2 (`@opencode/plugin`, `Plugin.define`) |
-| Source | Fully repo-authored (agents/ + skills/ owned by this repo — independent, nothing external) |
-| Surface | 7 agents · 15 skills · **no commands/prompts** |
-| Toolchain | TypeScript + tsup + vitest (pnpm) |
+- **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
+- **Phased plans**: Dual-status progress tracking across phases and sub-tasks with strict halt-on-blocker safeguards.
+- **7 agents and 15 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
+- **Plan lifecycle tools**: Built-in `dh_plan_read`, `dh_plan_update_status`, and `dh_plan_create` tools for programmatic plan management in `docs/plans`.
+- **DuckDB sheet tools**: Integrated tools (`dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`) for SQL querying and editing of tabular data.
+- **Logged executor strategy**: `dh_logged_command` captures full command execution logs in the OS temp directory while streaming head/tail windows.
+- **Full QA gate**: Thorough verification suite integrating Biome, Knip, jscpd, dependency-cruiser, OSV-Scanner, Semgrep, Vitest, and TypeScript.
+- **Source-mode loading**: Automatic discovery by OpenCode via root `index.ts` with direct asset loading from the repository.
 
-## Agents & skills
+## Installation
 
-**Agents (7):** `dh-software-architect` (planning, execute-plan,
-create-documentation), `dh-software-engineer` (execute-plan-task, coding),
-`dh-reviewer` (simplify, review, code-review), `dh-final-reviewer` (final-review),
-`dh-executor`, `dh-explorer`, `dh-documentor`.
+### Global (all projects)
 
-**Skills (15):** `dh-artifact-check`, `dh-simplify`, `dh-domain-check`, `dh-coding`,
-`dh-code-review`, `dh-execute-plan`, `dh-execute-plan-task`, `dh-final-review`,
-`dh-planning`, `dh-preflight`, `dh-review`, `dh-create-documentation`, `dh-grill-sdd`, `dh-setup`, `dh-code-ruler`.
-`dh-coding` is the NEW skill — TDD coding best practices that reads project
-rules from `CODE_RULES.md` at the project root when present.
+Clone the repository into your global OpenCode plugins directory:
 
-**The skills loop** (see [`AGENTS.md`](AGENTS.md)) — plans are **phased**
-(phases → sub-tasks with dual status markers; format contract in
-`skills/planning/references/phased-plan-template.md`):
+```sh
+git clone https://github.com/andrescevp/development-harness.git ~/.config/opencode/plugins/dev-harness-skills
+cd ~/.config/opencode/plugins/dev-harness-skills && pnpm install
+```
 
-1. `dh-planning` → use `dh-domain-check` while planning
-2. `dh-execute-plan` → 2.1 `dh-execute-plan-task` (uses `dh-coding`) · 2.2 `dh-simplify`
-   · 2.3 `dh-review` + `dh-code-review` · 2.4 hard blockers → stop and ask guidance
-   (otherwise loop back to 2.1)
-3. `dh-preflight` + `dh-artifact-check`
-4. `dh-final-review`
-5. `dh-create-documentation`
+OpenCode automatically discovers plugin package directories containing an `index.ts` entry under its plugins folder. No configuration file changes are required.
 
-## Plan lifecycle tools (bundled)
+### Per-project
 
-The plugin registers a `harness` namespace with three V2 custom tools
-(codemode) for managing phased plans under `docs/plans`:
+To scope the harness to a specific project, clone into the project plugins folder with the same install step:
 
-| Tool | Purpose |
-|---|---|
-| `dh_plan_read` | Parse a phased plan into structured JSON (meta, phases, sub-tasks with statuses) |
-| `dh_plan_update_status` | Update a phase or sub-task status marker (phase → Completed only when all its sub-tasks are Completed) |
-| `dh_plan_create` | Scaffold a new phased plan from a title + objective + phases/sub-tasks |
-| `dh_logged_command` | Run a command with its log in the OS temp dir, returning head/tail + log path (executor strategy) |
-| `dh_read_sheet` / `dh_update_sheet` / `dh_sheet_schema` | DuckDB-backed csv/xlsx management (read, update, describe) |
+```sh
+mkdir -p <project>/.opencode/plugins
+git clone https://github.com/andrescevp/development-harness.git <project>/.opencode/plugins/dev-harness-skills
+cd <project>/.opencode/plugins/dev-harness-skills && pnpm install
+```
 
-The loop skills (`dh-planning`, `dh-execute-plan`, `dh-execute-plan-task`, `dh-review`,
-`dh-final-review`) and the `dh-software-architect` / `dh-software-engineer` agents use
-these tools instead of manual plan.md edits (fallback to manual edits when the
-tools are unavailable).
+### Managed via OpenCode CLI
 
-## Provenance
+Install the plugin directly using the OpenCode CLI:
 
-- Harness content is **fully repo-authored**: `agents/` and `skills/` are
-  owned by this repository — the repo is self-contained and independent
-  (no external source, no extraction step).
-- The `dh-` names are canonical in the repo files. Bundled agents ship
-  **without the `permission` and `tools` frontmatter keys** — registration
-  carries no static tool rules; enforced by the audit.
-- Runtime delegation uses the bundled agent names directly:
-  `@dh-software-engineer` for implementation, `@dh-software-architect` for
-  architecture — see AGENTS.md → Runtime delegation.
+```sh
+opencode plugin add github:andrescevp/development-harness
+```
+
+This works with private repositories through your existing Git credentials. To refresh the plugin:
+
+```sh
+opencode plugin update
+```
+
+### From source / development
+
+Clone the repository, install dependencies, build the bundle (tsup bundle + dist/assets), and configure OpenCode:
+
+```sh
+git clone https://github.com/andrescevp/development-harness.git
+cd development-harness
+pnpm install
+pnpm build
+```
+
+Then load via `file:///path/to/dev-harness-skills` in your `opencode.json` or `opencode.jsonc` plugins array:
+
+```json
+{
+  "plugins": [
+    "file:///path/to/dev-harness-skills"
+  ]
+}
+```
 
 ## Quickstart
 
+1. Check that the plugin loaded successfully:
+
 ```sh
-# INSTALL (global, all projects) — clone into the plugin folder; opencode
-# auto-discovers the root index.ts entry (no config, no build):
-git clone https://github.com/andrescevp/development-harness.git \
-  ~/.config/opencode/plugins/dev-harness-skills
-cd ~/.config/opencode/plugins/dev-harness-skills && pnpm install
+opencode debug agents
+opencode debug skills
+```
 
-# or as a managed package (private repo works via your git credentials):
-opencode plugin add github:andrescevp/development-harness
+Confirm that the 7 `dh-` agents and 15 `dh-` skills appear and that zero commands are registered.
 
-# DEVELOP (inside the repo):
+2. Audit your environment and initialize QA:
+
+Ask `@dh-software-architect` to run `dh-setup` to audit system tools and configure project QA hooks.
+
+3. Establish project coding conventions:
+
+Run `dh-code-ruler` to interview requirements, inspect codebase patterns, and generate `CODE_RULES.md` at the project root.
+
+4. Plan and implement features:
+
+Run `dh-grill-sdd` to generate requirements (`sdd.md`), create a phased plan using `dh-planning`, and execute it with `dh-execute-plan`.
+
+## How it works
+
+Plan execution inside the plugin runs the 5-step skills loop:
+
+1. `dh-planning` — Prepares phased plans, validating architectural constraints with `dh-domain-check`.
+2. `dh-execute-plan` — Iterates through phases in sequential order and executes their sub-tasks:
+   - 2.1 `dh-execute-plan-task` — Implements the sub-task code using `dh-coding`.
+   - 2.2 `dh-simplify` — Refactors and simplifies changed code for clarity and reuse.
+   - 2.3 `dh-review` + `dh-code-review` — Verifies acceptance criteria and code correctness.
+   - 2.4 Hard blockers — If 3 consecutive validation failures occur or unresolved P0/P1 review findings arise, the loop stops and asks the user for guidance.
+3. `dh-preflight` + `dh-artifact-check` — Runs static analysis, tests, and build artifact validation.
+4. `dh-final-review` — Reports per-phase completion and provides final plan-level sign-off.
+5. `dh-create-documentation` — Generates and updates project documentation.
+
+### Phased plan model
+
+Plans are stored under `docs/plans/<slug>/plan.md` using a phased structure. Every phase and sub-task maintains a dual status marker (`Pending`, `In Progress`, or `Completed`). A phase cannot transition to `Completed` until all of its sub-tasks are marked `Completed`. When a hard blocker is reached, automation halts immediately so that blockers are never bypassed.
+
+### Bundled tools
+
+The plugin registers custom V2 tools under the `dh` namespace:
+
+- **Plan lifecycle**: `dh_plan_read` parses phased plans into structured JSON, `dh_plan_update_status` safely edits status markers, and `dh_plan_create` scaffolds new phased plans.
+- **Logged execution**: `dh_logged_command` runs commands locally while directing full output to a file in the system temporary directory, returning head and tail line windows.
+- **Tabular sheets**: `dh_read_sheet`, `dh_update_sheet`, and `dh_sheet_schema` provide DuckDB-backed querying, updating, and schema inspection for CSV and XLSX files.
+
+## Agents & skills
+
+The plugin defines 7 agents and 15 skills using `@opencode/plugin` (`Plugin.define`). Zero command transforms are registered.
+
+### Agents
+
+| Agent | Role |
+|---|---|
+| `dh-software-architect` | Senior architect for system design, planning, plan execution orchestration, and documentation. |
+| `dh-software-engineer` | Senior software engineer handling all sub-task implementation and TDD coding. |
+| `dh-reviewer` | Scoped code reviewer evaluating changes against sub-task criteria and code quality. |
+| `dh-final-reviewer` | Final reviewer conducting full diff review and plan-level sign-off. |
+| `dh-executor` | Execution agent running commands, tests, builds, and validation via logged command strategy. |
+| `dh-explorer` | Codebase exploration agent using fast glob, grep, and targeted reads. |
+| `dh-documentor` | Documentation agent responsible for creating, updating, and maintaining project documentation. |
+
+### Skills
+
+| Skill | Role |
+|---|---|
+| `dh-planning` | Creates phased plans in `docs/plans/<slug>/plan.md`. |
+| `dh-domain-check` | Validates domain boundaries and SOLID design during planning and execution. |
+| `dh-execute-plan` | Orchestrates the end-to-end execution and status tracking of phased plans. |
+| `dh-execute-plan-task` | Executes an individual sub-task by delegating to `@dh-software-engineer`. |
+| `dh-coding` | Applies TDD best practices and enforces rules from `CODE_RULES.md`. |
+| `dh-simplify` | Streamlines changed code to remove redundancy and reduce complexity. |
+| `dh-review` | Verifies sub-task implementations against specified acceptance criteria. |
+| `dh-code-review` | Inspects code changes for security, robustness, and style conformance. |
+| `dh-preflight` | Executes the full test, lint, and static analysis verification suite. |
+| `dh-artifact-check` | Validates build artifacts, distribution packages, and deployment scripts. |
+| `dh-final-review` | Performs final plan-level verification and delivers completion verdicts. |
+| `dh-create-documentation` | Generates and updates documentation in the project docs directory. |
+| `dh-grill-sdd` | Conducts interactive requirement interviews to produce `sdd.md` specification documents. |
+| `dh-setup` | Audits system tools, user plugins, MCPs, and project quality configuration. |
+| `dh-code-ruler` | Interviews users and inspects code to generate project-level `CODE_RULES.md`. |
+
+## Development
+
+Run development, test, and verification workflows with `pnpm`:
+
+```sh
 pnpm install
-pnpm run audit      # harness audit (FAIL findings must be 0)
-pnpm build      # tsup ESM bundle + declarations + dist/assets copy (package installs)
-pnpm test       # vitest suite: parser, builders, plan tools, registration, root entry
-
-# see docs/LOADING.md for alternatives + verification + troubleshooting
+pnpm test
+pnpm run audit
+pnpm typecheck
+pnpm build
+node scripts/smoke-load.mjs
+pnpm qa:check
+pnpm qa:check:full
+pnpm format:biome
 ```
 
-QA command set (mirrors the libresurvey frontend stack):
-
-```sh
-pnpm qa:check        # biome + knip + jscpd + dependency-cruiser + osv/semgrep (docker)
-pnpm qa:check:full   # qa:check + test + typecheck + audit + build + smoke-load
-pnpm format:biome   # apply biome formatting
-```
-
-Gate command set (release readiness):
-
-```sh
-pnpm typecheck && pnpm run audit && pnpm test && pnpm build && node scripts/smoke-load.mjs
-```
+Use `pnpm run audit` to run the harness consistency audit (`pnpm audit` runs pnpm's package security audit).
 
 ## Repository layout
 
-```
-index.ts         root plugin entry — opencode plugin-directory discovery (loads from source)
-agents/          bundled agent markdown (7) — frontmatter + system prompt body
-skills/          bundled skills (15) + index.md
-src/             plugin entry + lib (assets loader, records, frontmatter)
-scripts/         audit.mjs, copy-assets.mjs, smoke-load.mjs
-test/            root-entry test (vitest)
-docs/            LOADING.md, plans/
-dist/            build output (plugin.js + assets) — generated, git-ignored
+```text
+index.ts         Root plugin entry point for OpenCode plugin discovery (source mode)
+agents/          Markdown definitions and system prompts for the 7 bundled agents
+skills/          Instructions, templates, and references for the 15 bundled skills
+src/             TypeScript source code, asset loaders, type definitions, and tools
+scripts/         Audit, asset packaging, and smoke-testing scripts
+test/            Vitest unit and registration tests
+docs/            Plugin documentation, loading guides, and phased implementation plans
 ```
 
 ## Documentation
 
-- [`AGENTS.md`](AGENTS.md) — harness runtime contract: loop, provenance,
-  runtime delegation, loading.
-- [`docs/LOADING.md`](docs/LOADING.md) — how to load the plugin, verification,
-  troubleshooting.
-- [`docs/plans/dev-harness-v2-plugin/`](docs/plans/dev-harness-v2-plugin/) —
-  the implementation plan, audit report, reviews, verification report.
+- [`AGENTS.md`](AGENTS.md) — Runtime contract: skills loop, phase lifecycle, tools, and delegation routing.
+- [`docs/LOADING.md`](docs/LOADING.md) — Plugin loading methods, verification checklists, and troubleshooting.
+
+## Contributing
+
+Contributions are welcome. Please follow these workflow practices:
+
+1. Fork the repository and create a branch following Git Flow conventions:
+   - `feature/*` branched from `develop` for planned work
+   - `bugfix/*` branched from `develop` for fixes to in-development work
+   - `release/*` branched from `develop` when cutting a release
+   - `hotfix/*` branched from `main` for production fixes
+2. Follow Conventional Commits for all commit messages (e.g., `feat:`, `fix:`, `docs:`, `refactor:`).
+3. Run the full QA gate and ensure all checks pass before opening a Pull Request:
+
+```sh
+pnpm qa:check:full
+```
