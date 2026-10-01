@@ -12,9 +12,19 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 // eslint-disable-next-line @typescript-eslint/no-require-imports -- duckdb is CJS-only
-const duckdb = require('duckdb') as {
+type DuckDbModule = {
   Database: new (path: string) => DuckDb;
 };
+
+let duckdbModule: DuckDbModule | undefined;
+/** Lazy duckdb load — keeps the plugin bundle free of top-level bare imports
+ * (the v2.0.18 global-plugin loader cannot resolve them); only evaluated
+ * when a sheet tool actually runs. */
+function getDuckdb(): DuckDbModule {
+  const mod = duckdbModule ?? (require('duckdb') as DuckDbModule);
+  duckdbModule = mod;
+  return mod;
+}
 
 /** Minimal structural typing for duckdb.Database (package types are CJS-bound). */
 interface DuckDb {
@@ -65,7 +75,7 @@ function run(db: DuckDb, sql: string, params?: unknown[]): Promise<void> {
 
 /** Run an operation against a fresh in-memory DuckDB, with error/close handling. */
 async function withSheet(path: string, op: (db: DuckDb) => Promise<SheetResult>): Promise<SheetResult> {
-  const db = new duckdb.Database(':memory:');
+  const db = new (getDuckdb().Database)(':memory:');
   try {
     return await op(db);
   } catch (err) {
