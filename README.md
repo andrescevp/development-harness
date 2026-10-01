@@ -71,14 +71,21 @@ tools are unavailable).
 ## Quickstart
 
 ```sh
-# install deps + build + audit
+# INSTALL (global, all projects) — clone into the plugin folder; opencode
+# auto-discovers the root index.ts entry (no config, no build):
+git clone https://github.com/andrescevp/development-harness.git \
+  ~/.config/opencode/plugins/dev-harness-skills
+cd ~/.config/opencode/plugins/dev-harness-skills && pnpm install
+
+# or as a managed package (private repo works via your git credentials):
+opencode plugin add github:andrescevp/development-harness
+
+# DEVELOP (inside the repo):
 pnpm install
 pnpm run audit      # harness audit (FAIL findings must be 0)
-pnpm build      # tsup ESM bundle + declarations + dist/assets copy
-pnpm test       # vitest suite: parser, builders, plan tools, registration
+pnpm build      # tsup ESM bundle + declarations + dist/assets copy (package installs)
+pnpm test       # vitest suite: parser, builders, plan tools, registration, root entry
 
-# load into opencode: add to opencode.jsonc
-#   "plugins": ["file:///home/andres/workspace/dev-harness-skills"]
 # see docs/LOADING.md for alternatives + verification + troubleshooting
 ```
 
@@ -99,10 +106,12 @@ pnpm typecheck && pnpm run audit && pnpm test && pnpm build && node scripts/smok
 ## Repository layout
 
 ```
+index.ts         root plugin entry — opencode plugin-directory discovery (loads from source)
 agents/          bundled agent markdown (7) — frontmatter + system prompt body
 skills/          bundled skills (15) + index.md
 src/             plugin entry + lib (assets loader, records, frontmatter)
 scripts/         audit.mjs, copy-assets.mjs, smoke-load.mjs
+test/            root-entry test (vitest)
 docs/            LOADING.md, plans/
 dist/            build output (plugin.js + assets) — generated, git-ignored
 ```

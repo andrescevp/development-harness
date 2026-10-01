@@ -3,23 +3,64 @@
 How to enable the built plugin in OpenCode V2, verify it registered the
 harness, and troubleshoot when agents/skills do not appear.
 
-## Build first
+## Install: clone the repo into a plugin folder (primary)
 
-```sh
-cd /home/andres/workspace/dev-harness-skills
-pnpm install
-pnpm build        # produces dist/plugin.js + dist/assets (7 agents, 15 skills)
+OpenCode auto-discovers plugin package directories — subdirectories with an
+`index.ts` entry — under every `.opencode/plugins/` directory, project- and
+config-wide:
+
+```text
+~/.config/opencode/plugins/          global plugin folder
+<project>/.opencode/plugins/         per-project plugin folder
 ```
 
-## Load forms (opencode v2.0.18)
+Because the repo root ships `index.ts` (re-exporting `src/plugin.ts`), cloning
+the repo into such a folder is a complete install — **no config entry, no
+build step** (assets load from the repo's `agents/` + `skills/` in source
+mode; `@opencode/plugin` resolves from the clone's own node_modules):
 
-Add ONE of the following entries to `"plugins"` in `opencode.jsonc`:
+```sh
+# global install (all projects):
+git clone https://github.com/andrescevp/development-harness.git \
+  ~/.config/opencode/plugins/dev-harness-skills
+cd ~/.config/opencode/plugins/dev-harness-skills && pnpm install
+
+# or per-project:
+mkdir -p <project>/.opencode/plugins
+git clone https://github.com/andrescevp/development-harness.git \
+  <project>/.opencode/plugins/dev-harness-skills
+cd <project>/.opencode/plugins/dev-harness-skills && pnpm install
+```
+
+Private-repo note: cloning uses your existing git credentials (same as any
+`git clone` of the repo). To update, `git pull` inside the folder.
+
+## Alternative: `opencode plugin add` (managed install)
+
+OpenCode can install the plugin as a managed package directly from the git
+repo — including private repositories via your existing git credentials:
+
+```sh
+opencode plugin add github:andrescevp/development-harness
+# or pin a branch:
+opencode plugin add git+ssh://git@github.com/andrescevp/development-harness.git#main
+```
+
+Manage with `opencode plugin list` / `opencode plugin update` / `opencode plugin remove`.
+
+## Alternative: explicit config entry
+
+Add ONE of the following entries to `"plugins"` in `opencode.json(c)`:
 
 | Form | Entry | Notes |
 |---|---|---|
-| Local package directory | `"file:///home/andres/workspace/dev-harness-skills"` | Default local dev form. **`file://` entries must point to a directory** — the `dist/plugin.js` file form is rejected with "configured plugin path must be a directory". |
-| Relative directory | `"../shared/dev-harness-skills"` | From your project root. |
-| Installed package | `"dev-harness-skills"` | After `pnpm pack`/installing the package. |
+| Local package directory | `"file:///home/andres/workspace/dev-harness-skills"` | Requires the repo built (`pnpm build` → `dist/plugin.js` + `dist/assets`); **`file://` entries must point to a directory**. |
+| Relative directory | `"./plugins/local"` | From your project root. |
+| Installed package | `"dev-harness-skills"` | After installing the package (`pnpm pack`/git dependency). |
+
+The source `index.ts` entry also works when pointed at directly, e.g.
+`"plugins": ["/abs/path/dev-harness-skills/index.ts"]` (opencode loads direct
+`.ts` files too).
 
 ## Verification checklist
 

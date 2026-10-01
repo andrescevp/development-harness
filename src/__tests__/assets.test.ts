@@ -11,10 +11,50 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { loadHarnessAssets } from '../lib/assets.js';
+import { loadHarnessAssets, resolveAssetsRoot } from '../lib/assets.js';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const NAME_REGEX = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+describe('resolveAssetsRoot (source vs built layout)', () => {
+  it('prefers a bundled assets/ dir next to the module (dist/assets in the bundle)', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'dhs-root-'));
+    try {
+      const bundled = path.join(tmp, 'dist', 'assets');
+      fs.mkdirSync(bundled, { recursive: true });
+      fs.writeFileSync(path.join(bundled, 'marker'), 'x', 'utf8');
+      fs.mkdirSync(path.join(tmp, 'agents'), { recursive: true }); // source layout also present
+      fs.mkdirSync(path.join(tmp, 'skills'), { recursive: true });
+      expect(resolveAssetsRoot(path.join(tmp, 'dist'))).toBe(bundled);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it('falls back to the repo root (src/lib → root) in source mode when dist/assets is absent', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'dhs-root-'));
+    try {
+      fs.mkdirSync(path.join(tmp, 'agents'), { recursive: true });
+      fs.mkdirSync(path.join(tmp, 'skills'), { recursive: true });
+      fs.mkdirSync(path.join(tmp, 'src', 'lib'), { recursive: true });
+      const moduleDir = path.join(tmp, 'src', 'lib');
+      expect(resolveAssetsRoot(moduleDir)).toBe(tmp);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it('returns the bundled path when neither layout matches (empty load, never throws)', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'dhs-root-'));
+    try {
+      const moduleDir = path.join(tmp, 'src', 'lib');
+      fs.mkdirSync(moduleDir, { recursive: true });
+      expect(resolveAssetsRoot(moduleDir)).toBe(path.join(moduleDir, 'assets'));
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+});
 
 describe('loadHarnessAssets on the real repo layout', () => {
   const assets = loadHarnessAssets(REPO_ROOT);

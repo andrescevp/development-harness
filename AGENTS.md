@@ -76,13 +76,16 @@ bundled agent names — no mapping is needed.
 
 - The V2 plugin (`Plugin.define`) registers the 7 agents and 15 skills via
   synchronous domain transforms (`ctx.agent.transform`, `ctx.skill.transform`)
-  from frontmatter-parsed assets in `dist/assets/`. Zero command transforms
-  (commands are out of scope).
-- **Loading:** add the built plugin to `opencode.jsonc`. In opencode v2, a
-  `file://` plugins entry must point to a **directory** (the package dir), not
-  a `plugin.js` file:
-  `"plugins": ["file:///home/andres/workspace/dev-harness-skills"]`.
-  See [`docs/LOADING.md`](docs/LOADING.md) for alternatives + verification.
+  from frontmatter-parsed assets (repo `agents/` + `skills/` in source mode,
+  `dist/assets/` in the bundle). Zero command transforms (commands are out
+  of scope). The root `index.ts` is the plugin-directory discovery entry:
+  cloning this repo into `~/.config/opencode/plugins/` (global) or
+  `<project>/.opencode/plugins/` loads the plugin from source — no build or
+  config entry needed.
+- **Loading alternatives:** `opencode plugin add github:andrescevp/development-harness`
+  (managed install, private-repo friendly), a `file://`/relative entry in
+  `opencode.json(c)` pointing at a built clone (`pnpm build` first), or the
+  installed package name. See [`docs/LOADING.md`](docs/LOADING.md).
 - **Verify:** launch opencode and confirm the 7 agents and 15 skills appear
   (including `dh-coding`) and no commands are registered.
 ## QA tooling

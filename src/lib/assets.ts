@@ -30,9 +30,27 @@ export interface HarnessAssets {
   errors: LoadError[];
 }
 
-/** Absolute path of the assets directory next to this module (dist/assets in the bundle). */
+/**
+ * Resolve the assets root for a module location.
+ *
+ * - Built mode: `<moduleDir>/assets` exists (dist/assets next to the bundle).
+ * - Source mode: the module lives at `<root>/src/lib`, so the root is two
+ *   levels up — load `agents/` + `skills/` straight from the repo.
+ * - Fallback: the bundled path (yields an empty corpus, never throws).
+ */
+export function resolveAssetsRoot(moduleDir: string): string {
+  const bundled = path.join(moduleDir, 'assets');
+  if (fs.existsSync(bundled)) return bundled;
+  const repoRoot = path.resolve(moduleDir, '..', '..');
+  if (fs.existsSync(path.join(repoRoot, 'agents')) && fs.existsSync(path.join(repoRoot, 'skills'))) {
+    return repoRoot;
+  }
+  return bundled;
+}
+
+/** Absolute path of the assets directory for this module (dist/assets in the bundle, repo root in source mode). */
 function defaultAssetsRoot(): string {
-  return path.join(import.meta.dirname, 'assets');
+  return resolveAssetsRoot(import.meta.dirname);
 }
 
 function readFileSafe(file: string): string | undefined {
