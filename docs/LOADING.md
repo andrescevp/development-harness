@@ -102,6 +102,12 @@ pnpm test   # src/__tests__/registration.test.ts runs the real bundle setup
 
 ## Troubleshooting
 
+- **Agents missing after installing (skills visible)** — the running session
+  was started **before** the plugin was installed: plugins load at server
+  startup, and a long-lived opencode session keeps its original registry.
+  Restart opencode (or reload the config) and both the 7 `dh-*` agents and
+  15 `dh-*` skills appear — the plugin registers agents via `agent.transform`
+  exactly like skills, no `agent` map in config is needed.
 - **`pnpm audit` vs `pnpm run audit`** — `pnpm audit` is pnpm's **dependency
   security audit** (currently reports 1 low dev-only esbuild advisory and
   exits 1). The **harness audit** is `pnpm run audit` (aliases
@@ -119,11 +125,14 @@ pnpm test   # src/__tests__/registration.test.ts runs the real bundle setup
   the package's own `node_modules`. Load from the repo (deps installed) or
   install the package properly rather than copying `dist/` alone.
 - **Real-session note (v2.0.18 observation)** — see
-  `docs/plans/dev-harness-v2-plugin/tasks/verification.md`: the local host did
-  not surface plugin-registered agents through the tested load forms, while
-  the stub registration test passes. If agents do not appear, confirm the load
-  form + rebuild `dist/assets`, and consult the verification report's open
-  questions (agent upsert vs add semantics; installed-package form).
+  `docs/plans/dev-harness-v2-plugin/tasks/verification.md`: an early
+  observation reported that plugin-registered agents did not surface through
+  the tested load forms. Later verification (with the global plugins-directory
+  clone + a fresh server) showed the opposite: the plugin registers all 7
+  agents automatically — the earlier miss was a stale long-lived session
+  started before the plugin was installed. If agents do not appear, restart
+  opencode first, then confirm the load form and rebuild `dist/assets` if
+  using the built package form.
 - **Version skew** — the plugin targets `@opencode/plugin@^2.0.18`; keep the
   host opencode ≥ that version and pin the package if the host is older.
 - **Audit fails after editing harness content** — run
