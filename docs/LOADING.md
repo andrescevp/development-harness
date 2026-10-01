@@ -35,22 +35,12 @@ cd <project>/.opencode/plugins/dev-harness-skills && pnpm install
 Private-repo note: cloning uses your existing git credentials (same as any
 `git clone` of the repo). To update, `git pull` inside the folder.
 
-> **Host note (opencode v2.0.18):** this version cannot load the plugin from
-> the GLOBAL plugins directory (source-mode `index.ts` discovery fails on
-> bare imports; `file://…/dist/plugin.js` file entries are rejected with
-> "configured plugin path must be a directory"). PER-PROJECT installs under
-> `<project>/.opencode/plugins/` work from source. For a GLOBAL install on
-> this host use native registration instead:
->
-> - agents: config `agent` map in `~/.config/opencode/opencode.jsonc`
->   (`{file:plugins/dev-harness-skills/agents/dh-*.md}` prompt strings —
->   see `demo-project/opencode.jsonc` for the exact shape)
-> - skills: `scripts/link-dh-global.sh` (native dirs under
->   `~/.config/opencode/skills`)
->
-> The self-contained built bundle (`dist/plugin.js`, built by `pnpm build`)
-> has no bare imports at load, so directory/file loading works on newer
-> hosts and for package installs (`opencode plugin add`, npm/git deps).
+> **Tip:** if the plugin fails to load with
+> `Cannot find package '@opencode/plugin'` right after cloning, run
+> `pnpm install` in the folder (or `pnpm install` again after a `git pull`
+> that bumped dependencies) and restart opencode. The repo pins
+> `@opencode/plugin@^2.0.20` — earlier 2.0.18 builds fail bare-import
+> resolution in the global plugins directory.
 
 ## Alternative: `opencode plugin add` (managed install)
 
