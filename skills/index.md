@@ -49,7 +49,7 @@ graph TB
 
 Plans are **phased**: `## Phases` → `### Phase N: <title>` (with `- **Status:**`)
 → `#### Sub-Task N.M: <title>` (with full fields + `- **Status:**`). Format
-contract: `skills/planning/references/phased-plan-template.md`.
+contract: `skills/dh-planning/references/phased-plan-template.md`.
 
 1. `dh-planning` → use `dh-domain-check` while planning (creates phased plans)
 2. `dh-execute-plan` (iterates phases in order → their sub-tasks)

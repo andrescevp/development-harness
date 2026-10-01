@@ -51,7 +51,7 @@ update phase/sub-task status markers, and scaffold new phased plans from
 `docs/plans`. Loop skills and the planner agents prefer these tools over
 manual plan.md edits (fall back to manual edits only when the tools are
 unavailable). Format contract:
-`skills/planning/references/phased-plan-template.md`.
+`skills/dh-planning/references/phased-plan-template.md`.
 
 ## Runtime delegation
 
