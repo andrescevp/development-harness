@@ -24,13 +24,7 @@ git clone https://github.com/andrescevp/development-harness.git ~/.config/openco
 cd ~/.config/opencode/plugins/dev-harness-skills && pnpm install
 ```
 
-OpenCode automatically discovers plugin package directories containing an `index.ts` entry under its plugins folder. **Restart OpenCode after cloning** — plugins load at server startup; a session started before the install shows nothing.
-
-**Host note (opencode v2.0.18):** global loading of this plugin is limited on this version:
-- The global-dir discovery loads the plugin's source `index.ts`, and this host cannot resolve bare imports from the global plugins directory — the plugin fails with `Cannot find package '@opencode/plugin'` (per-project `<project>/.opencode/plugins/` installs DO work from source).
-- File entries (`file:///…/dist/plugin.js`) are rejected with "configured plugin path must be a directory".
-
-So the **global v2.0.18 form** is native registration: add the 7 `dh-*` agents as a config `agent` map (`{file:plugins/dev-harness-skills/agents/dh-*.md}` prompts in `~/.config/opencode/opencode.jsonc`) and run `scripts/link-dh-global.sh` for the 15 native skills. The self-contained built bundle (`dist/plugin.js` — no bare imports at load) makes directory/file loading work on newer hosts and for package-style installs (`opencode plugin add`, npm/git dependencies).
+OpenCode automatically discovers plugin package directories containing an `index.ts` entry under its plugins folder. **Restart OpenCode after cloning** — plugins load at server startup; a session started before the install shows nothing. The plugin registers its 7 `dh-*` agents and 15 `dh-*` skills automatically (requires `@opencode/plugin` ≥ 2.0.20; pinned `^2.0.20` in the repo).
 
 ### Per-project
 
