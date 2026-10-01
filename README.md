@@ -26,6 +26,8 @@ cd ~/.config/opencode/plugins/dev-harness-skills && pnpm install
 
 OpenCode automatically discovers plugin package directories containing an `index.ts` entry under its plugins folder. No configuration file changes are required.
 
+**Restart OpenCode after cloning** — plugins load at server startup; a session started before the install keeps its original registry and shows nothing. After a restart, the 7 `dh-*` agents and 15 `dh-*` skills are registered automatically by the plugin (agents via `agent.transform`, same as skills — no `agent` map in `opencode.json(c)` needed).
+
 ### Per-project
 
 To scope the harness to a specific project, clone into the project plugins folder with the same install step:
