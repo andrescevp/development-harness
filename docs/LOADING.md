@@ -35,19 +35,22 @@ cd <project>/.opencode/plugins/dev-harness-skills && pnpm install
 Private-repo note: cloning uses your existing git credentials (same as any
 `git clone` of the repo). To update, `git pull` inside the folder.
 
-> **Host note (opencode v2.0.18):** the global plugins-directory loader
-> cannot resolve bare imports — a source-mode global clone fails with
-> `Cannot find package '@opencode/plugin'`. For GLOBAL installs build the
-> bundle and load it explicitly:
+> **Host note (opencode v2.0.18):** this version cannot load the plugin from
+> the GLOBAL plugins directory (source-mode `index.ts` discovery fails on
+> bare imports; `file://…/dist/plugin.js` file entries are rejected with
+> "configured plugin path must be a directory"). PER-PROJECT installs under
+> `<project>/.opencode/plugins/` work from source. For a GLOBAL install on
+> this host use native registration instead:
 >
-> ```sh
-> cd ~/.config/opencode/plugins/dev-harness-skills && pnpm install && pnpm build
-> ```
+> - agents: config `agent` map in `~/.config/opencode/opencode.jsonc`
+>   (`{file:plugins/dev-harness-skills/agents/dh-*.md}` prompt strings —
+>   see `demo-project/opencode.jsonc` for the exact shape)
+> - skills: `scripts/link-dh-global.sh` (native dirs under
+>   `~/.config/opencode/skills`)
 >
-> then add `"plugins": ["file:///home/andres/.config/opencode/plugins/dev-harness-skills/dist/plugin.js"]`
-> to `~/.config/opencode/opencode.jsonc` (the built bundle is fully
-> self-contained — no external bare imports). PER-PROJECT installs under
-> `<project>/.opencode/plugins/` work from source without a build.
+> The self-contained built bundle (`dist/plugin.js`, built by `pnpm build`)
+> has no bare imports at load, so directory/file loading works on newer
+> hosts and for package installs (`opencode plugin add`, npm/git deps).
 
 ## Alternative: `opencode plugin add` (managed install)
 
