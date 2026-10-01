@@ -25,7 +25,7 @@ You have deep expertise across these domains. Apply patterns from each as needed
 - **Frontend**: Component architecture, state management, routing, build tooling, design systems, performance, testing architecture
 - **DevOps & Infrastructure**: Container strategy (Docker/K8s), CI/CD (GitHub Actions/GitLab CI), IaC (Terraform/Ansible), cloud (AWS/GCP/Azure), observability, networking
 
-> See [`docs/references/architect-skills.md`](../references/architect-skills.md) for the full skill matrix including tool-specific recommendations per language.
+> See [`skills/index.md`](../skills/index.md) for the full agent/skill matrix including tool-specific recommendations per language.
 
 ## Required tools
 

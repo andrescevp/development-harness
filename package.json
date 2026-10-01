@@ -27,8 +27,9 @@
     "scan:deps": "docker run --rm -v \"${PWD}:/src\" ghcr.io/google/osv-scanner --config=/src/.osv-scanner.toml --lockfile /src/pnpm-lock.yaml; true",
     "scan:code": "docker run --rm -v \"${PWD}:/src\" semgrep/semgrep semgrep --config=p/typescript --config=p/security-audit --metrics=off /src/src",
     "qa:fix": "pnpm format:biome",
-    "qa:check": "pnpm lint:biome && pnpm format:biome:check && pnpm lint:knip && pnpm lint:dup && pnpm lint:depcruise && pnpm scan:deps && pnpm scan:code",
-    "qa:check:full": "pnpm qa:check && pnpm test && pnpm typecheck && pnpm run audit && pnpm build && node scripts/smoke-load.mjs"
+    "qa:check": "pnpm lint:biome && pnpm format:biome:check && pnpm lint:knip && pnpm lint:dup && pnpm lint:depcruise && pnpm lint:links && pnpm scan:deps && pnpm scan:code",
+    "qa:check:full": "pnpm qa:check && pnpm test && pnpm typecheck && pnpm run audit && pnpm build && node scripts/smoke-load.mjs",
+    "lint:links": "node scripts/check-links.mjs"
   },
   "engines": {
     "node": ">=20.11"

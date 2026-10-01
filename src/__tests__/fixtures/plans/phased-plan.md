@@ -13,7 +13,7 @@ project: dev-harness-skills
 # Phased Plan — Canonical Fixture
 
 > Canonical sample consumed by ST2's `parsePlan` unit tests as ground truth.
-> It mirrors the output of `skills/planning/references/phased-plan-template.md`
+> It mirrors the output of `skills/dh-planning/references/phased-plan-template.md`
 > exactly (2 phases, mixed statuses, full field skeletons, at least one
 > sub-task with `Related Requirements`). Keep it in sync with the template.
 
