@@ -61,7 +61,7 @@ Add ONE of the following entries to `"plugins"` in `opencode.json(c)`:
 
 | Form | Entry | Notes |
 |---|---|---|
-| Local package directory | `"file:///home/andres/workspace/dev-harness-skills"` | Requires the repo built (`pnpm build` → `dist/plugin.js` + `dist/assets`); **`file://` entries must point to a directory**. |
+| Local package directory | `"file:///home/andres/workspace/dev-harness-skills"` | Loads the source `index.ts` directly — `pnpm install` only; **`file://` entries must point to a directory**. |
 | Relative directory | `"./plugins/local"` | From your project root. |
 | Installed package | `"dev-harness-skills"` | After installing the package (`pnpm pack`/git dependency). |
 
