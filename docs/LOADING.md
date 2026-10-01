@@ -35,6 +35,20 @@ cd <project>/.opencode/plugins/dev-harness-skills && pnpm install
 Private-repo note: cloning uses your existing git credentials (same as any
 `git clone` of the repo). To update, `git pull` inside the folder.
 
+> **Host note (opencode v2.0.18):** the global plugins-directory loader
+> cannot resolve bare imports — a source-mode global clone fails with
+> `Cannot find package '@opencode/plugin'`. For GLOBAL installs build the
+> bundle and load it explicitly:
+>
+> ```sh
+> cd ~/.config/opencode/plugins/dev-harness-skills && pnpm install && pnpm build
+> ```
+>
+> then add `"plugins": ["file:///home/andres/.config/opencode/plugins/dev-harness-skills/dist/plugin.js"]`
+> to `~/.config/opencode/opencode.jsonc` (the built bundle is fully
+> self-contained — no external bare imports). PER-PROJECT installs under
+> `<project>/.opencode/plugins/` work from source without a build.
+
 ## Alternative: `opencode plugin add` (managed install)
 
 OpenCode can install the plugin as a managed package directly from the git
