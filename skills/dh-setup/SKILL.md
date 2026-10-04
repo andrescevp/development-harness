@@ -1,7 +1,7 @@
 ---
 name: dh-setup
 description: >
-  Audit system software (chrome, uv, nvm, osv-scanner, docker, jq/xq/yq, graphify, optional phpenv/obsidian/notesmd-cli), configure user MCPs/plugins, scaffold project QA (hooks + per-stack tools). Use to check requirements or setup the environment.
+  Audit system software, configure user MCPs/plugins, scaffold project QA (hooks + per-stack tools), bootstrap docs/architecture via dh-software-architect, and write harness directives into AGENTS.md. Use to check requirements or setup the environment.
 license: MIT
 compatibility: opencode
 allowed-tools: read, write, edit, bash, websearch
@@ -135,11 +135,101 @@ script + CI where a workflow exists):
 and confirm it exits 0; if pre-existing violations block the gate, report
 them instead of silently disabling rules.
 
+## Step 4: Architecture Documentation
+
+Make sure the project has a **central architecture documentation directory**
+and that existing architecture artifacts are accounted for.
+
+**1. Explore first (via `@dh-executor`):** look for architecture files with
+these probes and report what exists:
+
+```bash
+# candidate locations — report matches, do not modify anything yet
+ls -d docs/architecture docs/adr docs/design docs/specs 2>/dev/null
+ls docs/ARCHITECTURE.md docs/architecture.md ARCHITECTURE.md architecture.md 2>/dev/null
+find . -maxdepth 3 -type f -name '*.md' \( -path '*/adr/*' -o -path '*/architecture/*' -o -path '*/design/*' \) -not -path './node_modules/*' 2>/dev/null
+git ls-files | grep -iE 'architect|adr|design' | head -20   # tracked ones
+```
+
+**2. Decision interview — only when architecture files EXIST.** Ask the user
+about each artifact (keep answers recorded in the report):
+
+- **Up to date?** — are these documents still accurate (yes / no / partial)?
+- **Movable?** — may they be **moved** into `docs/architecture/` to
+  consolidate, or must they stay where they are (e.g., linked from a
+  README/CI)?
+- **Updatable?** — do they need **updating/rewriting** (delegate the refresh
+  to `@dh-software-architect`) or archiving (old/obsolete)?
+- **Tracked?** — are they **tracked in git**; if untracked, should they be
+  committed, and is `docs/architecture/` itself tracked (else propose adding
+  a `.gitkeep` + `.gitignore` line)? Should they be linked from the repo
+  README?
+
+Never move, update, archive, or commit anything without explicit
+confirmation — this interview decides each item; the default is
+**keep in place, keep as-is** until the user says otherwise.
+
+**3. Create the architecture directory when absent** (with consent — it adds
+a dir to the project): `mkdir -p {project_root}/docs/architecture`, and if
+the repo would leave it empty/untracked, add `.gitkeep` (or an `index.md`
+placeholder) and note the `.gitignore` choice.
+
+**4. Create the architecture documentation when it does NOT exist:**
+delegate to `@dh-software-architect` (architecture author) with a brief that
+requires: a system/module overview, bounded contexts or module boundaries,
+key decisions (ADR-style entries), and data/control flow — all under
+`{project_root}/docs/architecture`, following the `dh-create-documentation`
+conventions (vault = project root, docs under `{project_root}/docs`). Then
+ensure an **index** (`README.md` in the architecture dir) links every
+architecture document; the index and other generated docs are owned by
+`@dh-documentor`.
+
+## Step 5: Harness Directives in AGENTS.md
+
+Ensure the **project root AGENTS.md** carries a section with the directives
+to use this harness — so any agent working in the project knows the loop,
+delegation, and plan tools. Idempotent: if a `## Dev Harness` section already
+exists, review and update it instead of duplicating.
+
+**If AGENTS.md is absent:** create it with the section below.
+
+**Append/replace the section** (validate with the user; keep existing
+AGENTS.md content untouched):
+
+```markdown
+## Dev Harness
+
+This project is managed with the dev-harness plugin (dev-harness-skills):
+
+- **Plans:** phased plans live in `docs/plans/<slug>/plan.md` (phases →
+  sub-tasks with `Pending | In Progress | Completed` markers); the format
+  contract is the phased-plan template. Use `dh_plan_read` /
+  `dh_plan_update_status` / `dh_plan_create` instead of manual edits when
+  available.
+- **Loop:** plan with `dh-planning` (SDD first via `dh-grill-sdd` when
+  absent), execute with `dh-execute-plan` → `dh-execute-plan-task`
+  (delegating implementation to `@dh-software-engineer`), simplify with
+  `dh-simplify`, review with `dh-review` + `dh-code-review`, gate with
+  `dh-preflight` + `dh-artifact-check`, sign off with `dh-final-review`,
+  document with `dh-create-documentation`.
+- **Delegation:** implementation → `@dh-software-engineer`; architecture →
+  `@dh-software-architect`; execution/validation → `@dh-executor`; review →
+  `@dh-reviewer` / `@dh-final-reviewer`; exploration → `@dh-explorer`;
+  generated docs (outside docs/plans) → `@dh-documentor`.
+- **Blockers halt automation:** 3 consecutive validation failures or
+  unresolved P0/P1 review findings stop the loop — report and ask for
+  guidance; never mark a phase Completed around a blocker.
+- **Architecture docs:** maintained under `docs/architecture/` (see the
+  index there); refresh via `@dh-software-architect`.
+```
+
 ## Verification Checklist
 
 - [ ] Step 1: every required system tool present with version (phpenv optional)
 - [ ] Step 2: user-level MCPs/plugins verified and enabled per user decision
 - [ ] Step 3: hooks installed with documented rules; QA toolset wired and gate green
+- [ ] Step 4: architecture artifacts explored + interview answers recorded (if files exist); `docs/architecture/` created; docs created via `@dh-software-architect` when absent; index present
+- [ ] Step 5: project AGENTS.md has the harness directives section (updated, not duplicated)
 - [ ] Report produced: per-tool status table + any blockers with exact commands
 
 ## Doc search
