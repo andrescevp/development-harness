@@ -33,7 +33,7 @@ Create a practical execution plan in `./docs/plans/<plan-slug>/plan.md`, not imp
 - **Project type awareness:** Before delegating to architecture/engineering agents, determine whether the project is a software project (has `package.json`, `pyproject.toml`, `Cargo.toml`, `composer.json`, or similar language markers) or a non-software project (docs, config, design assets).
   - For **software projects**:
     - Run the `dh-domain-check` skill to validate the proposed scope against DDD bounded contexts and SOLID principles before writing the plan.
-    - Run the `contingency` skill when there are multiple plausible architectural approaches — generate Plan A/B/C with trade-off analysis to inform the plan structure.
+    - Run the `dh-contingency` skill when there are multiple plausible architectural approaches — generate Plan A/B/C with trade-off analysis to inform the plan structure.
     - Delegate to `@dh-software-architect` for architectural patterns and `@dh-software-engineer` for implementation suggestions.
     - Include a documentation sub-task (referencing `dh-create-documentation`) in the plan for any new modules, APIs, or public interfaces.
   - For **non-software projects**: skip delegation to `@dh-software-architect` and `@dh-software-engineer` — these produce software-specific output that is not applicable. Use `@dh-software-engineer` if builder input is needed.
@@ -71,7 +71,7 @@ Before leaving interview mode, confirm the collected answers provide enough info
 1. Identify the goal, requirements, constraints, risks, dependencies, and out-of-scope items from the request (or interview answers).
 2. If critical information is still missing (interview mode was skipped or partial), ask focused numbered questions before proceeding.
 3. If `./docs/plans/<plan-slug>/sdd.md` exists extract a short requirements snapshot from it, including acceptance criteria, edge cases, out-of-scope boundaries, and constraints relevant to implementation, and assign stable IDs such as `R1`, `R2`, and `R3`. If it is an update request, preserve the original requirements and acceptance criteria from `./docs/plans/<plan-slug>/sdd.md` in the requirements snapshot, and call out any new requirements or changes as additions or modifications to the original requirements.
-4. **For software projects only:** If the scope involves architectural decisions or cross-module changes, run the `dh-domain-check` skill to validate bounded contexts and SOLID principles, and incorporate findings into the plan structure. If multiple plausible approaches exist, run the `contingency` skill to explore alternatives before committing to a single path.
+4. **For software projects only:** If the scope involves architectural decisions or cross-module changes, run the `dh-domain-check` skill to validate bounded contexts and SOLID principles, and incorporate findings into the plan structure. If multiple plausible approaches exist, run the `dh-contingency` skill to explore alternatives before committing to a single path.
 5. Break the work into **ordered phases**, and within each phase into
    **sub-tasks** with clear outcomes. Group phases by logical workstream; keep
    each phase independently completable.

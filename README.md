@@ -1,12 +1,12 @@
 # dev-harness-skills
 
-An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 7 agents and 15 skills.
+An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 7 agents and 16 skills.
 
 ## Features
 
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks with strict halt-on-blocker safeguards.
-- **7 agents and 15 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
+- **7 agents and 16 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
 - **Plan lifecycle tools**: Built-in `dh_plan_read`, `dh_plan_update_status`, and `dh_plan_create` tools for programmatic plan management in `docs/plans`.
 - **DuckDB sheet tools**: Integrated tools (`dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`) for SQL querying and editing of tabular data.
 - **Logged executor strategy**: `dh_logged_command` captures full command execution logs in the OS temp directory while streaming head/tail windows.
@@ -122,7 +122,7 @@ The plugin registers custom V2 tools under the `dh` namespace:
 
 ## Agents & skills
 
-The plugin defines 7 agents and 15 skills using `@opencode/plugin` (`Plugin.define`). Zero command transforms are registered.
+The plugin defines 7 agents and 16 skills using `@opencode/plugin` (`Plugin.define`). Zero command transforms are registered.
 
 ### Agents
 
@@ -142,6 +142,7 @@ The plugin defines 7 agents and 15 skills using `@opencode/plugin` (`Plugin.defi
 |---|---|
 | `dh-planning` | Creates phased plans in `docs/plans/<slug>/plan.md`. |
 | `dh-domain-check` | Validates domain boundaries and SOLID design during planning and execution. |
+| `dh-contingency` | Generates Plan A/B/C architectural alternatives with risk, complexity, and trade-off analysis. |
 | `dh-execute-plan` | Orchestrates the end-to-end execution and status tracking of phased plans. |
 | `dh-execute-plan-task` | Executes an individual sub-task by delegating to `@dh-software-engineer`. |
 | `dh-coding` | Applies TDD best practices and enforces rules from `CODE_RULES.md`. |
@@ -179,7 +180,7 @@ Use `pnpm run audit` to run the harness consistency audit (`pnpm audit` runs pnp
 ```text
 index.ts         Root plugin entry point for OpenCode plugin discovery (source mode)
 agents/          Markdown definitions and system prompts for the 7 bundled agents
-skills/          Instructions, templates, and references for the 15 bundled skills
+skills/          Instructions, templates, and references for the 16 bundled skills
 src/             TypeScript source code, asset loaders, type definitions, and tools
 scripts/         Audit, asset packaging, and smoke-testing scripts
 test/            Vitest unit and registration tests

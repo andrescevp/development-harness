@@ -9,8 +9,8 @@ runtime delegation routing.
 The `dev-harness-skills` OpenCode V2 plugin bundles a self-contained dev harness for
 plan-driven development: **7 agents** — `dh-software-architect`,
 `dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-executor`, `dh-explorer`, `dh-documentor` —
-and **15 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
-`dh-execute-plan-task`, `dh-coding`, `dh-simplify`, `dh-review`, `dh-code-review`, `dh-preflight`,
+and **16 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
+`dh-execute-plan-task`, `dh-coding`, `dh-contingency`, `dh-simplify`, `dh-review`, `dh-code-review`, `dh-preflight`,
 `dh-artifact-check`, `dh-final-review`, `dh-create-documentation`, `dh-grill-sdd`, `dh-setup`, `dh-code-ruler`. The plugin registers
 agents and skills only; **no commands, no prompts** are bundled or registered.
 All plan execution inside the plugin runs the skills loop below.
@@ -67,14 +67,14 @@ bundled agent names — no mapping is needed.
   owned by this repository — the repo is self-contained and independent
   (no external source, no extraction step).
 - OpenCode-only — no copilot/gemini variants.
-- Exactly **7 agents + 15 skills** are bundled. Commands, prompts, and all
+- Exactly **7 agents + 16 skills** are bundled. Commands, prompts, and all
   other non-bundled harness content are intentionally NOT bundled.
 - The `dh-` names are canonical in the repo files; bundled agents ship
   without the `permission` and `tools` frontmatter keys.
 
 ## Plugin registration and loading
 
-- The V2 plugin (`Plugin.define`) registers the 7 agents and 15 skills via
+- The V2 plugin (`Plugin.define`) registers the 7 agents and 16 skills via
   synchronous domain transforms (`ctx.agent.transform`, `ctx.skill.transform`)
   from frontmatter-parsed assets (repo `agents/` + `skills/` in source mode,
   `dist/assets/` in the bundle). Zero command transforms (commands are out
@@ -86,7 +86,7 @@ bundled agent names — no mapping is needed.
   (managed install, private-repo friendly), a `file://`/relative entry in
   `opencode.json(c)` pointing at a built clone (`pnpm build` first), or the
   installed package name. See [`docs/LOADING.md`](docs/LOADING.md).
-- **Verify:** launch opencode and confirm the 7 agents and 15 skills appear
+- **Verify:** launch opencode and confirm the 7 agents and 16 skills appear
   (including `dh-coding`) and no commands are registered.
 ## QA tooling
 

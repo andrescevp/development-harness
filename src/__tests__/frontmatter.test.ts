@@ -37,9 +37,9 @@ const AGENT_FILES = listMd('agents');
 const SKILL_FILES = listSkillMd();
 
 describe('corpus parsing (real bundled set)', () => {
-  it('finds the harness corpus on disk (7 agents + 15 skills)', () => {
+  it('finds the harness corpus on disk (7 agents + 16 skills)', () => {
     expect(AGENT_FILES).toHaveLength(7);
-    expect(SKILL_FILES).toHaveLength(15);
+    expect(SKILL_FILES).toHaveLength(16);
   });
 
   it.each([...AGENT_FILES.map((f) => ['agent', f] as const), ...SKILL_FILES.map((f) => ['skill', f] as const)])(
@@ -59,7 +59,7 @@ describe('corpus parsing (real bundled set)', () => {
     for (const file of AGENT_FILES) names.push(parseFrontmatter(fs.readFileSync(file, 'utf8')).data.name as string);
     for (const file of SKILL_FILES) names.push(parseFrontmatter(fs.readFileSync(file, 'utf8')).data.name as string);
     for (const n of names) expect(n).toMatch(NAME_REGEX);
-    expect(new Set(names)).toHaveLength(22); // 7 agents + 15 skills, no duplicates
+    expect(new Set(names)).toHaveLength(23); // 7 agents + 16 skills, no duplicates
   });
 
   it('the coding skill is present and parses', () => {
