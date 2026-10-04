@@ -2,10 +2,8 @@
 name: dh-final-reviewer
 description: >
   Final in-depth reviewer — performs full diff review against task requirements and plan.
-  Use via @final-reviewer for sign-off review.
+  Use via @dh-final-reviewer for sign-off review.
 mode: subagent
-model: opencode-go/deepseek-v4-flash
-variant: max
 ---
 
 

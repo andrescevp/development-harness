@@ -2,10 +2,8 @@
 name: dh-reviewer
 description: >
   Scoped code reviewer — reviews changed code against sub-task acceptance criteria.
-  Use via @reviewer for implementation review.
+  Use via @dh-reviewer for implementation review.
 mode: subagent
-model: opencode-go/deepseek-v4-flash
-variant: max
 ---
 
 

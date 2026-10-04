@@ -1,7 +1,7 @@
 /**
  * dev-harness-skills — OpenCode V2 plugin.
  *
- * Registers the bundled dev harness (7 agents, 15 skills) via
+ * Registers the bundled dev harness (7 agents, 16 skills) via
  * synchronous domain transforms. Assets are loaded BEFORE the transforms run
  * (transforms are synchronous; external data must be pre-loaded), resolved
  * from the bundle location (`import.meta.dirname` → dist/assets), NOT from

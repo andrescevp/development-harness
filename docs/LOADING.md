@@ -104,7 +104,7 @@ The in-repo gate that proves the plugin logic is the registration test:
 
 ```sh
 pnpm test   # src/__tests__/registration.test.ts runs the real bundle setup
-            # against a stub ctx → exactly 7 agents + 15 skills registered
+            # against a stub ctx → exactly 7 agents + 16 skills registered
 ```
 
 ## Troubleshooting

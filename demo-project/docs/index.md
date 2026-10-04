@@ -3,7 +3,7 @@ title: Demo Project Index
 tags: [documentation, demo]
 project: demo-project
 created: 2026-09-29
-updated: 2026-09-29
+updated: 2026-10-02
 stack: markdown, opencode
 feature: demo
 epic: plugin-demo
@@ -12,7 +12,7 @@ epic: plugin-demo
 # Demo Project
 
 Demo folder that links the `dev-harness-skills` plugin: run it isolated and
-exercise the bundled harness (7 agents, 15 skills, `dh_*` tools).
+exercise the bundled harness (7 agents, 16 skills, `dh_*` tools).
 
 ## Quickstart
 
@@ -25,7 +25,7 @@ cd demo-project
 > Note: opencode v2.0.18 does not load directory/local plugins (documented
 > host limitation) — `validate` reports the load status transparently and
 > gates plugin behavior via the harness test suite (89 tests, in-process
-> registration of the 7 agents / 15 skills / dh_* tools).
+> registration of the 7 agents / 16 skills / dh_* tools).
 
 ## How it is wired
 
@@ -53,7 +53,7 @@ flowchart LR
 +--------------------------------------------------+
 | demo-project          [sdd] [plan] [review] [docs]|
 +--------------------------------------------------+
-|  Harness loaded: 7 agents / 15 skills / dh_* tools|
+|  Harness loaded: 7 agents / 16 skills / dh_* tools|
 |  Try:  ask dh-software-architect to plan a task   |
 +--------------------------------------------------+
 ```

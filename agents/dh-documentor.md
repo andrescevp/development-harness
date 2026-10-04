@@ -5,7 +5,6 @@ description: >
   documentation outside docs/plans: create, update, delete, and retrieve
   documents.
 mode: subagent
-model: opencode-go/deepseek-v4-flash
 ---
 
 # Documentor Agent Guidelines

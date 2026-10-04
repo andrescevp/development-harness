@@ -1,7 +1,7 @@
 # Skills Index — dev-harness-skills plugin
 
-> The plugin bundles **15 skills** (
-> `dh-grill-sdd` SDD interviewer + `dh-setup` harness setup).
+> The plugin bundles **16 skills** (incl. `dh-grill-sdd` SDD interviewer,
+> `dh-setup` harness setup, and `dh-contingency` planning support).
 > Loading a skill injects its instructions and resources into the current
 > conversation. Plans are **phased** (phases → sub-tasks, dual status
 > markers); plan lifecycle is managed via the bundled `dh` tools
@@ -72,12 +72,13 @@ blocks its phase.
 `dh_plan_create` to scaffold a new plan — fall back to direct plan.md
 edits only when the tools are unavailable.
 
-## The 15 bundled skills
+## The 16 bundled skills
 
 | Skill | Role in the loop |
 |---|---|
 | [`dh-planning`](dh-planning/SKILL.md) | Step 1 — write plans (`docs/plans/<slug>/plan.md`), interview mode |
 | [`dh-domain-check`](dh-domain-check/SKILL.md) | During planning + before complex implementation — DDD/SOLID validation |
+| [`dh-contingency`](dh-contingency/SKILL.md) | Planning support — generate Plan A/B/C alternatives with risk, complexity, and trade-off analysis (`docs/plans/<slug>/contingency.md`) |
 | [`dh-execute-plan`](dh-execute-plan/SKILL.md) | Step 2 — orchestrate full plan execution, review each sub-task, resume mode |
 | [`dh-execute-plan-task`](dh-execute-plan-task/SKILL.md) | Step 2.1 — execute one sub-task (project-type-aware delegation) |
 | [`dh-coding`](dh-coding/SKILL.md) | **NEW** — TDD best practices; reads `CODE_RULES.md` at project root |

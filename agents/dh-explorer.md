@@ -4,7 +4,6 @@ description: >
   Explore codebases quickly using glob, grep, and targeted reads.
   Use for codebase exploration, file search, and pattern discovery.
 mode: subagent
-model: opencode-go/deepseek-v4-flash
 ---
 
 # Exploration Guidelines

@@ -21,6 +21,7 @@ export const LOOP = {
     'dh-code-review',
     'dh-code-ruler',
     'dh-coding',
+    'dh-contingency',
     'dh-create-documentation',
     'dh-domain-check',
     'dh-execute-plan',

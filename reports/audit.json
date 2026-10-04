@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-09-30T21:22:20.418Z",
+    "generated": "2026-10-04T19:10:30.545Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -11,19 +11,19 @@
     "dimensions": [
       {
         "name": "Inventory & structure",
-        "count": 22,
+        "count": 23,
         "sev": "PASS",
-        "note": "7 agents, 15 skill dirs + index.md; no commands/, no prompts/"
+        "note": "7 agents, 16 skill dirs + index.md; no commands/, no prompts/"
       },
       {
         "name": "Frontmatter parse",
-        "count": 23,
+        "count": 24,
         "sev": "PASS",
-        "note": "23 files on audit surface"
+        "note": "24 files on audit surface"
       },
       {
         "name": "Name regex",
-        "count": 22,
+        "count": 23,
         "sev": "PASS",
         "note": "/^[a-z0-9]+(-[a-z0-9]+)*$/"
       },
@@ -35,21 +35,21 @@
       },
       {
         "name": "Cross-references",
-        "count": 7,
+        "count": 1,
         "sev": "WARN",
-        "note": "347 resolved; 1 code-context; 0 allowlisted; 128 prose tokens (warn)"
+        "note": "414 resolved; 1 code-context; 0 allowlisted; 131 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
-        "count": 22,
+        "count": 23,
         "sev": "PASS",
-        "note": "15/15 skills present; 7/7 agents present"
+        "note": "16/16 skills present; 7/7 agents present"
       },
       {
         "name": "Secret scan",
-        "count": 24,
+        "count": 26,
         "sev": "PASS",
-        "note": "24 low-signature prose hits (instructional), 0 high-signature"
+        "note": "26 low-signature prose hits (instructional), 0 high-signature"
       },
       {
         "name": "Junk scan",
@@ -60,51 +60,45 @@
     ]
   },
   "schemaDevs": [],
-  "deviations": [],
+  "deviations": [
+    {
+      "dimension": "frontmatter",
+      "severity": "warn",
+      "note": "agent missing 'model' (plugin registration impact)"
+    },
+    {
+      "dimension": "frontmatter",
+      "severity": "warn",
+      "note": "agent missing 'model' (plugin registration impact)"
+    },
+    {
+      "dimension": "frontmatter",
+      "severity": "warn",
+      "note": "agent missing 'model' (plugin registration impact)"
+    },
+    {
+      "dimension": "frontmatter",
+      "severity": "warn",
+      "note": "agent missing 'model' (plugin registration impact)"
+    },
+    {
+      "dimension": "frontmatter",
+      "severity": "warn",
+      "note": "agent missing 'model' (plugin registration impact)"
+    },
+    {
+      "dimension": "frontmatter",
+      "severity": "warn",
+      "note": "agent missing 'model' (plugin registration impact)"
+    },
+    {
+      "dimension": "frontmatter",
+      "severity": "warn",
+      "note": "agent missing 'model' (plugin registration impact)"
+    }
+  ],
   "fails": [],
   "atMentions": [
-    {
-      "file": "agents/dh-software-engineer.md",
-      "line": 53,
-      "mention": "@executor",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "agents/dh-software-engineer.md",
-      "line": 54,
-      "mention": "@reviewer",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "agents/dh-software-engineer.md",
-      "line": 56,
-      "mention": "@executor",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "agents/dh-software-engineer.md",
-      "line": 63,
-      "mention": "@executor",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "agents/dh-software-engineer.md",
-      "line": 83,
-      "mention": "@executor",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "agents/dh-software-engineer.md",
-      "line": 83,
-      "mention": "@executor",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
     {
       "file": "skills/dh-setup/SKILL.md",
       "line": 90,
@@ -116,7 +110,7 @@
   "kebabList": [
     {
       "token": "project-name",
-      "count": 21,
+      "count": 22,
       "files": [
         "agents/dh-executor.md",
         "agents/dh-explorer.md",
@@ -204,25 +198,11 @@
       ]
     },
     {
-      "token": "architect-skills",
-      "count": 2,
-      "files": [
-        "agents/dh-software-architect.md"
-      ]
-    },
-    {
       "token": "dependency-cruiser",
       "count": 2,
       "files": [
         "agents/dh-software-architect.md",
         "skills/dh-setup/SKILL.md"
-      ]
-    },
-    {
-      "token": "dh-contingency",
-      "count": 2,
-      "files": [
-        "agents/dh-software-architect.md"
       ]
     },
     {
@@ -931,6 +911,41 @@
       ]
     },
     {
+      "token": "ls-files",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "as-is",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "dev-harness",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "dev-harness-skills",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "phased-plan",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
       "token": "per-tool",
       "count": 1,
       "files": [
@@ -1029,7 +1044,7 @@
       ]
     }
   ],
-  "secretLow": 24,
+  "secretLow": 26,
   "secretHigh": [],
   "junkList": [],
   "symlinkCount": 0,
@@ -1049,6 +1064,10 @@
       },
       {
         "name": "dh-coding",
+        "status": "present"
+      },
+      {
+        "name": "dh-contingency",
         "status": "present"
       },
       {
@@ -1131,118 +1150,149 @@
     {
       "file": "agents/dh-documentor.md",
       "kind": "agent",
-      "lines": 57,
+      "lines": 56,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-documentor",
           "description": "Documentation management agent — the main and ONLY owner of generated documentation outside docs/plans: create, update, delete, and retrieve documents.",
-          "mode": "subagent",
-          "model": "opencode-go/deepseek-v4-flash"
+          "mode": "subagent"
         }
       },
-      "findings": []
+      "findings": [
+        {
+          "dimension": "frontmatter",
+          "severity": "warn",
+          "note": "agent missing 'model' (plugin registration impact)"
+        }
+      ]
     },
     {
       "file": "agents/dh-executor.md",
       "kind": "agent",
-      "lines": 75,
+      "lines": 74,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-executor",
           "description": "Execute commands, run tests, builds, formatters, linters, and validation on behalf of other agents. Use for any command execution, test running, or build task.",
-          "mode": "subagent",
-          "model": "opencode-go/deepseek-v4-flash"
+          "mode": "subagent"
         }
       },
-      "findings": []
+      "findings": [
+        {
+          "dimension": "frontmatter",
+          "severity": "warn",
+          "note": "agent missing 'model' (plugin registration impact)"
+        }
+      ]
     },
     {
       "file": "agents/dh-explorer.md",
       "kind": "agent",
-      "lines": 42,
+      "lines": 41,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-explorer",
           "description": "Explore codebases quickly using glob, grep, and targeted reads. Use for codebase exploration, file search, and pattern discovery.",
-          "mode": "subagent",
-          "model": "opencode-go/deepseek-v4-flash"
+          "mode": "subagent"
         }
       },
-      "findings": []
+      "findings": [
+        {
+          "dimension": "frontmatter",
+          "severity": "warn",
+          "note": "agent missing 'model' (plugin registration impact)"
+        }
+      ]
     },
     {
       "file": "agents/dh-final-reviewer.md",
-      "kind": "agent",
-      "lines": 38,
-      "frontmatter": {
-        "status": "ok",
-        "errors": [],
-        "fields": {
-          "name": "dh-final-reviewer",
-          "description": "Final in-depth reviewer — performs full diff review against task requirements and plan. Use via @final-reviewer for sign-off review.",
-          "mode": "subagent",
-          "model": "opencode-go/deepseek-v4-flash",
-          "variant": "max"
-        }
-      },
-      "findings": []
-    },
-    {
-      "file": "agents/dh-reviewer.md",
       "kind": "agent",
       "lines": 36,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
-          "name": "dh-reviewer",
-          "description": "Scoped code reviewer — reviews changed code against sub-task acceptance criteria. Use via @reviewer for implementation review.",
-          "mode": "subagent",
-          "model": "opencode-go/deepseek-v4-flash",
-          "variant": "max"
+          "name": "dh-final-reviewer",
+          "description": "Final in-depth reviewer — performs full diff review against task requirements and plan. Use via @dh-final-reviewer for sign-off review.",
+          "mode": "subagent"
         }
       },
-      "findings": []
+      "findings": [
+        {
+          "dimension": "frontmatter",
+          "severity": "warn",
+          "note": "agent missing 'model' (plugin registration impact)"
+        }
+      ]
+    },
+    {
+      "file": "agents/dh-reviewer.md",
+      "kind": "agent",
+      "lines": 34,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-reviewer",
+          "description": "Scoped code reviewer — reviews changed code against sub-task acceptance criteria. Use via @dh-reviewer for implementation review.",
+          "mode": "subagent"
+        }
+      },
+      "findings": [
+        {
+          "dimension": "frontmatter",
+          "severity": "warn",
+          "note": "agent missing 'model' (plugin registration impact)"
+        }
+      ]
     },
     {
       "file": "agents/dh-software-architect.md",
       "kind": "agent",
-      "lines": 85,
+      "lines": 83,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-software-architect",
           "description": "Senior Architect Architect — solutions creator before coding, expert in arcitectural patterns. Use it to planify creation or updates of software features.",
-          "mode": "all",
-          "model": "opencode-go/deepseek-v4-flash",
-          "variant": "max"
+          "mode": "all"
         }
       },
-      "findings": []
+      "findings": [
+        {
+          "dimension": "frontmatter",
+          "severity": "warn",
+          "note": "agent missing 'model' (plugin registration impact)"
+        }
+      ]
     },
     {
       "file": "agents/dh-software-engineer.md",
       "kind": "agent",
-      "lines": 104,
+      "lines": 102,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-software-engineer",
           "description": "Senior Software Engineer — main coder agent to update or create new features. Use it for any software development tasks.",
-          "mode": "all",
-          "model": "opencode-go/deepseek-v4-flash",
-          "variant": "max"
+          "mode": "all"
         }
       },
-      "findings": []
+      "findings": [
+        {
+          "dimension": "frontmatter",
+          "severity": "warn",
+          "note": "agent missing 'model' (plugin registration impact)"
+        }
+      ]
     },
     {
       "file": "skills/dh-artifact-check/SKILL.md",
@@ -1311,6 +1361,24 @@
           "license": "MIT",
           "compatibility": "opencode",
           "allowed-tools": "read, write, edit, bash",
+          "metadata": "audience: developers workflow: development"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "skills/dh-contingency/SKILL.md",
+      "kind": "skill",
+      "lines": 104,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-contingency",
+          "description": "Generate architectural alternatives (Plan A/B/C) with trade-off analysis before committing to a path: identify decision areas, rate risk and complexity, and recommend one plan. Use when multiple plausible approaches exist, to compare architecture options, or during planning. Output: ./docs/plans/<plan-slug>/contingency.md.",
+          "license": "MIT",
+          "compatibility": "opencode, copilot, antigravity",
+          "allowed-tools": "read, write",
           "metadata": "audience: developers workflow: development"
         }
       },
@@ -1481,13 +1549,13 @@
     {
       "file": "skills/dh-setup/SKILL.md",
       "kind": "skill",
-      "lines": 150,
+      "lines": 240,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-setup",
-          "description": "Audit system software (chrome, uv, nvm, osv-scanner, docker, jq/xq/yq, graphify, optional phpenv/obsidian/notesmd-cli), configure user MCPs/plugins, scaffold project QA (hooks + per-stack tools). Use to check requirements or setup the environment.",
+          "description": "Audit system software, configure user MCPs/plugins, scaffold project QA (hooks + per-stack tools), bootstrap docs/architecture via dh-software-architect, and write harness directives into AGENTS.md. Use to check requirements or setup the environment.",
           "license": "MIT",
           "compatibility": "opencode",
           "allowed-tools": "read, write, edit, bash, websearch",
@@ -1517,7 +1585,7 @@
     {
       "file": "skills/index.md",
       "kind": "index",
-      "lines": 108,
+      "lines": 109,
       "frontmatter": {
         "status": "none-expected"
       },
