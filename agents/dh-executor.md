@@ -4,7 +4,6 @@ description: >
   Execute commands, run tests, builds, formatters, linters, and validation on behalf of other agents.
   Use for any command execution, test running, or build task.
 mode: subagent
-model: opencode-go/deepseek-v4-flash
 ---
 
 # Executor Agent Guidelines

@@ -4,8 +4,6 @@ description: >
   Senior Architect Architect — solutions creator before coding, expert in arcitectural patterns.
   Use it to planify creation or updates of software features.
 mode: all
-model: opencode-go/deepseek-v4-flash
-variant: max
 ---
 
 
