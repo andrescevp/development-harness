@@ -1,6 +1,6 @@
 {
   "name": "dev-harness-skills",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "type": "module",
   "description": "OpenCode V2 plugin with an opinionated development harness based in plan execution loop architecture",
   "main": "./index.ts",
