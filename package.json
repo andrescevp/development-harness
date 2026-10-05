@@ -1,6 +1,6 @@
 {
   "name": "dev-harness-skills",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "type": "module",
   "description": "OpenCode V2 plugin with an opinionated development harness based in plan execution loop architecture",
   "main": "./index.ts",
@@ -24,7 +24,7 @@
     "lint:knip": "knip",
     "lint:dup": "jscpd",
     "lint:depcruise": "depcruise src --config .dependency-cruiser.json",
-    "scan:deps": "docker run --rm -v \"${PWD}:/src\" ghcr.io/google/osv-scanner --config=/src/.osv-scanner.toml --lockfile /src/pnpm-lock.yaml; true",
+    "scan:deps": "docker run --rm -v \"${PWD}:/src\" ghcr.io/google/osv-scanner --config=/src/.osv-scanner.toml --lockfile /src/pnpm-lock.yaml",
     "scan:code": "docker run --rm -v \"${PWD}:/src\" semgrep/semgrep semgrep --config=p/typescript --config=p/security-audit --metrics=off /src/src",
     "qa:fix": "pnpm format:biome",
     "qa:check": "pnpm lint:biome && pnpm format:biome:check && pnpm lint:knip && pnpm lint:dup && pnpm lint:depcruise && pnpm lint:links && pnpm scan:deps && pnpm scan:code",

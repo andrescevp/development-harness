@@ -9,3 +9,8 @@ allowBuilds:
   duckdb: true
   esbuild: true
   msgpackr-extract: true
+# Security overrides for transitive dependencies flagged by OSV-Scanner.
+overrides:
+  "esbuild@<0.28.1": "^0.28.1"
+  "tar@<7": "^7.5.22"
+  "http-cache-semantics@<4.3.0": "^4.3.0"
