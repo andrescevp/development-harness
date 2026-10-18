@@ -24,7 +24,7 @@ git clone https://github.com/andrescevp/development-harness.git ~/.config/openco
 cd ~/.config/opencode/plugins/dev-harness-skills && pnpm install
 ```
 
-OpenCode automatically discovers plugin package directories containing an `index.ts` entry under its plugins folder. **Restart OpenCode after cloning** — plugins load at server startup; a session started before the install shows nothing. The plugin registers its 7 `dh-*` agents and 15 `dh-*` skills automatically (requires `@opencode/plugin` ≥ 2.0.20; pinned `^2.0.20` in the repo).
+OpenCode automatically discovers plugin package directories containing an `index.ts` entry under its plugins folder. **Restart OpenCode after cloning** — plugins load at server startup; a session started before the install shows nothing. The plugin registers its 8 `dh-*` agents and 17 `dh-*` skills automatically (requires `@opencode/plugin` ≥ 2.0.20; pinned `^2.0.20` in the repo).
 
 ### Per-project
 
@@ -80,7 +80,7 @@ opencode debug agents
 opencode debug skills
 ```
 
-Confirm that the 7 `dh-` agents and 15 `dh-` skills appear and that zero commands are registered.
+Confirm that the 8 `dh-` agents and 17 `dh-` skills appear and that zero commands are registered.
 
 2. Audit your environment and initialize QA:
 

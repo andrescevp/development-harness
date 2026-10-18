@@ -112,8 +112,8 @@ pnpm test   # src/__tests__/registration.test.ts runs the real bundle setup
 - **Agents missing after installing (skills visible)** — the running session
   was started **before** the plugin was installed: plugins load at server
   startup, and a long-lived opencode session keeps its original registry.
-  Restart opencode (or reload the config) and both the 7 `dh-*` agents and
-  15 `dh-*` skills appear — the plugin registers agents via `agent.transform`
+  Restart opencode (or reload the config) and both the 8 `dh-*` agents and
+  17 `dh-*` skills appear — the plugin registers agents via `agent.transform`
   exactly like skills, no `agent` map in config is needed.
 - **`pnpm audit` vs `pnpm run audit`** — `pnpm audit` is pnpm's **dependency
   security audit** (currently reports 1 low dev-only esbuild advisory and
