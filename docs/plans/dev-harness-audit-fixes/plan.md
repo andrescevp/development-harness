@@ -240,7 +240,7 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 #### Sub-Task 3.1: README.md counts + dh-semver skill row
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Make README counts truthful (17 skills) and document the new skill.
 - **Related Requirements:** R3 · AC3
 - **Dependencies and Preconditions:** 1.1 landed (skill exists to document).
@@ -260,7 +260,7 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 #### Sub-Task 3.2: docs/LOADING.md counts + complete verification checklists
 
-- **Status:** Pending
+- **Status:** In Progress
 - **Objective:** Make LOADING counts truthful and fix the incomplete verification checklist (missing `dh-contingency`, `dh-semver`, `dh-documentor`, missing `dh-` prefixes).
 - **Related Requirements:** R3 · AC3
 - **Dependencies and Preconditions:** 1.1 landed.

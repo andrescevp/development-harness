@@ -198,3 +198,39 @@ Format: one section per sub-task, findings P0–P3 with disposition.
 - [ ] Phase 3 — Sub-Task 3.1: README counts + `dh-semver` skill row.
 
 ---
+
+## Sub-Task Review: 3.1 — README.md counts + dh-semver skill row
+
+**Reviewed against:** Sub-Task 3.1 (plan.md, Phase 3) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| All six count sites read 17 skills | PASS | L3, L9, L27, L83, L125, L184; stale `15 dh-*`/`16 skills`/`16 bundled` → 0 matches |
+| `dh-semver` row appended last in the Skills table | PASS | Format matches neighbours; table has 17 skill rows; wording matches the bundled skill |
+| No unrelated content changed | PASS | Diff = 6 count edits + 1 row; `^2.0.20` pins and dot tool refs intact |
+| Scope | PASS | README.md only |
+| Corpus consistency | PASS | Disk: 7 agents / 17 skills; README: 7 agent rows / 17 skill rows |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- `rg` stale-count sweep → 0; row counts verified (17 skills, 7 agents); `node scripts/check-links.mjs` → OK (22 refs, 0 dead).
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — counts and one documentation row only.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Sub-Task 3.2 — docs/LOADING.md counts + complete verification checklists.
+
+---
