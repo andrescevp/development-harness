@@ -48,3 +48,40 @@ Format: one section per sub-task, findings P0–P3 with disposition.
 - [ ] Sub-Task 1.2 — register the skill in the loop list + count contracts.
 
 ---
+
+## Sub-Task Review: 1.2 — Wire count/test contracts for the new skill
+
+**Reviewed against:** Sub-Task 1.2 (plan.md, Phase 1) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| All corpus-size encodings updated to 17 skills / 24 names | PASS | 11 sites across 5 files; `rg` for stale patterns → 0 matches; secret-signature regexes (16/23-looking) correctly untouched |
+| Loop list has `dh-semver`, alphabetical, parses | PASS | `shared.mjs:34` between `dh-review` and `dh-setup`; 17 skills / 7 agents; set-diff vs corpus empty; no duplicates |
+| No unrelated edits; docs untouched (Phase 3 scope) | PASS | Diff limited to the 5 in-scope files; README/AGENTS/LOADING/skills-index unchanged |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+- Note: the engineer additionally fixed `assets.test.ts:66` ("loads the 16 bundled skills…") found by a broader sweep — within sub-task intent, no scope concern.
+
+### Validation Results
+
+- Build: `[copy-assets] agents 7 | skills 17 SKILL.md + index.md yes` (exit 0).
+- Focused tests: 45/45 pass, including `registers the 7 bundled agents and 17 skills, zero commands`; plugin stdout `registered 7 agents, 17 skills`.
+- Typecheck: clean (`tsc --noEmit`). Audit: PASS, loop membership 17/17 skills, 7/7 agents.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — mechanical count updates; set-uniqueness and inventory invariants enforced by the updated tests.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Sub-Task 1.3 — point bundled skill/agent references at `dh-semver`.
+
+---

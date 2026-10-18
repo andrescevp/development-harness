@@ -157,7 +157,7 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 #### Sub-Task 1.2: Wire count/test contracts for the new skill
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Move every corpus count contract from 16 → 17 skills (7 agents unchanged; 23 → 24 bundled names) so the test suite and audit reflect the new bundle.
 - **Related Requirements:** R1 · R3 · AC1 · AC3
 - **Dependencies and Preconditions:** 1.1 (skill file) exists.
