@@ -196,7 +196,7 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 ### Phase 2: Tool-name normalization to the registered dh namespace (R2)
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 2.1: Normalize root docs (README.md, AGENTS.md, docs/LOADING.md)
 
@@ -218,7 +218,7 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 #### Sub-Task 2.2: Normalize skills/ and agents/ tool references
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Replace underscore tool names with dot names across all bundled skills and agents.
 - **Related Requirements:** R2 · AC2
 - **Dependencies and Preconditions:** None.

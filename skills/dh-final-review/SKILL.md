@@ -15,7 +15,7 @@ Produce a comprehensive final sign-off review for a completed plan. Verify all s
 ## Core Rules
 
 - Read `./docs/plans/<plan-slug>/sdd.md` as the source of truth for requirements.
-- Read the plan (via `dh_plan_read` when available; fallback: manual read of `./docs/plans/<plan-slug>/plan.md`) to verify sub-task AND phase completion.
+- Read the plan (via `dh.plan_read` when available; fallback: manual read of `./docs/plans/<plan-slug>/plan.md`) to verify sub-task AND phase completion.
 - If any sub-task is not `Completed` (and therefore any phase is not `Completed`), stop and report which tasks remain — do not proceed to full review.
 - This skill is loop step 4 (`dh-final-review`); the full loop 1–5 lives in repo-root AGENTS.md (pointer only, no duplication).
 - Perform full-diff review against the entire scope, not just individual sub-tasks.
@@ -30,7 +30,7 @@ Produce a comprehensive final sign-off review for a completed plan. Verify all s
 
 ### Step 1: Verify plan completion
 
-Read the plan (via `dh_plan_read` when available; fallback: manual read) and check every sub-task AND phase status:
+Read the plan (via `dh.plan_read` when available; fallback: manual read) and check every sub-task AND phase status:
 
 - All sub-tasks must be `Completed` and every phase must be `Completed` (a phase is `Completed` only when all its sub-tasks are). If any sub-task is `Pending` or `In Progress`, list them, note their phase, and stop — do not proceed.
 - If the plan has no sub-tasks at all, report that the plan is empty and stop.

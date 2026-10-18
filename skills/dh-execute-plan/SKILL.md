@@ -18,13 +18,13 @@ Orchestrate the complete execution of a plan from start to finish. Iterate throu
   - Check you are in main branch and create the feature branch.
   - If not in feature branch, ask user permission to continue before any change.
   - if working in monorepos with git submodules create a branch per submodule along with the branch of the main repository to align and trace commints between repositories.
-- Read the plan with the `dh_plan_read` tool (`{ slug }` → structured JSON: meta, phases[].title/status, subTasks[].phase/title/status). Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually, following the phased template markers (`## Phases` → `### Phase N: <title>` → `#### Sub-Task N.M: <title>` with `- **Status:**` bullets).
+- Read the plan with the `dh.plan_read` tool (`{ slug }` → structured JSON: meta, phases[].title/status, subTasks[].phase/title/status). Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually, following the phased template markers (`## Phases` → `### Phase N: <title>` → `#### Sub-Task N.M: <title>` with `- **Status:**` bullets).
 - If the plan file does not exist, stop and report — suggest running the `dh-planning` skill first.
 - Iterate **phases in order**; within each phase, iterate its sub-tasks in order.
 - Phase lifecycle: a phase becomes `In Progress` when its first sub-task starts; it becomes `Completed` only when ALL its sub-tasks are `Completed`.
 - Do not re-execute sub-tasks already marked `Completed`.
 - If a sub-task is marked `In Progress`, resume from it (don't restart from the beginning).
-- Update statuses with the `dh_plan_update_status` tool (`{ slug, target: "phase"|"subtask", index: "N"|"N.M", status }`): mark a sub-task `In Progress` before execution, `Completed` after its review passes, and a phase `Completed` only when all its sub-tasks are `Completed`. Fallback when the tool is unavailable: manual plan.md edits following the marker rules (only blank lines precede status bullets).
+- Update statuses with the `dh.plan_update_status` tool (`{ slug, target: "phase"|"subtask", index: "N"|"N.M", status }`): mark a sub-task `In Progress` before execution, `Completed` after its review passes, and a phase `Completed` only when all its sub-tasks are `Completed`. Fallback when the tool is unavailable: manual plan.md edits following the marker rules (only blank lines precede status bullets).
 - After each sub-task execution, run the `dh-review` skill before proceeding to the next.
 - If a review produces P0/P1 findings, stop and report — do not continue to the next sub-task (a blocked sub-task blocks its phase).
 - After the final sub-task, run the `dh-final-review` skill for sign-off.
@@ -37,7 +37,7 @@ Orchestrate the complete execution of a plan from start to finish. Iterate throu
 
 ### Step 1: Read plan and assess state
 
-Read the plan (via `dh_plan_read`; fallback: manual read) and determine the starting point using this ordered priority:
+Read the plan (via `dh.plan_read`; fallback: manual read) and determine the starting point using this ordered priority:
 
 1. If all sub-tasks are `Completed` (every phase `Completed`), run `dh-final-review` skill only and proceed to Step 3. Skip the execution loop.
 2. Resume mode: if one or more phases are `In Progress`, start from the FIRST `In Progress` phase, then its FIRST sub-task marked `In Progress` or `Pending`.
@@ -48,7 +48,7 @@ Read the plan (via `dh_plan_read`; fallback: manual read) and determine the star
 
 Iterate **phases in order** (skip phases already `Completed`); within each phase, iterate its sub-tasks starting from the determined starting point:
 
-0. **Mark In Progress**: Ensure the active sub-task is marked `In Progress` via `dh_plan_update_status` (`target: "subtask"`). If it is already `In Progress` (resume), leave the state. Marking the first sub-task of a phase also moves that phase to `In Progress` (phase lifecycle). Fallback: manual plan.md edit per the marker rules. This ensures resume works if interrupted.
+0. **Mark In Progress**: Ensure the active sub-task is marked `In Progress` via `dh.plan_update_status` (`target: "subtask"`). If it is already `In Progress` (resume), leave the state. Marking the first sub-task of a phase also moves that phase to `In Progress` (phase lifecycle). Fallback: manual plan.md edit per the marker rules. This ensures resume works if interrupted.
 
 1. **Execute**: Follow the `dh-execute-plan-task` skill to implement this sub-task. Since this is called from the orchestrator, `dh-execute-plan-task` skips its internal review and completion steps (per its orchestration guard).
 
@@ -56,9 +56,9 @@ Iterate **phases in order** (skip phases already `Completed`); within each phase
 
 3. **Check findings**: Read the review output:
    - If P0/P1 findings exist: stop the execution loop and report the blocking issues. Do not mark this sub-task `Completed` — a blocked sub-task blocks its phase (loop rule 2.4). Recommend fixing findings and re-running.
-   - If no P0/P1 findings: mark the sub-task `Completed` via `dh_plan_update_status` (`target: "subtask"`, status `Completed`). Fallback: manual edit.
+   - If no P0/P1 findings: mark the sub-task `Completed` via `dh.plan_update_status` (`target: "subtask"`, status `Completed`). Fallback: manual edit.
 
-3a. **Close the phase**: When ALL sub-tasks of the current phase are `Completed`, mark the phase `Completed` via `dh_plan_update_status` (`target: "phase"`, status `Completed`; the tool refuses phase → `Completed` while any sub-task is open) and report the phase completion. Fallback: manual edit.
+3a. **Close the phase**: When ALL sub-tasks of the current phase are `Completed`, mark the phase `Completed` via `dh.plan_update_status` (`target: "phase"`, status `Completed`; the tool refuses phase → `Completed` while any sub-task is open) and report the phase completion. Fallback: manual edit.
 
 4. **Repeat**: Continue to the next sub-task, then the next phase, until all phases are completed.
 

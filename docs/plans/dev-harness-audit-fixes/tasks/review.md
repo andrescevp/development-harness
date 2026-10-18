@@ -160,3 +160,41 @@ Format: one section per sub-task, findings P0–P3 with disposition.
 - [ ] Sub-Task 2.2 — normalize skills/ and agents/ tool references.
 
 ---
+
+## Sub-Task Review: 2.2 — Normalize skills/ and agents/ tool references
+
+**Reviewed against:** Sub-Task 2.2 (plan.md, Phase 2) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Zero underscore tool refs remain in skills/ + agents/ | PASS | Targeted `rg` → 0; broader `dh_[a-z]` sweep → 0 |
+| Dot names are registered IDs, well-formed | PASS | All 7 IDs match `src/plugin.ts`; no malformed forms; backticks/line-wrapping preserved |
+| Occurrence count preserved (36 → 36) | PASS | Per-file 1:1 verified; token-normalized diff identical (rename-only) |
+| Skill names (`dh-*`) untouched; prose/formatting intact | PASS | Multiset of `dh-` names identical; no counts changed |
+| Scope | PASS | Exactly the 10 expected files |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+- Note: engineer also normalized the un-backticked variant at `skills/dh-setup/SKILL.md:37` — within sub-task intent.
+
+### Validation Results
+
+- `node scripts/check-links.mjs` → OK (22 refs, 0 dead); `node scripts/audit.mjs` → PASS.
+- Diff checked name-by-name; no occurrence dropped in tables, blockquotes, or wrapped prose.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — identifier renames in documentation/skill text only.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none (counts remain deferred to Phase 3).
+
+### Suggested Next Steps
+
+- [ ] Phase 3 — Sub-Task 3.1: README counts + `dh-semver` skill row.
+
+---

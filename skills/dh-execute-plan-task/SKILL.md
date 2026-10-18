@@ -14,7 +14,7 @@ Execute one self-contained sub-task from `./docs/plans/<plan-slug>/plan.md`.
 
 ## Core Rules
 
-- Read the plan with the `dh_plan_read` tool (`{ slug }` → structured JSON: meta, phases[].title/status, subTasks[].phase/title/status) to find the active sub-task. Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually, following the phased template markers (`## Phases` → `### Phase N: <title>` → `#### Sub-Task N.M: <title>` with `- **Status:**` bullets). If the plan does not exist, stop and report that no plan was found — suggest running the `dh-planning` skill first.
+- Read the plan with the `dh.plan_read` tool (`{ slug }` → structured JSON: meta, phases[].title/status, subTasks[].phase/title/status) to find the active sub-task. Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually, following the phased template markers (`## Phases` → `### Phase N: <title>` → `#### Sub-Task N.M: <title>` with `- **Status:**` bullets). If the plan does not exist, stop and report that no plan was found — suggest running the `dh-planning` skill first.
 - Treat the sub-task entry in plan.md as the full implementation brief.
 - **ALL sub-task execution is delegated to `@dh-software-engineer`** (the harness's single task executor). There is no complexity- or type-based builder split: simple, standard, complex, and non-software work ALL go to `@dh-software-engineer`.
 - **Detect project type** before the post-steps: it determines whether `dh-domain-check`, `dh-simplify`, and `dh-create-documentation` run (software projects only) — it does NOT change who implements.
@@ -23,7 +23,7 @@ Execute one self-contained sub-task from `./docs/plans/<plan-slug>/plan.md`.
 - Delegate validation to `@dh-executor` for tests, linters, and builds.
 - Delegate review to `@dh-reviewer` for code quality and acceptance criteria checks.
 - Do not modify files outside the sub-task scope.
-- Update the sub-task status only after review passes — via `dh_plan_update_status` (`target: "subtask"`, status `Completed`); fallback: manual plan.md edit per the marker rules.
+- Update the sub-task status only after review passes — via `dh.plan_update_status` (`target: "subtask"`, status `Completed`); fallback: manual plan.md edit per the marker rules.
 - If the sub-task has dependencies on earlier sub-tasks, verify they are Completed before starting.
 
 ## Project Type Detection
@@ -48,10 +48,10 @@ implemented by `@dh-software-engineer`**.
 
 ### Step 1: Select the active sub-task
 
-Read the plan with the `dh_plan_read` tool (`{ slug }`) and find exactly one sub-task using this phase-aware order. Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually per the marker rules:
+Read the plan with the `dh.plan_read` tool (`{ slug }`) and find exactly one sub-task using this phase-aware order. Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually per the marker rules:
 
 1. Pick the FIRST phase marked `In Progress`; within it, pick its FIRST sub-task marked `In Progress` or `Pending`. If that sub-task is already `In Progress` (set by the orchestrator), skip marking and proceed directly to implementation.
-2. If no phase is `In Progress`, take the first sub-task of the first `Pending` phase and mark it `In Progress` via `dh_plan_update_status` (`target: "subtask"`, status `In Progress`) — the phase follows the lifecycle (it becomes `In Progress` when its first sub-task starts). Fallback: manual plan.md edit per the marker rules.
+2. If no phase is `In Progress`, take the first sub-task of the first `Pending` phase and mark it `In Progress` via `dh.plan_update_status` (`target: "subtask"`, status `In Progress`) — the phase follows the lifecycle (it becomes `In Progress` when its first sub-task starts). Fallback: manual plan.md edit per the marker rules.
 3. If multiple phases are `In Progress`, or multiple sub-tasks within the active phase are `In Progress`, stop and ask which to continue.
 4. If no `In Progress` or `Pending` sub-tasks remain, report that the plan has no remaining work.
 
@@ -121,8 +121,8 @@ Read the review and address findings:
 
 ### Step 6: Update plan status
 
-1. (Orchestration note) When invoked from `dh-execute-plan` orchestrator, skip both status updates — the orchestrator marks Complete after its external review passes and handles sequencing. When invoked standalone, mark the current sub-task as `Completed` via `dh_plan_update_status` (`target: "subtask"`, status `Completed`); fallback: manual plan.md edit per the marker rules.
-2. **Phase coordination:** after the sub-task is `Completed`, check whether ALL sub-tasks of its phase are now `Completed`. If so, tell the orchestrator (`dh-execute-plan`) that the phase is ready to close; when running standalone, close it via `dh_plan_update_status` (`target: "phase"`, status `Completed`). Never mark a phase `Completed` yourself while any sub-task in it is still open.
+1. (Orchestration note) When invoked from `dh-execute-plan` orchestrator, skip both status updates — the orchestrator marks Complete after its external review passes and handles sequencing. When invoked standalone, mark the current sub-task as `Completed` via `dh.plan_update_status` (`target: "subtask"`, status `Completed`); fallback: manual plan.md edit per the marker rules.
+2. **Phase coordination:** after the sub-task is `Completed`, check whether ALL sub-tasks of its phase are now `Completed`. If so, tell the orchestrator (`dh-execute-plan`) that the phase is ready to close; when running standalone, close it via `dh.plan_update_status` (`target: "phase"`, status `Completed`). Never mark a phase `Completed` yourself while any sub-task in it is still open.
 3. When standalone: if a next sub-task exists and is `Pending`, mark it as `In Progress`.
 4. When standalone: update `./docs/plans/index.md` with the latest status if this was the final sub-task.
 
