@@ -88,6 +88,7 @@ Adopt Plan B only if [condition]; adopt Plan C only if [condition].
 - Never recommend an approach that violates requirements or skips validation.
 - Do not expose secrets, credentials, or tokens in the analysis.
 - If only one approach is viable, state that explicitly and skip the comparison instead of forcing alternatives.
+- Facts about the outside world (versions, EOL, benchmarks, current best practices) are delegated to `@dh-researcher` / `dh-research` — do not rate alternatives on unverified model knowledge.
 
 ## Final Check
 

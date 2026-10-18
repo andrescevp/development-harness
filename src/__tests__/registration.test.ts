@@ -1,7 +1,7 @@
 /**
  * registration.test.ts — integration-style check: run the REAL plugin setup
  * against a stub ctx and assert it registers the repo's bundled corpus —
- * 7 agents, 16 skills, and ZERO commands.
+ * 8 agents, 17 skills, and ZERO commands.
  *
  * The plugin entry imports the BUILT dist/plugin.js so the whole pipeline
  * (tsup bundle + dist/assets) is under test. Requires `pnpm build` first.
@@ -96,7 +96,7 @@ describe('plugin setup registration (built bundle)', () => {
     expect(fs.existsSync(DIST_PLUGIN)).toBe(true);
   });
 
-  it('registers the 7 bundled agents and 16 skills, zero commands', async () => {
+  it('registers the 8 bundled agents and 17 skills, zero commands', async () => {
     const { default: plugin } = (await import(DIST_PLUGIN)) as {
       default: { id: string; setup: (ctx: ReturnType<typeof createStubContext>['ctx']) => Promise<void> };
     };
@@ -119,8 +119,8 @@ describe('plugin setup registration (built bundle)', () => {
       .map((c) => c.name)
       .sort();
 
-    expect(agents).toHaveLength(7);
-    expect(skills).toHaveLength(16);
+    expect(agents).toHaveLength(8);
+    expect(skills).toHaveLength(17);
     expect(tools).toEqual(HARNESS_TOOLS);
     // One dh namespace registered; all tools are codemode.
     const namespaces = captured.filter((c) => c.domain === 'tool' && c.kind === 'namespace');

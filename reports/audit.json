@@ -1,7 +1,7 @@
 {
   "meta": {
-    "generated": "2026-10-04T19:10:30.545Z",
-    "repo": "/home/andres/workspace/dev-harness-skills",
+    "generated": "2026-10-18T18:07:21.344Z",
+    "repo": "/tmp/opencode/dh-harness",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
   },
@@ -11,19 +11,19 @@
     "dimensions": [
       {
         "name": "Inventory & structure",
-        "count": 23,
+        "count": 25,
         "sev": "PASS",
-        "note": "7 agents, 16 skill dirs + index.md; no commands/, no prompts/"
+        "note": "8 agents, 17 skill dirs + index.md; no commands/, no prompts/"
       },
       {
         "name": "Frontmatter parse",
-        "count": 24,
+        "count": 26,
         "sev": "PASS",
-        "note": "24 files on audit surface"
+        "note": "26 files on audit surface"
       },
       {
         "name": "Name regex",
-        "count": 23,
+        "count": 25,
         "sev": "PASS",
         "note": "/^[a-z0-9]+(-[a-z0-9]+)*$/"
       },
@@ -37,13 +37,13 @@
         "name": "Cross-references",
         "count": 1,
         "sev": "WARN",
-        "note": "414 resolved; 1 code-context; 0 allowlisted; 131 prose tokens (warn)"
+        "note": "436 resolved; 1 code-context; 0 allowlisted; 133 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
-        "count": 23,
+        "count": 25,
         "sev": "PASS",
-        "note": "16/16 skills present; 7/7 agents present"
+        "note": "17/17 skills present; 8/8 agents present"
       },
       {
         "name": "Secret scan",
@@ -61,6 +61,11 @@
   },
   "schemaDevs": [],
   "deviations": [
+    {
+      "dimension": "frontmatter",
+      "severity": "warn",
+      "note": "agent missing 'model' (plugin registration impact)"
+    },
     {
       "dimension": "frontmatter",
       "severity": "warn",
@@ -149,6 +154,14 @@
       "count": 4,
       "files": [
         "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "search-capable",
+      "count": 3,
+      "files": [
+        "agents/dh-researcher.md",
+        "skills/dh-research/SKILL.md"
       ]
     },
     {
@@ -799,6 +812,13 @@
       ]
     },
     {
+      "token": "guess-work",
+      "count": 1,
+      "files": [
+        "skills/dh-research/SKILL.md"
+      ]
+    },
+    {
       "token": "plan-defined",
       "count": 1,
       "files": [
@@ -1103,6 +1123,10 @@
         "status": "present"
       },
       {
+        "name": "dh-research",
+        "status": "present"
+      },
+      {
         "name": "dh-review",
         "status": "present"
       },
@@ -1130,6 +1154,10 @@
       },
       {
         "name": "dh-final-reviewer",
+        "status": "present"
+      },
+      {
+        "name": "dh-researcher",
         "status": "present"
       },
       {
@@ -1220,6 +1248,27 @@
         "fields": {
           "name": "dh-final-reviewer",
           "description": "Final in-depth reviewer — performs full diff review against task requirements and plan. Use via @dh-final-reviewer for sign-off review.",
+          "mode": "subagent"
+        }
+      },
+      "findings": [
+        {
+          "dimension": "frontmatter",
+          "severity": "warn",
+          "note": "agent missing 'model' (plugin registration impact)"
+        }
+      ]
+    },
+    {
+      "file": "agents/dh-researcher.md",
+      "kind": "agent",
+      "lines": 39,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-researcher",
+          "description": "Research the web for current, source-cited evidence: library versions and EOL status, breaking API changes, migrations, error causes and fixes, and best-practice comparisons. Use when planning (dh-planning, dh-contingency, dh-grill-sdd), review, or execution (dh-execute-plan-task) is blocked or risky because the local codebase and model knowledge cannot answer a question about the outside world.",
           "mode": "subagent"
         }
       },
@@ -1369,7 +1418,7 @@
     {
       "file": "skills/dh-contingency/SKILL.md",
       "kind": "skill",
-      "lines": 104,
+      "lines": 105,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1529,6 +1578,24 @@
       "findings": []
     },
     {
+      "file": "skills/dh-research/SKILL.md",
+      "kind": "skill",
+      "lines": 72,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-research",
+          "description": "Run a bounded, source-cited web research pass and record it as a research note: question, sources with retrieval dates, findings, and confidence. Use when planning needs current ecosystem facts (versions, EOL, API changes, comparisons) or when a hard blocker (loop step 2.4) gets one external evidence attempt before halting. Output: ./docs/plans/<plan-slug>/research/<topic>.md (or ./docs/research/<topic>.md outside a plan).",
+          "license": "MIT",
+          "compatibility": "opencode",
+          "allowed-tools": "read, write, webfetch, websearch",
+          "metadata": "audience: developers workflow: development"
+        }
+      },
+      "findings": []
+    },
+    {
       "file": "skills/dh-review/SKILL.md",
       "kind": "skill",
       "lines": 142,
@@ -1585,7 +1652,7 @@
     {
       "file": "skills/index.md",
       "kind": "index",
-      "lines": 109,
+      "lines": 121,
       "frontmatter": {
         "status": "none-expected"
       },

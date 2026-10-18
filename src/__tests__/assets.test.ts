@@ -3,7 +3,7 @@
  * skills/ mirror the dist/assets layout) and against temp fixtures for error
  * handling. loadHarnessAssets(root) is CWD-independent (root injectable).
  * Expectations are derived from the repo's own surface — it is fully
- * repo-authored, so the corpus IS the contract (7 agents, 16 skills).
+ * repo-authored, so the corpus IS the contract (8 agents, 17 skills).
  */
 
 import fs from 'node:fs';
@@ -59,12 +59,12 @@ describe('resolveAssetsRoot (source vs built layout)', () => {
 describe('loadHarnessAssets on the real repo layout', () => {
   const assets = loadHarnessAssets(REPO_ROOT);
 
-  it('loads the 7 bundled agents', () => {
-    expect(assets.agents).toHaveLength(7);
+  it('loads the 8 bundled agents', () => {
+    expect(assets.agents).toHaveLength(8);
   });
 
-  it('loads the 16 bundled skills including dh-coding', () => {
-    expect(assets.skills).toHaveLength(16);
+  it('loads the 17 bundled skills including dh-coding', () => {
+    expect(assets.skills).toHaveLength(17);
     expect(assets.skills.some((s) => s.name === 'dh-coding')).toBe(true);
   });
 
@@ -74,7 +74,7 @@ describe('loadHarnessAssets on the real repo layout', () => {
       expect(n, n).toMatch(NAME_REGEX);
       expect(n, n).toMatch(/^dh-/);
     }
-    expect(new Set(names).size).toBe(23); // 7 agents + 16 skills, no duplicates
+    expect(new Set(names).size).toBe(25); // 8 agents + 17 skills, no duplicates
   });
 
   it('captures the index and reports zero errors on the clean corpus', () => {
