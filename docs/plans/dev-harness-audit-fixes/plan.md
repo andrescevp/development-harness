@@ -129,11 +129,11 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 ### Phase 1: Bundled dh-semver skill (R1)
 
-- **Status:** Pending
+- **Status:** In Progress
 
 #### Sub-Task 1.1: Author skills/dh-semver/SKILL.md (global semver adapted to the harness)
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Create `skills/dh-semver/SKILL.md` as the harness-localized adaptation of `~/.agents/skills/semver/SKILL.md` (70 lines) so the harness is self-contained for versioning.
 - **Related Requirements:** R1 · AC1
 - **Dependencies and Preconditions:** None (new file). Must land together with 1.2 (count contracts) to keep the suite green.
