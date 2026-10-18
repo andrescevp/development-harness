@@ -31,7 +31,7 @@ Orchestrate the complete execution of a plan from start to finish. Iterate throu
 - Update `./docs/plans/index.md` when the plan is fully complete.
 - **Project type awareness is delegated to `dh-execute-plan-task`.** The orchestrator does not re-detect project type — it relies on `dh-execute-plan-task` to handle agent selection based on whether the project is software or non-software. Do not hardcode agent choices (e.g., `@dh-software-engineer`) in the orchestration loop that would conflict with this.
 - **After plan completion (all projects):** invokes `evolve` and `state-sync` to capture what was learned and update documentation. This ensures knowledge persists beyond the active session.
-- **After plan completion (software projects only):** invokes `dh-create-documentation` for generating/updating project docs, and `semver` for determining the next version bump.
+- **After plan completion (software projects only):** invokes `dh-create-documentation` for generating/updating project docs, and `dh-semver` for determining the next version bump.
 
 ## Workflow
 
@@ -81,7 +81,7 @@ After final sign-off passes and before marking the plan complete:
 
 3. **Generate documentation (software projects only):** Invoke the `dh-create-documentation` skill to generate or update API references, architecture overviews, READMEs, or other technical docs based on the sub-task implementation.
 
-4. **Version bump (software projects only):** Invoke the `semver` skill to determine the correct version bump from commit history, generate a changelog, and create a git tag.
+4. **Version bump (software projects only):** Invoke the `dh-semver` skill to determine the correct version bump from commit history, generate a changelog, and create a git tag.
 
 5. **Mark plan complete** in `./docs/plans/index.md`:
    - Locate the row for `<plan-slug>` and update the Status to `Completed` and Updated timestamp columns. If the slug is not found, append a new row.

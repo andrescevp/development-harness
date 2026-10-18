@@ -120,7 +120,7 @@ This repository is managed with **Git Flow**:
   `main` AND back to `develop`; tagged on `main`.
 - `hotfix/*` — branched from `main` for production fixes; merged to `main`
   AND `develop`; tagged on `main`.
-- Tags: semver (`vX.Y.Z`) on `main` only (see dh-semver guidance).
+- Tags: semver (`vX.Y.Z`) on `main` only (see the bundled `dh-semver` skill).
 
 Local config already set (`git config gitflow.*`): main/develop + the
 prefixes above.

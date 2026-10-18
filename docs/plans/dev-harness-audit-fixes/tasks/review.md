@@ -85,3 +85,40 @@ Format: one section per sub-task, findings P0–P3 with disposition.
 - [ ] Sub-Task 1.3 — point bundled skill/agent references at `dh-semver`.
 
 ---
+
+## Sub-Task Review: 1.3 — Point bundled skill/agent references at dh-semver
+
+**Reviewed against:** Sub-Task 1.3 (plan.md, Phase 1) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Skill invocations/pointers route to `dh-semver` | PASS | 7 refs in 4 files: `dh-execute-plan` L34/L84, `dh-final-review` L27/L78/L126, `dh-software-architect` L59, `AGENTS.md` L123 |
+| No bare `semver` skill invocation remains | PASS | Only the intentional provenance attribution at `skills/dh-semver/SKILL.md:21` ("adaptation of the global `semver` skill") |
+| Concept prose preserved | PASS | `dh-final-review` frontmatter "semver recommendation" unchanged; `AGENTS.md` "Tags: semver (`vX.Y.Z`)" retained; report label reworked to "(via `dh-semver`)" |
+| Scope compliance | PASS | Only the 4 in-scope files; README/LOADING/skills-index untouched (Phase 3) |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- `node scripts/audit.mjs` → PASS (exit 0; `dh-semver` resolves as a bundled skill).
+- `node scripts/check-links.mjs` → OK, 22 refs checked, 0 dead.
+- Grammar/readability of the reworded sentences verified in context.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — textual references only; no runtime/interface change.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none (`state-sync` in the architect list remains a pre-existing point-6 concern).
+
+### Suggested Next Steps
+
+- [ ] Phase 2 — Sub-Task 2.1: normalize root docs to the registered dot namespace.
+
+---

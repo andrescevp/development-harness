@@ -129,7 +129,7 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 ### Phase 1: Bundled dh-semver skill (R1)
 
-- **Status:** In Progress
+- **Status:** Completed
 
 #### Sub-Task 1.1: Author skills/dh-semver/SKILL.md (global semver adapted to the harness)
 
@@ -177,7 +177,7 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 #### Sub-Task 1.3: Point bundled skill/agent references at dh-semver
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Replace references that invoke or point to the versioning *skill* with `dh-semver` so the bundled harness is self-contained; sharpen the AGENTS.md pointer.
 - **Related Requirements:** R1 · AC1
 - **Dependencies and Preconditions:** 1.1 (skill exists so renames resolve).
