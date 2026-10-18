@@ -1,12 +1,12 @@
 # dev-harness-skills
 
-An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 7 agents and 16 skills.
+An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 8 agents and 17 skills.
 
 ## Features
 
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks with strict halt-on-blocker safeguards.
-- **7 agents and 16 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
+- **8 agents and 17 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
 - **Plan lifecycle tools**: Built-in `dh_plan_read`, `dh_plan_update_status`, and `dh_plan_create` tools for programmatic plan management in `docs/plans`.
 - **DuckDB sheet tools**: Integrated tools (`dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`) for SQL querying and editing of tabular data.
 - **Logged executor strategy**: `dh_logged_command` captures full command execution logs in the OS temp directory while streaming head/tail windows.
@@ -122,7 +122,7 @@ The plugin registers custom V2 tools under the `dh` namespace:
 
 ## Agents & skills
 
-The plugin defines 7 agents and 16 skills using `@opencode/plugin` (`Plugin.define`). Zero command transforms are registered.
+The plugin defines 8 agents and 17 skills using `@opencode/plugin` (`Plugin.define`). Zero command transforms are registered.
 
 ### Agents
 
@@ -135,6 +135,7 @@ The plugin defines 7 agents and 16 skills using `@opencode/plugin` (`Plugin.defi
 | `dh-executor` | Execution agent running commands, tests, builds, and validation via logged command strategy. |
 | `dh-explorer` | Codebase exploration agent using fast glob, grep, and targeted reads. |
 | `dh-documentor` | Documentation agent responsible for creating, updating, and maintaining project documentation. |
+| `dh-researcher` | Internet research agent answering planning, review, and blocker questions with source-cited evidence. |
 
 ### Skills
 
@@ -156,6 +157,7 @@ The plugin defines 7 agents and 16 skills using `@opencode/plugin` (`Plugin.defi
 | `dh-grill-sdd` | Conducts interactive requirement interviews to produce `sdd.md` specification documents. |
 | `dh-setup` | Audits system tools, user plugins, MCPs, and project quality configuration. |
 | `dh-code-ruler` | Interviews users and inspects code to generate project-level `CODE_RULES.md`. |
+| `dh-research` | Runs one bounded, source-cited web research pass and records it as `docs/plans/<slug>/research/<topic>.md`. |
 
 ## Development
 

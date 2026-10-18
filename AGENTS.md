@@ -7,11 +7,11 @@ runtime delegation routing.
 ## Role summary
 
 The `dev-harness-skills` OpenCode V2 plugin bundles a self-contained dev harness for
-plan-driven development: **7 agents** — `dh-software-architect`,
-`dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-executor`, `dh-explorer`, `dh-documentor` —
-and **16 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
+plan-driven development: **8 agents** — `dh-software-architect`,
+`dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-executor`, `dh-explorer`, `dh-documentor`, `dh-researcher` —
+and **17 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
 `dh-execute-plan-task`, `dh-coding`, `dh-contingency`, `dh-simplify`, `dh-review`, `dh-code-review`, `dh-preflight`,
-`dh-artifact-check`, `dh-final-review`, `dh-create-documentation`, `dh-grill-sdd`, `dh-setup`, `dh-code-ruler`. The plugin registers
+`dh-artifact-check`, `dh-final-review`, `dh-create-documentation`, `dh-grill-sdd`, `dh-setup`, `dh-code-ruler`, `dh-research`. The plugin registers
 agents and skills only; **no commands, no prompts** are bundled or registered.
 All plan execution inside the plugin runs the skills loop below.
 
@@ -43,7 +43,10 @@ worked around — the loop STOPS: report the blocker and ask the user for
 guidance. Never silently continue, never skip the blocked step, and never mark
 sub-tasks Complete around a blocker. The rule applies at phase boundaries too:
 a blocked sub-task blocks its phase — do not mark the phase `Completed` around
-a blocker.
+a blocker. Before halting, the loop MAY run ONE bounded research attempt via
+`@dh-researcher` / `dh-research` using the blocker reason as the question;
+the halt (or resume) decision still comes from the resulting evidence plus
+the user.
 
 **Plan lifecycle tools (bundled harness namespace):** `dh_plan_read`,
 `dh_plan_update_status`, `dh_plan_create` — read/parse phased plans,
@@ -61,20 +64,29 @@ builder split; `dh-execute-plan-task` and `dh-coding` route every task there.
 Architectural guidance comes from `@dh-software-architect`. These are the
 bundled agent names — no mapping is needed.
 
+**Research delegation:** questions the local codebase cannot answer (current
+library versions, EOL status, API changes, error causes, ecosystem
+comparisons) route to `@dh-researcher` / `dh-research`. Planning skills
+(`dh-grill-sdd`, `dh-planning`, `dh-contingency`) and reviewers delegate it
+while shaping requirements and Plan A/B/C; on a hard blocker (step 2.4) the
+loop MAY fire ONE bounded research attempt with the blocker reason as the
+question — the loop still halts (or resumes) driven by the resulting
+evidence, never by continued unverified guess-work.
+
 ## Provenance
 
 - Harness content is **fully repo-authored**: `agents/` and `skills/` are
   owned by this repository — the repo is self-contained and independent
   (no external source, no extraction step).
 - OpenCode-only — no copilot/gemini variants.
-- Exactly **7 agents + 16 skills** are bundled. Commands, prompts, and all
+- Exactly **8 agents + 17 skills** are bundled. Commands, prompts, and all
   other non-bundled harness content are intentionally NOT bundled.
 - The `dh-` names are canonical in the repo files; bundled agents ship
   without the `permission` and `tools` frontmatter keys.
 
 ## Plugin registration and loading
 
-- The V2 plugin (`Plugin.define`) registers the 7 agents and 16 skills via
+- The V2 plugin (`Plugin.define`) registers the 8 agents and 17 skills via
   synchronous domain transforms (`ctx.agent.transform`, `ctx.skill.transform`)
   from frontmatter-parsed assets (repo `agents/` + `skills/` in source mode,
   `dist/assets/` in the bundle). Zero command transforms (commands are out
@@ -86,7 +98,7 @@ bundled agent names — no mapping is needed.
   (managed install, private-repo friendly), a `file://`/relative entry in
   `opencode.json(c)` pointing at a built clone (`pnpm build` first), or the
   installed package name. See [`docs/LOADING.md`](docs/LOADING.md).
-- **Verify:** launch opencode and confirm the 7 agents and 16 skills appear
+- **Verify:** launch opencode and confirm the 8 agents and 17 skills appear
   (including `dh-coding`) and no commands are registered.
 ## QA tooling
 

@@ -1,7 +1,8 @@
 # Skills Index — dev-harness-skills plugin
 
-> The plugin bundles **16 skills** (incl. `dh-grill-sdd` SDD interviewer,
-> `dh-setup` harness setup, and `dh-contingency` planning support).
+> The plugin bundles **17 skills** (incl. `dh-grill-sdd` SDD interviewer,
+> `dh-setup` harness setup, `dh-contingency` planning support, and
+> `dh-research` web research).
 > Loading a skill injects its instructions and resources into the current
 > conversation. Plans are **phased** (phases → sub-tasks, dual status
 > markers); plan lifecycle is managed via the bundled `dh` tools
@@ -19,6 +20,9 @@ graph TB
     CD{{"coding ⭐ NEW"}}
     SM{{"2.2 simplify"}}
     RV{{"2.3 review + code-review"}}
+    BG{{"2.4 hard blocker"}}
+    RES{{"research"}}
+    STOP{{"2.4 STOP — ask guidance"}}
     PR{{"③ preflight + artifact-check"}}
     FR{{"④ final-review"}}
     DOC{{"⑤ create-documentation"}}
@@ -30,7 +34,10 @@ graph TB
     CD -- "pass" --> SM
     SM --> RV
     RV -- "pass" --> EPT
-    RV -- "P0/P1 blockers" --> STOP{{"2.4 STOP — ask guidance"}}
+    RV -- "P0/P1 blockers" --> BG
+    BG -- "one bounded attempt" --> RES
+    RES -- "resolved" --> EPT
+    BG -- "unresolved" --> STOP
     EPT -- "all sub-tasks done" --> PR
     PR --> FR
     FR -- "approved" --> DOC
@@ -40,7 +47,7 @@ graph TB
   classDef pdd fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#0d47a1
   classDef new fill:#fff8e1,stroke:#f57f17,stroke-width:2px,color:#e65100
   classDef stop fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#b71c1c
-  class PL,EP,EPT,RV,PR,FR,DOC,DC,SM pdd
+  class PL,EP,EPT,RV,PR,FR,DOC,DC,SM,BG,RES pdd
   class CD new
   class STOP stop
 ```
@@ -65,14 +72,17 @@ contract: `skills/dh-planning/references/phased-plan-template.md`.
 failures, unresolved P0/P1 review findings, or missing preconditions), report
 it and ask the user for guidance — never silently continue or mark sub-tasks
 Complete around a blocker (see repo-root `AGENTS.md`). A blocked sub-task
-blocks its phase.
+blocks its phase. The blocker MAY trigger ONE bounded research attempt via
+`dh-research` (`@dh-researcher`) using the blocker reason as the question —
+the loop still halts (or resumes) driven by the researched evidence, not by
+guess-work.
 
 **Plan lifecycle tools:** use `dh_plan_read` to parse a phased plan,
 `dh_plan_update_status` to flip phase/sub-task status markers, and
 `dh_plan_create` to scaffold a new plan — fall back to direct plan.md
 edits only when the tools are unavailable.
 
-## The 16 bundled skills
+## The 17 bundled skills
 
 | Skill | Role in the loop |
 |---|---|
@@ -92,16 +102,18 @@ edits only when the tools are unavailable.
 | [`dh-grill-sdd`](dh-grill-sdd/SKILL.md) | Pre-planning — interviews the user and produces `./docs/plans/<slug>/sdd.md` (the requirements contract `dh-planning` consumes) |
 | [`dh-setup`](dh-setup/SKILL.md) | Environment — audits system software (chrome/uv/nvm/osv-scanner/docker/jq/xq/yq/graphify/phpenv), user MCPs + plugins, and scaffolds project QA (hooks + stack tools) |
 | [`dh-code-ruler`](dh-code-ruler/SKILL.md) | Rules — grills the user + analyzes code to generate `{project_root}/CODE_RULES.md` (style, patterns, security/perf constraints, stack best practices); run by dh-software-architect |
+| [`dh-research`](dh-research/SKILL.md) | Research — bounded, source-cited web research note (`docs/plans/<slug>/research/<topic>.md`); delegated from planning skills and the 2.4 blocker path; executed by dh-researcher |
 
 ## Agents
 
-The 7 bundled agents used by the skills loop (see `AGENTS.md` → Runtime
+The 8 bundled agents used by the skills loop (see `AGENTS.md` → Runtime
 delegation):
 
 `dh-software-architect` (planning, execute-plan, create-documentation) ·
 `dh-software-engineer` (execute-plan-task, coding) · `dh-reviewer` (simplify,
 review, code-review) · `dh-final-reviewer` (final-review) · `dh-executor` (all
-validation/execution) · `dh-explorer` (codebase exploration), `dh-documentor` (documentation owner).
+validation/execution) · `dh-explorer` (codebase exploration), `dh-documentor` (documentation owner) ·
+`dh-researcher` (internet research, delegated from planning, review, and the blocker path).
 
 ## Out of scope
 
