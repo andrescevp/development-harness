@@ -45,8 +45,8 @@ sub-tasks Complete around a blocker. The rule applies at phase boundaries too:
 a blocked sub-task blocks its phase — do not mark the phase `Completed` around
 a blocker.
 
-**Plan lifecycle tools (bundled harness namespace):** `dh_plan_read`,
-`dh_plan_update_status`, `dh_plan_create` — read/parse phased plans,
+**Plan lifecycle tools (bundled harness namespace):** `dh.plan_read`,
+`dh.plan_update_status`, `dh.plan_create` — read/parse phased plans,
 update phase/sub-task status markers, and scaffold new phased plans from
 `docs/plans`. Loop skills and the planner agents prefer these tools over
 manual plan.md edits (fall back to manual edits only when the tools are

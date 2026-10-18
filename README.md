@@ -7,9 +7,9 @@ An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated develop
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks with strict halt-on-blocker safeguards.
 - **7 agents and 16 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
-- **Plan lifecycle tools**: Built-in `dh_plan_read`, `dh_plan_update_status`, and `dh_plan_create` tools for programmatic plan management in `docs/plans`.
-- **DuckDB sheet tools**: Integrated tools (`dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`) for SQL querying and editing of tabular data.
-- **Logged executor strategy**: `dh_logged_command` captures full command execution logs in the OS temp directory while streaming head/tail windows.
+- **Plan lifecycle tools**: Built-in `dh.plan_read`, `dh.plan_update_status`, and `dh.plan_create` tools for programmatic plan management in `docs/plans`.
+- **DuckDB sheet tools**: Integrated tools (`dh.read_sheet`, `dh.update_sheet`, `dh.sheet_schema`) for SQL querying and editing of tabular data.
+- **Logged executor strategy**: `dh.logged_command` captures full command execution logs in the OS temp directory while streaming head/tail windows.
 - **Full QA gate**: Thorough verification suite integrating Biome, Knip, jscpd, dependency-cruiser, OSV-Scanner, Semgrep, Vitest, and TypeScript.
 - **Source-mode loading**: Automatic discovery by OpenCode via root `index.ts` with direct asset loading from the repository.
 
@@ -116,9 +116,9 @@ Plans are stored under `docs/plans/<slug>/plan.md` using a phased structure. Eve
 
 The plugin registers custom V2 tools under the `dh` namespace:
 
-- **Plan lifecycle**: `dh_plan_read` parses phased plans into structured JSON, `dh_plan_update_status` safely edits status markers, and `dh_plan_create` scaffolds new phased plans.
-- **Logged execution**: `dh_logged_command` runs commands locally while directing full output to a file in the system temporary directory, returning head and tail line windows.
-- **Tabular sheets**: `dh_read_sheet`, `dh_update_sheet`, and `dh_sheet_schema` provide DuckDB-backed querying, updating, and schema inspection for CSV and XLSX files.
+- **Plan lifecycle**: `dh.plan_read` parses phased plans into structured JSON, `dh.plan_update_status` safely edits status markers, and `dh.plan_create` scaffolds new phased plans.
+- **Logged execution**: `dh.logged_command` runs commands locally while directing full output to a file in the system temporary directory, returning head and tail line windows.
+- **Tabular sheets**: `dh.read_sheet`, `dh.update_sheet`, and `dh.sheet_schema` provide DuckDB-backed querying, updating, and schema inspection for CSV and XLSX files.
 
 ## Agents & skills
 

@@ -122,3 +122,41 @@ Format: one section per sub-task, findings P0–P3 with disposition.
 - [ ] Phase 2 — Sub-Task 2.1: normalize root docs to the registered dot namespace.
 
 ---
+
+## Sub-Task Review: 2.1 — Normalize root docs (README.md, AGENTS.md, docs/LOADING.md)
+
+**Reviewed against:** Sub-Task 2.1 (plan.md, Phase 2) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| All underscore tool refs removed from root docs | PASS | `rg "dh_plan_|dh_logged_command|dh_read_sheet|dh_update_sheet|dh_sheet_schema"` over the 3 files → 0 matches |
+| Dot names are the registered IDs | PASS | All 7 IDs verified against `src/plugin.ts` namespace/tool registrations; no malformed forms |
+| LOADING table intro matches its 4 rows | PASS | "three plan-lifecycle tools plus the logged-command tool" — old "three … for phased plans" mismatch resolved |
+| No skill names, counts, or unrelated prose changed | PASS | Identifier-only diff (11 tokens + 1 sentence) |
+| Scope containment | PASS | Only README.md, AGENTS.md, docs/LOADING.md |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- `rg` underscore sweep → 0 hits in the three files; broader `dh_` sweep clean.
+- Registered names cross-checked against `src/plugin.ts` (namespace `dh`, tools `plan_read`/`plan_update_status`/`plan_create`/`logged_command`/`read_sheet`/`update_sheet`/`sheet_schema`).
+- `node scripts/check-links.mjs` → OK, 22 refs, 0 dead.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — documentation identifiers only.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Sub-Task 2.2 — normalize skills/ and agents/ tool references.
+
+---

@@ -200,7 +200,7 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 #### Sub-Task 2.1: Normalize root docs (README.md, AGENTS.md, docs/LOADING.md)
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Replace all underscore tool names with the registered dot names in the three root docs.
 - **Related Requirements:** R2 · AC2
 - **Dependencies and Preconditions:** None.
