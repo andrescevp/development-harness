@@ -244,7 +244,7 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 ### Phase 2: Packaging & startup path
 
-- **Status:** In Progress
+- **Status:** Completed
 
 #### Sub-Task 2.1: stdio entry (serveStdio, instructions, stdout purity)
 
@@ -278,7 +278,7 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 #### Sub-Task 2.3: Stdio spawn smoke test + QA gate wiring
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** `scripts/smoke-mcp.mjs` — spawn the built `dist/mcp/stdio.js` via `StdioClientTransport` (from `@modelcontextprotocol/client/stdio`), assert `tools/list` = 7 tools, call `plan_create` + `plan_read` against a fresh temp workspace, print a compact result, exit 0; wire into `qa:check:full`.
 - **Related Requirements:** R11, R12, AC3
 - **Dependencies and Preconditions:** 2.2 (built bundle), Phase 1 (tools).

@@ -471,3 +471,54 @@ fail-closed anchor precondition, index ACL tests, row escaping, helper relocatio
 
 - [x] Proceed to Sub-Task 2.3 — `scripts/smoke-mcp.mjs` via `StdioClientTransport`; optionally
       add a symlink-style launch variant mirroring npx (the 2.1 guard is already unit-pinned).
+
+---
+
+## Sub-Task Review: 2.3 — Stdio spawn smoke test + QA gate wiring
+
+**Reviewed against:** Sub-Task 2.3 (plan.md, Phase 2) · **Overall risk:** Low · **Verdict:** Approve with comments
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Smoke spawns the built binary via `StdioClientTransport` | PASS | 12 checks: exact 7-tool set (sorted names), `plan_create` (+ index row, no `*.tmp`), `plan_read` path parity, `plan_update_status` round-trip + disk re-read, symlink-direct-exec variant |
+| Exit non-zero + clear message when the bundle is missing | PASS | `statSync(…, { throwIfNoEntry: false })` + `isFile()` + `size > 0` guard; verified |
+| Wired into `qa:check:full` | PASS | Full gate ran green (docker scans included) with `smoke-load` + `smoke-mcp` at the tail |
+| No orphan process after success/failure | PASS | `pgrep` verified after success, hung-child, and SIGTERM scenarios |
+| Runtime < 10 s | PASS | 235–280 ms internal (≈0.35 s wall) |
+| Child anchored on the temp workspace (cwd e2e) | PASS | `DH_WORKSPACE_ROOT` explicitly blanked via `getDefaultEnvironment()` spread — cannot leak into a real workspace |
+
+### Findings
+
+- **[P0] Blocking:** none.
+- **[P1] High:** none.
+- **[P2] `TMPDIR`-symlink false failure** (macOS default `/var` → `/private/var` shape): **Addressed** — workspace canonicalized via `realpathSync`; reproduced under a symlinked `TMPDIR`, then verified fixed.
+- **[P2] No signal handling → orphan child + temp leaks on SIGINT/SIGTERM:** **Addressed** — once-only handlers, bounded client close, exit 130/143, single-root idempotent cleanup; verified with a hung child (shutdown ≈5 s, bounded by the request timeout — by design).
+- **[P2] No request timeouts** (SDK default 60 s would stall the gate): **Addressed** — 5 s on `connect`/`listTools`/every `callTool`; hung child fails at ~5 s.
+- **[P2] Symlink variant did not exercise the npx exec shape:** **Addressed** — the symlink itself is executed directly (shebang + exec bit; exec-bit assertion added); win32 skips with a note.
+- **[P3 batch a–l]:** **Addressed** — `checkToolList` exact-name helper for both clients; labeled payload/path guards; `*.tmp` residue scanned after both write paths across both dirs; per-client stderr; single temp root; `process.exitCode`; post-update disk re-read; explicit env isolation; artifact stat guard; close-failure reported; `smoke-mcp` npm alias added.
+- **Recorded for 4.2:** AGENTS.md/README gate-description drift (`smoke-mcp` is now part of the full gate).
+
+### Validation Results
+
+- Tests present: 178 unit/integration + the shipped-binary smoke (12 checks).
+- Validation commands: smoke green ×multiple runs; `pnpm qa:check:full` exit 0 (full scans); all lint gates green — independently re-run via `@dh-executor` (PASS; no orphans, no temp residue).
+- Evidence: TMPDIR-symlink reproduction, SIGTERM hung-child probe, timeout probe, direct-exec symlink probe (~115 ms), timing matrix.
+- Web validation (MCP Chrome): not applicable.
+- Architecture: no `src/` changes; gate ordering verified (`build` → smokes; `&&` chain prevents stale-artifact runs).
+
+### Regression Risk Assessment
+
+- No source regressions; the full gate now includes the smoke and is green. Script robustness improved across environments (symlinked TMPDIR, signals, hung children).
+
+### Scope Compliance
+
+- In scope: `scripts/smoke-mcp.mjs` + `package.json` wiring/alias.
+- Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [x] Phase 2 complete — close the phase, commit.
+- [ ] Phase 3 (3.1): plugin cutover — remove tool registration; update registration/bundle
+      tests; docs land in Phase 4.
