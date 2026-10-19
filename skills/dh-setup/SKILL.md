@@ -70,18 +70,9 @@ the configuration, but let the user decide whether to enable each.
 **MCP servers** (add to `opencode.jsonc` `mcp` section; local servers run via
 `npx`):
 
-- chrome-devtools-mcp — https://github.com/ChromeDevTools/chrome-devtools-mcp
-  ```jsonc
-  "chrome-devtools": { "type": "local", "enabled": true, "command": ["npx", "-y", "chrome-devtools-mcp@latest"] }
-  ```
-- Playwright MCP — https://playwright.dev/docs/getting-started-mcp
-  ```jsonc
-  "playwright": { "type": "local", "enabled": true, "command": ["npx", "-y", "@playwright/mcp@latest"] }
-  ```
-- mobile-mcp — https://github.com/mobile-next/mobile-mcp
-  ```jsonc
-  "mobile-mcp": { "type": "local", "enabled": true, "command": ["npx", "-y", "mobile-mcp@latest"] }
-  ```
+- chrome-devtools-mcp — https://github.com/ChromeDevTools/chrome-devtools-mcp — `"chrome-devtools": { "type": "local", "enabled": true, "command": ["npx", "-y", "chrome-devtools-mcp@latest"] }`
+- Playwright MCP — https://playwright.dev/docs/getting-started-mcp — `"playwright": { "type": "local", "enabled": true, "command": ["npx", "-y", "@playwright/mcp@latest"] }`
+- mobile-mcp — https://github.com/mobile-next/mobile-mcp — `"mobile-mcp": { "type": "local", "enabled": true, "command": ["npx", "-y", "mobile-mcp@latest"] }`
 
 **OpenCode plugin:** `opencode-rules` **latest v2 tag, beta versions for opencode v2** — https://github.com/frap129/opencode-rules
 ```jsonc
@@ -134,6 +125,22 @@ script + CI where a workflow exists):
 **3. Verify setup:** run the project's `qa:check` (or the equivalent gate)
 and confirm it exits 0; if pre-existing violations block the gate, report
 them instead of silently disabling rules.
+
+**4. Harness MCP server (`dh`)** — the harness tools are served by a
+project-scope local MCP server; wire it once (idempotent, consent first):
+- In the project `opencode.jsonc` (or `opencode.json`), ensure the entry
+  matches `"type": "local"`, `"command": ["npx", "-y", "--package=github:andrescevp/development-harness", "dev-harness-mcp"]`,
+  `"protocol": "2026-07-28"`. Accept nested `mcp.servers.dh` or legacy flat `mcp.dh` (both present → NESTED wins: show it and ask before consolidating).
+  Compare ONLY `type`/`command`/`protocol`; extra keys (`timeout`, `environment`, `disabled`, `codemode`) are preserved — not conflicts.
+  Create `mcp`/`servers` when absent; never overwrite other servers. Identical canonical fields → "already wired";
+  a difference → show a diff and ask (same consent as hooks). If neither config file exists, create `opencode.jsonc` with consent
+  (`$schema` + the block), preserving comments/format when editing in place (no parser round-trip).
+- Prewarm (best-effort; expect a fast exit via stdin EOF; on timeout note the
+  cold start): `npx -y --package=github:andrescevp/development-harness dev-harness-mcp < /dev/null`.
+- Verify: `opencode mcp list` → `dh` connected (restart long-lived sessions).
+- Slow first connection: add `"timeout": { "startup": 300000 }`; offline/local
+  fallback: `["node", "<clone>/dist/mcp/stdio.js"]` (needs `pnpm build`).
+  Details: [docs/LOADING.md](https://github.com/andrescevp/development-harness/blob/main/docs/LOADING.md#mcp-server-dh).
 
 ## Step 4: Architecture Documentation
 
@@ -227,7 +234,7 @@ This project is managed with the dev-harness plugin (dev-harness-skills):
 
 - [ ] Step 1: every required system tool present with version (phpenv optional)
 - [ ] Step 2: user-level MCPs/plugins verified and enabled per user decision
-- [ ] Step 3: hooks installed with documented rules; QA toolset wired and gate green
+- [ ] Step 3: hooks installed with documented rules; QA toolset wired and gate green; `dh` server wired/already wired **or explicitly skipped by the user**; prewarm **attempted** (cold start noted on timeout); `opencode mcp list` shows `dh` connected when wired
 - [ ] Step 4: architecture artifacts explored + interview answers recorded (if files exist); `docs/architecture/` created; docs created via `@dh-software-architect` when absent; index present
 - [ ] Step 5: project AGENTS.md has the harness directives section (updated, not duplicated)
 - [ ] Report produced: per-tool status table + any blockers with exact commands

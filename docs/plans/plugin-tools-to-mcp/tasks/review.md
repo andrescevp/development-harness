@@ -664,3 +664,49 @@ fail-closed anchor precondition, index ACL tests, row escaping, helper relocatio
 
 - [x] Proceed to Sub-Task 4.3 — `dh-setup` wiring step (consent-based `mcp.servers.dh`
       merge + prewarm + verify); cap watch at 239/250 lines.
+
+---
+
+## Sub-Task Review: 4.3 — dh-setup project wiring step (consent-based mcp.servers.dh + prewarm + verify)
+
+**Reviewed against:** Sub-Task 4.3 (plan.md, Phase 4) · **Overall risk:** Low · **Verdict:** Approve with comments
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Step wires + prewarms + verifies with consent, idempotently | PASS | 5-scenario dry-run simulation (absent → propose; other servers preserved; identical → "already wired"; conflicting → diff prompt; no-config → create with consent); live execution is 4.4/5.1 acceptance |
+| Audit line limits | PASS | 246/250 (compression applied first, per the cap-watch clause) |
+| No silent config changes | PASS | Consent-first wording retained; conflicting `dh` never overwritten without a diff prompt |
+| Snippet identity | PASS | `type`/`command`/`protocol` match the other copies (field comparison for the inline form) |
+| Verify + troubleshooting guidance | PASS | `opencode mcp list`, prewarm via `< /dev/null`, `timeout.startup`, node-dist fallback, LOADING pointer |
+
+### Findings
+
+- **[P0–P1]:** none.
+- **[P2] Idempotency match too narrow and too strict:** opencode v2.0.18 accepts nested `mcp.servers.dh` **and** legacy flat `mcp.dh` (nested wins when both exist — reviewer-probed via `opencode debug config`); valid extra keys (`timeout`, `environment`, …) were treated as conflicts. **Addressed** — both shapes detected, canonical fields compared (`type`/`command`/`protocol`), extras preserved, nested-wins consolidation asks first.
+- **[P3] Missing no-config-file case + JSONC comment preservation:** **Addressed** — create `opencode.jsonc` with consent; edit in place without a comment-stripping round-trip.
+- **[P3] Checklist required success where best-effort/decline is allowed:** **Addressed** — "wired/already wired or explicitly skipped; prewarm attempted (cold start noted)".
+- **[P3] LOADING pointer dead in the packaged skill** (bundle ships only agents/skills): **Addressed** — absolute GitHub URL replaces the relative link.
+- **Recorded:** 5.1 compares fragment fields for inline copies; file sits at 246/250 (5 headroom).
+- **Simplify method note:** consolidated docs pass (recorded).
+
+### Validation Results
+
+- Validation commands: line cap 246; `check-links` 26 refs OK; `audit.mjs` PASS; snippet identity ×4; `pnpm test` 18/181 unchanged — independently re-run via `@dh-executor` (PASS).
+- Evidence: reviewer implementation probes (flat vs nested resolution), 5-scenario dry-run.
+- Web validation (MCP Chrome): not applicable.
+
+### Regression Risk Assessment
+
+- Docs-only; no code/config behavior change. The step is the mechanism that closes the zero-tools window for projects.
+
+### Scope Compliance
+
+- In scope: `skills/dh-setup/SKILL.md` only (plus plan bookkeeping).
+- Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [x] Proceed to Sub-Task 4.4 — demo-project config + `demo.sh` validation (living proof; the
+      fifth snippet copy).
