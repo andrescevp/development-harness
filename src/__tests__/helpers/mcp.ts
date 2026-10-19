@@ -16,6 +16,8 @@ import { buildServer } from '../../mcp/server.js';
 export interface McpTestHarnessOptions {
   /** Seed files/dirs into the temp workspace before the server is built. */
   setup?: (workspaceRoot: string) => void;
+  /** Server instructions to build with (default: none). */
+  instructions?: string;
 }
 
 export interface McpTestHarness {
@@ -57,7 +59,11 @@ export async function createMcpTestHarness(options: McpTestHarnessOptions = {}):
 
   try {
     options.setup?.(workspaceRoot);
-    const serverInstance = buildServer({ workspaceRoot, version: SERVER_VERSION });
+    const serverInstance = buildServer({
+      workspaceRoot,
+      version: SERVER_VERSION,
+      instructions: options.instructions,
+    });
     server = serverInstance;
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
     // Server first: the client's initialize request needs the server attached.

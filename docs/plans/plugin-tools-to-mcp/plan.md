@@ -244,11 +244,11 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 ### Phase 2: Packaging & startup path
 
-- **Status:** Pending
+- **Status:** In Progress
 
 #### Sub-Task 2.1: stdio entry (serveStdio, instructions, stdout purity)
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Create `src/mcp/stdio.ts` — the `bin` entry: `serveStdio(factory)` building the server with `resolveWorkspaceRoot()` at connection time, the short harness `instructions` string, a `console.error` readiness banner (stderr only), and clean shutdown (SIGINT/SIGTERM close handler; stdin EOF teardown relies on the SDK).
 - **Related Requirements:** R3, R6, R9, R12, AC3
 - **Dependencies and Preconditions:** Phase 1 complete (factory + workspace ACL).

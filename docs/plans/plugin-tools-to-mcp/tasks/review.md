@@ -363,3 +363,58 @@ fail-closed anchor precondition, index ACL tests, row escaping, helper relocatio
 - [x] Phase 1 complete (all five sub-tasks Completed) — close the phase, commit.
 - [ ] Phase 2 picks up: remove the `.dependency-cruiser.json` `no-orphans` exemption when `stdio.ts`
       imports `workspace.ts` (the TODO(2.1) trigger); wire the stdio entry.
+
+---
+
+## Sub-Task Review: 2.1 — stdio entry (serveStdio, instructions, stdout purity)
+
+**Reviewed against:** Sub-Task 2.1 (plan.md, Phase 2) · **Overall risk:** Medium (entry correctness on the shipped npx path) · **Verdict:** Approve with comments
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Module imports cleanly; entry runs on execute | PASS | Entry guard is the realpath-based `isMainEntry` (post-P1 fix); import purity pinned (no stdout/stderr writes, no listeners, double re-evaluation silent) |
+| Per-connection factory with connection-time root resolution | PASS | `serveStdio(() => buildServer({ workspaceRoot: resolveRoot(), … }))`; blank-root error passes through verbatim; cwd-failure wrapped with `cause` |
+| `instructions` surfaced via the SDK | PASS | v2 mechanism verified: constructor-only `ServerOptions.instructions`; `client.getInstructions()` pinned through a real in-memory connection |
+| stderr-only diagnostics; stdout purity | PASS | Banner/errors on stderr; reviewers measured 0 stdout bytes incl. SIGINT/SIGTERM runs |
+| `no-orphans` exemption removed (TODO(2.1)) | PASS | Base rule restored; `stdio.ts` is not an orphan (has dependencies); reviewers probed that the base rule still fires on a scratch orphan |
+| Tests for the changed code | PASS | stdio suite grew 7 → 13 tests (P1 pin via symlink fixture; version fallback + memoization; purity; instructions) |
+
+### Findings
+
+- **[P0] Blocking:** none.
+- **[P1] Main-entry guard false through npm/npx bin symlinks** (silent exit 0 — the shipped npx path would serve nothing; reproduced independently by two lenses across npm install / packed tgz / npx / pnpm-shim): **Addressed** — realpath-comparing `isMainEntry`, exported and pinned with a symlink fixture test.
+- **[P2] Instructions test re-implemented the harness** (pre-`try` setup leak): **Addressed** — `instructions?` option on `McpTestHarnessOptions`; test now uses `connectHarness`.
+- **[P3] Shutdown robustness** (floating promise, no exit backstop): **Addressed** — `shutdown(signal)` awaits `close()` → `exit(0)` / logged `exit(1)`; `once` semantics + force-quit comment.
+- **[P3] Error-path quality** (heuristic classification, duplicate stderr, lost `cause`): **Addressed** — sentinel-prefix pass-through, single `onerror` reporter logging message + cause chain.
+- **[P3] Version fallback/memoization untested; overclaiming title:** **Addressed** — fallback (throw + malformed JSON) and single-read pins; title retitled honestly.
+- **[P3] Instructions wording overstates `update_sheet`:** **Addressed** — now "read csv/xlsx and update csv sheets by absolute path".
+- **[P3] Plan-ID reference in shipped JSDoc:** **Addressed** — invariant phrasing.
+- **[P3] Purity-test scope:** **Addressed** — stderr-silent and no-stdin-listener assertions added.
+- **[P3] `LOG_PREFIX` differs from the plugin's tag:** **Kept intentionally + documented** — distinct bin-vs-plugin tag aids stderr triage; one-line comment added.
+- **Accepted nuance:** `isMainEntry(undefined)` exercises the default-parameter path (ES semantics) — behavior correct (false, no throw); the symlink fixture is the assertion that pins the P1 fix.
+
+### Validation Results
+
+- Tests present: yes — 13 stdio tests; P1 pin cannot regress silently (symlink fixture).
+- Validation commands: `pnpm test` PASS (18 files / 178 tests) · `pnpm typecheck` PASS · `lint:biome`/`knip`/`depcruise`/`dup` PASS — independently re-run via `@dh-executor` after the fix round.
+- Code-quality evidence: three-lens simplify pass (all `@dh-reviewer`) with a multi-manager bin-launch probe matrix, duplicate-stderr probe, and orphan-rule probe; all scratch probes removed.
+- Web validation (MCP Chrome): not applicable.
+- Architecture: entry stays thin; resolvers exported for tests; `server.ts` additive `instructions` option approved as a justified deviation (SDK constructor-only mechanism).
+
+### Regression Risk Assessment
+
+- Fixed the shipping (npx) launch path; direct `node dist/…` behavior unchanged; all suites green.
+- Residual: `import.meta.main` is unavailable at the Node `>=20.11` floor — the realpath idiom is the portability-correct approach.
+
+### Scope Compliance
+
+- In scope: `stdio.ts` + tests + harness option + depcruise cleanup. The `server.ts` additive change is an approved justified deviation.
+- Out of scope detected: none (a reviewer's stray `review.md` write was normalized by the orchestrator into this consolidated section).
+
+### Suggested Next Steps
+
+- [x] Proceed to Sub-Task 2.2 — build & package wiring (tsup second entry, shebang,
+      `bin`, `prepare`, knip entry config); the 2.3 smoke must spawn through a symlink-style
+      invocation mirroring npx.

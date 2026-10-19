@@ -26,6 +26,8 @@ export interface BuildServerOptions {
   workspaceRoot: string;
   /** Server version advertised in the MCP `initialize` handshake. */
   version: string;
+  /** Optional harness instructions surfaced in the MCP initialize result. */
+  instructions?: string;
 }
 
 const SERVER_NAME = 'dev-harness-skills';
@@ -74,8 +76,8 @@ async function guardedAsync(body: () => Promise<CallToolResult>): Promise<CallTo
 }
 
 /** Fresh server instance per connection — never share one across transports. */
-export function buildServer({ workspaceRoot, version }: BuildServerOptions): McpServer {
-  const server = new McpServer({ name: SERVER_NAME, version });
+export function buildServer({ workspaceRoot, version, instructions }: BuildServerOptions): McpServer {
+  const server = new McpServer({ name: SERVER_NAME, version }, { instructions });
 
   server.registerTool(
     'plan_read',
