@@ -87,6 +87,9 @@ repeated per relevant sub-task.
 - Repo QA gate: `pnpm run audit` (not `pnpm audit`),
   `node scripts/check-links.mjs`, `pnpm test`, `pnpm build`; Git Flow branch
   off `develop` (suggested `bugfix/audit-fixes`).
+- **Amendment 2026-10-19 (user-approved, Plan A):** Sub-Task 5.1 additionally
+  applies the pre-existing `source-map-js` OSV fix (override + lockfile
+  refresh) discovered during validation — required for `scan:deps` to pass.
 
 ## Risks and Areas Requiring Care
 
@@ -330,17 +333,18 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 ### Phase 5: Verification and closeout (AC1–AC5)
 
-- **Status:** Pending
+- **Status:** In Progress
 
 #### Sub-Task 5.1: Build + full gate validation (tests, audit, check-links, rg checks)
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Prove all five fix areas with the repo's gates and targeted greps, and regenerate the audit reports.
 - **Related Requirements:** AC1–AC5
 - **Dependencies and Preconditions:** Phases 1–4 complete.
-- **In Scope for This Sub-Task:** Build + validation runs; regenerated `reports/audit.md` + `reports/audit.json` (tracked files — expect them modified).
+- **In Scope for This Sub-Task:** Build + validation runs; regenerated `reports/audit.md` + `reports/audit.json` (tracked files — expect them modified); **PRE-STEP (added 2026-10-19, user-approved Plan A extension):** the `source-map-js` security override + lockfile refresh required to unblock `scan:deps`.
 - **Out of Scope for This Sub-Task:** Fixing failures beyond scope — a failure here means re-opening the responsible sub-task first (blocker protocol).
 - **Instructions:**
+  0. **Dependency fix (added 2026-10-19, user-approved):** add `"source-map-js@<1.2.2": "^1.2.2"` to the `overrides:` block in `pnpm-workspace.yaml` (mirrors commit `e00711e`), run `pnpm install` to refresh `pnpm-lock.yaml`, and confirm `pnpm why source-map-js` resolves to ≥ 1.2.2. This clears OSV `GHSA-68fv-2mgg-jv7q` (High; dev-only transitive via postcss ← tsup/vitest), which halts the full gate at `scan:deps`.
   1. `pnpm build` — confirm `[copy-assets] agents 7 | skills 17 SKILL.md + index.md yes`.
   2. `pnpm test` — all suites green (registration asserts 17).
   3. `node scripts/audit.mjs` — PASS, 0 fail findings; loop membership `17/17 skills present; 7/7 agents present`.
@@ -350,8 +354,8 @@ the harness: git commands run via `@dh-executor`; invocation sources are
      - `rg -n "15 \`dh|16 skills|16 bundled" README.md AGENTS.md docs/LOADING.md skills/index.md` → 0.
      - `rg -n "dh-semver" AGENTS.md README.md docs/LOADING.md skills/index.md skills/dh-semver/SKILL.md` → present in all.
   6. If Docker is available: `pnpm qa:check:full` or at least `pnpm qa:check`; otherwise document the skip (docker scans unchanged by this work).
-- **Acceptance Criteria:** All gates pass; greps return the expected results; reports regenerated.
-- **Cautionary Points (Risks & Edge Cases):** `pnpm audit` is the wrong command (security audit) — use `pnpm run audit`. Rebuild before tests whenever the corpus changes. Audit warns (e.g. kebab prose tokens) are acceptable; fail findings are not.
+- **Acceptance Criteria:** All gates pass **including `scan:deps` with 0 findings after the override**; greps return the expected results; reports regenerated.
+- **Cautionary Points (Risks & Edge Cases):** `pnpm audit` is the wrong command (security audit) — use `pnpm run audit`. Rebuild before tests whenever the corpus changes. Audit warns (e.g. kebab prose tokens) are acceptable; fail findings are not. Lockfile churn from `pnpm install` is expected (cf. `e00711e`); inspect `git diff pnpm-lock.yaml` to confirm no unintended upgrades beyond `source-map-js`.
 - **Implementation Suggestions:** Run in the order above; capture exact outputs for the review.
 - **Testing Suggestions:** The commands are the tests.
 - **Done When:** Gate outputs recorded; AC1–AC5 evidenced.

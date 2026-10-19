@@ -75,7 +75,9 @@ numbered findings) and directed that **`dh-semver` must be the global
   forces to move (`scripts/lib/shared.mjs` loop list, `assets.test.ts`,
   `frontmatter.test.ts`, `registration.test.ts`, `src/plugin.ts` comment);
   regenerated `reports/audit.md` + `reports/audit.json`; `docs/plans/index.md`
-  row for this plan.
+  row for this plan; **amendment (2026-10-19, user-approved):** the
+  gate-blocking transitive-dependency fix (`source-map-js` override) found
+  during validation.
 - **Out of scope:** audit points 5 and 6 (explicitly deferred by the
   requester); `demo-project/` counts and underscore refs (point 5 family);
   runtime tool aliasing (R2 is fixed in docs only).

@@ -380,3 +380,42 @@ Format: one section per sub-task, findings P0–P3 with disposition.
 - [ ] Phase 5 — Sub-Task 5.1: build + full gate validation.
 
 ---
+
+## Sub-Task Review: 5.1 — Build + full gate validation (incl. 2026-10-19 Plan A dependency amendment)
+
+**Reviewed against:** Sub-Task 5.1 (plan.md, Phase 5) + user-approved amendment · **Overall risk:** Low · **Verdict:** Approve
+
+**Note:** first validation attempt was a hard blocker (loop rule 2.4): OSV `GHSA-68fv-2mgg-jv7q` (High) in pre-existing `source-map-js@1.2.1`. User approved Plan A; the plan was amended and the fix applied; all gates were then re-run green.
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| All gates pass **including `scan:deps` with 0 findings** | PASS | `pnpm qa:check:full` exit 0 (independently re-run): OSV "No issues found" (609 pkgs), Semgrep 0 findings, 94/94 tests, typecheck clean, audit PASS (17/17), build `agents 7 \| skills 17`, smoke-load OK, links OK |
+| Dependency fix correctness | PASS | Override `"source-map-js@<1.2.2": "^1.2.2"`; lockfile delta = only `source-map-js@1.2.1 → 1.2.2` (+ peer-suffix normalization from pnpm 11.9.0); no unrelated upgrades; `pnpm install --frozen-lockfile` reproducible |
+| AC greps | PASS | Underscore tool refs → 0; stale counts → 0; `dh-semver` present in all required surfaces |
+| Scope | PASS | Only pnpm files, plan/sdd amendment records, regenerated reports; `dist/`/`report/` gitignored |
+| Amendment traceability + real fix | PASS | plan.md + sdd.md record the user-approved amendment; `.osv-scanner.toml` has **no** `IgnoredVulns` (fix, not mask) |
+
+### Findings
+
+- **[P0] Blocking:** none (blocker resolved via user-approved amendment). **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- Full gate evidence independently reproduced by review; scan:deps clean post-override.
+- Lockfile consistency verified (`--frozen-lockfile` no-op); resolution path confirmed (`postcss ← tsup/vitest`, dev-only).
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — dev-toolchain-only transitive bump within postcss's compatible range.
+
+### Scope Compliance
+
+- In scope (as amended): verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Sub-Task 5.2 — documentation completeness pass.
+
+---
