@@ -362,7 +362,7 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 #### Sub-Task 5.2: Documentation completeness pass (dh-create-documentation)
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Confirm the new public interface (`dh-semver`) and all counts are fully documented across the repo's documentation surfaces, per `dh-create-documentation` guidance.
 - **Related Requirements:** R1 · R3 · AC1 · AC3
 - **Dependencies and Preconditions:** 5.1 green.

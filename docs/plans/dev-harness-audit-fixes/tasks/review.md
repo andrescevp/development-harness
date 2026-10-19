@@ -419,3 +419,40 @@ Format: one section per sub-task, findings P0–P3 with disposition.
 - [ ] Sub-Task 5.2 — documentation completeness pass.
 
 ---
+
+## Sub-Task Review: 5.2 — Documentation completeness pass (dh-create-documentation)
+
+**Reviewed against:** Sub-Task 5.2 (plan.md, Phase 5) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| All four surfaces describe `dh-semver` + the 17-skill corpus coherently | PASS | `dh-semver` in README (L159), AGENTS (L14/L123), LOADING (L85), index (L95); all lists set-equal to `LOOP` |
+| Counts read 7 agents / 17 skills; no stale 15/16 | PASS | `rg \b15\b|\b16\b` over the four surfaces → 0 (historical 2.0.18 notes legitimately excepted) |
+| No underscore tool refs | PASS | Sweep over four surfaces + skills/ + agents/ → 0 |
+| 5.2 made no file modifications (clean pass) | PASS | Working tree showed only the plan status flip |
+| Residual observations correctly classified | PASS | R1 (src/ comment doc-strings) genuinely outside R2 scope → recorded as follow-up; R2/R3 cosmetic, no AC failure |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+- Follow-up (recorded for 5.3): underscore tool names in `src/` header comments (`sheet-tools.ts`, `logged-command.ts`, `sheet-tools.test.ts`) — cosmetic, out of R2 scope.
+
+### Validation Results
+
+- Corpus reality re-verified (7/17); surface lists script-compared against `LOOP`; stale-count/underscore sweeps clean.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — verification-only sub-task.
+
+### Scope Compliance
+
+- In scope: verified (no changes needed). Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Sub-Task 5.3 — closeout (index row, follow-ups).
+
+---
