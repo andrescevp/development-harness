@@ -117,9 +117,12 @@ This repository is managed with **Git Flow**:
   (`feat`/`fix`/`refactor`/`docs` commits); merged back with `--no-ff`.
 - `bugfix/*` — branched from `develop` for fixes to in-development work.
 - `release/*` — branched from `develop` when a release is cut; merged to
-  `main` AND back to `develop`; tagged on `main`.
-- `hotfix/*` — branched from `main` for production fixes; merged to `main`
-  AND `develop`; tagged on `main`.
+  `main` and tagged there; then `main` (not the release branch) is merged
+  back into `develop` so released tags stay reachable (`git describe` /
+  `dh-semver`).
+- `hotfix/*` — branched from `main` for production fixes; merged to `main`,
+  tagged there, and `main` merged back into `develop` (same tag-ancestry
+  rule).
 - Tags: semver (`vX.Y.Z`) on `main` only (see the bundled `dh-semver` skill).
 
 Local config already set (`git config gitflow.*`): main/develop + the
