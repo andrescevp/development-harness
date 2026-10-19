@@ -272,3 +272,40 @@ Format: one section per sub-task, findings P0–P3 with disposition.
 - [ ] Sub-Task 3.3 — AGENTS.md + skills/index.md counts and lists.
 
 ---
+
+## Sub-Task Review: 3.3 — AGENTS.md + skills/index.md counts and lists
+
+**Reviewed against:** Sub-Task 3.3 (plan.md, Phase 3) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| AGENTS.md count sites read 17; enumeration includes `dh-semver` | PASS | Role summary L12/L14, provenance L70, registration L77, verify L89 — stale patterns → 0 |
+| skills/index.md: intro, heading, `dh-semver` row | PASS | L3 "**17 skills**"; L75 "## The 17 bundled skills"; row appended last with link target that resolves |
+| Set-equality of both lists with the corpus | PASS | AGENTS enumeration = index table = disk = `LOOP.skills` (17, no duplicates) |
+| Scope | PASS | Exactly 8 single-line hunks across the two files; nothing else touched |
+| Tooling | PASS | `check-links` OK (23 refs, 0 dead — the new link is followed); `audit` PASS |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- Programmatic set-equality checks passed on both surfaces; table row count = 17.
+- No stale `15`/`16` counts remain in either file.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — counts, one list entry, one table row.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Phase 4 — Sub-Task 4.1: LOADING version-skew bullet.
+
+---

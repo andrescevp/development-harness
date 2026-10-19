@@ -236,7 +236,7 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 ### Phase 3: Counts and verification checklists (R3)
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 3.1: README.md counts + dh-semver skill row
 
@@ -279,7 +279,7 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 #### Sub-Task 3.3: AGENTS.md + skills/index.md counts and lists
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Update the runtime contract and the skills index to the 17-skill bundle.
 - **Related Requirements:** R3 · AC3
 - **Dependencies and Preconditions:** 1.1 landed; 1.2 updated the loop list.
