@@ -5,7 +5,7 @@
   // file form is rejected with "configured plugin path must be a directory".
   "$schema": "https://opencode.ai/config.json",
   "plugins": [
-    // Local package directory form (works after `pnpm build` in the repo):
+    // Local package directory form (works after `pnpm install`; no build needed):
     "file:///home/andres/workspace/dev-harness-skills"
 
     // Alternatives (pick ONE at a time):

@@ -88,8 +88,9 @@ bundled agent names — no mapping is needed.
   config entry needed.
 - **Loading alternatives:** `opencode plugin add github:andrescevp/development-harness`
   (managed install, private-repo friendly), a `file://`/relative entry in
-  `opencode.json(c)` pointing at a built clone (`pnpm build` first), or the
-  installed package name. See [`docs/LOADING.md`](docs/LOADING.md).
+  `opencode.json(c)` pointing at the repo directory (`pnpm install` only; no
+  build needed for source loading), or the installed package name. See
+  [`docs/LOADING.md`](docs/LOADING.md).
 - **Verify:** launch opencode and confirm the 7 agents and 17 skills appear
   (including `dh-coding`) and no commands are registered; then confirm the
   project-scope `dh` MCP server is connected (`opencode mcp list`) so the

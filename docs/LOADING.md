@@ -1,6 +1,6 @@
 # Loading the dev-harness-skills plugin
 
-How to enable the built plugin in OpenCode V2, verify it registered the
+How to enable the plugin in OpenCode V2, verify it registered the
 harness, and troubleshoot when agents/skills do not appear.
 
 ## Install: clone the repo into a plugin folder (primary)
