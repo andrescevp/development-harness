@@ -4,7 +4,7 @@ slug: plugin-tools-to-mcp
 description: Remove opencode plugin tool registration; serve all 7 harness tools from a project-scope local MCP stdio server (@modelcontextprotocol/server v2) started via npx from the git repo; flip docs/skills/configs to dh_* naming (full parity, hard cut)
 created: 2026-10-19
 updated: 2026-10-19
-status: Pending
+status: Completed
 active: true
 tags: [plan, mcp, refactor]
 project: dev-harness-skills
@@ -376,7 +376,7 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 ### Phase 5: Verification & release
 
-- **Status:** In Progress
+- **Status:** Completed
 
 #### Sub-Task 5.1: Real-session verification (mcp list, live tool call, cold npx timing)
 
@@ -395,7 +395,7 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 #### Sub-Task 5.2: Full gate + release (qa:check:full, audit, semver, index closure)
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Run the complete release gate, apply the versioning path (dh-semver), and close the plan (statuses + index row).
 - **Related Requirements:** AC7, AC8
 - **Dependencies and Preconditions:** 5.1 complete; all prior phases green.
