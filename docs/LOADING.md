@@ -71,46 +71,112 @@ The source `index.ts` entry also works when pointed at directly, e.g.
 
 ## Verification checklist
 
-After loading, confirm the harness is registered:
+After loading, confirm the harness is registered (opencode v2.0.18 exposes
+only the `agents`, `config`, and `paths` debug subcommands):
 
 ```
-opencode debug agents   → look for: dh-software-architect, dh-software-engineer,
-                          dh-reviewer, dh-final-reviewer, dh-executor,
-                          dh-explorer, dh-documentor
-opencode debug skills   → look for: dh-artifact-check, dh-code-review,
-                          dh-code-ruler, dh-coding, dh-contingency,
-                          dh-create-documentation, dh-domain-check,
-                          dh-execute-plan, dh-execute-plan-task, dh-final-review,
-                          dh-grill-sdd, dh-planning, dh-preflight, dh-review,
-                          dh-semver, dh-setup, dh-simplify
-opencode debug commands → no new commands (commands are out of scope)
+opencode debug agents   → the 7 dh-* agents must appear
+opencode debug config   → the plugin entry, and mcp.servers.dh once wired
+opencode mcp list       → `dh` connected (server/status only)
 ```
 
-## Plan lifecycle tools (harness namespace)
+The plugin also registers 17 skills (there is no skills debug subcommand on
+v2.0.18 — the bundled list lives in `skills/index.md`). Zero tools are
+registered by the plugin: the 7 tools come from the MCP server below.
 
-The plugin also registers V2 custom tools (codemode) under the `dh` namespace: three plan-lifecycle tools plus the logged-command tool:
+## MCP server (`dh`)
+
+The harness **tools do not come from the plugin** — the plugin registers
+agents and skills only. They are served by a local stdio **MCP server** named
+`dh` (`@modelcontextprotocol/server` v2), wired **per project** in that
+project's `opencode.jsonc` (additive to the plugin loading above):
+
+```jsonc
+{
+  "mcp": {
+    "servers": {
+      "dh": {
+        "type": "local",
+        "command": ["npx", "-y", "--package=github:andrescevp/development-harness", "dev-harness-mcp"],
+        "protocol": "2026-07-28"
+      }
+    }
+  }
+}
+```
+
+- The command runs the package `bin` (`dev-harness-mcp` → `dist/mcp/stdio.js`).
+  The first run clones/installs it into the npx cache — **cold starts can take
+  a while**. Prewarm once with
+  `npx -y --package=github:andrescevp/development-harness dev-harness-mcp < /dev/null`
+  and, on slow networks, raise the allowance with
+  `"timeout": { "startup": 300000 }` on the `dh` entry.
+- `protocol: "2026-07-28"` pins the native MCP revision; the same server
+  factory also serves legacy (`initialize`) clients, so 2025-era hosts work.
+- **Workspace anchoring:** the server resolves the workspace from the process
+  cwd (the project directory opencode starts it in). Override with
+  `"environment": { "DH_WORKSPACE_ROOT": "/absolute/workspace" }`.
+- **No-npx fallback** (no cache, offline, or pinned local build): build a
+  clone (`pnpm build`) and point the entry at the binary:
+  `"command": ["node", "<clone>/dist/mcp/stdio.js"]`.
+
+### Naming and permissions
+
+Server key `dh` + tool `plan_read` → the normalized tool name
+**`dh_plan_read`**. Under Code Mode (the default) the call path is
+`tools.dh.<tool>`. Consumer permission actions match `dh_*`.
+
+The underscore form is MCP host naming (`<server>_<tool>`); the older
+`dh.<tool>` spelling belonged to the plugin's V2 tool namespace and is
+retired by this release.
+
+### Tools
 
 | Tool | Input | Returns |
 |---|---|---|
-| `dh.plan_read` | `{ slug }` or `{ path }` (relative to `docs/plans`) | `{ ok, path, plan }` — parsed phases/sub-tasks with statuses |
-| `dh.plan_update_status` | `{ slug?, path?, target: phase\|subtask, index: "N"\|"N.M", status }` | `{ ok, path, plan }` — line-aware status edit |
-| `dh.plan_create` | `{ slug, title, objective, phases: [{title, subTasks:[{title}]}], updateIndex? }` | `{ ok, path, plan }` — scaffolds a phased plan |
-| `dh.logged_command` | `{ command, logName?, timeoutMs? }` | `{ ok, exitCode, logPath, head, tail, truncated }` — runs a command with its log in the OS temp dir and returns a head/tail window + log path |
+| `dh_plan_read` | `{ slug }` or `{ path }` (relative to `docs/plans`) | `{ ok, path, plan }` — parsed phases/sub-tasks with statuses |
+| `dh_plan_update_status` | `{ slug?, path?, target: phase\|subtask, index: "N"\|"N.M", status }` | `{ ok, path, plan }` — line-aware status edit |
+| `dh_plan_create` | `{ slug, title, objective, phases: [{title, subTasks:[{title}]}], updateIndex? }` | `{ ok, path, plan }` — scaffolds a phased plan |
+| `dh_read_sheet` | `{ path, query?, limit? }` | `{ ok, columns, rowCount, rows }` — csv by default; xlsx via a `read_xlsx(...)` query when the DuckDB extension loads |
+| `dh_update_sheet` | `{ path, query }` | `{ ok, columns, rowCount, rows }` — applies UPDATE/INSERT/DELETE, writes the CSV back |
+| `dh_sheet_schema` | `{ path }` | `{ ok, columns, rowCount, rows }` — columns as `name:type` |
+| `dh_logged_command` | `{ command, logName?, timeoutMs? }` | `{ ok, exitCode, logPath, head, tail, truncated }` — log in the OS temp dir + head/tail window; the command runs with the MCP server's OS permissions |
 
 Phase → `Completed` is gated: it fails while any sub-task of the phase is not
-`Completed`. Reads/writes are anchored under `<workspace>/docs/plans`;
+`Completed`. Plan reads/writes are anchored under `<workspace>/docs/plans`;
 `..` escapes, absolute paths outside the anchor, symlinks, and missing
-workspace roots are rejected with descriptive errors.
+workspace roots are rejected with descriptive errors. Sheet tools take
+absolute paths; helper failures return `{ ok: false, error }` payloads (not
+protocol errors).
 
-The in-repo gate that proves the plugin logic is the registration test:
+### Verify
 
 ```sh
-pnpm test   # src/__tests__/registration.test.ts runs the real bundle setup
-            # against a stub ctx → exactly 7 agents + 17 skills registered
+opencode mcp list   # expect the `dh` server, connected
 ```
+
+MCP servers connect at session start — restart opencode after adding or
+changing the project entry. The in-repo gates are
+`src/__tests__/registration.test.ts` (exactly 7 agents + 17 skills, zero tool
+transforms) and `node scripts/smoke-mcp.mjs` (spawns the built binary, lists
+the 7 tools, and round-trips plan create/read/update).
 
 ## Troubleshooting
 
+- **MCP server missing or failed to connect** — run `opencode mcp list` and
+  restart the session. Slow first start: prewarm the npx cache (see above) and
+  raise `timeout.startup`; without network use the `node <clone>/dist/mcp/stdio.js`
+  fallback (requires `pnpm build`; the clone's `dist/.build-ok` sentinel marks
+  a complete build).
+- **Stale tool behavior after a harness update** — npx may serve a cached
+  checkout. Bust it with `npm cache npx rm --force` (full cache:
+  `npm cache clean --force`; `npx clear-npx-cache` is legacy-npm only), then
+  restart opencode; the next start re-installs from git.
+- **`ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` (pnpm 11 consumers installing the
+  repo as a git dependency)** — allow the package build in the consumer's
+  `pnpm-workspace.yaml` (`allowBuilds:`) using the exact form pnpm prints
+  (e.g. `dev-harness-skills@git+https://github.com/andrescevp/development-harness.git#<sha>: true`),
+  or run `pnpm approve-builds`; npm/npx are unaffected.
 - **Agents missing after installing (skills visible)** — the running session
   was started **before** the plugin was installed: plugins load at server
   startup, and a long-lived opencode session keeps its original registry.

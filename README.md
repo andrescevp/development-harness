@@ -7,9 +7,7 @@ An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated develop
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks with strict halt-on-blocker safeguards.
 - **7 agents and 17 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
-- **Plan lifecycle tools**: Built-in `dh.plan_read`, `dh.plan_update_status`, and `dh.plan_create` tools for programmatic plan management in `docs/plans`.
-- **DuckDB sheet tools**: Integrated tools (`dh.read_sheet`, `dh.update_sheet`, `dh.sheet_schema`) for SQL querying and editing of tabular data.
-- **Logged executor strategy**: `dh.logged_command` captures full command execution logs in the OS temp directory while streaming head/tail windows.
+- **`dh` MCP server (7 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents and skills only.
 - **Full QA gate**: Thorough verification suite integrating Biome, Knip, jscpd, dependency-cruiser, OSV-Scanner, Semgrep, Vitest, and TypeScript.
 - **Source-mode loading**: Automatic discovery by OpenCode via root `index.ts` with direct asset loading from the repository.
 
@@ -71,16 +69,23 @@ Then load via `file:///path/to/dev-harness-skills` in your `opencode.json` or `o
 }
 ```
 
+The plugin installation above loads agents and skills only; the harness tools
+require the project-scope `mcp.servers.dh` entry described in
+[MCP server (`dh`)](#mcp-server-dh).
+
 ## Quickstart
 
 1. Check that the plugin loaded successfully:
 
 ```sh
-opencode debug agents
-opencode debug skills
+opencode debug agents   # expect the 7 dh-* agents
+opencode debug config   # expect the plugin entry, and mcp.servers.dh once wired
+opencode mcp list       # expect: dh connected (server/status only)
 ```
 
-Confirm that the 7 `dh-` agents and 17 `dh-` skills appear and that zero commands are registered.
+The plugin also registers 17 skills (there is no skills debug subcommand on
+v2.0.18 — see `skills/index.md`) and zero tools; the harness tools come from
+the project-scope MCP server — see [MCP server (`dh`)](#mcp-server-dh).
 
 2. Audit your environment and initialize QA:
 
@@ -112,17 +117,48 @@ Plan execution inside the plugin runs the 5-step skills loop:
 
 Plans are stored under `docs/plans/<slug>/plan.md` using a phased structure. Every phase and sub-task maintains a dual status marker (`Pending`, `In Progress`, or `Completed`). A phase cannot transition to `Completed` until all of its sub-tasks are marked `Completed`. When a hard blocker is reached, automation halts immediately so that blockers are never bypassed.
 
-### Bundled tools
+### MCP server (`dh`)
 
-The plugin registers custom V2 tools under the `dh` namespace:
+The plugin registers **no tools**. The 7 harness tools are served by a local
+stdio MCP server (`@modelcontextprotocol/server` v2), enabled **per project**
+in that project's `opencode.jsonc`:
 
-- **Plan lifecycle**: `dh.plan_read` parses phased plans into structured JSON, `dh.plan_update_status` safely edits status markers, and `dh.plan_create` scaffolds new phased plans.
-- **Logged execution**: `dh.logged_command` runs commands locally while directing full output to a file in the system temporary directory, returning head and tail line windows.
-- **Tabular sheets**: `dh.read_sheet`, `dh.update_sheet`, and `dh.sheet_schema` provide DuckDB-backed querying, updating, and schema inspection for CSV and XLSX files.
+```jsonc
+{
+  "mcp": {
+    "servers": {
+      "dh": {
+        "type": "local",
+        "command": ["npx", "-y", "--package=github:andrescevp/development-harness", "dev-harness-mcp"],
+        "protocol": "2026-07-28"
+      }
+    }
+  }
+}
+```
+
+| Tool | Purpose |
+|---|---|
+| `dh_plan_read` | Parse a phased plan (`docs/plans/<slug>/plan.md`) into structured JSON |
+| `dh_plan_update_status` | Edit phase/sub-task status markers (phase completion is gated) |
+| `dh_plan_create` | Scaffold a phased plan; optionally append the `index.md` row |
+| `dh_read_sheet` | Query tabular data with DuckDB — csv by default; xlsx via a `read_xlsx(...)` query when the extension loads |
+| `dh_update_sheet` | Apply UPDATE/INSERT/DELETE and write the CSV back |
+| `dh_sheet_schema` | Describe columns as `name:type` |
+| `dh_logged_command` | Run a command with its log in the OS temp dir (runs with the MCP server's OS permissions); return head/tail + log path |
+
+Full inputs/returns contract: [`docs/LOADING.md` → Tools](docs/LOADING.md#tools).
+
+Server key `dh` + tool `plan_read` → **`dh_plan_read`** (MCP host naming
+`<server>_<tool>`); under Code Mode call `tools.dh.<tool>`. The older
+`dh.<tool>` spelling belonged to the plugin's V2 tool namespace and is
+retired. Consumer permission actions match `dh_*`. Full wiring, verification
+(`opencode mcp list`), prewarm, and troubleshooting:
+[`docs/LOADING.md`](docs/LOADING.md#mcp-server-dh).
 
 ## Agents & skills
 
-The plugin defines 7 agents and 17 skills using `@opencode/plugin` (`Plugin.define`). Zero command transforms are registered.
+The plugin defines 7 agents and 17 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
 
 ### Agents
 
@@ -169,6 +205,7 @@ pnpm run audit
 pnpm typecheck
 pnpm build
 node scripts/smoke-load.mjs
+node scripts/smoke-mcp.mjs
 pnpm qa:check
 pnpm qa:check:full
 pnpm format:biome

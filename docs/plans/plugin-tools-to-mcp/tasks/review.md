@@ -616,3 +616,51 @@ fail-closed anchor precondition, index ACL tests, row escaping, helper relocatio
 - [x] Proceed to Sub-Task 4.2 — repo docs & examples (README, AGENTS.md, LOADING.md MCP
       reference, `opencode.example.jsonc`), including the recorded gate-description drift
       (`smoke-mcp` now in `qa:check:full`).
+
+---
+
+## Sub-Task Review: 4.2 — Repo docs & examples (README, AGENTS.md, LOADING.md, skills/index.md, opencode.example.jsonc)
+
+**Reviewed against:** Sub-Task 4.2 (plan.md, Phase 4 — designated documentation sub-task) · **Overall risk:** Low · **Verdict:** Approve with comments
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Commands in the new docs sections run and match | PASS | Runnable ones executed (node-dist fallback: exit 0 / 0 stdout; JSONC parse; links; gates); `opencode mcp list` + cold-npx framed as 5.1 verification steps, not completed-run claims |
+| Zero stale tool refs in the four files | PASS | `rg` → 0 matches |
+| LOADING.md carries the exact npx command array | PASS | Byte-identical to the shipped contract; snippet identity verified ×3 (4th copy lands in 4.4) |
+| README lists all 7 tools | PASS | Purpose table + link to LOADING's canonical inputs/returns table |
+| Gate description accurate | PASS | build→test order, smoke rows, QA heading fixed |
+
+### Findings
+
+- **[P0–P1]:** none. **Fact-check:** the wiring contract is accurate — command array vs `package.json` bin, protocol/legacy claim vs `src/mcp/stdio.ts`, `DH_WORKSPACE_ROOT` vs `src/mcp/workspace.ts`, naming vs 4.1, gate order vs `package.json`, anchors resolved.
+- **[P2] AGENTS QA heading contradicted the table contents:** **Addressed** — "release gate `qa:check:full` runs all of these (fast subset `qa:check`)".
+- **[P2] Cache-bust command invalid on npm 11** (`npx clear-npx-cache`): **Addressed** — `npm cache npx rm --force` primary; legacy label kept; plan.md 5.1 updated to match.
+- **[P2] README adds a fourth snippet copy not covered by 5.1's identity check:** **Addressed** — plan.md 5.1 now verifies FOUR copies (README, LOADING, example, demo).
+- **[P2] Example checklist overstated `opencode mcp list` output:** **Addressed** — server/status line + separate expected-tools line.
+- **[P3 batch]:** **Addressed** — `dist/.build-ok` wording; `allowBuilds` resolved-spec form + `pnpm approve-builds`; README table link; csv/xlsx nuance; `dh_logged_command` trust-boundary note; installation sentence; AGENTS wording + prose nits.
+- **[P3-adjacent] Stale verification blocks** (`opencode debug skills`/`commands` don't exist on v2.0.18; example checklist claimed 12/17 skills, 6/7 agents): **Addressed** — replaced with valid `debug agents` / `debug config` / `mcp list` checks; current 7 agents + 17 skills recorded.
+- **Recorded:** `timeout.startup: 300000` provisional (5.1 measures); cwd parenthetical host assumption (5.1 confirms); `docs/evolve/**` historical names excluded from the 5.1 grep.
+- **Simplify method note (recorded):** consolidated three-lens pass (docs-only; reuse/quality/efficiency covered in one reviewer — proportionate).
+
+### Validation Results
+
+- Validation commands: zero-stale greps; `lint:links` 26 refs OK; `audit.mjs` PASS; JSONC parse OK; snippet identity ×3; `pnpm test` 18/181 unchanged — independently re-run via `@dh-executor` (PASS; reports churn reverted).
+- Evidence: source cross-checks (stdio.ts legacy default, workspace.ts precedence), anchor resolution, gate-order transcription.
+- Web validation (MCP Chrome): not applicable.
+
+### Regression Risk Assessment
+
+- Docs-only; no code/config behavior change. The docs now describe the shipped hard-cut reality; the zero-tools window closes for projects at 4.3/4.4.
+
+### Scope Compliance
+
+- In scope: the four files (skills/index.md audited, unchanged — already consistent after 4.1).
+- Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [x] Proceed to Sub-Task 4.3 — `dh-setup` wiring step (consent-based `mcp.servers.dh`
+      merge + prewarm + verify); cap watch at 239/250 lines.
