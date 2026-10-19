@@ -34,7 +34,7 @@ where they differ) and re-verify.
 | graphify | yes | `graphify --version` | https://github.com/Graphify-Labs/graphify (v8 README) — `uv tool install graphifyy` (or `pipx install graphifyy`), then register the skill with `graphify install` |
 | obsidian | optional | `command -v obsidian` (app + best-effort CLI) | https://obsidian.md — recommended when the project vault flow (dh-create-documentation) should sync live |
 | notesmd-cli | optional | `notesmd --version` / `command -v notesmd` | https://github.com/Yakitrak/notesmd-cli — `yay -S notesmd-cli-bin` (Arch) / `brew install yakitrak/yakitrak/notesmd-cli` / release binary; used by dh-create-documentation for vault operations without Obsidian running |
-| duckdb (CLI, optional) | optional | `duckdb --version` | https://duckdb.org — native CLI alternative to the plugin's bundled sheet tools (dh.read_sheet/dh.update_sheet use the duckdb npm package) |
+| duckdb (CLI, optional) | optional | `duckdb --version` | https://duckdb.org — native CLI alternative to the `dh` MCP server's sheet tools (dh_read_sheet/dh_update_sheet use the duckdb npm package) |
 | phpenv | optional | `phpenv --version` / `phpenv versions` | https://github.com/phpenv/phpenv — skip with a note when absent |
 
 For anything missing, do NOT silently skip (except the optional items —
@@ -203,9 +203,9 @@ This project is managed with the dev-harness plugin (dev-harness-skills):
 
 - **Plans:** phased plans live in `docs/plans/<slug>/plan.md` (phases →
   sub-tasks with `Pending | In Progress | Completed` markers); the format
-  contract is the phased-plan template. Use `dh.plan_read` /
-  `dh.plan_update_status` / `dh.plan_create` instead of manual edits when
-  available.
+  contract is the phased-plan template. Use `dh_plan_read` /
+  `dh_plan_update_status` / `dh_plan_create` instead of manual edits when
+  available. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 - **Loop:** plan with `dh-planning` (SDD first via `dh-grill-sdd` when
   absent), execute with `dh-execute-plan` → `dh-execute-plan-task`
   (delegating implementation to `@dh-software-engineer`), simplify with

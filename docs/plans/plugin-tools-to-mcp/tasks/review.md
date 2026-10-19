@@ -571,3 +571,48 @@ fail-closed anchor precondition, index ACL tests, row escaping, helper relocatio
 - [x] Phase 3 complete — close the phase, commit.
 - [ ] Phase 4: content, docs & project wiring (4.1 naming flip → 4.4 demo) — the
       zero-tools window closes at 4.3/4.4 with the demo config + validation.
+
+---
+
+## Sub-Task Review: 4.1 — Skills + agents naming flip (canonical mapping table)
+
+**Reviewed against:** Sub-Task 4.1 (plan.md, Phase 4) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Zero stale dot-form tool refs in `skills/` + `agents/` | PASS | `rg` → 0 matches; new names present in exactly the 10 changed files with per-file counts matching the old refs |
+| Canonical naming sentence per tool-introducing file | PASS | One sentence per file; unified meaning; executor singular template normalized |
+| Rename-only discipline | PASS | Token-normalized comparison (HEAD + mappings vs current minus the sentence) byte-identical for all 10 files |
+| Fallback language preserved | PASS | Per-file "Fallback…" counts unchanged (25 → 25 across changed files) |
+| Harness audit + links green | PASS | `audit.mjs` failFindings 0; `lint:links` 23 refs, none dead |
+| Line limits | PASS | Max skill 239/250; max agent 73/300 |
+
+### Findings
+
+- **[P0–P2]:** none.
+- **[P3] Sentence-shape variance** (singular/plural, placeholder vs literal): **Addressed** — executor sentence normalized to a singular template; `dh-review`/`dh-final-review` referents fixed ("The plan tools").
+- **[P3] `dh-setup` sentence placement** (inside the generated AGENTS.md template rather than the first tool mention): **Confirmed intentional** — plan-tools introduction; 4.3 reuses this sentence (no second variant).
+- **[P3] Residual "bundled/plugin tools" wording** contradicting MCP delivery: **Addressed** — four files aligned (`skills/index.md`, `agents/dh-documentor.md`, `agents/dh-executor.md`, `skills/dh-setup/SKILL.md`).
+- **Simplify method note (recorded deviation):** a single consolidated three-lens pass was run (docs-only rename; per-lens separation adds no incremental signal); reuse/consistency, quality/prose, and efficiency (n/a) were all covered explicitly.
+- **Forward note:** `dh-setup` at 239/250 lines — the 4.3 wiring subsection must fit or extract first (headroom clause added to plan.md 4.3 scope).
+
+### Validation Results
+
+- Validation commands: zero-stale grep; per-file new-name counts; `audit.mjs` PASS; `lint:links` PASS; `pnpm test` 18/181 unchanged — independently re-run via `@dh-executor` (PASS).
+- Evidence: token-normalized rename-only proof; fallback-language conservation; line-count table.
+- Web validation (MCP Chrome): not applicable (docs).
+- Regression: none (docs-only; test suite unchanged).
+- Note: `reports/audit.*` churn from the audit runs is excluded from this commit (regenerated at release, 5.2).
+
+### Scope Compliance
+
+- In scope: the 10 `skills/` + `agents/` files. `docs/plans/**` untouched (historical records keep the dot form).
+- Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [x] Proceed to Sub-Task 4.2 — repo docs & examples (README, AGENTS.md, LOADING.md MCP
+      reference, `opencode.example.jsonc`), including the recorded gate-description drift
+      (`smoke-mcp` now in `qa:check:full`).

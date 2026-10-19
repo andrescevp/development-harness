@@ -82,7 +82,7 @@ Before leaving interview mode, confirm the collected answers provide enough info
 10. Prefer concrete validation commands or checks when known.
 11. Explain core concepts with appropriate code example when necessary.
 12. Write a self-contained plan that can be executed without the conversation.
-13. **Tools:** create the plan scaffold with the `dh.plan_create` tool when available (then fill details), and read/verify with `dh.plan_read`; fall back to manual writes using `references/phased-plan-template.md` when the tools are not installed.
+13. **Tools:** create the plan scaffold with the `dh_plan_create` tool when available (then fill details), and read/verify with `dh_plan_read`; fall back to manual writes using `references/phased-plan-template.md` when the tools are not installed. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 14. Update `./docs/plans/index.md` to add the new plan or reflect the update, including title, slug, description, timestamps and status.
 15. Optionally use chrome mcp tools to validate the work via web if it is possible to do so, and include the results in the plan.
 

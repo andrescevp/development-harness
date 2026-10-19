@@ -312,11 +312,11 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 ### Phase 4: Harness content, docs & project wiring
 
-- **Status:** Pending
+- **Status:** In Progress
 
 #### Sub-Task 4.1: Skills + agents naming flip (canonical mapping table)
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Flip every tool reference inside `skills/*` and `agents/*` to the MCP naming, using a single frozen mapping table, with zero stale references remaining (outside historical `docs/plans/**`).
 - **Related Requirements:** R8, AC6
 - **Dependencies and Preconditions:** none strictly (text layer), but logically after the MCP naming is final (it is — Phase 1).
@@ -352,7 +352,7 @@ return { content: [{ type: 'text', text: message }], isError: true };
 - **Dependencies and Preconditions:** 2.2 (npx-ready package), 4.2 (exact snippet).
 - **In Scope for This Sub-Task:** `skills/dh-setup/SKILL.md` — new subsection (project layer, next to the QA/hook steps): (1) detect/read the project `opencode.jsonc` (`mcp.servers.dh` idempotent merge; create the `mcp.servers` keys when absent; never overwrite other servers; user consent first, consistent with the hook policy); (2) prewarm: `npx -y --package=github:andrescevp/development-harness dev-harness-mcp < /dev/null` (warms the npx cache and validates reachability; expect a fast exit via stdin EOF); (3) verify: `opencode mcp list` shows `dh` connected (restart note for running sessions); (4) document the `timeout.startup` bump when cold starts are slow and the node-dist fallback; update the skill's verification checklist + tools table mentions.
 - **Out of Scope for This Sub-Task:** implementing anything in opencode itself; global-scope MCP entries (`--global` out of scope per SDD).
-- **Instructions:** keep the entry byte-identical to the `opencode.example.jsonc` snippet from 4.2 (single source: the docs); the prewarm uses the exact shipped command (+ `< /dev/null`); state clearly that this step is skipped when the project already carries the entry (report as "already wired").
+- **Instructions:** keep the entry byte-identical to the `opencode.example.jsonc` snippet from 4.2 (single source: the docs); the prewarm uses the exact shipped command (+ `< /dev/null`); state clearly that this step is skipped when the project already carries the entry (report as "already wired"). CAP WATCH: this file sits at 239/250 lines — compress or extract first if the new subsection pushes past the limit (e.g. move the tools table details to LOADING.md and keep a pointer).
 - **Acceptance Criteria:** the SKILL.md step, executed manually in demo-project (4.4/5.1), wires the entry, prewarms, and shows `dh` connected; file passes the harness audit (line limits); no silent config changes (consent text present).
 - **Cautionary Points (Risks & Edge Cases):** JSONC editing preserves comments/format where feasible (append under `mcp.servers`); do not clobber an existing `dh` entry with different settings without showing a diff; cold-start timing varies by network — prewarm is best-effort with a clear timeout.
 - **Implementation Suggestions:** model the step phrasing on the existing hook-consent pattern in the same skill; keep the snippet short and link to LOADING.md for details.

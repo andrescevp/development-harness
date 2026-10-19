@@ -33,8 +33,8 @@ Generate structured, cross-referenced documentation in any format, at any locati
   "<project>"` (preferred) or `obsidian search query="<term>"` to retrieve
   information from documents; `rg` as fallback.
 - **Parsing extra formats:** use `jq` (json), `yq` (yaml), `xq` (xml), and
-  DuckDB (`dh.read_sheet`, `dh.update_sheet`, `dh.sheet_schema`) for
-  tabular data.
+  DuckDB (`dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`) for
+  tabular data. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 
 ## Workflow
 
