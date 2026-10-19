@@ -10,7 +10,7 @@
 | `node scripts/audit.mjs` | **PASS** — failFindings 0 (one warn-only dimension: cross-references) |
 | Live end-to-end | **PASS** — real agent session called `tools.dh.plan_create`; payload `{ ok: true, path: …/demo-project/docs/plans/verification-scratch/plan.md }` (evidence: `tasks/verification.md`) |
 | Stale references (AC6) | **PASS** — 0 matches outside `docs/plans/**` + `docs/evolve/**` |
-| Snippet identity | **PASS** — 4 canonical npx copies match (`type` / `command` / `protocol`); demo copy is the documented local fallback |
+| Snippet identity | **PASS** — 4 canonical npx copies match (`type` / `command` / `protocol` / `timeout.startup`); demo copy is the documented local fallback |
 
 ## Version Decision
 
@@ -59,8 +59,15 @@ The plan expected this (`0.5.0`); the decision is recorded rather than silently 
 
 ## Tag
 
-**Deferred to the release step** — this repository's Git Flow tags semver releases on `main`
-only; the feature branch must be merged (`feature/* → develop → release/* → main`) first.
+**Pre-tag step — bump the shipped version.** On the release branch, before tagging,
+set `package.json` `"version"` to `0.5.0` (`npm version 0.5.0 --no-git-tag-version`,
+or edit the file) and commit it. The MCP `serverInfo.version` is read from
+`package.json` at runtime, so the newly tagged commit must not report `0.4.0`.
+
+**Deferred acceptance:** plan 5.2 acceptance “tag created locally” was intentionally
+deferred per Git Flow; the tag is created on `main` at release time. The feature branch
+must be merged (`feature/* → develop → release/* → main`) first.
+
 When cutting the release on `main`:
 
 ```sh
@@ -70,11 +77,25 @@ git tag -a v0.5.0 -m "Release v0.5.0"
 
 No tag was created on the feature branch (policy: tags on `main` only).
 
+**Post-merge AC5 re-run:** once the branch is on the remote default branch, run the
+verbatim `npx -y --package=github:andrescevp/development-harness dev-harness-mcp`
+command once and record the result (the machinery was already proven with a cold
+`git+file` run: 24.2 s, exit 0).
+
+## Release Checklist
+
+- [ ] `package.json` version bumped to `0.5.0` (the new tag must not report `0.4.0` via `serverInfo.version`)
+- [ ] `pnpm qa:check:full` green on the release commit (regenerates `reports/`)
+- [ ] commit the regenerated `reports/audit.{md,json}` as the release-report commit (repo convention, cf. v0.4.0)
+- [ ] Git Flow merge path executed; `v0.5.0` tagged on `main`
+- [ ] post-merge AC5 re-run recorded
+
 ## Notes / Follow-ups
 
 - The `github:andrescevp/development-harness` npx spec becomes exercisable after this branch is
   merged/released (it resolves the remote default branch); the local folder-spec proxy measured
-  the install/launch mechanics (752 ms cold / 1046 ms warm) and the documented
-  `timeout.startup: 300000` remains the safe ceiling.
+  the install/launch mechanics (752 ms cold / 1046 ms warm), and a cold `git+file` install +
+  handshake measured 24.2 s (fresh cache) — hence the canonical snippet now ships
+  `"timeout": { "startup": 300000 }` **active**.
 - Distribution/merge/push are user decisions (Git Flow): merge feature → `develop`, cut
   `release/v0.5.0`, merge to `main`, tag there, back-merge `main` → `develop`.

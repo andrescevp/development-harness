@@ -130,7 +130,9 @@ in that project's `opencode.jsonc`:
       "dh": {
         "type": "local",
         "command": ["npx", "-y", "--package=github:andrescevp/development-harness", "dev-harness-mcp"],
-        "protocol": "2026-07-28"
+        "protocol": "2026-07-28",
+        // Cold first npx install can take ~20–25 s; prewarm makes later starts fast.
+        "timeout": { "startup": 300000 }
       }
     }
   }

@@ -412,16 +412,16 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 - **System-Wide Test:** on the final branch state — `pnpm build` → `pnpm qa:check:full` (includes unit + registration + bundle + stdio smoke + lint/depcruise/knip/dup + scans) → `./demo-project/demo.sh validate` (fresh data dir; MCP step green) → live opencode session calls `dh_plan_create` + `dh_plan_read` through the MCP server and prints the returned plan → cold npx timing recorded and thresholds documented.
 - **Completion Checklist:**
-  - [ ] Plugin registers 7 agents, 17 skills, 0 tools (registration gate)
-  - [ ] MCP server exposes exactly 7 tools with parity payloads + `isError` messages (AC2 tests)
-  - [ ] `scripts/smoke-mcp.mjs` green in `qa:check:full` (AC3)
-  - [ ] `opencode mcp list` shows `dh` connected; live call recorded (AC4)
-  - [ ] Cold-start npx measured; `timeout.startup` guidance documented (AC5)
-  - [ ] Zero stale tool refs outside `docs/plans/**` (AC6)
-  - [ ] `pnpm qa:check:full` exit 0; audit PASS (AC7)
-  - [ ] `docs/plans/index.md` row final; all statuses `Completed` (AC8)
-  - [ ] Snippet copies identical (LOADING.md / opencode.example.jsonc / demo config)
-  - [ ] No orphan processes after smoke/live runs
+  - [x] Plugin registers 7 agents, 17 skills, 0 tools (registration gate)
+  - [x] MCP server exposes exactly 7 tools with parity payloads + `isError` messages (AC2 tests)
+  - [x] `scripts/smoke-mcp.mjs` green in `qa:check:full` (AC3)
+  - [x] `opencode mcp list` shows `dh` connected; live call recorded (AC4)
+  - [x] Cold-start npx measured; `timeout.startup` guidance documented (AC5)
+  - [x] Zero stale tool refs outside `docs/plans/**` (AC6)
+  - [x] `pnpm qa:check:full` exit 0; audit PASS (AC7)
+  - [x] `docs/plans/index.md` row final; all statuses `Completed` (AC8)
+  - [x] Snippet copies identical (LOADING.md / opencode.example.jsonc / demo config)
+  - [x] No orphan processes after smoke/live runs
 
 ## Open Questions
 

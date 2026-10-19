@@ -98,7 +98,8 @@ project's `opencode.jsonc` (additive to the plugin loading above):
       "dh": {
         "type": "local",
         "command": ["npx", "-y", "--package=github:andrescevp/development-harness", "dev-harness-mcp"],
-        "protocol": "2026-07-28"
+        "protocol": "2026-07-28",
+        "timeout": { "startup": 300000 }
       }
     }
   }
@@ -106,11 +107,11 @@ project's `opencode.jsonc` (additive to the plugin loading above):
 ```
 
 - The command runs the package `bin` (`dev-harness-mcp` → `dist/mcp/stdio.js`).
-  The first run clones/installs it into the npx cache — **cold starts can take
-  a while**. Prewarm once with
-  `npx -y --package=github:andrescevp/development-harness dev-harness-mcp < /dev/null`
-  and, on slow networks, raise the allowance with
-  `"timeout": { "startup": 300000 }` on the `dh` entry.
+  The first run clones/installs it into the npx cache — **cold installs measured
+  ~20–25 s**, so the canonical snippet includes
+  `"timeout": { "startup": 300000 }`. Prewarm once with
+  `npx -y --package=github:andrescevp/development-harness dev-harness-mcp < /dev/null`;
+  prewarmed/already-connected starts are fast.
 - `protocol: "2026-07-28"` pins the native MCP revision; the same server
   factory also serves legacy (`initialize`) clients, so 2025-era hosts work.
 - **Workspace anchoring:** the server resolves the workspace from the process
@@ -172,6 +173,11 @@ the 7 tools, and round-trips plan create/read/update).
   checkout. Bust it with `npm cache npx rm --force` (full cache:
   `npm cache clean --force`; `npx clear-npx-cache` is legacy-npm only), then
   restart opencode; the next start re-installs from git.
+- **Stale `dh` after rebuilding `dist/` or editing the entry** — a long-lived
+  shared `opencode serve` service can keep a previously spawned MCP child
+  alive, so `opencode mcp list` may report a stale `dh` as connected.
+  Restart/close the service (or the project session), then re-run
+  `opencode mcp list`.
 - **`ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` (pnpm 11 consumers installing the
   repo as a git dependency)** — allow the package build in the consumer's
   `pnpm-workspace.yaml` (`allowBuilds:`) using the exact form pnpm prints

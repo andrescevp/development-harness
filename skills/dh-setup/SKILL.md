@@ -130,16 +130,17 @@ them instead of silently disabling rules.
 project-scope local MCP server; wire it once (idempotent, consent first):
 - In the project `opencode.jsonc` (or `opencode.json`), ensure the entry
   matches `"type": "local"`, `"command": ["npx", "-y", "--package=github:andrescevp/development-harness", "dev-harness-mcp"]`,
-  `"protocol": "2026-07-28"`. Accept nested `mcp.servers.dh` or legacy flat `mcp.dh` (both present → NESTED wins: show it and ask before consolidating).
-  Compare ONLY `type`/`command`/`protocol`; extra keys (`timeout`, `environment`, `disabled`, `codemode`) are preserved — not conflicts.
+  `"protocol": "2026-07-28"`, `"timeout": { "startup": 300000 }`. Accept nested `mcp.servers.dh` or legacy flat `mcp.dh` (both present → NESTED wins: show it and ask before consolidating).
+  Compare ONLY `type`/`command`/`protocol`/`timeout.startup`; other keys (`environment`, `disabled`, `codemode`) are preserved — not conflicts.
   Create `mcp`/`servers` when absent; never overwrite other servers. Identical canonical fields → "already wired";
   a difference → show a diff and ask (same consent as hooks). If neither config file exists, create `opencode.jsonc` with consent
   (`$schema` + the block), preserving comments/format when editing in place (no parser round-trip).
 - Prewarm (best-effort; expect a fast exit via stdin EOF; on timeout note the
   cold start): `npx -y --package=github:andrescevp/development-harness dev-harness-mcp < /dev/null`.
 - Verify: `opencode mcp list` → `dh` connected (restart long-lived sessions).
-- Slow first connection: add `"timeout": { "startup": 300000 }`; offline/local
-  fallback: `["node", "<clone>/dist/mcp/stdio.js"]` (needs `pnpm build`).
+- Cold first npx install (~20–25 s) is covered by the canonical
+  `"timeout": { "startup": 300000 }`; offline/local fallback:
+  `["node", "<clone>/dist/mcp/stdio.js"]` (needs `pnpm build`).
   Details: [docs/LOADING.md](https://github.com/andrescevp/development-harness/blob/main/docs/LOADING.md#mcp-server-dh).
 
 ## Step 4: Architecture Documentation

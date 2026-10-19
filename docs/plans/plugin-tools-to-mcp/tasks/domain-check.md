@@ -64,3 +64,8 @@ move is: **core tool helpers stay; the host adapter swaps** (plugin tool API →
 ## Blocking Issues
 
 None.
+
+## Post-implementation Note
+
+Adapters live in `src/mcp/server.ts` — no separate `tools.ts` was needed; the
+registration stayed under the 300-line cap.

@@ -36,7 +36,9 @@ cd demo-project
 2. `opencode.jsonc` — `mcp.servers.dh` wires the project-scope MCP server with
    the LOCAL build: `["node", "../dist/mcp/stdio.js"]` (run `pnpm build` in the
    repo first). Shipped projects use the npx form (see README / docs/LOADING.md).
-   `validate` step 4/5 connects through it on a fresh data dir.
+   `validate` step 4/5 connects through it on a fresh data dir. Restart the
+   shared opencode service after rebuilding — it can keep a stale MCP child
+   alive, so the gate would re-evaluate against the old process.
 3. `.obsidian/` — the project root IS an Obsidian vault (dh-setup mandate),
    so `notesmd-cli search-content "..." --vault "demo-project"` works.
 4. `docs/` — every generated document follows the documentation contract:
