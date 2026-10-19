@@ -2,15 +2,20 @@ import { defineConfig } from "tsup"
 import path from "node:path"
 
 /**
- * Dev Harness Skills — V2 plugin bundle.
+ * Dev Harness Skills — V2 plugin bundle + MCP stdio bin.
  *
- * - Single ESM entry (`dist/plugin.js`) consumed by the opencode plugin loader.
+ * - Two ESM entries: `dist/plugin.js` (opencode plugin loader) and
+ *   `dist/mcp/stdio.js` (npx `dev-harness-mcp` bin).
  * - `@opencode/plugin` and `yaml` are BUNDLED IN so the built plugin is
  *   self-contained: opencode v2.0.18's global-plugin loader cannot resolve
  *   bare imports from the ~/.config/opencode/plugins directory, so the
- *   bundle must not evaluate any bare specifier at load time.
+ *   bundle must not evaluate any bare specifier at load time. The MCP bundle
+ *   runs with a real node_modules (npx cache) and keeps its SDK deps
+ *   external instead.
  * - `duckdb` (CJS-only native module) stays external and is lazy-required
  *   inside sheet-tools, so it is only evaluated when a sheet tool runs.
+ * - The shebang banner makes `dist/mcp/stdio.js` directly executable; it is
+ *   harmless in the ESM plugin bundle (Node strips shebangs in ESM).
  * - `clean: true` wipes dist/ before bundling; the npm `build` script then
  *   emits declarations (`tsc --emitDeclarationOnly`) and re-copies
  *   `agents/` + `skills/` into `dist/assets/` (see copy-assets.mjs).
@@ -19,12 +24,13 @@ import path from "node:path"
  *   native TypeScript 7 compiler (tsgo).
  */
 export default defineConfig({
-  entry: ["src/plugin.ts"],
-  format: ["esm"],
-  platform: "node",
-  target: "node20",
-  external: ["duckdb"],
-  noExternal: ["@opencode/plugin", "yaml", /^effect(?:\/|$)/],
+  entry: { plugin: 'src/plugin.ts', 'mcp/stdio': 'src/mcp/stdio.ts' },
+  format: ['esm'],
+  platform: 'node',
+  target: 'node20',
+  banner: { js: '#!/usr/bin/env node' },
+  external: ['duckdb'],
+  noExternal: ['@opencode/plugin', 'yaml', /^effect(?:\/|$)/],
   outDir: "dist",
   clean: true,
   sourcemap: false,

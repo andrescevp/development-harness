@@ -7,12 +7,17 @@
   "exports": {
     ".": "./index.ts"
   },
+  "bin": {
+    "dev-harness-mcp": "./dist/mcp/stdio.js"
+  },
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsup && tsc --emitDeclarationOnly && npm run copy-assets",
+    "build:runtime": "tsup && npm run copy-assets",
     "copy-assets": "node scripts/copy-assets.mjs",
+    "prepare": "node scripts/prepare.mjs",
     "audit": "node scripts/audit.mjs",
     "test": "vitest run",
     "test:watch": "vitest",

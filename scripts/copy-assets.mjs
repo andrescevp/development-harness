@@ -25,6 +25,7 @@ import { createJunkReason, listEntries, projectRoot } from './lib/shared.mjs';
 
 const REPO_ROOT = projectRoot(import.meta.url);
 const ASSETS_ROOT = path.join(REPO_ROOT, 'dist', 'assets');
+const BUILD_SENTINEL = path.join(REPO_ROOT, 'dist', '.build-ok');
 const COPY_SECTIONS = ['agents', 'skills'];
 
 const junkReason = createJunkReason();
@@ -108,6 +109,9 @@ function main() {
     process.exit(1);
   }
   console.log('[copy-assets] OK — assets synced to dist/assets');
+  // Final build step of BOTH build variants: the timestamp sentinel marks a
+  // complete build so `prepare` never mistakes a partial retry for success.
+  fs.writeFileSync(BUILD_SENTINEL, `${new Date().toISOString()}\n`, 'utf8');
 }
 
 main();

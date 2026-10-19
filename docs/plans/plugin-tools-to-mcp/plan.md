@@ -263,7 +263,7 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 #### Sub-Task 2.2: Build & package wiring (tsup entries, bin, prepare, knip)
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Produce `dist/mcp/stdio.js` from the standard build; make the package npx-runnable: `bin` entry, `prepare` build for git installs, tsup second entry with a shebang banner; keep knip/depcruise/biome green.
 - **Related Requirements:** R5, R11, AC5, AC7
 - **Dependencies and Preconditions:** 2.1 (entry module exists).

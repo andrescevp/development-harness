@@ -418,3 +418,56 @@ fail-closed anchor precondition, index ACL tests, row escaping, helper relocatio
 - [x] Proceed to Sub-Task 2.2 — build & package wiring (tsup second entry, shebang,
       `bin`, `prepare`, knip entry config); the 2.3 smoke must spawn through a symlink-style
       invocation mirroring npx.
+
+---
+
+## Sub-Task Review: 2.2 — Build & package wiring (tsup entries, bin, prepare, knip)
+
+**Reviewed against:** Sub-Task 2.2 (plan.md, Phase 2) · **Overall risk:** Low · **Verdict:** Approve with comments
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| `pnpm build` emits both bundles, non-empty | PASS | `dist/plugin.js` 1,003,521 B · `dist/mcp/stdio.js` 229,943 B; shebang first line on both; tsup chmods both executable |
+| npx-ready package metadata | PASS | `bin.dev-harness-mcp → ./dist/mcp/stdio.js`; tarball includes it (`npm pack --dry-run` 34 files, JSON-clean) |
+| SDK/zod external in the MCP bundle; `duckdb` lazy; `yaml` bundled | PASS | Verified in the emitted bundle (no inlined SDK/zod; `require2("duckdb")` lazy) |
+| `node dist/mcp/stdio.js < /dev/null` → exit 0, no stdout | PASS | 0 stdout bytes; stderr banner only |
+| `prepare` skip/build logic both ways | PASS | Skip ~20 ms (stderr-only message); rebuilds on missing or zero-byte artifacts |
+| knip entry config | PASS | No change needed — the `bin` covers `src/mcp/stdio.ts` |
+| QA gates green | PASS | 178 tests; typecheck; biome/knip/depcruise/dup; audit |
+
+### Findings
+
+- **[P0] Blocking:** none.
+- **[P1] High:** none.
+- **[P2] Existence-only skip masked partial/failed builds** (tsup emits both JS files before `tsc`/`copy-assets`): **Addressed** — `dist/.build-ok` sentinel written as copy-assets' final step; the predicate requires the sentinel + non-empty artifacts; partial and zero-byte states verified to rebuild.
+- **[P2] `prepare` broke devDeps-omitted installs** (raw exit 127 when `tsup` is absent): **Addressed** — `require.resolve('tsup')` guard → stderr message + skip (verified with hidden tooling).
+- **[P3] Lifecycle-hook stdout pollution** (`npm pack --dry-run --json` unparseable): **Addressed** — all messages on stderr, child build output routed to stderr; JSON output verified parseable.
+- **[P3] Silent failure on signal-terminated builds:** **Addressed** — non-numeric status logs a diagnostic before exit 1 (verified with a signal-killed fake npm).
+- **[P3] `prepare` ran release-only build work (~2 s of tsc declarations) on the cold path:** **Addressed** — `build:runtime` (tsup + copy-assets) used by `prepare`; full `build` kept for QA/release.
+- **Deferred (recorded):** devDependency slimming (`@opencode/plugin`, `yaml`) for the cold npx path → Sub-Task 5.1 (needs real timing; source-mode consumer risk); automated `prepare.mjs` tests (plan sanctions manual verification; predicate kept small); `tsup.config.ts` quote-style drift (informational).
+- **Recorded for 4.2 docs:** pnpm 11 consumers installing this package from git need an `allowBuilds` entry (`ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED`); npm/npx unaffected.
+
+### Validation Results
+
+- Tests present: build/artifact/prepare/stdin checks; gates — independently re-run via `@dh-executor` (PASS; logs `/tmp/dh-val-22/`).
+- Evidence: second-entry build cost measured (~6–16 ms); bundle-composition probes; pack-JSON probe; signal-kill probe; prepare skip/partial/zero-byte/missing-tooling matrix.
+- Web validation (MCP Chrome): not applicable.
+- Architecture: no `src/` changes; build surface only.
+- Operational note (harness-tooling observation, not a 2.2 issue): `dh.logged_command`'s head/tail window drops earlier segments on compound `&&` commands — pre-existing behavior, recorded for awareness.
+
+### Regression Risk Assessment
+
+- Full `build` semantics unchanged; `prepare` now builds runtime-only (declarations skipped — no current d.ts consumer; acceptable, noted).
+- The sentinel lives inside gitignored `dist/` (`git check-ignore` verified); no repo pollution.
+
+### Scope Compliance
+
+- In scope: `tsup.config.ts`, `package.json`, `scripts/prepare.mjs`; `scripts/copy-assets.mjs` touched for the sentinel (build-order justified within "build wiring").
+- Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [x] Proceed to Sub-Task 2.3 — `scripts/smoke-mcp.mjs` via `StdioClientTransport`; optionally
+      add a symlink-style launch variant mirroring npx (the 2.1 guard is already unit-pinned).
