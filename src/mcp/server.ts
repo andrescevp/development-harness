@@ -1,11 +1,11 @@
 /**
  * server.ts — MCP server factory for the harness tools.
  *
- * Serves the 7 plan/sheet/command capabilities of the `dh` tool namespace
- * during the transition from plugin tools to MCP: the opencode plugin still
- * registers them at this commit; this module is their MCP home. Handlers are
- * thin adapters over the pure helpers in `src/tools/*`; the workspace root is
- * injected by the caller (the stdio entry resolves it per connection).
+ * Serves the 7 plan/sheet/command capabilities of the `dh` tool namespace.
+ * The opencode plugin registers agents and skills only; these tools live here
+ * and are served over stdio by `src/mcp/stdio.ts`. Handlers are thin adapters
+ * over the pure helpers in `src/tools/*`; the workspace root is injected by
+ * the caller (the stdio entry resolves it per connection).
  *
  * When served over stdio, stdout is the MCP protocol channel — never log here.
  */
@@ -217,7 +217,7 @@ export function buildServer({ workspaceRoot, version, instructions }: BuildServe
     'logged_command',
     {
       description:
-        "Run a command under the logged-execution strategy: output is written to a log file in the SYSTEM TEMP directory, then the first 20 and last 30 lines are returned with a TRUNCATED marker plus the log path for full exploration. Intended for the executor agent; command runs locally with the plugin server's permissions.",
+        "Run a command under the logged-execution strategy: output is written to a log file in the SYSTEM TEMP directory, then the first 20 and last 30 lines are returned with a TRUNCATED marker plus the log path for full exploration. Intended for the executor agent; command runs locally with the MCP server's permissions.",
       inputSchema: z.object({
         command: z.string().describe('The shell command to run (POSIX shell on linux/macOS; PowerShell on Windows)'),
         logName: z

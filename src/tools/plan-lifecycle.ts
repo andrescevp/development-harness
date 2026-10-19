@@ -17,9 +17,6 @@ import { parse } from 'yaml';
 import { splitFrontmatter } from '../lib/frontmatter.js';
 import { planScaffold } from './plan-template.js';
 
-// TODO(3.1): repoint importers (plugin.ts, plan-lifecycle.test.ts) at plan-paths and drop this re-export.
-export { resolvePlanPath } from './plan-paths.js';
-
 /** Canonical status/target domains shared by parser, editors, and adapters. */
 export const PHASE_STATUSES = ['Pending', 'In Progress', 'Completed'] as const;
 export type PhaseStatus = (typeof PHASE_STATUSES)[number];

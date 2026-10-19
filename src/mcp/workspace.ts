@@ -3,7 +3,7 @@
  *
  * Lexical only: never touches the filesystem and never returns an empty root
  * (a blank cwd throws); `resolvePlanPath` keeps its own guard for direct
- * callers such as `plugin.ts`.
+ * callers (the MCP server and tests).
  */
 import path from 'node:path';
 

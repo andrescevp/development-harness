@@ -34,7 +34,7 @@
     "scan:code": "docker run --rm -v \"${PWD}:/src\" semgrep/semgrep semgrep --config=p/typescript --config=p/security-audit --metrics=off /src/src",
     "qa:fix": "pnpm format:biome",
     "qa:check": "pnpm lint:biome && pnpm format:biome:check && pnpm lint:knip && pnpm lint:dup && pnpm lint:depcruise && pnpm lint:links && pnpm scan:deps && pnpm scan:code",
-    "qa:check:full": "pnpm qa:check && pnpm test && pnpm typecheck && pnpm run audit && pnpm build && node scripts/smoke-load.mjs && node scripts/smoke-mcp.mjs",
+    "qa:check:full": "pnpm qa:check && pnpm build && pnpm test && pnpm typecheck && pnpm run audit && node scripts/smoke-load.mjs && node scripts/smoke-mcp.mjs",
     "lint:links": "node scripts/check-links.mjs"
   },
   "engines": {

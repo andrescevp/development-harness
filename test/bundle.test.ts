@@ -47,10 +47,10 @@ const BUILTIN_MODULES = new Set([
   'process',
 ]);
 
-/** duckdb is the one allowed lazy external — a require() inside the
- * getDuckdb() accessor, only evaluated when a sheet tool runs. The
- * isolated-evaluation test below proves it is not evaluated at load. */
-const ALLOWED_LAZY_EXTERNALS = new Set(['duckdb']);
+/** Nothing is allowed: the tool cut removed the lazy duckdb require from the
+ * plugin bundle — all harness tools (and their native dependency) live in the
+ * MCP server now. */
+const ALLOWED_LAZY_EXTERNALS = new Set<string>();
 
 describe('dist/plugin.js self-contained bundle', () => {
   it('dist is built (run `pnpm build` first)', () => {
@@ -68,6 +68,12 @@ describe('dist/plugin.js self-contained bundle', () => {
       return !ALLOWED_LAZY_EXTERNALS.has(s);
     });
     expect(bare).toEqual([]);
+  });
+
+  it('carries no harness-tool code or duckdb references (hard cut)', () => {
+    const src = fs.readFileSync(DIST_PLUGIN, 'utf8');
+    const forbidden = /duckdb|plan_read|plan_update_status|plan_create|read_sheet|update_sheet|sheet_schema|logged_command/;
+    expect(src.match(forbidden)).toBeNull();
   });
 
   it('evaluates in an isolated directory with no node_modules', async () => {

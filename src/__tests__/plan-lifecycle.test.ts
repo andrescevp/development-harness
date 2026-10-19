@@ -10,8 +10,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { buildPlanTemplate, parsePlan, resolvePlanPath, setStatus } from '../tools/plan-lifecycle.js';
-import { assertNoSymlinks } from '../tools/plan-paths.js';
+import { buildPlanTemplate, parsePlan, setStatus } from '../tools/plan-lifecycle.js';
+import { assertNoSymlinks, resolvePlanPath } from '../tools/plan-paths.js';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const FIXTURE = fs.readFileSync(

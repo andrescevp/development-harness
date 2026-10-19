@@ -30,7 +30,7 @@ export default defineConfig({
   target: 'node20',
   banner: { js: '#!/usr/bin/env node' },
   external: ['duckdb'],
-  noExternal: ['@opencode/plugin', 'yaml', /^effect(?:\/|$)/],
+  noExternal: ['@opencode/plugin', 'yaml'],
   outDir: "dist",
   clean: true,
   sourcemap: false,

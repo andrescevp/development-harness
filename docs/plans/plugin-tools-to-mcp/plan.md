@@ -293,11 +293,11 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 ### Phase 3: Plugin cutover
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 3.1: Remove tool registration from plugin.ts + update registration/bundle tests
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Delete the `ctx.tool.transform` block (`registerPlanTools`), tool imports, and the local `readPlanFile` from `src/plugin.ts`; update tests to assert the plugin registers agents + skills only and never touches the tool domain.
 - **Related Requirements:** R1, AC1, AC7
 - **Dependencies and Preconditions:** Phases 1–2 complete (MCP surface exists, so no capability gap when the plugin stops registering tools).

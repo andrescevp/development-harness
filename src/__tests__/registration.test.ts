@@ -1,7 +1,9 @@
 /**
  * registration.test.ts — integration-style check: run the REAL plugin setup
- * against a stub ctx and assert it registers the repo's bundled corpus —
- * 7 agents, 17 skills, and ZERO commands.
+ * against a stub ctx and assert the hard cut (Sub-Task 3.1): the plugin
+ * registers 7 agents and 17 skills ONLY. Tools live in the `dh` MCP server,
+ * so ANY tool-domain access throws (same guard style as the command domain);
+ * the guards themselves are meta-tested below.
  *
  * The plugin entry imports the BUILT dist/plugin.js so the whole pipeline
  * (tsup bundle + dist/assets) is under test. Requires `pnpm build` first.
@@ -16,18 +18,16 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 const DIST_PLUGIN = path.join(REPO_ROOT, 'dist', 'plugin.js');
 
 interface CapturedUpdate {
-  domain: 'agent' | 'skill' | 'tool' | 'command';
-  kind: 'update' | 'add' | 'namespace';
+  domain: 'agent' | 'skill';
+  kind: 'update' | 'add';
   name?: string;
-  namespace?: string;
-  codemode?: boolean;
 }
 
 /** Minimal stub ctx capturing transform registrations (mirrors the V2 contract). */
 function createStubContext() {
   const captured: CapturedUpdate[] = [];
+  let toolTouches = 0;
   const ctx = {
-    location: { directory: process.cwd() },
     agent: {
       transform: async (
         fn: (editor: { update: (id: string, mutate: (agent: Record<string, unknown>) => void) => void }) => void
@@ -49,61 +49,33 @@ function createStubContext() {
       },
     },
     tool: {
-      transform: async (
-        fn: (editor: {
-          namespace: (ns: { name: string }) => void;
-          add: (info: {
-            name: string;
-            options?: { namespace?: string; codemode?: boolean };
-            execute?: unknown;
-          }) => void;
-        }) => void
-      ) => {
-        fn({
-          namespace: (ns) => captured.push({ domain: 'tool', kind: 'namespace', name: ns.name, namespace: ns.name }),
-          add: (info) =>
-            captured.push({
-              domain: 'tool',
-              kind: 'add',
-              name: info.name,
-              namespace: info.options?.namespace,
-              codemode: info.options?.codemode ?? false,
-            }),
-        });
+      transform: async (_fn: unknown) => {
+        toolTouches += 1;
+        throw new Error('tool domain must never be touched (tools live in the MCP server)');
       },
     },
     command: {
-      transform: async () => {
+      transform: async (_fn: unknown) => {
         throw new Error('command domain must never be touched (commands out of scope)');
       },
     },
   };
-  return { ctx, captured };
+  return { ctx, captured, toolTouches: () => toolTouches };
 }
-
-const HARNESS_TOOLS = [
-  'plan_read',
-  'plan_update_status',
-  'plan_create',
-  'logged_command',
-  'read_sheet',
-  'update_sheet',
-  'sheet_schema',
-].sort();
 
 describe('plugin setup registration (built bundle)', () => {
   it('dist is built (run `pnpm build` first)', () => {
     expect(fs.existsSync(DIST_PLUGIN)).toBe(true);
   });
 
-  it('registers the 7 bundled agents and 17 skills, zero commands', async () => {
+  it('registers the 7 bundled agents and 17 skills only (hard cut)', async () => {
     const { default: plugin } = (await import(DIST_PLUGIN)) as {
       default: { id: string; setup: (ctx: ReturnType<typeof createStubContext>['ctx']) => Promise<void> };
     };
     expect(plugin.id).toBe('dev-harness-skills');
     expect(typeof plugin.setup).toBe('function');
 
-    const { ctx, captured } = createStubContext();
+    const { ctx, captured, toolTouches } = createStubContext();
     await plugin.setup(ctx);
 
     const agents = captured
@@ -114,22 +86,22 @@ describe('plugin setup registration (built bundle)', () => {
       .filter((c) => c.domain === 'skill' && c.kind === 'add')
       .map((c) => c.name)
       .sort();
-    const tools = captured
-      .filter((c) => c.domain === 'tool' && c.kind === 'add')
-      .map((c) => c.name)
-      .sort();
 
     expect(agents).toHaveLength(7);
     expect(skills).toHaveLength(17);
-    expect(tools).toEqual(HARNESS_TOOLS);
-    // One dh namespace registered; all tools are codemode.
-    const namespaces = captured.filter((c) => c.domain === 'tool' && c.kind === 'namespace');
-    expect(namespaces.map((c) => c.name)).toEqual(['dh']);
-    const toolAdds = captured.filter((c) => c.domain === 'tool' && c.kind === 'add');
-    expect(toolAdds.every((c) => c.codemode === true)).toBe(true);
-    expect(toolAdds.every((c) => c.namespace === 'dh')).toBe(true);
-    // No command domain is ever touched (stub throws if invoked).
-    expect(captured.some((c) => c.domain === 'command')).toBe(false);
-    expect(captured.every((c) => c.domain === 'agent' || c.domain === 'skill' || c.domain === 'tool')).toBe(true);
+    expect(toolTouches()).toBe(0);
+  });
+});
+
+describe('domain guards (meta)', () => {
+  it('the tool stub throws and counts when the tool domain is touched', async () => {
+    const { ctx, toolTouches } = createStubContext();
+    await expect(ctx.tool.transform(() => undefined)).rejects.toThrow(/tool domain/);
+    expect(toolTouches()).toBe(1);
+  });
+
+  it('the command stub throws when the command domain is touched', async () => {
+    const { ctx } = createStubContext();
+    await expect(ctx.command.transform(() => undefined)).rejects.toThrow(/command domain/);
   });
 });

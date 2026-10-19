@@ -522,3 +522,52 @@ fail-closed anchor precondition, index ACL tests, row escaping, helper relocatio
 - [x] Phase 2 complete — close the phase, commit.
 - [ ] Phase 3 (3.1): plugin cutover — remove tool registration; update registration/bundle
       tests; docs land in Phase 4.
+
+---
+
+## Sub-Task Review: 3.1 — Remove tool registration from plugin.ts (hard cut)
+
+**Reviewed against:** Sub-Task 3.1 (plan.md, Phase 3) · **Overall risk:** Low · **Verdict:** Approve with comments
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| `pnpm test` green with updated assertions | PASS | 18 files / 181 tests; registration gate rewritten as the hard-cut proof |
+| Grep: no `ctx.tool` / `registerPlanTools` in `src/` | PASS | Only the deliberate meta-test stub reference remains (asserts the guard throws) |
+| Built bundle loads in isolation | PASS | `test/bundle.test.ts` + `test/plugin-entry.test.ts` green; inlined `define` evaluates in isolation; static hard-cut assertion added |
+| Plugin registers zero tools (7 agents / 17 skills) | PASS | Throwing tool/command stubs + `toolTouches` counter + guard meta-tests |
+| Dead code removed (`readPlanFile`, index append, shim) | PASS | Zero refs; `duckdb` = 0 in `dist/plugin.js`; `plugin.ts` 299 → 85 lines; `resolvePlanPath` shim retired with importers repointed |
+
+### Findings
+
+- **[P0] Blocking:** none.
+- **[P1] High:** none.
+- **[P2] Stale-dist false pass** (gate ran `test` before `build` against the built bundle): **Addressed** — `qa:check:full` reordered to `qa:check → build → test → typecheck → audit → smoke-load → smoke-mcp`; reordered gate verified green end-to-end.
+- **[P2] 769 KB (78.6 %) unused SDK barrel in the plugin bundle** (runtime `Plugin.define` import dragged effect + `@opencode/schema`): **Addressed** — deep `define` import via `@opencode/plugin/promise/plugin`; bundle **978,910 → 208,381 B (−79 %)**; `effect` removed from `noExternal`; isolation tests green.
+- **[P3 batch]:** **Addressed** — guard self-tests + `toolTouches` counter; dead `location` stub field removed; tautological assertion replaced; comment hygiene across `plugin.ts`/`server.ts` (incl. the protocol-visible `logged_command` description wording)/`workspace.ts`/`logged-command.ts`/`sheet-tools.ts`; `bundle.test.ts` allowlist emptied + static hard-cut assertion.
+- **Recorded (no action):** optional dist-freshness mtime check (moot for the gate after the reorder); pre-parsed records JSON to drop the yaml parser (future design decision); sequencing note below.
+
+### Validation Results
+
+- Tests present: yes — hard-cut gate (throwing stubs + counters + meta-tests) + static bundle assertion.
+- Validation commands: `pnpm build && pnpm test` PASS (18/181) · `typecheck` · `lint:biome`/`knip`/`depcruise`/`dup` PASS · both smokes PASS · **reordered `qa:check:full` exit 0** (docker scans included) — independently re-run via `@dh-executor` (PASS).
+- Evidence: bundle segment analysis, isolated-eval timing probes, unhandled-rejection probe for fire-and-forget regressions.
+- Web validation (MCP Chrome): not applicable.
+- Architecture: plugin = agents/skills only (single responsibility restored); tools single-sourced in the MCP server; helpers fully covered.
+
+### Regression Risk Assessment
+
+- Intended hard cut; gate hermetic (build → test); bundle −79 %; no behavior change beyond registration removal.
+- **Release-gating condition (flag to `dh-final-review`):** until Sub-Task 4.3 wires the `dh` MCP server into projects, the harness has **zero tools** — already observable live (this session's `dh.*` tools disappeared when the cut landed). The hard cut and the wiring must ship in the same release.
+
+### Scope Compliance
+
+- In scope: the cut + test updates. Orchestrator-sanctioned extensions (recorded): gate reorder, bundle slim via deep import, `bundle.test.ts` tightening — all direct hard-cut hardening.
+- Out of scope detected: docs/text refs deferred to Phase 4, as planned.
+
+### Suggested Next Steps
+
+- [x] Phase 3 complete — close the phase, commit.
+- [ ] Phase 4: content, docs & project wiring (4.1 naming flip → 4.4 demo) — the
+      zero-tools window closes at 4.3/4.4 with the demo config + validation.
