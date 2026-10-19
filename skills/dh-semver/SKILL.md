@@ -52,6 +52,11 @@ commands.
 - No tags in the repo → treat `v0.0.0` as the current version, but note it
   is not a real ref to diff against — enumerate ALL commits with
   `git log --oneline` to determine the first release.
+- Tags exist but are unreachable from the current branch (e.g. releases are
+  tagged on `main` while you work on `develop`) → `git describe` under-reports
+  the current version. Cross-check `git tag --sort=-v:refname` for the highest
+  released tag and state the assumption; the durable fix is the repo's
+  back-merge of `main` after tagging, which keeps tags reachable.
 - History without conventional commit prefixes → ask the user which bump
   applies; do not infer a bump from vague messages.
 
