@@ -260,7 +260,7 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 #### Sub-Task 3.2: docs/LOADING.md counts + complete verification checklists
 
-- **Status:** In Progress
+- **Status:** Completed
 - **Objective:** Make LOADING counts truthful and fix the incomplete verification checklist (missing `dh-contingency`, `dh-semver`, `dh-documentor`, missing `dh-` prefixes).
 - **Related Requirements:** R3 · AC3
 - **Dependencies and Preconditions:** 1.1 landed.

@@ -75,12 +75,14 @@ After loading, confirm the harness is registered:
 
 ```
 opencode debug agents   → look for: dh-software-architect, dh-software-engineer,
-                          reviewer, final-reviewer, executor, explorer
-opencode debug skills   → look for: dh-artifact-check, dh-simplify,
-                          dh-domain-check, dh-coding, dh-code-review,
+                          dh-reviewer, dh-final-reviewer, dh-executor,
+                          dh-explorer, dh-documentor
+opencode debug skills   → look for: dh-artifact-check, dh-code-review,
+                          dh-code-ruler, dh-coding, dh-contingency,
+                          dh-create-documentation, dh-domain-check,
                           dh-execute-plan, dh-execute-plan-task, dh-final-review,
-                          dh-planning, dh-preflight, dh-review,
-                          dh-create-documentation, dh-grill-sdd, dh-setup, dh-code-ruler
+                          dh-grill-sdd, dh-planning, dh-preflight, dh-review,
+                          dh-semver, dh-setup, dh-simplify
 opencode debug commands → no new commands (commands are out of scope)
 ```
 
@@ -104,7 +106,7 @@ The in-repo gate that proves the plugin logic is the registration test:
 
 ```sh
 pnpm test   # src/__tests__/registration.test.ts runs the real bundle setup
-            # against a stub ctx → exactly 7 agents + 16 skills registered
+            # against a stub ctx → exactly 7 agents + 17 skills registered
 ```
 
 ## Troubleshooting
@@ -113,7 +115,7 @@ pnpm test   # src/__tests__/registration.test.ts runs the real bundle setup
   was started **before** the plugin was installed: plugins load at server
   startup, and a long-lived opencode session keeps its original registry.
   Restart opencode (or reload the config) and both the 7 `dh-*` agents and
-  15 `dh-*` skills appear — the plugin registers agents via `agent.transform`
+  17 `dh-*` skills appear — the plugin registers agents via `agent.transform`
   exactly like skills, no `agent` map in config is needed.
 - **`pnpm audit` vs `pnpm run audit`** — `pnpm audit` is pnpm's **dependency
   security audit** (currently reports 1 low dev-only esbuild advisory and

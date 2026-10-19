@@ -234,3 +234,41 @@ Format: one section per sub-task, findings P0–P3 with disposition.
 - [ ] Sub-Task 3.2 — docs/LOADING.md counts + complete verification checklists.
 
 ---
+
+## Sub-Task Review: 3.2 — docs/LOADING.md counts + complete verification checklists
+
+**Reviewed against:** Sub-Task 3.2 (plan.md, Phase 3) · **Overall risk:** Low · **Verdict:** Approve
+*(Implementing session was interrupted mid-run; edits were in the working tree and validation/review were re-run cleanly after resume.)*
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Checklist agents line: all 7 agents, `dh-` prefixed | PASS | Adds `dh-documentor`; fixes previously bare names; set-equal to `LOOP.agents` |
+| Checklist skills line: all 17 skills, `dh-` prefixed | PASS | Adds `dh-contingency`, `dh-code-ruler`, `dh-semver`; set-equal to `LOOP.skills`; no duplicates |
+| Count sites read 17 | PASS | L109 "7 agents + 17 skills", L118 "17 `dh-*` skills"; `rg \b15\b|\b16\b` → 0 |
+| Scope/formatting | PASS | Exactly 4 hunks; code-block indent/fences intact; version bullet left for 4.1 |
+| Tooling | PASS | `check-links` OK (22/0); `audit` PASS |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- Set-equality script: `agents: 7 set-equal: true`, `skills: 17 set-equal: true`.
+- Checklist diff verified hunk-by-hunk; no interruption artifacts; no unrelated edits.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — documentation lists only.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Sub-Task 3.3 — AGENTS.md + skills/index.md counts and lists.
+
+---
