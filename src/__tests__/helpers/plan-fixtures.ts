@@ -6,7 +6,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { parsePlan } from '../../tools/plan-lifecycle.js';
 import type { McpTestHarness } from './mcp.js';
-import { createMcpTestHarness } from './mcp.js';
+import { connectHarness } from './mcp.js';
+
+export { closeHarness as closePlanHarness } from './mcp.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURE = path.resolve(HERE, '..', 'fixtures', 'plans', 'phased-plan.md');
@@ -67,16 +69,7 @@ export function seedSymlinkedIndex(root: string): string {
   return real;
 }
 
-let active: McpTestHarness | undefined;
-
 /** Start (and track) the suite harness; seeds the canonical plan by default. */
 export async function connectPlanHarness(setup?: (root: string) => void): Promise<McpTestHarness> {
-  active = await createMcpTestHarness({ setup: setup ?? ((root) => seedPlan(root)) });
-  return active;
-}
-
-/** Close the tracked harness (idempotent no-op when nothing was created). */
-export async function closePlanHarness(): Promise<void> {
-  await active?.close();
-  active = undefined;
+  return connectHarness({ setup: setup ?? ((root) => seedPlan(root)) });
 }

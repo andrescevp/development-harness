@@ -46,16 +46,36 @@ function errorResult(message: string): CallToolResult {
   return { content: [{ type: 'text', text: message }], isError: true };
 }
 
+/** Map a thrown value onto the MCP error-result contract. */
+function toErrorResult(err: unknown): CallToolResult {
+  return errorResult(err instanceof Error ? err.message : String(err));
+}
+
 /**
  * Run a synchronous tool body, mapping thrown helper errors to `isError`.
  * Synchronous on purpose: read-modify-write bodies keep no `await` between
- * their `readFileSync` and `writeFileSync`.
+ * their `readFileSync` and `writeFileSync`. The SDK also maps handler throws
+ * to this shape; the guard keeps the parity contract explicit and
+ * SDK-independent.
  */
 function guarded(body: () => CallToolResult): CallToolResult {
   try {
     return body();
   } catch (err) {
-    return errorResult(err instanceof Error ? err.message : String(err));
+    return toErrorResult(err);
+  }
+}
+
+/**
+ * Async-safe variant of `guarded` for handlers delegating to async helpers.
+ * The SDK also maps handler throws to the same `{ content, isError }` shape;
+ * the guard keeps the parity contract explicit and SDK-independent.
+ */
+async function guardedAsync(body: () => Promise<CallToolResult>): Promise<CallToolResult> {
+  try {
+    return await body();
+  } catch (err) {
+    return toErrorResult(err);
   }
 }
 
@@ -157,10 +177,11 @@ export function buildServer({ workspaceRoot, version }: BuildServerOptions): Mcp
         limit: z.number().describe('Max rows to return').optional(),
       }),
     },
-    async ({ path: sheetPath, query, limit }) => {
-      const result = await readSheet(sheetPath, query, limit);
-      return textResult(result);
-    }
+    async ({ path: sheetPath, query, limit }) =>
+      guardedAsync(async () => {
+        const result = await readSheet(sheetPath, query, limit);
+        return textResult(result);
+      })
   );
 
   server.registerTool(
@@ -173,10 +194,11 @@ export function buildServer({ workspaceRoot, version }: BuildServerOptions): Mcp
         query: z.string().describe('UPDATE/INSERT/DELETE SQL against temp table t'),
       }),
     },
-    async ({ path: sheetPath, query }) => {
-      const result = await updateSheet(sheetPath, query);
-      return textResult(result);
-    }
+    async ({ path: sheetPath, query }) =>
+      guardedAsync(async () => {
+        const result = await updateSheet(sheetPath, query);
+        return textResult(result);
+      })
   );
 
   server.registerTool(
@@ -187,10 +209,11 @@ export function buildServer({ workspaceRoot, version }: BuildServerOptions): Mcp
         path: z.string(),
       }),
     },
-    async ({ path: sheetPath }) => {
-      const result = await sheetSchema(sheetPath);
-      return textResult(result);
-    }
+    async ({ path: sheetPath }) =>
+      guardedAsync(async () => {
+        const result = await sheetSchema(sheetPath);
+        return textResult(result);
+      })
   );
 
   server.registerTool(
@@ -207,10 +230,11 @@ export function buildServer({ workspaceRoot, version }: BuildServerOptions): Mcp
         timeoutMs: z.number().describe('Kill after this many milliseconds (default 120000)').optional(),
       }),
     },
-    async ({ command, logName, timeoutMs }) => {
-      const result = await runLoggedCommand({ command, logName, timeoutMs });
-      return textResult(result);
-    }
+    async ({ command, logName, timeoutMs }) =>
+      guardedAsync(async () => {
+        const result = await runLoggedCommand({ command, logName, timeoutMs });
+        return textResult(result);
+      })
   );
 
   return server;

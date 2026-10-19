@@ -214,14 +214,14 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 #### Sub-Task 1.4: Sheet + logged_command adapters
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Bring `read_sheet`, `update_sheet`, `sheet_schema`, and `logged_command` to full parity through the MCP surface.
 - **Related Requirements:** R2, R12, AC2
 - **Dependencies and Preconditions:** 1.1 (factory + harness).
-- **In Scope for This Sub-Task:** Zod schemas exactly as current (`path` required for sheet tools; `query?` + `limit?` for `read_sheet`; `path`+`query` required for `update_sheet`; `command` required, `logName?`, `timeoutMs?` for `logged_command`); success payloads identical (`SheetResult` JSON; `LoggedCommandResult` JSON with `ok/exitCode/logPath/head/tail/truncated`); `logged_command` never throws for command failures — non-zero exit codes stay in the payload; helper throws (e.g. unreadable csv) map to `isError` with the same message.
+- **In Scope for This Sub-Task:** Zod schemas exactly as current (`path` required for sheet tools; `query?` + `limit?` for `read_sheet`; `path`+`query` required for `update_sheet`; `command` required, `logName?`, `timeoutMs?` for `logged_command`); success payloads identical (`SheetResult` JSON; `LoggedCommandResult` JSON with `ok/exitCode/logPath/head/tail/truncated`); `logged_command` never throws for command failures — non-zero exit codes stay in the payload; unexpected thrown errors map to `isError` via an async-safe guard (note: sheet helpers never throw — `withSheet` converts failures to `ok: false` payloads, and legacy parity keeps those as normal results).
 - **Out of Scope for This Sub-Task:** changing duckdb behavior or the logged-command strategy; OS-specific wrapper changes.
 - **Instructions:** keep the lazy duckdb accessor untouched (external require); run the sheet tools against a temp CSV fixture (2–3 columns, a few rows); run `logged_command` with a tiny portable command (e.g. `node -e "console.log('x')"`), plus a failing command to assert `ok: false` payload semantics.
-- **Acceptance Criteria:** tests cover happy paths for all four tools plus: unreadable file → `isError`; non-existent csv → `isError`; failing shell command → success result with `ok: false`, non-zero `exitCode`, `logPath` present.
+- **Acceptance Criteria:** tests cover happy paths for all four tools plus: unreadable file → `ok: false` payload with a `duckdb error:` message (legacy parity; NOT `isError` — helpers never throw); non-existent csv → same shape; failing shell command → normal result with `ok: false`, non-zero `exitCode`, `logPath` present; payloads deep-equal the legacy `SheetResult`/`LoggedCommandResult` shapes.
 - **Cautionary Points (Risks & Edge Cases):** `logged_command` child output must never leak to the server's stdout (exec captures; keep it that way — assert handshake purity again in 2.3); Windows wrapper untouched; timeout path (`timeoutMs`) returns exitCode 1-style failure per current behavior.
 - **Implementation Suggestions:** reuse existing unit fixtures/patterns from `src/__tests__/sheet-tools.test.ts` and `logged-command.test.ts`; keep temp logs in the OS temp dir (existing helper behavior).
 - **Testing Suggestions:** `pnpm test -- src/mcp src/__tests__/sheet-tools.test.ts src/__tests__/logged-command.test.ts`.

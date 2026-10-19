@@ -106,3 +106,17 @@ export function schemaOf(tools: { name: string; inputSchema: unknown }[], name: 
   if (!tool) throw new Error(`tool not listed: ${name}`);
   return tool.inputSchema as JsonSchema;
 }
+
+let activeHarness: McpTestHarness | undefined;
+
+/** Start (and track) the suite's harness; pair with `closeHarness` in afterEach. */
+export async function connectHarness(options: McpTestHarnessOptions = {}): Promise<McpTestHarness> {
+  activeHarness = await createMcpTestHarness(options);
+  return activeHarness;
+}
+
+/** Close the tracked harness (idempotent no-op when nothing is active). */
+export async function closeHarness(): Promise<void> {
+  await activeHarness?.close();
+  activeHarness = undefined;
+}

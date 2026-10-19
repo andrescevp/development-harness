@@ -253,3 +253,55 @@ fail-closed anchor precondition, index ACL tests, row escaping, helper relocatio
 - [x] Proceed to Sub-Task 1.4 — reuse `errorResult` + the harness/textOf/schemaOf helpers.
 - [ ] 1.5 must honor: exclusive-create mode, `O_NOFOLLOW` final component, `plan-lifecycle.ts`
       cap watch.
+
+---
+
+## Sub-Task Review: 1.4 — Sheet + logged_command adapters
+
+**Reviewed against:** Sub-Task 1.4 (plan.md, Phase 1 — acceptance wording corrected pre-implementation for verified helper semantics: sheet helpers never throw → `ok: false` payloads stay **normal results**; unexpected throws → `isError`) · **Overall risk:** Low · **Verdict:** Approve with comments
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Happy paths for all four tools (deep-equal legacy payloads) | PASS | `read_sheet` full payload deep-equal; `update_sheet` rewrite re-read through the MCP surface; `sheet_schema` `name:type` shape; `logged_command` exact key-set pin |
+| Unreadable file → `ok: false` payload with `duckdb error:` (NOT `isError`) | PASS | Explicit falsy-`isError` assertion + full empty shape (`columns/rowCount/rows`) |
+| Non-existent csv → same shape | PASS | Covered for `read_sheet`, `update_sheet`, `sheet_schema` |
+| Failing shell command → normal result `ok: false`, non-zero `exitCode`, `logPath` present | PASS | `echo boom && exit 3` (a child `node -e "process.exit(3)"` is masked by the wrapper's trailing echo — mirrors the pinned tool-suite idiom) |
+| Payloads deep-equal the legacy `SheetResult`/`LoggedCommandResult` shapes | PASS | Key set `[exitCode, head, logPath, ok, tail, truncated]` pinned; error-string prefix rules asserted exactly (`duckdb error:` vs unprefixed pre-check) |
+
+### Findings
+
+- **[P0] Blocking:** none.
+- **[P1] High:** none.
+- **[P2] Medium:** none.
+- **[P3] Failure-safe temp-log cleanup** (flagged by two lenses; red-run logs leaked): **Addressed** — module-level log-path drain in `afterEach`; stale 0-byte logs deleted; 0 leftovers verified after runs.
+- **[P3] Guard redundancy undocumented** (SDK already maps handler throws to the identical shape — verified against SDK source + runtime probe): **Addressed** — both guards document that they exist to keep the parity contract explicit and SDK-independent; guards retained by decision.
+- **[P3] Deviation comment didn't name the plan's suggested command:** **Addressed** — comment now explains the wrapper-exit masking.
+- **[P3] Tracked-harness lifecycle duplicated across four suites:** **Addressed** — generic `connectHarness`/`closeHarness` in `helpers/mcp.ts`; plan fixtures delegate; new suites migrated.
+- **[P3] `timeoutMs` pass-through not tested at the MCP surface:** **Deferred** (plan scope-tight; the tool-level suite pins timeout semantics).
+- **Kept decisions:** outer `async` on the four handler arrows (uniformity with plan handlers); pre-existing backlog notes (`toJsonSafe` round-trip, `readWindow` full-file read, `read_sheet` DB-open-before-validation) — no action, out of scope.
+
+### Validation Results
+
+- Tests present: yes — 12 + 2 new (15 files / 151 tests total; +14 in 1.4), MCP-surface parity + guard pinning.
+- Validation commands: `pnpm test` PASS · `pnpm typecheck` PASS · `lint:biome`/`knip`/`depcruise`/`dup` PASS (0 clones) · `node scripts/audit.mjs` PASS — independently re-run via `@dh-executor`; 0 temp leftovers.
+- Code-quality evidence: the three-lens simplify pass (all `@dh-reviewer`) including SDK-internals inspection and a runtime throw-mapping probe; no separate fourth delegation for this sub-task (evidence considered sufficient and recorded).
+- Edge cases from the sub-task: handled — `ok:false`-never-`isError` policy pinned; disallowed-query messages exact; log artifact assertions.
+- Web validation (MCP Chrome): not applicable.
+- Architecture: guards are thin wrappers; async guard added without disturbing the sync invariant of the plan handlers.
+
+### Regression Risk Assessment
+
+- Breaking changes: none — guard wrappers are behavior-identical (SDK source + runtime probe evidence); tool helpers and `logged-command`/`sheet-tools` untouched; test-infra consolidation only.
+- Interface/config changes: none (tool schemas and payloads unchanged).
+
+### Scope Compliance
+
+- In scope: verified (`server.ts` guard work + MCP-surface tests; bounded test-infra consolidation in `helpers/mcp.ts`, `plan-fixtures.ts`).
+- Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [x] Proceed to Sub-Task 1.5 — atomic writes; must honor exclusive-create mode, `O_NOFOLLOW`
+      final component, and the `plan-lifecycle.ts` cap watch.
