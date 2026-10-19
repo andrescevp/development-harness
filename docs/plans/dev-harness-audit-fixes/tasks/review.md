@@ -309,3 +309,74 @@ Format: one section per sub-task, findings P0–P3 with disposition.
 - [ ] Phase 4 — Sub-Task 4.1: LOADING version-skew bullet.
 
 ---
+
+## Sub-Task Review: 4.1 — Fix LOADING.md version-skew bullet
+
+**Reviewed against:** Sub-Task 4.1 (plan.md, Phase 4) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Version-skew bullet reads `@opencode/plugin@^2.0.20` | PASS | One-line change at L145; sentence grammatical |
+| Historical v2.0.18 notes intact | PASS | Install tip (L42) and real-session note (L136) unchanged |
+| Consistency with `package.json` and install tip | PASS | package.json = `^2.0.20`; all live version claims aligned; no live `^2.0.18` remains |
+| Scope | PASS | Exactly one line; no other files |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- `rg "2.0.18"` → only the two historical notes; `rg "^2.0.20"` → install tip + version-skew bullet.
+- `check-links` OK; `audit` PASS.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — single documentation token.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Sub-Task 4.2 — scripts/audit.mjs header comment.
+
+---
+
+## Sub-Task Review: 4.2 — Fix scripts/audit.mjs header comment
+
+**Reviewed against:** Sub-Task 4.2 (plan.md, Phase 4) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Usage comment names real outputs | PASS | L10 now `reports/audit.json + reports/audit.md`, matching `MD_TARGET`/`JSON_TARGET` constants |
+| Comment-only change; syntax valid | PASS | 1/1 line diff; `node --check` OK |
+| No stale `audit-report.md` claims remain | PASS | `rg` over active surface → 0 (only the SDD/plan quotes describing the defect + archives) |
+| Behavior unchanged | PASS | `node scripts/audit.mjs` → exit 0, PASS, loop 17/17 |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- Diff is exactly one comment line; runtime console output already pointed at `reports/audit.md`.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — comment only.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Phase 5 — Sub-Task 5.1: build + full gate validation.
+
+---

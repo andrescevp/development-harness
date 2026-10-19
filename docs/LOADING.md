@@ -142,7 +142,7 @@ pnpm test   # src/__tests__/registration.test.ts runs the real bundle setup
   started before the plugin was installed. If agents do not appear, restart
   opencode first, then confirm the load form and rebuild `dist/assets` if
   using the built package form.
-- **Version skew** — the plugin targets `@opencode/plugin@^2.0.18`; keep the
+- **Version skew** — the plugin targets `@opencode/plugin@^2.0.20`; keep the
   host opencode ≥ that version and pin the package if the host is older.
 - **Audit fails after editing harness content** — run
   `node scripts/audit.mjs`; new skills/agents must pass the audit rules

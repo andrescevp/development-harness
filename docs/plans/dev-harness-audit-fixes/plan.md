@@ -296,11 +296,11 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 ### Phase 4: Version consistency and stale comment (R4, R5)
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 4.1: Fix LOADING.md version-skew bullet
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Remove the `^2.0.18` / `^2.0.20` contradiction in `docs/LOADING.md` (R4).
 - **Related Requirements:** R4 · AC4
 - **Dependencies and Preconditions:** None.
@@ -315,7 +315,7 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 #### Sub-Task 4.2: Fix scripts/audit.mjs header comment
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Make the audit script header describe its actual outputs (R5).
 - **Related Requirements:** R5 · AC5
 - **Dependencies and Preconditions:** None.
