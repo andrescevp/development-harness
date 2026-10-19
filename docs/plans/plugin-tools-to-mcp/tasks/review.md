@@ -710,3 +710,51 @@ fail-closed anchor precondition, index ACL tests, row escaping, helper relocatio
 
 - [x] Proceed to Sub-Task 4.4 — demo-project config + `demo.sh` validation (living proof; the
       fifth snippet copy).
+
+---
+
+## Sub-Task Review: 4.4 — demo-project config + demo.sh validation
+
+**Reviewed against:** Sub-Task 4.4 (plan.md, Phase 4) · **Overall risk:** Low–Medium (validation-gate robustness) · **Verdict:** Approve with comments
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| `./demo.sh validate` prints the new MCP step green | PASS | Cold ~3.3 s / warm ~2.7 s (engineer); independent run 2.8 s with `MCP GATE: ✓ dh connected` |
+| Demo config reflects the MCP entry | PASS | Project-scope assertion inside the gate (`../dist/mcp/stdio.js` present in `opencode debug config`) |
+| Demo config parses | PASS | JSONC parse clean |
+| Existing gates preserved | PASS | 5/5 steps green; the in-process line now shows `Tests 181 passed (181)` |
+| In-repo demo uses the documented local fallback (orchestrator decision) | PASS | `["node", "../dist/mcp/stdio.js"]` with a comment; canonical npx copies unchanged; rationale: npx-from-git resolves the remote repo pre-release |
+
+### Findings
+
+- **[P0–P1]:** none.
+- **[P2] Unanchored MCP-gate grep could false-pass** on unrelated global servers (e.g. `adhoc-mcp connected`): **Addressed** — anchored server-column match + project-scope assertion; false-positive case verified non-matching.
+- **[P2] GNU `timeout` breaks on stock macOS:** **Addressed** — `timeout` → `gtimeout` → unbounded-with-WARN fallback (bash 3.2-safe).
+- **[P2] `/tmp/opencode` existence assumption** (failure branch crashed before printing its hint; shared log races): **Addressed** — `TMP_ROOT` + `mkdir -p`, per-run `$$` log names, non-fatal tail.
+- **[P3] Step-5 evidence line empty** (ANSI escapes): **Addressed** — `NO_COLOR=1`, count now visible.
+- **[P3] Stale demo docs** (counts 16 skills / 89 tests; no MCP wiring): **Addressed** — 7 agents / 17 skills / 181 tests, MCP gate + wiring documented.
+- **Recorded finding:** a long-lived `opencode serve` can keep a previously spawned `dh` server "connected" across artifact/config swaps — the gate reflects live connectivity; the project-scope assertion still prevents a global `dh` from masking a missing demo entry. 5.1 must restart the service before config-change verification.
+- **Simplify method note:** consolidated pass (docs + shell script; three lenses covered).
+
+### Validation Results
+
+- Validation commands: `bash -n`; `./demo.sh validate` exit 0 (MCP + test gates visible); false-positive grep no match; `pnpm test` 18/181; `check-links` 26 refs OK — independently re-run via `@dh-executor` (PASS).
+- Evidence: cold/warm timings, failure-path outputs (missing artifact; broken command), `/proc/<pid>/cwd` child check (reviewer).
+- Web validation (MCP Chrome): not applicable.
+
+### Regression Risk Assessment
+
+- Demo-only; no library/runtime changes. The demo now proves the project-scope MCP path end-to-end and closes the zero-tools window for this workspace.
+
+### Scope Compliance
+
+- In scope: `demo-project/opencode.jsonc`, `demo-project/demo.sh`, `demo-project/docs/index.md` (demo docs freshness, adjacent but coherent).
+- Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [x] Phase 4 complete — close the phase, commit.
+- [ ] Phase 5: real-session verification (restart/kill any long-lived opencode service first),
+      cold-path timing, then the full gate + release closure.

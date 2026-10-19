@@ -312,7 +312,7 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 ### Phase 4: Harness content, docs & project wiring
 
-- **Status:** In Progress
+- **Status:** Completed
 
 #### Sub-Task 4.1: Skills + agents naming flip (canonical mapping table)
 
@@ -361,11 +361,11 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 #### Sub-Task 4.4: demo-project config + demo.sh validation
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Make `demo-project` the living proof of project-scope MCP wiring: add the `mcp.servers.dh` entry to its `opencode.jsonc` and extend `demo.sh validate` with an MCP connectivity check.
 - **Related Requirements:** R3, AC4
 - **Dependencies and Preconditions:** 4.2 (snippet), 2.2 (build).
-- **In Scope for This Sub-Task:** `demo-project/opencode.jsonc` — add `mcp.servers.dh` with the exact npx command + `protocol: "2026-07-28"` (+ commented `timeout.startup` guidance); `demo-project/demo.sh` — new validation step (e.g. "4/5 MCP server"): fresh data dir `opencode mcp list` greps `dh` + `connected`, with a tolerant first-run timeout and a prewarm hint on failure; renumber steps; keep the existing agent/config gates.
+- **In Scope for This Sub-Task:** `demo-project/opencode.jsonc` — add `mcp.servers.dh` using the LOCAL node-dist fallback command (`["node", "../dist/mcp/stdio.js"]`, resolved from the demo workspace to the repo build) so the in-repo demo verifies THIS branch pre-release/offline; add a comment that production projects use the npx-from-git form (README/LOADING canonical) + `protocol: "2026-07-28"` (+ commented `timeout.startup` guidance); `demo-project/demo.sh` — new validation step (e.g. "4/5 MCP server"): fresh data dir `opencode mcp list` greps `dh` + `connected`, with a tolerant first-run timeout and a prewarm hint on failure; renumber steps; keep the existing agent/config gates.
 - **Out of Scope for This Sub-Task:** committing a demo fixture plan (5.1 decides); demo.sh launch mode changes.
 - **Instructions:** the demo config is the second canonical copy of the snippet — keep it identical to 4.2/4.3 (a test in 5.1 could diff the three copies; at minimum a manual check); validate on a fresh `XDG_DATA_HOME` (existing `fresh()` helper) so no stale server state masks config errors.
 - **Acceptance Criteria:** `./demo.sh validate` prints the new step green (first run may take the cold-start path; prewarm documented); `opencode debug config` reflects the mcp entry; the demo config parses.
@@ -384,7 +384,7 @@ return { content: [{ type: 'text', text: message }], isError: true };
 - **Objective:** Prove the full path end-to-end on this host: built dist + demo-project config + real opencode connection + a live tool call through the MCP server + cold-start npx timing; record everything in `docs/plans/plugin-tools-to-mcp/tasks/verification.md`.
 - **Related Requirements:** AC4, AC5, AC6
 - **Dependencies and Preconditions:** Phases 1–4 complete; network access for the first npx git install.
-- **In Scope for This Sub-Task:** (1) `pnpm build`; (2) `cd demo-project && ./demo.sh validate` (fresh data dir) — record the MCP step; (3) live session check: run opencode non-interactively with a prompt to call `dh_plan_create` (or `dh_plan_read`) on a scratch plan inside demo-project and confirm the returned payload (record the transcript excerpt); (4) cold-start timing: `npm cache npx rm --force` (then `npm cache clean --force` if needed) → time `npx -y --package=github:andrescevp/development-harness dev-harness-mcp < /dev/null` → record duration and set the documented `timeout.startup` guidance accordingly; (5) AC6 grep: `rg -n 'dh\.(plan_read|plan_update_status|plan_create|logged_command|read_sheet|update_sheet|sheet_schema)' --glob '!docs/plans/**' --glob '!docs/evolve/**' --glob '!node_modules'` → expect zero (docs/evolve holds historical observations with the old names); (6) verify the FIVE snippet copies (README.md, docs/LOADING.md, opencode.example.jsonc, skills/dh-setup/SKILL.md, demo config) are identical — compare the canonical fields (`type`, `command`, `protocol`) where a copy stores them inline rather than as a full JSON block.
+- **In Scope for This Sub-Task:** (1) `pnpm build`; (2) `cd demo-project && ./demo.sh validate` (fresh data dir) — record the MCP step; (3) live session check: run opencode non-interactively with a prompt to call `dh_plan_create` (or `dh_plan_read`) on a scratch plan inside demo-project and confirm the returned payload (record the transcript excerpt); (4) cold-start timing: `npm cache npx rm --force` (then `npm cache clean --force` if needed) → time `npx -y --package=github:andrescevp/development-harness dev-harness-mcp < /dev/null` → record duration and set the documented `timeout.startup` guidance accordingly; (5) AC6 grep: `rg -n 'dh\.(plan_read|plan_update_status|plan_create|logged_command|read_sheet|update_sheet|sheet_schema)' --glob '!docs/plans/**' --glob '!docs/evolve/**' --glob '!node_modules'` → expect zero (docs/evolve holds historical observations with the old names); (6) verify the FOUR npx snippet copies (README.md, docs/LOADING.md, opencode.example.jsonc, skills/dh-setup/SKILL.md) are identical (compare canonical fields `type`/`command`/`protocol`; inline forms field-wise), and that the demo config matches the documented local fallback (`node ../dist/mcp/stdio.js` from the demo workspace resolves to the built artifact).
 - **Out of Scope for This Sub-Task:** CI automation; publishing.
 - **Instructions:** verification must exercise the real binary via opencode, not only the in-memory client (smoke already covers the binary mechanically); if the cold npx run exceeds a usable startup window, record it and mark the node-dist fallback as the recommended primary in LOADING.md/dh-setup (edit in this sub-task with justification); capture exact commands + outputs in the verification file (no paraphrasing).
 - **Acceptance Criteria:** verification.md contains: build transcript, demo validate output, live call payload, cold/warm npx timings, grep result (0), snippet diff (identical); every claim backed by a recorded command.

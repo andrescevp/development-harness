@@ -8,6 +8,23 @@
     // "file:///home/andres/workspace/dev-harness-skills"
     "../"
   ],
+  // Project-scope MCP server for the harness tools (plan lifecycle, sheets,
+  // logged commands). This in-repo demo uses the LOCAL build — run
+  // `pnpm build` in the repo first; the command path resolves from this demo
+  // workspace (project cwd). Shipped projects use the npx-from-git form:
+  //   ["npx", "-y", "--package=github:andrescevp/development-harness", "dev-harness-mcp"]
+  // See README / docs/LOADING.md for production wiring.
+  "mcp": {
+    "servers": {
+      "dh": {
+        "type": "local",
+        "command": ["node", "../dist/mcp/stdio.js"],
+        "protocol": "2026-07-28"
+        // Optional on slow hosts (cold npx start in shipped projects):
+        // ,"timeout": { "startup": 300000 }
+      }
+    }
+  },
   // Native agent registration — hosts that do not load local directory
   // plugins (opencode v2.0.18 limitation) still register config agents.
   // The plugin ALSO registers these agents when it loads; the config map
