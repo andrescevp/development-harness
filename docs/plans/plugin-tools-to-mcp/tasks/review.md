@@ -802,3 +802,97 @@ fail-closed anchor precondition, index ACL tests, row escaping, helper relocatio
 
 - [x] Proceed to Sub-Task 5.2 — full gate + release closure (qa:check:full, audit, dh-semver,
       index row, plan statuses).
+
+---
+
+# Final Plan Review: Plugin Tools to MCP Server
+
+**Plan slug:** plugin-tools-to-mcp
+**Review against:** `sdd.md` (R1–R12, AC1–AC8)
+**Overall risk:** Low
+**Verdict:** **Approve with comments**
+
+## Plan Completion Status
+
+| Phase | Sub-task | Status | Notes |
+|---|---|---|---|
+| 1 — MCP server module | 1.1 Server factory + harness + tools/list | Completed | 7 tools registered; contract test |
+| 1 — MCP server module | 1.2 Workspace root resolver ACL | Completed | env override + cwd fallback |
+| 1 — MCP server module | 1.3 Plan-lifecycle adapters | Completed | parity + `isError` + ACL consolidation |
+| 1 — MCP server module | 1.4 Sheet + `logged_command` adapters | Completed | legacy `ok:false` semantics preserved |
+| 1 — MCP server module | 1.5 Atomic plan-file writes | Completed | wx temp, link/rename, `O_NOFOLLOW` |
+| 2 — Packaging & startup | 2.1 stdio entry | Completed | `serveStdio`, instructions, symlink-safe guard |
+| 2 — Packaging & startup | 2.2 Build & package wiring | Completed | dual entries, bin, prepare sentinel |
+| 2 — Packaging & startup | 2.3 Stdio spawn smoke + QA wiring | Completed | 13 checks, gate-integrated |
+| 3 — Plugin cutover | 3.1 Remove tool registration (hard cut) | Completed | 0 tools; bundle −79 % |
+| 4 — Content & wiring | 4.1 Skills + agents naming flip | Completed | zero stale refs |
+| 4 — Content & wiring | 4.2 Repo docs & examples | Completed | MCP reference + snippets |
+| 4 — Content & wiring | 4.3 dh-setup wiring step | Completed | consent + idempotent + prewarm |
+| 4 — Content & wiring | 4.4 Demo config + validate gate | Completed | live `dh connected` proof |
+| 5 — Verification & release | 5.1 Real-session verification | Completed | live tool call recorded |
+| 5 — Verification & release | 5.2 Full gate + release closure | Completed | qa:check:full PASS; v0.5.0 decision |
+
+**Per-phase completion:** Phase 1 — 5/5 · Phase 2 — 3/3 · Phase 3 — 1/1 · Phase 4 — 4/4 · Phase 5 — 2/2. No phase was closed around a blocker.
+
+## Requirements Verification
+
+| Requirement | Status | Evidence |
+|---|---|---|
+| R1 zero plugin tools (hard cut) | PASS | `src/plugin.ts` (no `ctx.tool`); registration gate (throwing stubs + `toolTouches`) ; `duckdb`/tool strings absent from `dist/plugin.js` |
+| R2 7-tool parity contracts | PASS (one pinned deviation) | `src/mcp/server.ts` vs legacy `src/plugin.ts` (descriptions byte-identical); payload/error suites; invalid-enum message is SDK-generated (accepted, pinned) |
+| R3 project-scope stdio config | PASS | canonical snippets ×4; live `dh connected`; demo gate |
+| R4 workspace anchoring ACL | PASS | `workspace.ts` + `plan-paths.ts`; dangling/anchor/escape tests; no handler env reads |
+| R5 npx packaging + fallback | PASS | bin/`prepare` sentinel; **independent cold `git+file` npx run: 24.2 s, exit 0, 0 stdout**; node-dist fallback documented |
+| R6 protocol pin + legacy serving | PASS | `2026-07-28` in all copies; raw `2025-06-18` handshake probe served |
+| R7 dh-setup consent wiring | PASS | idempotent merge, both config shapes, prewarm + verify; executed in demo |
+| R8 naming flip atomicity | PASS | AC6 grep → 0 stale refs (excl. historical `docs/plans/**`, `docs/evolve/**`) |
+| R9 MCP instructions | PASS | `stdio.ts` instructions; asserted in-memory + in the raw handshake |
+| R10 atomic writes / no-await RMW | PASS | `atomic-write.ts` + `plan-io.ts`; temp-symlink, mode, EEXIST, residue tests |
+| R11 QA gates + TDD | PASS | `qa:check:full` PASS (15 s); 181 tests |
+| R12 stdout purity + lifecycle | PASS | 0 stdout bytes; EOF teardown; no orphans in smoke/signal probes |
+| AC1 registration gate (0 tools) | PASS | `registration.test.ts` |
+| AC2 in-memory parity/error tests | PASS | `src/mcp/__tests__/*` |
+| AC3 smoke spawn + gate wiring | PASS | `scripts/smoke-mcp.mjs` in `qa:check:full` |
+| AC4 `mcp list` + live call | PASS | `tasks/verification.md` transcript (`tools.dh.plan_create` → `{ok,path,plan}`) |
+| AC5 cold npx handshake | PASS (release-ordered) | cold `git+file` clone→install→prepare→handshake 24.2 s; verbatim `github:` run scheduled post-merge (release.md) |
+| AC6 zero stale refs | PASS | grep 0 |
+| AC7 `qa:check:full` exit 0 | PASS | `tasks/release.md` |
+| AC8 index row + closure | PASS | `docs/plans/index.md` Completed/No; all statuses Completed |
+
+## Findings
+
+### [P0] Blocking
+None.
+
+### [P1] High
+None.
+
+### [P2] Medium — all addressed during closure
+
+1. **Cold-start window vs the host default** (independent measurement: 24.2 s first npx install): **Addressed** — `"timeout": { "startup": 300000 }` is now ACTIVE in all four canonical snippet copies; guidance updated.
+2. **AC5 literal `github:` run + release ordering:** **Recorded in the release recipe** — verbatim re-run on the remote default branch after merge; the cold `git+file` run already proved clone→install→prepare→bin.
+3. **Version/tag consistency:** **Addressed** — `tasks/release.md` now mandates `package.json` 0.4.0 → 0.5.0 on the release branch before tagging (MCP `serverInfo.version` reads it at runtime); the deferred local-tag acceptance is documented (Git Flow: tags on `main`).
+
+### [P3] Low — addressed or accepted
+
+4. **Long-lived `opencode serve` can keep a stale `dh` child alive** → restart guidance added to LOADING + demo docs. (Host-behavior residual, documented.)
+5. **Audit gate dirties tracked `reports/`** → release checklist commits the regenerated reports (repo convention, cf. v0.4.0).
+6. **R2 invalid-enum message parity** → SDK-generated `isError` text; accepted deviation, pinned by test (recorded since 1.3).
+7. **Plan-artifact hygiene** → completion checklist ticked; domain-check post-implementation note added.
+8. **Cold npx install weight** (devDeps pulled for git installs: duckdb + effect) → backlog; prewarm/timeout mitigate; optional dep split out of scope.
+
+## Integration Assessment
+
+- **Cross-sub-task integration:** none found — snippets ↔ `package.json` bin (field-verified ×4 + executed), demo fallback ↔ build output (gate + live call), smoke ↔ real launch (symlink variant), dh-setup ↔ canonical fields, release notes ↔ shipped behavior.
+- **Regression risk across the full scope:** Low. Full gate green; the only intended behavior changes are the hard cut and stricter ACL/hardening, all pinned by tests.
+
+## Release Readiness (software project)
+
+- **`dh-artifact-check`:** READY — `pnpm build` exit 0; `plugin.js` 208,381 B + `stdio.js` 229,940 B (shebangs, non-zero, SDK external); `scripts/*.mjs` syntax OK; `demo.sh` syntax OK; no Dockerfile; shellcheck not installed (N/A).
+- **`dh-preflight`:** READY — 181/181 tests; typecheck clean; biome 0 errors (5 pre-existing warnings); knip/depcruise/dup/links clean; working tree clean.
+- **Recommended version bump (dh-semver):** **MINOR — v0.4.0 → v0.5.0** (pre-1.0 breaking = MINOR; literal-major mapping documented). Changelog generated: yes (`tasks/release.md`). Tag deferred to release-on-main per Git Flow.
+- **Full gate:** `pnpm qa:check:full` exit 0 (15 s) including OSV/Semgrep, both smokes; audit PASS.
+
+## Sign-off Verdict
+
+**Approve with comments.** All 15 sub-tasks and 5 phases are Completed; all requirements and acceptance criteria pass (AC5 with the documented post-merge ordering). The plan is ready to merge per the repository's Git Flow: `feature/plugin-tools-to-mcp → develop`, then `release/v0.5.0 → main` (bump `package.json`, commit regenerated reports, tag `v0.5.0` on main, back-merge main → develop, then run the verbatim `github:` AC5 command).
