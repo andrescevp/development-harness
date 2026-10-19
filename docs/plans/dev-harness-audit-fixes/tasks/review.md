@@ -493,3 +493,67 @@ Format: one section per sub-task, findings P0–P3 with disposition.
 - [ ] Final review (dh-final-review) — plan-level sign-off.
 
 ---
+
+## Final In-Depth Review (@dh-final-reviewer)
+
+**Scope:** full branch diff `feat/dev-harness-audit-fixes` vs the `develop` merge-base (`9d5c4df`) — 29 files, +1318/−143, 15 commits (`16814ed`..`2db9d0e`) — reviewed against `sdd.md` (R1–R5, AC1–AC5), `plan.md` (phases 1–5 + the 2026-10-19 amendment) and reviews 1.1–5.3.
+**Overall risk:** Low
+**Verdict:** **Approve with comments** (no in-scope P0/P1/P2; one out-of-scope P3 observation; one closeout bookkeeping step pending by design)
+
+### Requirements / Acceptance Criteria Verification
+
+| ID | Requirement / AC | Status | Evidence |
+|---|---|---|---|
+| R1 | Bundled `dh-semver` skill (global `semver` adapted); bundled skill references route to it | **PASS** | `skills/dh-semver/SKILL.md` (115 lines; valid frontmatter; `@dh-executor` ×3; zero `/release`, zero bare `@executor`; no-tags edge case fixed with `git log --oneline`). References updated: `dh-execute-plan` (L34/L84), `dh-final-review` (L27/L78/L126), `agents/dh-software-architect.md` (L59), `AGENTS.md` (L123). |
+| R2 | Dot-namespace tool refs; zero underscore aliases in `README.md`, `AGENTS.md`, `docs/LOADING.md`, `skills/`, `agents/` | **PASS** | `rg "dh_plan_|dh_logged_command|dh_read_sheet|dh_update_sheet|dh_sheet_schema"` over the five surfaces → 0 matches. All 7 IDs match the registrations in `src/plugin.ts`; the registration test still asserts the unchanged 7-tool `HARNESS_TOOLS` set. |
+| R3 | Counts/checklists truthful (`7 agents + 17 skills`) | **PASS** | Count sites updated in README (6 + table row), AGENTS (4 + enumeration), LOADING (2 + full checklists), `skills/index.md` (2 + row), `scripts/lib/shared.mjs` LOOP, 3 test files, `src/plugin.ts` comment. Independent set-equality script: corpus = LOOP = AGENTS enumeration = `skills/index.md` table = README table = LOADING checklist (7/17 each). |
+| R4 | LOADING version consistency at `^2.0.20`; `2.0.18` only historical | **PASS** | “Version skew” bullet now `^2.0.20` (L145); L42 install tip already stated the pin as `^2.0.20` with the historical “earlier 2.0.18 builds fail” limitation; L136 is a labeled v2.0.18 observation. `package.json` = `^2.0.20`. |
+| R5 | `scripts/audit.mjs` header matches real outputs | **PASS** | L10 → `reports/audit.json + reports/audit.md`, matching `MD_TARGET`/`JSON_TARGET` and the runtime console output; comment-only diff. |
+| AC1 | dh-semver exists; audit loop `17/17`; AGENTS ref resolves | **PASS** | Audit re-run: `Loop membership PASS — 17/17 skills present; 7/7 agents present`; cross-references 433 resolved, 1 warn (`@graphify`, external product, pre-existing). |
+| AC2 | Underscore sweep returns 0 | **PASS** | Command above → 0. Residual underscore names exist only in `src/` header comments — explicitly outside R2’s documentation scope and recorded as a plan follow-up. |
+| AC3 | No 15/16 corpus counts; checklists enumerate 7 + 17 | **PASS** | Sweep → 0 on the active surface; LOADING checklist set-equal to the corpus (7 agents / 17 skills, all `dh-` prefixed). |
+| AC4 | Only historical `^2.0.18` remains | **PASS** | `rg "2\.0\.18" docs/LOADING.md` → only the two historical notes (L42 limitation phrase, L136 observation). |
+| AC5 | build, test, audit PASS/0 fails, links 0 dead; comment matches | **PASS** | Independently re-run at branch HEAD: `pnpm build` exit 0 (`[copy-assets] agents 7 \| skills 17`); `pnpm test` 94/94 (9 files); `node scripts/audit.mjs` exit 0, PASS, `fails: []`; `node scripts/check-links.mjs` 0 dead (23 refs); `pnpm scan:deps` → “No issues found” (609 pkgs); `pnpm scan:code` → 0 findings; `pnpm install --frozen-lockfile` → “Already up to date”. |
+
+### Amendment Traceability (2026-10-19, user-approved source-map-js override)
+
+- Recorded in `plan.md` (Assumptions amendment + Sub-Task 5.1 PRE-STEP 0), `sdd.md` (Scope amendment) and the `docs/plans/index.md` row.
+- Real fix, no masking: `"source-map-js@<1.2.2": "^1.2.2"` in `pnpm-workspace.yaml`; `.osv-scanner.toml` contains **no** `IgnoredVulns`.
+- Lockfile hygiene: token-level diff of `pnpm-lock.yaml` shows the only version change is `source-map-js@1.2.1 → 1.2.2`; all other hunks are `(supports-color@7.2.0)` peer-suffix normalizations carrying identical versions — no unintended upgrades.
+- Resolution path dev-only: `pnpm why source-map-js` → `1.2.2` via `postcss ← tsup/vitest`; OSV re-run green post-override.
+
+### Findings
+
+- **[P0] Blocking:** none.
+- **[P1] High:** none.
+- **[P2] Medium:** none.
+- **[P3] Low — tag lineage not reachable from `develop` (pre-existing, out of scope).** From this branch `git describe --tags --abbrev=0` resolves `v0.1.0`, although v0.2.x–v0.3.1 are released: `git merge-base --is-ancestor v0.3.1 HEAD` fails and `git branch --contains v0.3.1` lists only `main`/`origin/main`. Impact: when `dh-semver` is invoked from a `develop`-based feature branch (its primary invocation path), it reports `v0.1.0` as “current” and ranges over 45 commits. It is not a defect of the adaptation (algorithm parity with the global skill; releases are tagged on `main`, where the tags are reachable) and is not introduced by this diff. **Fix (follow-up, outside this plan):** preserve tag ancestry on release back-merges (merge `main` after tagging, or tag the merge-back commit), or note it in `dh-semver`’s edge cases.
+
+### Integration Assessment
+
+- **Cross-sub-task coherence:** all 29 changed files fall in the plan’s in-scope list — no drive-by edits. The count contract moved everywhere in one change set (LOOP list, 3 test files, plugin comment, 4 doc surfaces, regenerated reports); corpus, tests, docs and audit agree at 7 agents + 17 skills.
+- **Count contract completeness:** verified beyond the plan’s checklist — `test/bundle.test.ts` / `test/plugin-entry.test.ts` encode no corpus counts; no stale `16`/`23` literals or “15/16 skills” strings remain outside the archives (`docs/plans/dev-*`) and `demo-project/` (deferred point-5 family).
+- **Wording coherence:** README and `skills/index.md` `dh-semver` rows mirror each other; AGENTS enumeration, LOADING checklist and index table are set-equal; LOADING’s tool-table intro now matches its four rows.
+- **Residual, accepted observations (no action in this plan):** `docs/plans/index.md:5` keeps the historical “7 agents + 15 skills” description of the first plan (true at creation time; archive semantics); `agents/dh-software-architect.md:49` still illustrates the lifecycle with `/release` (pre-existing, point-6 family); `skills/dh-final-review/SKILL.md:4` uses “semver recommendation” as a concept label; `src/` header comments retain underscore names (recorded follow-up).
+- **Regression risk / runtime behavior:** zero plugin-behavior change — `src/plugin.ts` edit is a comment; `scripts/lib/shared.mjs` only extends the audit-tooling LOOP membership; the registration test asserts the unchanged 7-tool namespace and 7 agents. Branch is cut from the current `develop` tip (Git Flow compliant).
+- **Out-of-scope verification:** `scripts/link-dh-global.sh`, `opencode.example.jsonc`, `demo-project/**`, `docs/plans/dev-harness-v2-plugin/**`, `docs/plans/dev-harness-phases-and-tools/**` — all byte-identical to the merge base.
+- **Security:** no secrets/credentials in the diff (targeted pattern scan clean; audit secret scan PASS, 0 high-signature); dependency change is a dev-transitive patch only.
+- **Rollback/recovery:** documentation/contract-only changes plus one localized override — revertable by reverting the branch commits; removing the override + `pnpm install` restores the previous `source-map-js` state. No migrations, no persisted state.
+- **Test coverage:** 94/94 across 9 files (unit + built-bundle integration); count invariants, name-regex, frontmatter and loop membership are enforced by tests/audit; `dh-semver` is validated as a content artifact (frontmatter/name/loop/cross-refs) — proportionate.
+
+### Release Readiness (dh-artifact-check + dh-preflight, re-verified)
+
+- **Build/artifacts:** `pnpm build` exit 0; `dist/plugin.js` emitted; `dist/assets` synced (`agents 7 | skills 17`). The repo has no deploy scripts (its scripts are the harness tooling; audit + link checks pass).
+- **Gate:** full `pnpm qa:check:full` was recorded green in 5.1; independently re-verified here: tests, audit, links, OSV, Semgrep, frozen-lockfile.
+- **Semver recommendation:** **MINOR → v0.4.0** (new bundled skill = `feat`, additive and backward compatible; no breaking changes to agents, tools or contracts). Caveat: computed from the branch, `git describe` names `v0.1.0` because of the P3 tag-ancestry issue; the release is cut on `main`, where `v0.3.1` is reachable.
+
+### Closeout Note (not a finding)
+
+Plan frontmatter `status: Pending` and the index row `Pending | Yes` were deliberately left for `dh-execute-plan` Step 4.5 to flip **after** this sign-off (per the 5.3 review). After approval: set plan `status: Completed`, `active: false`, and the index row `Completed | No`.
+
+### Suggested Next Steps
+
+- [ ] Flip plan frontmatter + `docs/plans/index.md` row to Completed (post-sign-off, `dh-execute-plan` Step 4.5).
+- [ ] Optional follow-ups already recorded in `plan.md` Open Questions: point 5 (stale config assets), point 6 (non-bundled scope note), `demo-project/` counts, `src/` comment tool names, and the P3 tag-lineage note.
+
+**Sign-off:** Approve with comments — all R1–R5 requirements and AC1–AC5 are met with independently reproduced evidence; merge into `develop` is recommended.

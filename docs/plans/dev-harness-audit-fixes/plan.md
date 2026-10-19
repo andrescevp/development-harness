@@ -8,8 +8,8 @@ description: >
   stale scripts/audit.mjs comment.
 created: 2026-10-18
 updated: 2026-10-19
-status: Pending
-active: true
+status: Completed
+active: false
 tags: [plan]
 project: dev-harness-skills
 ---
@@ -402,3 +402,4 @@ the harness: git commands run via `@dh-executor`; invocation sources are
   - Audit point 6 — "Bundled scope" note in `skills/index.md` naming non-bundled dependencies (`evolve`, `state-sync`, `semver`, commands). Partially mitigated: versioning is now bundled as `dh-semver`.
   - `demo-project/docs/index.md` — counts (16 skills) and underscore tool refs (`dh_read_sheet` on line ~66).
   - Source-code comments — underscore tool names remain in `src/tools/sheet-tools.ts`, `src/tools/logged-command.ts`, and `src/__tests__/sheet-tools.test.ts` header comments (outside R2's documentation scope; cosmetic).
+  - Tag lineage on `develop` — released tags `v0.2.x`–`v0.3.1` are unreachable from develop-based branches (`git describe` resolves `v0.1.0`), affecting `dh-semver`'s tag discovery there; preserve tag ancestry on release back-merges (P3 from the final review).
