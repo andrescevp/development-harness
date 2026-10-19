@@ -1,0 +1,559 @@
+# Sub-Task Reviews — dev-harness-audit-fixes
+
+Reviews produced by the `dh-review` skill during `dh-execute-plan` orchestration.
+Format: one section per sub-task, findings P0–P3 with disposition.
+
+---
+
+## Sub-Task Review: 1.1 — Author skills/dh-semver/SKILL.md (global semver adapted to the harness)
+
+**Reviewed against:** Sub-Task 1.1 (plan.md, Phase 1) · **Overall risk:** Low · **Verdict:** Approve with comments
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| `skills/dh-semver/SKILL.md` exists | PASS | New file, 115 lines (< 250 threshold) |
+| Frontmatter parses; `name`/`description` present | PASS | `name: dh-semver`; trigger-rich description with all five required trigger phrases; license/compatibility/allowed-tools/metadata mirror corpus convention; repo frontmatter parser reports 0 errors, name regex OK |
+| Body contains algorithm, output template, safety sections | PASS | Algorithm parity with `~/.agents/skills/semver/SKILL.md` (tag discovery, commit range, conventional-commit mapping, edge cases); "Version Decision"/"Changelog" template; safety rules (no push/delete without confirmation) |
+| Harness adaptations: `@dh-executor` for git; no `/release`; no non-bundled refs | PASS | `@dh-executor` at lines 23/45/102; zero bare `@executor`; zero `/release`; invocation sources are `dh-execute-plan`/`dh-final-review`/user request |
+| Under 250 lines | PASS | 115 lines |
+
+### Findings
+
+- **[P0] Blocking:** none.
+- **[P1] High:** none.
+- **[P2] Medium:** none.
+- **[P3] Low — no-tags path ambiguity:** the edge case said to default to `v0.0.0` but `git log v0.0.0..HEAD` cannot run without that ref. **Addressed** — Edge Cases now instruct enumerating all commits with `git log --oneline` (lines 52–54); revalidated (`wc -l` = 115).
+
+### Validation Results
+
+- Tests present: n/a (content artifact; corpus checks in Phase 5).
+- Validation commands: `wc -l` (< 250) PASS; frontmatter parse (repo parser) PASS; `grep` for `/release`/`@executor` PASS; `node scripts/audit.mjs` PASS with the file on the surface (frontmatter ok, no findings attributed).
+- Edge cases from sub-task: heading/trigger quality, adaptation completeness, length — all handled.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — new file only.
+- Interface/config changes affecting other components: none yet (loop registration is Sub-Task 1.2; forward references become live in 1.3, as planned).
+
+### Scope Compliance
+
+- In scope: verified — only `skills/dh-semver/SKILL.md` created.
+- Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [x] Apply the P3 clarification.
+- [ ] Sub-Task 1.2 — register the skill in the loop list + count contracts.
+
+---
+
+## Sub-Task Review: 1.2 — Wire count/test contracts for the new skill
+
+**Reviewed against:** Sub-Task 1.2 (plan.md, Phase 1) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| All corpus-size encodings updated to 17 skills / 24 names | PASS | 11 sites across 5 files; `rg` for stale patterns → 0 matches; secret-signature regexes (16/23-looking) correctly untouched |
+| Loop list has `dh-semver`, alphabetical, parses | PASS | `shared.mjs:34` between `dh-review` and `dh-setup`; 17 skills / 7 agents; set-diff vs corpus empty; no duplicates |
+| No unrelated edits; docs untouched (Phase 3 scope) | PASS | Diff limited to the 5 in-scope files; README/AGENTS/LOADING/skills-index unchanged |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+- Note: the engineer additionally fixed `assets.test.ts:66` ("loads the 16 bundled skills…") found by a broader sweep — within sub-task intent, no scope concern.
+
+### Validation Results
+
+- Build: `[copy-assets] agents 7 | skills 17 SKILL.md + index.md yes` (exit 0).
+- Focused tests: 45/45 pass, including `registers the 7 bundled agents and 17 skills, zero commands`; plugin stdout `registered 7 agents, 17 skills`.
+- Typecheck: clean (`tsc --noEmit`). Audit: PASS, loop membership 17/17 skills, 7/7 agents.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — mechanical count updates; set-uniqueness and inventory invariants enforced by the updated tests.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Sub-Task 1.3 — point bundled skill/agent references at `dh-semver`.
+
+---
+
+## Sub-Task Review: 1.3 — Point bundled skill/agent references at dh-semver
+
+**Reviewed against:** Sub-Task 1.3 (plan.md, Phase 1) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Skill invocations/pointers route to `dh-semver` | PASS | 7 refs in 4 files: `dh-execute-plan` L34/L84, `dh-final-review` L27/L78/L126, `dh-software-architect` L59, `AGENTS.md` L123 |
+| No bare `semver` skill invocation remains | PASS | Only the intentional provenance attribution at `skills/dh-semver/SKILL.md:21` ("adaptation of the global `semver` skill") |
+| Concept prose preserved | PASS | `dh-final-review` frontmatter "semver recommendation" unchanged; `AGENTS.md` "Tags: semver (`vX.Y.Z`)" retained; report label reworked to "(via `dh-semver`)" |
+| Scope compliance | PASS | Only the 4 in-scope files; README/LOADING/skills-index untouched (Phase 3) |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- `node scripts/audit.mjs` → PASS (exit 0; `dh-semver` resolves as a bundled skill).
+- `node scripts/check-links.mjs` → OK, 22 refs checked, 0 dead.
+- Grammar/readability of the reworded sentences verified in context.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — textual references only; no runtime/interface change.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none (`state-sync` in the architect list remains a pre-existing point-6 concern).
+
+### Suggested Next Steps
+
+- [ ] Phase 2 — Sub-Task 2.1: normalize root docs to the registered dot namespace.
+
+---
+
+## Sub-Task Review: 2.1 — Normalize root docs (README.md, AGENTS.md, docs/LOADING.md)
+
+**Reviewed against:** Sub-Task 2.1 (plan.md, Phase 2) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| All underscore tool refs removed from root docs | PASS | `rg "dh_plan_|dh_logged_command|dh_read_sheet|dh_update_sheet|dh_sheet_schema"` over the 3 files → 0 matches |
+| Dot names are the registered IDs | PASS | All 7 IDs verified against `src/plugin.ts` namespace/tool registrations; no malformed forms |
+| LOADING table intro matches its 4 rows | PASS | "three plan-lifecycle tools plus the logged-command tool" — old "three … for phased plans" mismatch resolved |
+| No skill names, counts, or unrelated prose changed | PASS | Identifier-only diff (11 tokens + 1 sentence) |
+| Scope containment | PASS | Only README.md, AGENTS.md, docs/LOADING.md |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- `rg` underscore sweep → 0 hits in the three files; broader `dh_` sweep clean.
+- Registered names cross-checked against `src/plugin.ts` (namespace `dh`, tools `plan_read`/`plan_update_status`/`plan_create`/`logged_command`/`read_sheet`/`update_sheet`/`sheet_schema`).
+- `node scripts/check-links.mjs` → OK, 22 refs, 0 dead.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — documentation identifiers only.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Sub-Task 2.2 — normalize skills/ and agents/ tool references.
+
+---
+
+## Sub-Task Review: 2.2 — Normalize skills/ and agents/ tool references
+
+**Reviewed against:** Sub-Task 2.2 (plan.md, Phase 2) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Zero underscore tool refs remain in skills/ + agents/ | PASS | Targeted `rg` → 0; broader `dh_[a-z]` sweep → 0 |
+| Dot names are registered IDs, well-formed | PASS | All 7 IDs match `src/plugin.ts`; no malformed forms; backticks/line-wrapping preserved |
+| Occurrence count preserved (36 → 36) | PASS | Per-file 1:1 verified; token-normalized diff identical (rename-only) |
+| Skill names (`dh-*`) untouched; prose/formatting intact | PASS | Multiset of `dh-` names identical; no counts changed |
+| Scope | PASS | Exactly the 10 expected files |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+- Note: engineer also normalized the un-backticked variant at `skills/dh-setup/SKILL.md:37` — within sub-task intent.
+
+### Validation Results
+
+- `node scripts/check-links.mjs` → OK (22 refs, 0 dead); `node scripts/audit.mjs` → PASS.
+- Diff checked name-by-name; no occurrence dropped in tables, blockquotes, or wrapped prose.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — identifier renames in documentation/skill text only.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none (counts remain deferred to Phase 3).
+
+### Suggested Next Steps
+
+- [ ] Phase 3 — Sub-Task 3.1: README counts + `dh-semver` skill row.
+
+---
+
+## Sub-Task Review: 3.1 — README.md counts + dh-semver skill row
+
+**Reviewed against:** Sub-Task 3.1 (plan.md, Phase 3) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| All six count sites read 17 skills | PASS | L3, L9, L27, L83, L125, L184; stale `15 dh-*`/`16 skills`/`16 bundled` → 0 matches |
+| `dh-semver` row appended last in the Skills table | PASS | Format matches neighbours; table has 17 skill rows; wording matches the bundled skill |
+| No unrelated content changed | PASS | Diff = 6 count edits + 1 row; `^2.0.20` pins and dot tool refs intact |
+| Scope | PASS | README.md only |
+| Corpus consistency | PASS | Disk: 7 agents / 17 skills; README: 7 agent rows / 17 skill rows |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- `rg` stale-count sweep → 0; row counts verified (17 skills, 7 agents); `node scripts/check-links.mjs` → OK (22 refs, 0 dead).
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — counts and one documentation row only.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Sub-Task 3.2 — docs/LOADING.md counts + complete verification checklists.
+
+---
+
+## Sub-Task Review: 3.2 — docs/LOADING.md counts + complete verification checklists
+
+**Reviewed against:** Sub-Task 3.2 (plan.md, Phase 3) · **Overall risk:** Low · **Verdict:** Approve
+*(Implementing session was interrupted mid-run; edits were in the working tree and validation/review were re-run cleanly after resume.)*
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Checklist agents line: all 7 agents, `dh-` prefixed | PASS | Adds `dh-documentor`; fixes previously bare names; set-equal to `LOOP.agents` |
+| Checklist skills line: all 17 skills, `dh-` prefixed | PASS | Adds `dh-contingency`, `dh-code-ruler`, `dh-semver`; set-equal to `LOOP.skills`; no duplicates |
+| Count sites read 17 | PASS | L109 "7 agents + 17 skills", L118 "17 `dh-*` skills"; `rg \b15\b|\b16\b` → 0 |
+| Scope/formatting | PASS | Exactly 4 hunks; code-block indent/fences intact; version bullet left for 4.1 |
+| Tooling | PASS | `check-links` OK (22/0); `audit` PASS |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- Set-equality script: `agents: 7 set-equal: true`, `skills: 17 set-equal: true`.
+- Checklist diff verified hunk-by-hunk; no interruption artifacts; no unrelated edits.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — documentation lists only.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Sub-Task 3.3 — AGENTS.md + skills/index.md counts and lists.
+
+---
+
+## Sub-Task Review: 3.3 — AGENTS.md + skills/index.md counts and lists
+
+**Reviewed against:** Sub-Task 3.3 (plan.md, Phase 3) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| AGENTS.md count sites read 17; enumeration includes `dh-semver` | PASS | Role summary L12/L14, provenance L70, registration L77, verify L89 — stale patterns → 0 |
+| skills/index.md: intro, heading, `dh-semver` row | PASS | L3 "**17 skills**"; L75 "## The 17 bundled skills"; row appended last with link target that resolves |
+| Set-equality of both lists with the corpus | PASS | AGENTS enumeration = index table = disk = `LOOP.skills` (17, no duplicates) |
+| Scope | PASS | Exactly 8 single-line hunks across the two files; nothing else touched |
+| Tooling | PASS | `check-links` OK (23 refs, 0 dead — the new link is followed); `audit` PASS |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- Programmatic set-equality checks passed on both surfaces; table row count = 17.
+- No stale `15`/`16` counts remain in either file.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — counts, one list entry, one table row.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Phase 4 — Sub-Task 4.1: LOADING version-skew bullet.
+
+---
+
+## Sub-Task Review: 4.1 — Fix LOADING.md version-skew bullet
+
+**Reviewed against:** Sub-Task 4.1 (plan.md, Phase 4) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Version-skew bullet reads `@opencode/plugin@^2.0.20` | PASS | One-line change at L145; sentence grammatical |
+| Historical v2.0.18 notes intact | PASS | Install tip (L42) and real-session note (L136) unchanged |
+| Consistency with `package.json` and install tip | PASS | package.json = `^2.0.20`; all live version claims aligned; no live `^2.0.18` remains |
+| Scope | PASS | Exactly one line; no other files |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- `rg "2.0.18"` → only the two historical notes; `rg "^2.0.20"` → install tip + version-skew bullet.
+- `check-links` OK; `audit` PASS.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — single documentation token.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Sub-Task 4.2 — scripts/audit.mjs header comment.
+
+---
+
+## Sub-Task Review: 4.2 — Fix scripts/audit.mjs header comment
+
+**Reviewed against:** Sub-Task 4.2 (plan.md, Phase 4) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Usage comment names real outputs | PASS | L10 now `reports/audit.json + reports/audit.md`, matching `MD_TARGET`/`JSON_TARGET` constants |
+| Comment-only change; syntax valid | PASS | 1/1 line diff; `node --check` OK |
+| No stale `audit-report.md` claims remain | PASS | `rg` over active surface → 0 (only the SDD/plan quotes describing the defect + archives) |
+| Behavior unchanged | PASS | `node scripts/audit.mjs` → exit 0, PASS, loop 17/17 |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- Diff is exactly one comment line; runtime console output already pointed at `reports/audit.md`.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — comment only.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Phase 5 — Sub-Task 5.1: build + full gate validation.
+
+---
+
+## Sub-Task Review: 5.1 — Build + full gate validation (incl. 2026-10-19 Plan A dependency amendment)
+
+**Reviewed against:** Sub-Task 5.1 (plan.md, Phase 5) + user-approved amendment · **Overall risk:** Low · **Verdict:** Approve
+
+**Note:** first validation attempt was a hard blocker (loop rule 2.4): OSV `GHSA-68fv-2mgg-jv7q` (High) in pre-existing `source-map-js@1.2.1`. User approved Plan A; the plan was amended and the fix applied; all gates were then re-run green.
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| All gates pass **including `scan:deps` with 0 findings** | PASS | `pnpm qa:check:full` exit 0 (independently re-run): OSV "No issues found" (609 pkgs), Semgrep 0 findings, 94/94 tests, typecheck clean, audit PASS (17/17), build `agents 7 \| skills 17`, smoke-load OK, links OK |
+| Dependency fix correctness | PASS | Override `"source-map-js@<1.2.2": "^1.2.2"`; lockfile delta = only `source-map-js@1.2.1 → 1.2.2` (+ peer-suffix normalization from pnpm 11.9.0); no unrelated upgrades; `pnpm install --frozen-lockfile` reproducible |
+| AC greps | PASS | Underscore tool refs → 0; stale counts → 0; `dh-semver` present in all required surfaces |
+| Scope | PASS | Only pnpm files, plan/sdd amendment records, regenerated reports; `dist/`/`report/` gitignored |
+| Amendment traceability + real fix | PASS | plan.md + sdd.md record the user-approved amendment; `.osv-scanner.toml` has **no** `IgnoredVulns` (fix, not mask) |
+
+### Findings
+
+- **[P0] Blocking:** none (blocker resolved via user-approved amendment). **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+
+### Validation Results
+
+- Full gate evidence independently reproduced by review; scan:deps clean post-override.
+- Lockfile consistency verified (`--frozen-lockfile` no-op); resolution path confirmed (`postcss ← tsup/vitest`, dev-only).
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — dev-toolchain-only transitive bump within postcss's compatible range.
+
+### Scope Compliance
+
+- In scope (as amended): verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Sub-Task 5.2 — documentation completeness pass.
+
+---
+
+## Sub-Task Review: 5.2 — Documentation completeness pass (dh-create-documentation)
+
+**Reviewed against:** Sub-Task 5.2 (plan.md, Phase 5) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| All four surfaces describe `dh-semver` + the 17-skill corpus coherently | PASS | `dh-semver` in README (L159), AGENTS (L14/L123), LOADING (L85), index (L95); all lists set-equal to `LOOP` |
+| Counts read 7 agents / 17 skills; no stale 15/16 | PASS | `rg \b15\b|\b16\b` over the four surfaces → 0 (historical 2.0.18 notes legitimately excepted) |
+| No underscore tool refs | PASS | Sweep over four surfaces + skills/ + agents/ → 0 |
+| 5.2 made no file modifications (clean pass) | PASS | Working tree showed only the plan status flip |
+| Residual observations correctly classified | PASS | R1 (src/ comment doc-strings) genuinely outside R2 scope → recorded as follow-up; R2/R3 cosmetic, no AC failure |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+- Follow-up (recorded for 5.3): underscore tool names in `src/` header comments (`sheet-tools.ts`, `logged-command.ts`, `sheet-tools.test.ts`) — cosmetic, out of R2 scope.
+
+### Validation Results
+
+- Corpus reality re-verified (7/17); surface lists script-compared against `LOOP`; stale-count/underscore sweeps clean.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — verification-only sub-task.
+
+### Scope Compliance
+
+- In scope: verified (no changes needed). Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Sub-Task 5.3 — closeout (index row, follow-ups).
+
+---
+
+## Sub-Task Review: 5.3 — Closeout: docs/plans/index.md row, plan statuses, follow-ups
+
+**Reviewed against:** Sub-Task 5.3 (plan.md, Phase 5) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Index row accurate (dates, description, format) | PASS | Created 2026-10-18 / Updated 2026-10-19; description includes the source-map-js override; 7-column format intact |
+| Status flip correctly deferred | PASS | `Pending`/`Yes` retained pending dh-execute-plan Step 4.5 (post-final-review) — flipping early would violate the final-review gate |
+| Plan.md frontmatter + Open Questions follow-ups | PASS | `updated: 2026-10-19`; follow-ups list now covers points 5/6, demo-project, and the source-comment bullet (R1 from 5.2) |
+| Lifecycle state | PASS | Phases 1–4 Completed; Phase 5 closes with this sub-task; 1.1–5.2 Completed |
+| Scope + parser invariants | PASS | Only index.md + plan.md changed; `dh.plan_read` parses cleanly |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+- Informational: index.md lacks a trailing newline (pre-existing).
+
+### Validation Results
+
+- Statuses verified via tool parse; index table column-checked; diff limited to the three expected hunks.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — bookkeeping only.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Final review (dh-final-review) — plan-level sign-off.
+
+---
+
+## Final In-Depth Review (@dh-final-reviewer)
+
+**Scope:** full branch diff `feat/dev-harness-audit-fixes` vs the `develop` merge-base (`9d5c4df`) — 29 files, +1318/−143, 15 commits (`16814ed`..`2db9d0e`) — reviewed against `sdd.md` (R1–R5, AC1–AC5), `plan.md` (phases 1–5 + the 2026-10-19 amendment) and reviews 1.1–5.3.
+**Overall risk:** Low
+**Verdict:** **Approve with comments** (no in-scope P0/P1/P2; one out-of-scope P3 observation; one closeout bookkeeping step pending by design)
+
+### Requirements / Acceptance Criteria Verification
+
+| ID | Requirement / AC | Status | Evidence |
+|---|---|---|---|
+| R1 | Bundled `dh-semver` skill (global `semver` adapted); bundled skill references route to it | **PASS** | `skills/dh-semver/SKILL.md` (115 lines; valid frontmatter; `@dh-executor` ×3; zero `/release`, zero bare `@executor`; no-tags edge case fixed with `git log --oneline`). References updated: `dh-execute-plan` (L34/L84), `dh-final-review` (L27/L78/L126), `agents/dh-software-architect.md` (L59), `AGENTS.md` (L123). |
+| R2 | Dot-namespace tool refs; zero underscore aliases in `README.md`, `AGENTS.md`, `docs/LOADING.md`, `skills/`, `agents/` | **PASS** | `rg "dh_plan_|dh_logged_command|dh_read_sheet|dh_update_sheet|dh_sheet_schema"` over the five surfaces → 0 matches. All 7 IDs match the registrations in `src/plugin.ts`; the registration test still asserts the unchanged 7-tool `HARNESS_TOOLS` set. |
+| R3 | Counts/checklists truthful (`7 agents + 17 skills`) | **PASS** | Count sites updated in README (6 + table row), AGENTS (4 + enumeration), LOADING (2 + full checklists), `skills/index.md` (2 + row), `scripts/lib/shared.mjs` LOOP, 3 test files, `src/plugin.ts` comment. Independent set-equality script: corpus = LOOP = AGENTS enumeration = `skills/index.md` table = README table = LOADING checklist (7/17 each). |
+| R4 | LOADING version consistency at `^2.0.20`; `2.0.18` only historical | **PASS** | “Version skew” bullet now `^2.0.20` (L145); L42 install tip already stated the pin as `^2.0.20` with the historical “earlier 2.0.18 builds fail” limitation; L136 is a labeled v2.0.18 observation. `package.json` = `^2.0.20`. |
+| R5 | `scripts/audit.mjs` header matches real outputs | **PASS** | L10 → `reports/audit.json + reports/audit.md`, matching `MD_TARGET`/`JSON_TARGET` and the runtime console output; comment-only diff. |
+| AC1 | dh-semver exists; audit loop `17/17`; AGENTS ref resolves | **PASS** | Audit re-run: `Loop membership PASS — 17/17 skills present; 7/7 agents present`; cross-references 433 resolved, 1 warn (`@graphify`, external product, pre-existing). |
+| AC2 | Underscore sweep returns 0 | **PASS** | Command above → 0. Residual underscore names exist only in `src/` header comments — explicitly outside R2’s documentation scope and recorded as a plan follow-up. |
+| AC3 | No 15/16 corpus counts; checklists enumerate 7 + 17 | **PASS** | Sweep → 0 on the active surface; LOADING checklist set-equal to the corpus (7 agents / 17 skills, all `dh-` prefixed). |
+| AC4 | Only historical `^2.0.18` remains | **PASS** | `rg "2\.0\.18" docs/LOADING.md` → only the two historical notes (L42 limitation phrase, L136 observation). |
+| AC5 | build, test, audit PASS/0 fails, links 0 dead; comment matches | **PASS** | Independently re-run at branch HEAD: `pnpm build` exit 0 (`[copy-assets] agents 7 \| skills 17`); `pnpm test` 94/94 (9 files); `node scripts/audit.mjs` exit 0, PASS, `fails: []`; `node scripts/check-links.mjs` 0 dead (23 refs); `pnpm scan:deps` → “No issues found” (609 pkgs); `pnpm scan:code` → 0 findings; `pnpm install --frozen-lockfile` → “Already up to date”. |
+
+### Amendment Traceability (2026-10-19, user-approved source-map-js override)
+
+- Recorded in `plan.md` (Assumptions amendment + Sub-Task 5.1 PRE-STEP 0), `sdd.md` (Scope amendment) and the `docs/plans/index.md` row.
+- Real fix, no masking: `"source-map-js@<1.2.2": "^1.2.2"` in `pnpm-workspace.yaml`; `.osv-scanner.toml` contains **no** `IgnoredVulns`.
+- Lockfile hygiene: token-level diff of `pnpm-lock.yaml` shows the only version change is `source-map-js@1.2.1 → 1.2.2`; all other hunks are `(supports-color@7.2.0)` peer-suffix normalizations carrying identical versions — no unintended upgrades.
+- Resolution path dev-only: `pnpm why source-map-js` → `1.2.2` via `postcss ← tsup/vitest`; OSV re-run green post-override.
+
+### Findings
+
+- **[P0] Blocking:** none.
+- **[P1] High:** none.
+- **[P2] Medium:** none.
+- **[P3] Low — tag lineage not reachable from `develop` (pre-existing, out of scope).** From this branch `git describe --tags --abbrev=0` resolves `v0.1.0`, although v0.2.x–v0.3.1 are released: `git merge-base --is-ancestor v0.3.1 HEAD` fails and `git branch --contains v0.3.1` lists only `main`/`origin/main`. Impact: when `dh-semver` is invoked from a `develop`-based feature branch (its primary invocation path), it reports `v0.1.0` as “current” and ranges over 45 commits. It is not a defect of the adaptation (algorithm parity with the global skill; releases are tagged on `main`, where the tags are reachable) and is not introduced by this diff. **Fix (follow-up, outside this plan):** preserve tag ancestry on release back-merges (merge `main` after tagging, or tag the merge-back commit), or note it in `dh-semver`’s edge cases.
+
+### Integration Assessment
+
+- **Cross-sub-task coherence:** all 29 changed files fall in the plan’s in-scope list — no drive-by edits. The count contract moved everywhere in one change set (LOOP list, 3 test files, plugin comment, 4 doc surfaces, regenerated reports); corpus, tests, docs and audit agree at 7 agents + 17 skills.
+- **Count contract completeness:** verified beyond the plan’s checklist — `test/bundle.test.ts` / `test/plugin-entry.test.ts` encode no corpus counts; no stale `16`/`23` literals or “15/16 skills” strings remain outside the archives (`docs/plans/dev-*`) and `demo-project/` (deferred point-5 family).
+- **Wording coherence:** README and `skills/index.md` `dh-semver` rows mirror each other; AGENTS enumeration, LOADING checklist and index table are set-equal; LOADING’s tool-table intro now matches its four rows.
+- **Residual, accepted observations (no action in this plan):** `docs/plans/index.md:5` keeps the historical “7 agents + 15 skills” description of the first plan (true at creation time; archive semantics); `agents/dh-software-architect.md:49` still illustrates the lifecycle with `/release` (pre-existing, point-6 family); `skills/dh-final-review/SKILL.md:4` uses “semver recommendation” as a concept label; `src/` header comments retain underscore names (recorded follow-up).
+- **Regression risk / runtime behavior:** zero plugin-behavior change — `src/plugin.ts` edit is a comment; `scripts/lib/shared.mjs` only extends the audit-tooling LOOP membership; the registration test asserts the unchanged 7-tool namespace and 7 agents. Branch is cut from the current `develop` tip (Git Flow compliant).
+- **Out-of-scope verification:** `scripts/link-dh-global.sh`, `opencode.example.jsonc`, `demo-project/**`, `docs/plans/dev-harness-v2-plugin/**`, `docs/plans/dev-harness-phases-and-tools/**` — all byte-identical to the merge base.
+- **Security:** no secrets/credentials in the diff (targeted pattern scan clean; audit secret scan PASS, 0 high-signature); dependency change is a dev-transitive patch only.
+- **Rollback/recovery:** documentation/contract-only changes plus one localized override — revertable by reverting the branch commits; removing the override + `pnpm install` restores the previous `source-map-js` state. No migrations, no persisted state.
+- **Test coverage:** 94/94 across 9 files (unit + built-bundle integration); count invariants, name-regex, frontmatter and loop membership are enforced by tests/audit; `dh-semver` is validated as a content artifact (frontmatter/name/loop/cross-refs) — proportionate.
+
+### Release Readiness (dh-artifact-check + dh-preflight, re-verified)
+
+- **Build/artifacts:** `pnpm build` exit 0; `dist/plugin.js` emitted; `dist/assets` synced (`agents 7 | skills 17`). The repo has no deploy scripts (its scripts are the harness tooling; audit + link checks pass).
+- **Gate:** full `pnpm qa:check:full` was recorded green in 5.1; independently re-verified here: tests, audit, links, OSV, Semgrep, frozen-lockfile.
+- **Semver recommendation:** **MINOR → v0.4.0** (new bundled skill = `feat`, additive and backward compatible; no breaking changes to agents, tools or contracts). Caveat: computed from the branch, `git describe` names `v0.1.0` because of the P3 tag-ancestry issue; the release is cut on `main`, where `v0.3.1` is reachable.
+
+### Closeout Note (not a finding)
+
+Plan frontmatter `status: Pending` and the index row `Pending | Yes` were deliberately left for `dh-execute-plan` Step 4.5 to flip **after** this sign-off (per the 5.3 review). After approval: set plan `status: Completed`, `active: false`, and the index row `Completed | No`.
+
+### Suggested Next Steps
+
+- [ ] Flip plan frontmatter + `docs/plans/index.md` row to Completed (post-sign-off, `dh-execute-plan` Step 4.5).
+- [ ] Optional follow-ups already recorded in `plan.md` Open Questions: point 5 (stale config assets), point 6 (non-bundled scope note), `demo-project/` counts, `src/` comment tool names, and the P3 tag-lineage note.
+
+**Sign-off:** Approve with comments — all R1–R5 requirements and AC1–AC5 are met with independently reproduced evidence; merge into `develop` is recommended.

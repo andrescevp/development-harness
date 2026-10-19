@@ -75,25 +75,27 @@ After loading, confirm the harness is registered:
 
 ```
 opencode debug agents   → look for: dh-software-architect, dh-software-engineer,
-                          reviewer, final-reviewer, executor, explorer
-opencode debug skills   → look for: dh-artifact-check, dh-simplify,
-                          dh-domain-check, dh-coding, dh-code-review,
+                          dh-reviewer, dh-final-reviewer, dh-executor,
+                          dh-explorer, dh-documentor
+opencode debug skills   → look for: dh-artifact-check, dh-code-review,
+                          dh-code-ruler, dh-coding, dh-contingency,
+                          dh-create-documentation, dh-domain-check,
                           dh-execute-plan, dh-execute-plan-task, dh-final-review,
-                          dh-planning, dh-preflight, dh-review,
-                          dh-create-documentation, dh-grill-sdd, dh-setup, dh-code-ruler
+                          dh-grill-sdd, dh-planning, dh-preflight, dh-review,
+                          dh-semver, dh-setup, dh-simplify
 opencode debug commands → no new commands (commands are out of scope)
 ```
 
 ## Plan lifecycle tools (harness namespace)
 
-The plugin also registers three V2 custom tools (codemode) for phased plans:
+The plugin also registers V2 custom tools (codemode) under the `dh` namespace: three plan-lifecycle tools plus the logged-command tool:
 
 | Tool | Input | Returns |
 |---|---|---|
-| `dh_plan_read` | `{ slug }` or `{ path }` (relative to `docs/plans`) | `{ ok, path, plan }` — parsed phases/sub-tasks with statuses |
-| `dh_plan_update_status` | `{ slug?, path?, target: phase\|subtask, index: "N"\|"N.M", status }` | `{ ok, path, plan }` — line-aware status edit |
-| `dh_plan_create` | `{ slug, title, objective, phases: [{title, subTasks:[{title}]}], updateIndex? }` | `{ ok, path, plan }` — scaffolds a phased plan |
-| `dh_logged_command` | `{ command, logName?, timeoutMs? }` | `{ ok, exitCode, logPath, head, tail, truncated }` — runs a command with its log in the OS temp dir and returns a head/tail window + log path |
+| `dh.plan_read` | `{ slug }` or `{ path }` (relative to `docs/plans`) | `{ ok, path, plan }` — parsed phases/sub-tasks with statuses |
+| `dh.plan_update_status` | `{ slug?, path?, target: phase\|subtask, index: "N"\|"N.M", status }` | `{ ok, path, plan }` — line-aware status edit |
+| `dh.plan_create` | `{ slug, title, objective, phases: [{title, subTasks:[{title}]}], updateIndex? }` | `{ ok, path, plan }` — scaffolds a phased plan |
+| `dh.logged_command` | `{ command, logName?, timeoutMs? }` | `{ ok, exitCode, logPath, head, tail, truncated }` — runs a command with its log in the OS temp dir and returns a head/tail window + log path |
 
 Phase → `Completed` is gated: it fails while any sub-task of the phase is not
 `Completed`. Reads/writes are anchored under `<workspace>/docs/plans`;
@@ -104,7 +106,7 @@ The in-repo gate that proves the plugin logic is the registration test:
 
 ```sh
 pnpm test   # src/__tests__/registration.test.ts runs the real bundle setup
-            # against a stub ctx → exactly 7 agents + 16 skills registered
+            # against a stub ctx → exactly 7 agents + 17 skills registered
 ```
 
 ## Troubleshooting
@@ -113,7 +115,7 @@ pnpm test   # src/__tests__/registration.test.ts runs the real bundle setup
   was started **before** the plugin was installed: plugins load at server
   startup, and a long-lived opencode session keeps its original registry.
   Restart opencode (or reload the config) and both the 7 `dh-*` agents and
-  15 `dh-*` skills appear — the plugin registers agents via `agent.transform`
+  17 `dh-*` skills appear — the plugin registers agents via `agent.transform`
   exactly like skills, no `agent` map in config is needed.
 - **`pnpm audit` vs `pnpm run audit`** — `pnpm audit` is pnpm's **dependency
   security audit** (currently reports 1 low dev-only esbuild advisory and
@@ -140,7 +142,7 @@ pnpm test   # src/__tests__/registration.test.ts runs the real bundle setup
   started before the plugin was installed. If agents do not appear, restart
   opencode first, then confirm the load form and rebuild `dist/assets` if
   using the built package form.
-- **Version skew** — the plugin targets `@opencode/plugin@^2.0.18`; keep the
+- **Version skew** — the plugin targets `@opencode/plugin@^2.0.20`; keep the
   host opencode ≥ that version and pin the package if the host is older.
 - **Audit fails after editing harness content** — run
   `node scripts/audit.mjs`; new skills/agents must pass the audit rules

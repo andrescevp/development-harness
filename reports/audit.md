@@ -1,21 +1,21 @@
 # Audit Report — dev-harness-skills plugin
 
-Generated 2026-10-04T19:10:30.545Z by `scripts/audit.mjs`.
+Generated 2026-10-19T04:17:23.949Z by `scripts/audit.mjs`.
 
 ## Verdict
 
-**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 139. Documented schema deviations: 0.
+**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 141. Documented schema deviations: 0.
 
 ## Summary verdict table
 
 | Dimension | Count | Status | Notes |
 |---|---|---|---|
-| Inventory & structure | 23 | PASS | 7 agents, 16 skill dirs + index.md; no commands/, no prompts/ |
-| Frontmatter parse | 24 | PASS | 24 files on audit surface |
-| Name regex | 23 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
+| Inventory & structure | 24 | PASS | 7 agents, 17 skill dirs + index.md; no commands/, no prompts/ |
+| Frontmatter parse | 25 | PASS | 25 files on audit surface |
+| Name regex | 24 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 1 | WARN | 414 resolved; 1 code-context; 0 allowlisted; 131 prose tokens (warn) |
-| Loop membership | 23 | PASS | 16/16 skills present; 7/7 agents present |
+| Cross-references | 1 | WARN | 433 resolved; 1 code-context; 0 allowlisted; 133 prose tokens (warn) |
+| Loop membership | 24 | PASS | 17/17 skills present; 7/7 agents present |
 | Secret scan | 26 | PASS | 26 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
 
@@ -53,6 +53,7 @@ _None._
 | skill | dh-planning | present |
 | skill | dh-preflight | present |
 | skill | dh-review | present |
+| skill | dh-semver | present |
 | skill | dh-setup | present |
 | skill | dh-simplify | present |
 | agent | dh-documentor | present |
@@ -71,7 +72,7 @@ _None._
 
 Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; full list in reports/audit.json):
 
-- `project-name` × 22
+- `project-name` × 23
 - `osv-scanner` × 7
 - `phased-plan-template` × 5
 - `bounded-context` × 4

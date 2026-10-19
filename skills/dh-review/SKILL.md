@@ -14,7 +14,7 @@ Verify that a single sub-task implementation meets its plan-defined acceptance c
 
 ## Core Rules
 
-- Read the plan to find the active sub-task and its criteria — via `dh_plan_read` (`{ slug }`) when available, else manual read of `./docs/plans/<plan-slug>/plan.md` following the phased marker rules. If the plan does not exist, stop and report that no plan was found.
+- Read the plan to find the active sub-task and its criteria — via `dh.plan_read` (`{ slug }`) when available, else manual read of `./docs/plans/<plan-slug>/plan.md` following the phased marker rules. If the plan does not exist, stop and report that no plan was found.
 - This skill is loop step 2.3 (`dh-review` + `dh-code-review`); the full loop 1–5 lives in repo-root AGENTS.md (pointer only, no duplication).
 - Do not review code outside the sub-task scope.
 - Delegate code quality checks to `@dh-reviewer` agent — do not duplicate the `dh-code-review` skill.
@@ -58,7 +58,7 @@ Review the implementation against these dimensions, in order:
 
 ### Step 1: Read plan context
 
-Read the plan (via `dh_plan_read` when available; fallback: manual read of `./docs/plans/<plan-slug>/plan.md`) and extract:
+Read the plan (via `dh.plan_read` when available; fallback: manual read of `./docs/plans/<plan-slug>/plan.md`) and extract:
 - The active sub-task: the one marked `In Progress` within the first `In Progress` phase. If none is In Progress, use the most recently Completed sub-task and explicitly state that assumption in the review report.
 - The sub-task's phase (`Phase N`), which the review report may note to support the orchestrator's phase-completion tracking
 - Its acceptance criteria, done-when conditions, and scope boundaries

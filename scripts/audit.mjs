@@ -7,7 +7,7 @@
  * are derived from the corpus itself (no external manifest).
  *
  * Usage:
- *   node scripts/audit.mjs               # summary; writes reports/audit.json + tasks/audit-report.md; exit 0/1
+ *   node scripts/audit.mjs               # summary; writes reports/audit.json + reports/audit.md; exit 0/1
  *   node scripts/audit.mjs --json        # also prints the full JSON report to stdout
  *   node scripts/audit.mjs --report <p>  # override the markdown report destination
  *

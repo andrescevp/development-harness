@@ -31,6 +31,7 @@ export const LOOP = {
     'dh-planning',
     'dh-preflight',
     'dh-review',
+    'dh-semver',
     'dh-setup',
     'dh-simplify',
   ],
