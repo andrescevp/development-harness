@@ -376,11 +376,11 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 ### Phase 5: Verification & release
 
-- **Status:** Pending
+- **Status:** In Progress
 
 #### Sub-Task 5.1: Real-session verification (mcp list, live tool call, cold npx timing)
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Prove the full path end-to-end on this host: built dist + demo-project config + real opencode connection + a live tool call through the MCP server + cold-start npx timing; record everything in `docs/plans/plugin-tools-to-mcp/tasks/verification.md`.
 - **Related Requirements:** AC4, AC5, AC6
 - **Dependencies and Preconditions:** Phases 1–4 complete; network access for the first npx git install.

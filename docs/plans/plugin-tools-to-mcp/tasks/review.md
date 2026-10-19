@@ -709,7 +709,7 @@ fail-closed anchor precondition, index ACL tests, row escaping, helper relocatio
 ### Suggested Next Steps
 
 - [x] Proceed to Sub-Task 4.4 — demo-project config + `demo.sh` validation (living proof; the
-      fifth snippet copy).
+      documented local-fallback copy — npx copies stay canonical for shipped projects).
 
 ---
 
@@ -758,3 +758,47 @@ fail-closed anchor precondition, index ACL tests, row escaping, helper relocatio
 - [x] Phase 4 complete — close the phase, commit.
 - [ ] Phase 5: real-session verification (restart/kill any long-lived opencode service first),
       cold-path timing, then the full gate + release closure.
+
+---
+
+## Sub-Task Review: 5.1 — Real-session verification (mcp list, live tool call, cold npx timing)
+
+**Reviewed against:** Sub-Task 5.1 (plan.md, Phase 5) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification (SDD AC4 / AC5 / AC6)
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Build + artifact evidence recorded | PASS | `dist/mcp/stdio.js` 229,940 B · `dist/plugin.js` 208,381 B · sentinel present · SHA-256s recorded |
+| Demo validate (fresh data dir) green | PASS | 2.67 s at execution; independent re-run 2.73 s; `MCP GATE: ✓ dh connected`; all 5 gates green (7/7 agents, 181 tests) |
+| **Live session tool call** (real opencode agent) | **PASS** | `opencode run --standalone --auto` (fresh `XDG_DATA_HOME`, 180 s bound; 11,964 ms): the agent discovered the `dh` server via Code Mode and executed `tools.dh.plan_create` → `{ ok: true, path: …/demo-project/docs/plans/verification-scratch/plan.md }`; the plan file existed on disk (1,572 B); scratch removed afterwards |
+| Cold-start timing + guidance | PASS | Local folder-spec npx proxy: **752 ms cold / 1046 ms warm**, 0 stdout bytes, stderr banner; caveats recorded (local spec symlinks the dir and skips `prepare` → lower bound for the remote git path); `timeout.startup: 300000` retained as the safe ceiling |
+| AC6 grep: zero stale tool refs | PASS | Exact command run; independent re-run → 0 matches |
+| Snippet identity | PASS | 4 canonical npx copies match all three fields (`type`, `command`, `protocol`); demo copy is the documented local fallback and resolves to the built artifact |
+| Evidence artifact | PASS | `tasks/verification.md` (241 lines): commands, raw outputs, timings, transcript, decisions |
+| Cleanup | PASS | Scratch plan absent; temp XDG dirs removed; cache left warm |
+
+### Findings
+
+- **None.** Evidence-only sub-task; no code or docs changes were required (the timeout guidance was confirmed, not adjusted).
+- **Recorded caveats:** (a) the `github:` npx spec resolves the remote default branch and becomes exercisable after merge/release — the local proxy validates the install/launch mechanics and the warm/cold shape; (b) a long-lived opencode service can retain a previously spawned `dh` server across config swaps (the demo gate was verified with no stale child running).
+
+### Validation Results
+
+- Independent `@dh-executor` spot-checks: AC6 grep (0), snippet fields (4/4 × 3), demo validate (exit 0, 2.73 s), scratch cleanup, verification.md content — all PASS.
+- Evidence quality: real command logs with exit codes and durations; no paraphrased results.
+- Web validation (MCP Chrome): not applicable.
+
+### Regression Risk Assessment
+
+- None — evidence gathering only. The live-session result is the strongest possible proof of the shipped path: a real model invoked `tools.dh.plan_create` through the project-scope MCP server and got a workspace-anchored payload.
+
+### Scope Compliance
+
+- In scope: `tasks/verification.md` only (plus orchestrator plan/review bookkeeping).
+- Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [x] Proceed to Sub-Task 5.2 — full gate + release closure (qa:check:full, audit, dh-semver,
+      index row, plan statuses).
