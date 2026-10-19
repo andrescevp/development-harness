@@ -21,3 +21,6 @@ __pycache__/
 
 # QA tool artifacts
 report/
+
+# Atomic-write crash residue (temp files beside plan files)
+docs/plans/**/*.tmp

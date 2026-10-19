@@ -10,13 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import {
-  appendPlanIndexRow,
-  buildPlanTemplate,
-  parsePlan,
-  resolvePlanPath,
-  setStatus,
-} from '../tools/plan-lifecycle.js';
+import { buildPlanTemplate, parsePlan, resolvePlanPath, setStatus } from '../tools/plan-lifecycle.js';
 import { assertNoSymlinks } from '../tools/plan-paths.js';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -207,41 +201,6 @@ describe('resolvePlanPath', () => {
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }
-  });
-});
-
-describe('appendPlanIndexRow', () => {
-  /** Run the append against a fresh temp workspace and return the index contents. */
-  function withIndexRow(slug: string, title: string): string {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dhs-index-'));
-    try {
-      const index = path.join(root, 'docs', 'plans', 'index.md');
-      fs.mkdirSync(path.dirname(index), { recursive: true });
-      fs.writeFileSync(index, '# Plans\n', 'utf8');
-      appendPlanIndexRow(root, slug, title);
-      return fs.readFileSync(index, 'utf8');
-    } finally {
-      fs.rmSync(root, { recursive: true, force: true });
-    }
-  }
-
-  it('rejects an empty workspace root', () => {
-    expect(() => appendPlanIndexRow('', 'slug', 'Title')).toThrow(/no workspace root available/);
-  });
-
-  it('escapes pipes and newlines into one well-formed row', () => {
-    const rows = withIndexRow('escaped', 'Line | break\nsecond').trimEnd().split('\n');
-    expect(rows).toHaveLength(2);
-    const today = new Date().toISOString().slice(0, 10);
-    expect(rows[1]).toBe(
-      `| Line \\| break second | escaped | Line \\| break second | ${today} | ${today} | Pending | Yes |`
-    );
-  });
-
-  it('escapes backslashes before pipes in both cells', () => {
-    const row = withIndexRow('slug|pipe', 'Back\\|slash').trimEnd().split('\n')[1];
-    const bs = '\\';
-    expect(row).toContain(`| Back${bs}${bs}${bs}|slash | slug${bs}|pipe |`);
   });
 });
 

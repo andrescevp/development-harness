@@ -8,16 +8,14 @@
  *   - status lines are the first `- **Status:**` bullet in their section;
  *     only blank lines may precede them.
  *
- * Node built-ins only (no framework): string/line edits plus minimal
- * plan-file I/O, so the helpers are unit-testable and the tools stay thin.
+ * Node built-ins only (no framework): string/line edits, so the helpers are
+ * unit-testable and the tools stay thin; plan-file I/O lives in plan-io.ts.
  * CRLF-tolerant: all markers accept an optional trailing `\r` and edits
  * preserve the original line ending.
  */
-import fs from 'node:fs';
 import { parse } from 'yaml';
 import { splitFrontmatter } from '../lib/frontmatter.js';
-import { assertNoSymlinks, planIndexFile, requireWorkspaceRoot } from './plan-paths.js';
-import { INITIAL_PHASE_STATUS, planScaffold } from './plan-template.js';
+import { planScaffold } from './plan-template.js';
 
 // TODO(3.1): repoint importers (plugin.ts, plan-lifecycle.test.ts) at plan-paths and drop this re-export.
 export { resolvePlanPath } from './plan-paths.js';
@@ -262,38 +260,4 @@ export interface PlanScaffold {
 /** Build the phased plan markdown from a scaffold (all statuses Pending). */
 export function buildPlanTemplate(input: PlanScaffold): string {
   return planScaffold(input);
-}
-
-/** Read a plan file with a descriptive error when missing/unreadable. */
-export function readPlanFile(file: string): string {
-  try {
-    return fs.readFileSync(file, 'utf8');
-  } catch {
-    throw new Error(`plan file not readable: ${file}`);
-  }
-}
-
-/** Append a plan row to docs/plans/index.md (absent → no-op; symlink-checked). */
-export function appendPlanIndexRow(workspaceRoot: string, slug: string, title: string): void {
-  requireWorkspaceRoot(workspaceRoot);
-  const indexFile = planIndexFile(workspaceRoot);
-  assertNoSymlinks(workspaceRoot, indexFile);
-  let fd: number;
-  try {
-    fd = fs.openSync(indexFile, fs.constants.O_WRONLY | fs.constants.O_APPEND);
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException).code === 'ENOENT') return;
-    throw err;
-  }
-  try {
-    // Backslashes first (so `\|` stays literal), then pipes, then line breaks.
-    const pipeSafe = (value: string) => value.replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
-    const cell = (value: string) => pipeSafe(value).replace(/[\r\n]+/g, ' ');
-    const today = new Date().toISOString().slice(0, 10);
-    const row = `| ${cell(title)} | ${cell(slug)} | ${cell(title)} | ${today} | ${today} | ${INITIAL_PHASE_STATUS} | Yes |\n`;
-    // writeFileSync loops on the fd (short-write safe); O_APPEND keeps rows atomic.
-    fs.writeFileSync(fd, row);
-  } finally {
-    fs.closeSync(fd);
-  }
 }

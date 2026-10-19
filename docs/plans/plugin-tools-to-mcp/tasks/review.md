@@ -305,3 +305,61 @@ fail-closed anchor precondition, index ACL tests, row escaping, helper relocatio
 
 - [x] Proceed to Sub-Task 1.5 — atomic writes; must honor exclusive-create mode, `O_NOFOLLOW`
       final component, and the `plan-lifecycle.ts` cap watch.
+
+---
+
+## Sub-Task Review: 1.5 — Atomic plan-file writes
+
+**Reviewed against:** Sub-Task 1.5 (plan.md, Phase 1 — scope expanded post-1.3-review: exclusive-create mode + `O_NOFOLLOW` final-component hardening) · **Overall risk:** Low–Medium (filesystem write path) · **Verdict:** Approve with comments
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| `writeFileAtomic` content exactness (overwrite mode) | PASS | Content equality; forced rename failure (`vi.spyOn`) preserves the original and cleans the temp |
+| Exclusive mode: exact content, `EEXIST` on existing, original untouched | PASS | `linkSync` semantics pinned; caller maps to `plan already exists` |
+| Zero `*.tmp` residue after success/failure | PASS | Unit pins + a new MCP-surface no-residue assertion |
+| Original preserved on simulated failure | PASS | Both modes covered |
+| Existing tests green | PASS | 17 files / 165 tests |
+| `O_NOFOLLOW` final-component hardening | PASS | Read via numeric flag (`ELOOP` → ACL message, `cause` preserved); index append `O_APPEND\|O_NOFOLLOW`; status writes use rename-replace — supersedes the literal `O_TRUNC` approach (accepted, documented) |
+| Exclusive-create never clobbers | PASS | Temp + `linkSync`; exhausted-retry error wrapped as non-`EEXIST` so the target mapping cannot misfire |
+| `plan-lifecycle.ts` cap watch | PASS | I/O extracted to `plan-io.ts`; lifecycle now 263/300 |
+
+### Findings
+
+- **[P0] Blocking:** none.
+- **[P1] High:** none.
+- **[P2] Temp path written without `O_EXCL`** (pre-planted temp symlink followed — probe demonstrated a write-through + link-rename): **Addressed** — `wx` create with bounded fresh-suffix retry; deterministic mock test pins no-write-through and victim integrity.
+- **[P2, simplified] `readPlanFile` hand-rolled fd open/read/close:** **Addressed** — single `readFileSync` with numeric `O_NOFOLLOW` flag (identical errno behavior, `cause` added to both errors).
+- **[P3] Rename reset file mode** (0600 → 0644 confidentiality regression): **Addressed** — existing mode carried onto the temp create; pinned.
+- **[P3] Guaranteed-failing unlink on every successful overwrite:** **Addressed** — cleanup-on-error only (exclusive variant keeps `finally`).
+- **[P3] ACL message string composed in three places:** **Addressed** — `traversalError` single producer in `plan-paths.ts`.
+- **[P3] Index pre-flight duplicated `appendPlanIndexRow`'s validation prefix:** **Addressed** — `assertPlanIndexWritable` in `plan-io.ts`; `server.ts` drops the direct `plan-paths` imports.
+- **[P3] Test gaps + fixture rebuild:** **Addressed** — symlinked-destination `EEXIST`, temp-symlink exhaustion, MCP tmp-residue pins; `plansIndexFile`/`seedSymlinkedIndex` reused.
+- **[P3] Crash-window temp residue:** **Addressed** — module-header note + `.gitignore` (`docs/plans/**/*.tmp`); no per-write sweep (documented trade-off; a SIGKILL mid-write can leave one temp file).
+- **Accepted (no action):** `plan_create`'s intentional double symlink walk (defense-in-depth, commented); `ELOOP` branches as race-only defense-in-depth; `src/plugin.ts` residual copies (3.1); fsync/durability beyond rename (out of scope by plan).
+
+### Validation Results
+
+- Tests present: yes — atomicity, exclusive create, mode preservation, temp-symlink no-write-through, ACL reuse, MCP-surface residue; red-first confirmed for the two new pins.
+- Validation commands: `pnpm test` PASS · `pnpm typecheck` PASS · `lint:biome`/`knip`/`depcruise`/`dup` PASS (0 clones) · `node scripts/audit.mjs` PASS — independently re-run via `@dh-executor`; 0 temp artifacts.
+- Code-quality evidence: three-lens simplify pass (all `@dh-reviewer`) with runtime probes (write-through demo, mode probe); fixes applied; no separate fourth delegation (evidence sufficient, recorded).
+- Web validation (MCP Chrome): not applicable.
+- Architecture: clean adjusted layering — `plan-lifecycle` (parse/edit) vs `plan-io` (fd I/O + index) vs `lib/atomic-write` (commit semantics); depcruise acyclic (13 modules).
+
+### Regression Risk Assessment
+
+- Intended changes: crash-semantics improvement (temp + rename/link); mode preservation restores pre-1.5 truncation behavior; centralized ACL message is byte-identical.
+- Interface changes: `plan-io.ts`/`atomic-write.ts` are new internal surfaces; server wiring only.
+- Residual: SIGKILL between temp write and commit leaves one `.tmp` (documented, gitignored).
+
+### Scope Compliance
+
+- In scope: verified — extraction to `plan-io.ts` was cap-driven and documented; `.gitignore` addition bounded.
+- Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [x] Phase 1 complete (all five sub-tasks Completed) — close the phase, commit.
+- [ ] Phase 2 picks up: remove the `.dependency-cruiser.json` `no-orphans` exemption when `stdio.ts`
+      imports `workspace.ts` (the TODO(2.1) trigger); wire the stdio entry.

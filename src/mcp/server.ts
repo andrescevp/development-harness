@@ -14,17 +14,11 @@ import path from 'node:path';
 import type { CallToolResult } from '@modelcontextprotocol/server';
 import { McpServer } from '@modelcontextprotocol/server';
 import * as z from 'zod/v4';
+import { writeFileAtomic, writeFileExclusiveAtomic } from '../lib/atomic-write.js';
 import { runLoggedCommand } from '../tools/logged-command.js';
-import {
-  appendPlanIndexRow,
-  buildPlanTemplate,
-  PHASE_STATUSES,
-  parsePlan,
-  readPlanFile,
-  STATUS_TARGETS,
-  setStatus,
-} from '../tools/plan-lifecycle.js';
-import { assertNoSymlinks, planIndexFile, resolvePlanPath } from '../tools/plan-paths.js';
+import { appendPlanIndexRow, assertPlanIndexWritable, readPlanFile } from '../tools/plan-io.js';
+import { buildPlanTemplate, PHASE_STATUSES, parsePlan, STATUS_TARGETS, setStatus } from '../tools/plan-lifecycle.js';
+import { resolvePlanPath } from '../tools/plan-paths.js';
 import { readSheet, sheetSchema, updateSheet } from '../tools/sheet-tools.js';
 
 export interface BuildServerOptions {
@@ -54,9 +48,9 @@ function toErrorResult(err: unknown): CallToolResult {
 /**
  * Run a synchronous tool body, mapping thrown helper errors to `isError`.
  * Synchronous on purpose: read-modify-write bodies keep no `await` between
- * their `readFileSync` and `writeFileSync`. The SDK also maps handler throws
- * to this shape; the guard keeps the parity contract explicit and
- * SDK-independent.
+ * their `readPlanFile` read and `writeFileAtomic` rename. The SDK also maps
+ * handler throws to this shape; the guard keeps the parity contract explicit
+ * and SDK-independent.
  */
 function guarded(body: () => CallToolResult): CallToolResult {
   try {
@@ -120,7 +114,7 @@ export function buildServer({ workspaceRoot, version }: BuildServerOptions): Mcp
         const contents = readPlanFile(file);
         const result = setStatus(contents, target, index, status);
         // No-op edits must not touch the file (mtime stays stable).
-        if (result.contents !== contents) fs.writeFileSync(file, result.contents, 'utf8');
+        if (result.contents !== contents) writeFileAtomic(file, result.contents);
         return textResult({ ok: true, path: file, plan: result.plan });
       })
   );
@@ -148,15 +142,16 @@ export function buildServer({ workspaceRoot, version }: BuildServerOptions): Mcp
         const file = resolvePlanPath(workspaceRoot, slug);
         // Fail before any write when the index chain is compromised — a
         // symlinked index must never strand an already-created plan file.
-        if (updateIndex) assertNoSymlinks(workspaceRoot, planIndexFile(workspaceRoot));
+        // Intentional double walk with appendPlanIndexRow's own check:
+        // pre-flight here, defense-in-depth there.
+        if (updateIndex) assertPlanIndexWritable(workspaceRoot);
         const template = buildPlanTemplate({ slug, title, objective, phases });
         // Parse before writing anything: an invalid scaffold must not leave a
         // broken plan behind (retries would then hit `plan already exists`).
         const plan = parsePlan(template);
         fs.mkdirSync(path.dirname(file), { recursive: true });
         try {
-          // Exclusive create ('wx') replaces an existsSync pre-check (no TOCTOU gap).
-          fs.writeFileSync(file, template, { flag: 'wx' });
+          writeFileExclusiveAtomic(file, template);
         } catch (err) {
           if ((err as NodeJS.ErrnoException).code === 'EEXIST') throw new Error(`plan already exists: ${file}`);
           throw err;

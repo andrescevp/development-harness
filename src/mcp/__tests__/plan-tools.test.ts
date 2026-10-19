@@ -213,6 +213,31 @@ describe('plan_create', () => {
     expect(created.ok).toBe(true);
     expect(fs.existsSync(plansIndexFile(h.workspaceRoot))).toBe(false);
   });
+
+  it('leaves no temp files behind after atomic writes', async () => {
+    const h = await connectPlanHarness((root) => {
+      seedPlan(root);
+      fs.writeFileSync(plansIndexFile(root), '# Plans\n', 'utf8');
+    });
+    await h.callToolJson('plan_update_status', {
+      slug: PLAN_SLUG,
+      target: 'subtask',
+      index: '1.2',
+      status: 'Completed',
+    });
+    await h.callToolJson('plan_create', {
+      slug: 'atomic',
+      title: 'Atomic',
+      objective: 'o',
+      phases: [{ title: 'P', subTasks: [] }],
+      updateIndex: true,
+    });
+    const planDir = path.dirname(plansFile(h.workspaceRoot, PLAN_SLUG));
+    const residue = [...fs.readdirSync(planDir), ...fs.readdirSync(path.dirname(planDir))].filter((name) =>
+      name.endsWith('.tmp')
+    );
+    expect(residue).toEqual([]);
+  });
 });
 
 describe('input schema tightenings (accepted deviations)', () => {

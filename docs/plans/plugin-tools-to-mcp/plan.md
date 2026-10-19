@@ -165,7 +165,7 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 ### Phase 1: MCP server module (core contracts)
 
-- **Status:** In Progress
+- **Status:** Completed
 
 #### Sub-Task 1.1: Server factory + MCP test harness + tools/list contract
 
@@ -229,7 +229,7 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 #### Sub-Task 1.5: Atomic plan-file writes
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Harden `plan_update_status` and `plan_create` writes: new `src/lib/atomic-write.ts` with `writeFileAtomic(file, contents)` (write `<file>.<pid>.<rand>.tmp` in the same directory → `fs.renameSync`), used by both flows; tests prove no temp leftovers and original content preserved on failure.
 - **Related Requirements:** R10, AC2
 - **Dependencies and Preconditions:** 1.3 (plan tool flows exist through MCP).

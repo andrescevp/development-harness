@@ -17,6 +17,11 @@ export function planIndexFile(workspaceRoot: string): string {
   return path.join(plansDir(workspaceRoot), 'index.md');
 }
 
+/** The single producer of the ACL traversal message. */
+export function traversalError(target: string, cause?: unknown): Error {
+  return new Error(`path traverses a symlink: ${target}`, cause === undefined ? undefined : { cause });
+}
+
 /** Reject an empty workspace root (plan paths never fall back to the process CWD). */
 export function requireWorkspaceRoot(workspaceRoot: string): void {
   if (!workspaceRoot) throw new Error('no workspace root available; pass an explicit `path` input');
@@ -78,6 +83,6 @@ export function assertNoSymlinks(workspaceRoot: string, target: string): void {
       if ((err as NodeJS.ErrnoException).code === 'ENOTDIR') return;
       throw err;
     }
-    if (stat?.isSymbolicLink()) throw new Error(`path traverses a symlink: ${current}`);
+    if (stat?.isSymbolicLink()) throw traversalError(current);
   }
 }
