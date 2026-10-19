@@ -8,15 +8,19 @@
  *   - status lines are the first `- **Status:**` bullet in their section;
  *     only blank lines may precede them.
  *
- * Framework-free (string/line operations) so the helpers are unit-testable
- * and the plugin tools stay thin. CRLF-tolerant: all markers accept an
- * optional trailing `\r` and edits preserve the original line ending.
+ * Node built-ins only (no framework): string/line edits plus minimal
+ * plan-file I/O, so the helpers are unit-testable and the tools stay thin.
+ * CRLF-tolerant: all markers accept an optional trailing `\r` and edits
+ * preserve the original line ending.
  */
 import fs from 'node:fs';
-import path from 'node:path';
 import { parse } from 'yaml';
 import { splitFrontmatter } from '../lib/frontmatter.js';
-import { planScaffold } from './plan-template.js';
+import { assertNoSymlinks, planIndexFile, requireWorkspaceRoot } from './plan-paths.js';
+import { INITIAL_PHASE_STATUS, planScaffold } from './plan-template.js';
+
+// TODO(3.1): repoint importers (plugin.ts, plan-lifecycle.test.ts) at plan-paths and drop this re-export.
+export { resolvePlanPath } from './plan-paths.js';
 
 /** Canonical status/target domains shared by parser, editors, and adapters. */
 export const PHASE_STATUSES = ['Pending', 'In Progress', 'Completed'] as const;
@@ -260,40 +264,36 @@ export function buildPlanTemplate(input: PlanScaffold): string {
   return planScaffold(input);
 }
 
-/**
- * Resolve a plan file path, anchored under <workspaceRoot>/docs/plans.
- * Rejects `..` escapes, absolute paths outside the anchor, slugs containing
- * path separators, and symlink traversal. Requires a non-empty workspaceRoot
- * (never falls back to the process CWD).
- */
-export function resolvePlanPath(workspaceRoot: string, slug?: string, explicitPath?: string): string {
-  if (!workspaceRoot) throw new Error('no workspace root available; pass an explicit `path` input');
-  const base = path.resolve(workspaceRoot, 'docs', 'plans');
-  const baseWithSep = base + path.sep;
-
-  let resolved: string;
-  if (explicitPath !== undefined) {
-    resolved = path.resolve(base, explicitPath);
-  } else {
-    if (!slug) throw new Error('either slug or path is required');
-    if (slug.includes('..') || slug.includes('/') || slug.includes('\\')) throw new Error(`invalid slug: ${slug}`);
-    resolved = path.resolve(base, slug, 'plan.md');
+/** Read a plan file with a descriptive error when missing/unreadable. */
+export function readPlanFile(file: string): string {
+  try {
+    return fs.readFileSync(file, 'utf8');
+  } catch {
+    throw new Error(`plan file not readable: ${file}`);
   }
-  if (!resolved.startsWith(baseWithSep)) throw new Error(`path escapes docs/plans: ${explicitPath ?? slug}`);
-
-  assertNoSymlinks(base, resolved);
-  return resolved;
 }
 
-/** Reject symlink components between the anchor and the resolved target. */
-function assertNoSymlinks(base: string, target: string): void {
-  const rel = path.relative(base, target);
-  if (!rel || rel === '.') return;
-  let current = base;
-  for (const seg of rel.split(path.sep)) {
-    current = path.join(current, seg);
-    if (fs.existsSync(current) && fs.lstatSync(current).isSymbolicLink()) {
-      throw new Error(`path traverses a symlink: ${current}`);
-    }
+/** Append a plan row to docs/plans/index.md (absent → no-op; symlink-checked). */
+export function appendPlanIndexRow(workspaceRoot: string, slug: string, title: string): void {
+  requireWorkspaceRoot(workspaceRoot);
+  const indexFile = planIndexFile(workspaceRoot);
+  assertNoSymlinks(workspaceRoot, indexFile);
+  let fd: number;
+  try {
+    fd = fs.openSync(indexFile, fs.constants.O_WRONLY | fs.constants.O_APPEND);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') return;
+    throw err;
+  }
+  try {
+    // Backslashes first (so `\|` stays literal), then pipes, then line breaks.
+    const pipeSafe = (value: string) => value.replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
+    const cell = (value: string) => pipeSafe(value).replace(/[\r\n]+/g, ' ');
+    const today = new Date().toISOString().slice(0, 10);
+    const row = `| ${cell(title)} | ${cell(slug)} | ${cell(title)} | ${today} | ${today} | ${INITIAL_PHASE_STATUS} | Yes |\n`;
+    // writeFileSync loops on the fd (short-write safe); O_APPEND keeps rows atomic.
+    fs.writeFileSync(fd, row);
+  } finally {
+    fs.closeSync(fd);
   }
 }

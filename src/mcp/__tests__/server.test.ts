@@ -6,10 +6,11 @@
  * workspace root. Payload/error parity is covered by the dedicated
  * plan/sheet/command parity suites.
  */
-import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { McpTestHarness } from '../../__tests__/helpers/mcp.js';
 import { createMcpTestHarness } from '../../__tests__/helpers/mcp.js';
+import type { PlanPayload } from '../../__tests__/helpers/plan-fixtures.js';
+import { plansFile } from '../../__tests__/helpers/plan-fixtures.js';
 
 const HARNESS_TOOLS = [
   'logged_command',
@@ -46,20 +47,17 @@ describe('MCP server tools/list contract', () => {
   });
 
   it('anchors plan handlers on the injected workspace root', async () => {
-    const created = await harness!.callToolJson<{ ok: boolean; path: string; plan: { title?: string } }>(
-      'plan_create',
-      {
-        slug: 'demo',
-        title: 'Demo Plan',
-        objective: 'Prove workspace anchoring',
-        phases: [{ title: 'Phase One', subTasks: [{ title: 'First task' }] }],
-      }
-    );
+    const created = await harness!.callToolJson<PlanPayload>('plan_create', {
+      slug: 'demo',
+      title: 'Demo Plan',
+      objective: 'Prove workspace anchoring',
+      phases: [{ title: 'Phase One', subTasks: [{ title: 'First task' }] }],
+    });
     expect(created.ok).toBe(true);
-    expect(created.path).toBe(path.join(harness!.workspaceRoot, 'docs', 'plans', 'demo', 'plan.md'));
+    expect(created.path).toBe(plansFile(harness!.workspaceRoot, 'demo'));
     expect(created.plan.title).toBe('Demo Plan');
 
-    const read = await harness!.callToolJson<{ path: string }>('plan_read', { slug: 'demo' });
+    const read = await harness!.callToolJson<PlanPayload>('plan_read', { slug: 'demo' });
     expect(read.path).toBe(created.path);
   });
 });

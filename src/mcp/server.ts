@@ -16,13 +16,15 @@ import { McpServer } from '@modelcontextprotocol/server';
 import * as z from 'zod/v4';
 import { runLoggedCommand } from '../tools/logged-command.js';
 import {
+  appendPlanIndexRow,
   buildPlanTemplate,
   PHASE_STATUSES,
   parsePlan,
-  resolvePlanPath,
+  readPlanFile,
   STATUS_TARGETS,
   setStatus,
 } from '../tools/plan-lifecycle.js';
+import { assertNoSymlinks, planIndexFile, resolvePlanPath } from '../tools/plan-paths.js';
 import { readSheet, sheetSchema, updateSheet } from '../tools/sheet-tools.js';
 
 export interface BuildServerOptions {
@@ -39,23 +41,22 @@ function textResult(payload: unknown): CallToolResult {
   return { content: [{ type: 'text', text: JSON.stringify(payload) }] };
 }
 
-/** Read a plan file with a descriptive error when missing/unreadable. */
-function readPlanFile(file: string): string {
-  try {
-    return fs.readFileSync(file, 'utf8');
-  } catch {
-    throw new Error(`plan file not readable: ${file}`);
-  }
+/** MCP error-result contract (parity error messages survive verbatim). */
+function errorResult(message: string): CallToolResult {
+  return { content: [{ type: 'text', text: message }], isError: true };
 }
 
-/** Append the new plan's row to docs/plans/index.md when the index exists. */
-function appendPlanIndexRow(workspaceRoot: string, slug: string, title: string): void {
-  const indexFile = path.join(workspaceRoot, 'docs', 'plans', 'index.md');
-  if (!fs.existsSync(indexFile)) return;
-  const escapedTitle = title.replace(/\|/g, '\\|');
-  const today = new Date().toISOString().slice(0, 10);
-  const row = `| ${escapedTitle} | ${slug} | ${escapedTitle} | ${today} | ${today} | ${PHASE_STATUSES[0]} | Yes |`;
-  fs.appendFileSync(indexFile, `${row}\n`, 'utf8');
+/**
+ * Run a synchronous tool body, mapping thrown helper errors to `isError`.
+ * Synchronous on purpose: read-modify-write bodies keep no `await` between
+ * their `readFileSync` and `writeFileSync`.
+ */
+function guarded(body: () => CallToolResult): CallToolResult {
+  try {
+    return body();
+  } catch (err) {
+    return errorResult(err instanceof Error ? err.message : String(err));
+  }
 }
 
 /** Fresh server instance per connection — never share one across transports. */
@@ -72,11 +73,12 @@ export function buildServer({ workspaceRoot, version }: BuildServerOptions): Mcp
         path: z.string().describe('Explicit path relative to docs/plans (overrides slug)').optional(),
       }),
     },
-    async ({ slug, path: relPath }) => {
-      const file = resolvePlanPath(workspaceRoot, slug, relPath);
-      const contents = readPlanFile(file);
-      return textResult({ ok: true, path: file, plan: parsePlan(contents) });
-    }
+    async ({ slug, path: relPath }) =>
+      guarded(() => {
+        const file = resolvePlanPath(workspaceRoot, slug, relPath);
+        const contents = readPlanFile(file);
+        return textResult({ ok: true, path: file, plan: parsePlan(contents) });
+      })
   );
 
   server.registerTool(
@@ -92,13 +94,15 @@ export function buildServer({ workspaceRoot, version }: BuildServerOptions): Mcp
         status: z.enum(PHASE_STATUSES),
       }),
     },
-    async ({ slug, path: relPath, target, index, status }) => {
-      const file = resolvePlanPath(workspaceRoot, slug, relPath);
-      const contents = readPlanFile(file);
-      const result = setStatus(contents, target, index, status);
-      fs.writeFileSync(file, result.contents, 'utf8');
-      return textResult({ ok: true, path: file, plan: result.plan });
-    }
+    async ({ slug, path: relPath, target, index, status }) =>
+      guarded(() => {
+        const file = resolvePlanPath(workspaceRoot, slug, relPath);
+        const contents = readPlanFile(file);
+        const result = setStatus(contents, target, index, status);
+        // No-op edits must not touch the file (mtime stays stable).
+        if (result.contents !== contents) fs.writeFileSync(file, result.contents, 'utf8');
+        return textResult({ ok: true, path: file, plan: result.plan });
+      })
   );
 
   server.registerTool(
@@ -119,20 +123,27 @@ export function buildServer({ workspaceRoot, version }: BuildServerOptions): Mcp
         updateIndex: z.boolean().describe('Append a row to docs/plans/index.md').optional(),
       }),
     },
-    async ({ slug, title, objective, phases, updateIndex }) => {
-      const file = resolvePlanPath(workspaceRoot, slug);
-      const template = buildPlanTemplate({ slug, title, objective, phases });
-      fs.mkdirSync(path.dirname(file), { recursive: true });
-      try {
-        // Exclusive create ('wx') replaces an existsSync pre-check (no TOCTOU gap).
-        fs.writeFileSync(file, template, { flag: 'wx' });
-      } catch (err) {
-        if ((err as NodeJS.ErrnoException).code === 'EEXIST') throw new Error(`plan already exists: ${file}`);
-        throw err;
-      }
-      if (updateIndex) appendPlanIndexRow(workspaceRoot, slug, title);
-      return textResult({ ok: true, path: file, plan: parsePlan(template) });
-    }
+    async ({ slug, title, objective, phases, updateIndex }) =>
+      guarded(() => {
+        const file = resolvePlanPath(workspaceRoot, slug);
+        // Fail before any write when the index chain is compromised — a
+        // symlinked index must never strand an already-created plan file.
+        if (updateIndex) assertNoSymlinks(workspaceRoot, planIndexFile(workspaceRoot));
+        const template = buildPlanTemplate({ slug, title, objective, phases });
+        // Parse before writing anything: an invalid scaffold must not leave a
+        // broken plan behind (retries would then hit `plan already exists`).
+        const plan = parsePlan(template);
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        try {
+          // Exclusive create ('wx') replaces an existsSync pre-check (no TOCTOU gap).
+          fs.writeFileSync(file, template, { flag: 'wx' });
+        } catch (err) {
+          if ((err as NodeJS.ErrnoException).code === 'EEXIST') throw new Error(`plan already exists: ${file}`);
+          throw err;
+        }
+        if (updateIndex) appendPlanIndexRow(workspaceRoot, slug, title);
+        return textResult({ ok: true, path: file, plan });
+      })
   );
 
   server.registerTool(

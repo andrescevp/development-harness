@@ -73,9 +73,7 @@ export async function createMcpTestHarness(options: McpTestHarnessOptions = {}):
       callTool: (name, args) => clientInstance.callTool({ name, arguments: args }),
       callToolJson: async <T = Record<string, unknown>>(name: string, args?: Record<string, unknown>): Promise<T> => {
         const result = await clientInstance.callTool({ name, arguments: args });
-        const block = result.content[0];
-        if (block?.type !== 'text') throw new Error(`tool ${name}: expected a text content block`);
-        return JSON.parse(block.text) as T;
+        return JSON.parse(textOf(result)) as T;
       },
       close,
     };
@@ -83,4 +81,28 @@ export async function createMcpTestHarness(options: McpTestHarnessOptions = {}):
     await close().catch(() => undefined);
     throw error;
   }
+}
+
+/** Extract the single text content block of a tool result. */
+export function textOf(result: CallToolResult): string {
+  const block = result.content[0];
+  if (block?.type !== 'text') throw new Error('expected a text content block');
+  return block.text;
+}
+
+/** Loosely typed JSON Schema record as listed by `tools/list`. */
+export interface JsonSchema {
+  type?: string;
+  required?: string[];
+  additionalProperties?: boolean;
+  enum?: string[];
+  properties?: Record<string, JsonSchema>;
+  items?: JsonSchema;
+}
+
+/** inputSchema of a listed tool, as a loosely typed JSON Schema record. */
+export function schemaOf(tools: { name: string; inputSchema: unknown }[], name: string): JsonSchema {
+  const tool = tools.find((t) => t.name === name);
+  if (!tool) throw new Error(`tool not listed: ${name}`);
+  return tool.inputSchema as JsonSchema;
 }

@@ -199,7 +199,7 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 #### Sub-Task 1.3: Plan-lifecycle adapters (plan_read / plan_update_status / plan_create)
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Bring the three plan tools to full parity: exact input schemas, exact success payloads (`{ ok: true, path, plan }`), and exact error behavior mapped to `isError` results with the same message strings.
 - **Related Requirements:** R2, R4, AC2
 - **Dependencies and Preconditions:** 1.1 (factory + harness), 1.2 (workspace root).
@@ -233,7 +233,7 @@ return { content: [{ type: 'text', text: message }], isError: true };
 - **Objective:** Harden `plan_update_status` and `plan_create` writes: new `src/lib/atomic-write.ts` with `writeFileAtomic(file, contents)` (write `<file>.<pid>.<rand>.tmp` in the same directory → `fs.renameSync`), used by both flows; tests prove no temp leftovers and original content preserved on failure.
 - **Related Requirements:** R10, AC2
 - **Dependencies and Preconditions:** 1.3 (plan tool flows exist through MCP).
-- **In Scope for This Sub-Task:** `src/lib/atomic-write.ts` + tests; update `setStatus` call site in the MCP adapter and `plan_create` file creation to use it; `resolvePlanPath`/validation untouched. The atomic helper must support an exclusive-create mode (`plan_create` must never clobber an existing file: temp write + EEXIST-safe link/rename semantics) in addition to overwrite mode.
+- **In Scope for This Sub-Task:** `src/lib/atomic-write.ts` + tests; update `setStatus` call site in the MCP adapter and `plan_create` file creation to use it; `resolvePlanPath`/validation untouched. The atomic helper must support an exclusive-create mode (`plan_create` must never clobber an existing file: temp write + EEXIST-safe link/rename semantics) in addition to overwrite mode. Wire final-component `O_NOFOLLOW` semantics into the helper's I/O paths (read via fd; `O_WRONLY|O_TRUNC|O_NOFOLLOW` for status writes; `O_APPEND|O_NOFOLLOW` for the index append) to close the path ACL's check-then-use TOCTOU for the final component; parent-component swaps remain accepted residual.
 - **Out of Scope for This Sub-Task:** write ordering across concurrent processes (out of scope; single-process invariant preserved); fsync/durability guarantees beyond rename semantics.
 - **Instructions:** same-directory temp file guarantees rename atomicity on POSIX; clean up the temp file in a `finally` when rename fails; keep the API synchronous to preserve the no-await invariant.
 - **Acceptance Criteria:** unit tests: content written exactly; no `*.tmp` files remain after success; on simulated failure (target directory removed mid-flow or rename onto an invalid path) the original file content is unchanged and the error propagates; existing plan-lifecycle tests stay green.

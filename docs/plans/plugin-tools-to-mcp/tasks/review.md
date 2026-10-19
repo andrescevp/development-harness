@@ -175,3 +175,81 @@ crash-later behavior); emitted `inputSchema` has correct `required`/`enum` shape
 - [x] Proceed to Sub-Task 1.3 — it must pick up the recorded consolidations (path-ACL
       extraction → `src/tools/plan-paths.ts` first, adapter-helper consolidation, symlink
       hardening, input-validation deviation record, `INITIAL_PHASE_STATUS`).
+
+---
+
+## Sub-Task Review: 1.3 — Plan-lifecycle adapters (plan_read / plan_update_status / plan_create)
+
+**Reviewed against:** Sub-Task 1.3 (plan.md, Phase 1) · **Overall risk:** Low–Medium (security-relevant path ACL surface) · **Verdict:** Approve with comments
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Exact input schemas (enums single-sourced) | PASS | `z.enum(PHASE_STATUSES)` / `z.enum(STATUS_TARGETS)`; SDK boundary validation for bad enums is the accepted, pinned deviation |
+| Byte-compatible success payloads `{ ok, path, plan }` | PASS | Deep-equal tests: `plan_read` (slug + `path` variants), `plan_update_status` (re-parsed plan), CRLF stability, `plan_create` roundtrip |
+| `isError` mapping with the legacy message strings | PASS | Error matrix: missing file, `..`/absolute escapes, invalid slug, symlink component + symlinked anchor, phase gate, missing ref, missing status marker, existing slug |
+| Traversal rejections via the MCP surface | PASS | ACL suite (8 tests) incl. dangling symlinks, symlinked `docs/`, symlinked `index.md` (outside target byte-unchanged, no stranded plan) |
+| `plan_create` → `plan_read` roundtrip + `updateIndex` parity | PASS | Index row byte-identical (pipe/newline escaping pinned) |
+| Existing tests green | PASS | 13 files / 137 tests total; plan-lifecycle suite green via the transitional re-export |
+
+### Findings
+
+- **[P0] Blocking:** none.
+- **[P1] High:** none.
+- **[P2] `plan_create` stranded a file with `phases: []`** (parse ran after write):
+  **Addressed** — `parsePlan(template)` now runs before `mkdirSync`/write/append; test proves
+  an invalid scaffold leaves the workspace untouched and retries are safe.
+- **[P3] Raw `ENOTDIR` leaked from `assertNoSymlinks`** (file at a path component regressed the
+  legacy `plan file not readable` message): **Addressed** — traversal stops on `ENOTDIR`;
+  regression test pins the legacy message.
+- **[P3] Incomplete index-row escaping (`\|` split the table):** **Addressed** — backslashes
+  escaped first, then pipes, then CR/LF (both cells); cases added.
+- **[P3] Final-component TOCTOU (`O_NOFOLLOW`):** **Routed to Sub-Task 1.5** — plan.md 1.5
+  scope now requires `O_NOFOLLOW` semantics in the atomic-write helper; parent-component swaps
+  remain accepted residual.
+- **[P3] Index path derived in two places:** **Addressed** — `planIndexFile(root)` in
+  `plan-paths.ts`, consumed by both the append helper and the hoisted validation.
+- **Informational:** `guarded` flattens errors without stack/stderr breadcrumbs — revisit at
+  2.1 (stderr logging) if diagnosis needs it; no parity impact.
+
+**Simplify pass (3 lenses):** 3×P2 dispositioned — dangling-symlink `lstat` fix (applied),
+`INITIAL_PHASE_STATUS` single-sourced into `plan-template.ts` (applied), `plugin.ts` divergence
+re-affirmed as 3.1-owned; P3 batch applied: short-write-safe append, empty-root guard,
+fail-closed anchor precondition, index ACL tests, row escaping, helper relocation
+(`textOf`/`schemaOf`), no-op write skip, comment/shim hygiene, `plansFile` adoption.
+
+### Validation Results
+
+- Tests present: yes — 137 total (21 → split into parity + ACL suites; add: ACL 8, workspace 9,
+  server 3).
+- Validation commands: `pnpm test` PASS · `pnpm typecheck` PASS · `pnpm lint:biome`/`knip`/
+  `depcruise`/`dup` PASS (0 clones) · `node scripts/audit.mjs` PASS — independently re-run via
+  `@dh-executor` after both fix rounds.
+- Edge cases from the sub-task: handled — traversal, gates, escaping, ENOENT-index skip,
+  `phases: []`, dangling links.
+- Web validation (MCP Chrome): not applicable.
+- Architecture: layering clean and acyclic (`plan-paths` leaf ACL → `plan-lifecycle`
+  parser/editor + plan I/O → `plan-template` scaffold → `mcp/server` adapter); no cycles
+  (depcruise); the `resolvePlanPath` re-export carries a `TODO(3.1)`.
+
+### Regression Risk Assessment
+
+- Intended, pinned behavior changes vs legacy: stricter anchor-symlink rejection; no-op status
+  writes skipped (mtime stable); schema tightenings; SDK enum-validation text. `src/plugin.ts`
+  untouched (deleted in 3.1).
+- Interface changes: `plan-paths.ts` is new surface; `plan-lifecycle.ts` re-exports
+  `resolvePlanPath` transitionally.
+- **Cap watch:** `plan-lifecycle.ts` at 299/300 lines — Sub-Task 1.5 will touch this file.
+
+### Scope Compliance
+
+- In scope: verified (tool-layer extraction, adapter consolidation, tests, QA-config exemption
+  from 1.2 carried).
+- Out of scope detected: none (ACL suite split and helper extraction were line-cap-driven).
+
+### Suggested Next Steps
+
+- [x] Proceed to Sub-Task 1.4 — reuse `errorResult` + the harness/textOf/schemaOf helpers.
+- [ ] 1.5 must honor: exclusive-create mode, `O_NOFOLLOW` final component, `plan-lifecycle.ts`
+      cap watch.
