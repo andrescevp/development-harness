@@ -43,8 +43,8 @@ update, delete, retrieve) — everything EXCEPT plan documents
   - `obsidian search query="<term>"`, or `rg` as fallback.
 - Parse extra formats with:
   - `jq` (json), `yq` (yaml), `xq` (xml),
-  - **DuckDB** via the plugin tools `dh_read_sheet`, `dh_update_sheet`,
-    `dh_sheet_schema` (csv/xlsx: query, update, describe).
+  - **DuckDB** via the plugin tools `dh.read_sheet`, `dh.update_sheet`,
+    `dh.sheet_schema` (csv/xlsx: query, update, describe).
 
 ## Operating Rules
 

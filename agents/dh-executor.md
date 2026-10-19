@@ -46,7 +46,7 @@ Every command you run must be logged and summarized with a head/tail window:
 - Keep the log path in your report so the caller (or you) can explore the
   full log on demand. Only delete logs after the session ends or when the
   caller confirms they are no longer needed.
-- Prefer the bundled `dh_logged_command` tool when available — it implements
+- Prefer the bundled `dh.logged_command` tool when available — it implements
   exactly this strategy (temp log + head/tail window + log path). Fall back
   to the manual patterns below when the tool is unavailable.
 

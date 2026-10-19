@@ -33,7 +33,7 @@ Generate structured, cross-referenced documentation in any format, at any locati
   "<project>"` (preferred) or `obsidian search query="<term>"` to retrieve
   information from documents; `rg` as fallback.
 - **Parsing extra formats:** use `jq` (json), `yq` (yaml), `xq` (xml), and
-  DuckDB (`dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`) for
+  DuckDB (`dh.read_sheet`, `dh.update_sheet`, `dh.sheet_schema`) for
   tabular data.
 
 ## Workflow

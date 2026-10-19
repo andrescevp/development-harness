@@ -15,7 +15,7 @@ Produce a comprehensive final sign-off review for a completed plan. Verify all s
 ## Core Rules
 
 - Read `./docs/plans/<plan-slug>/sdd.md` as the source of truth for requirements.
-- Read the plan (via `dh_plan_read` when available; fallback: manual read of `./docs/plans/<plan-slug>/plan.md`) to verify sub-task AND phase completion.
+- Read the plan (via `dh.plan_read` when available; fallback: manual read of `./docs/plans/<plan-slug>/plan.md`) to verify sub-task AND phase completion.
 - If any sub-task is not `Completed` (and therefore any phase is not `Completed`), stop and report which tasks remain — do not proceed to full review.
 - This skill is loop step 4 (`dh-final-review`); the full loop 1–5 lives in repo-root AGENTS.md (pointer only, no duplication).
 - Perform full-diff review against the entire scope, not just individual sub-tasks.
@@ -24,13 +24,13 @@ Produce a comprehensive final sign-off review for a completed plan. Verify all s
 - Use severity levels: P0 (blocking), P1 (high), P2 (medium), P3 (low).
 - Do not modify any implementation files — this skill is review-only.
 - If sdd.md does not exist, use plan.md's requirements snapshot as the fallback requirements source.
-- **For software projects:** run `dh-artifact-check` and `dh-preflight` for release readiness validation, and recommend a `semver` version bump in the final report.
+- **For software projects:** run `dh-artifact-check` and `dh-preflight` for release readiness validation, and determine the recommended version bump with the `dh-semver` skill in the final report.
 
 ## Workflow
 
 ### Step 1: Verify plan completion
 
-Read the plan (via `dh_plan_read` when available; fallback: manual read) and check every sub-task AND phase status:
+Read the plan (via `dh.plan_read` when available; fallback: manual read) and check every sub-task AND phase status:
 
 - All sub-tasks must be `Completed` and every phase must be `Completed` (a phase is `Completed` only when all its sub-tasks are). If any sub-task is `Pending` or `In Progress`, list them, note their phase, and stop — do not proceed.
 - If the plan has no sub-tasks at all, report that the plan is empty and stop.
@@ -75,7 +75,7 @@ After `@dh-final-reviewer` completes, read its findings from `./docs/plans/<plan
 1. Run the `dh-artifact-check` skill to validate that production builds compile and deployment scripts pass.
 2. Run the `dh-preflight` skill to execute the full test suite, linters, and static analysis as a formal release gate.
 3. If either check fails with P0/P1 findings, mark the corresponding requirement as FAIL in the final report.
-4. Determine the appropriate `semver` version bump based on the plan scope (major for breaking changes, minor for features, patch for fixes).
+4. Determine the appropriate version bump with the `dh-semver` skill based on the plan scope (major for breaking changes, minor for features, patch for fixes).
 5. **For non-software projects:** skip this entire step.
 
 ### Step 5: Produce final verdict
@@ -123,7 +123,7 @@ Any requirement marked FAIL must have a corresponding finding below with an appr
 
 - `dh-artifact-check` build validation: [pass/fail — details]
 - `dh-preflight` test/lint gate: [pass/fail — details]
-- Recommended `semver` bump: [major/minor/patch]
+- Recommended version bump (via `dh-semver`): [major/minor/patch]
 - Changelog generated: [yes/no]
 
 ## Sign-off Verdict

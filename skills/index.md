@@ -1,11 +1,11 @@
 # Skills Index — dev-harness-skills plugin
 
-> The plugin bundles **16 skills** (incl. `dh-grill-sdd` SDD interviewer,
+> The plugin bundles **17 skills** (incl. `dh-grill-sdd` SDD interviewer,
 > `dh-setup` harness setup, and `dh-contingency` planning support).
 > Loading a skill injects its instructions and resources into the current
 > conversation. Plans are **phased** (phases → sub-tasks, dual status
 > markers); plan lifecycle is managed via the bundled `dh` tools
-> (`dh_plan_read`, `dh_plan_update_status`, `dh_plan_create` —
+> (`dh.plan_read`, `dh.plan_update_status`, `dh.plan_create` —
 > see `docs/LOADING.md`). All plan execution follows the skills loop below.
 
 ```mermaid
@@ -67,12 +67,12 @@ it and ask the user for guidance — never silently continue or mark sub-tasks
 Complete around a blocker (see repo-root `AGENTS.md`). A blocked sub-task
 blocks its phase.
 
-**Plan lifecycle tools:** use `dh_plan_read` to parse a phased plan,
-`dh_plan_update_status` to flip phase/sub-task status markers, and
-`dh_plan_create` to scaffold a new plan — fall back to direct plan.md
+**Plan lifecycle tools:** use `dh.plan_read` to parse a phased plan,
+`dh.plan_update_status` to flip phase/sub-task status markers, and
+`dh.plan_create` to scaffold a new plan — fall back to direct plan.md
 edits only when the tools are unavailable.
 
-## The 16 bundled skills
+## The 17 bundled skills
 
 | Skill | Role in the loop |
 |---|---|
@@ -92,6 +92,7 @@ edits only when the tools are unavailable.
 | [`dh-grill-sdd`](dh-grill-sdd/SKILL.md) | Pre-planning — interviews the user and produces `./docs/plans/<slug>/sdd.md` (the requirements contract `dh-planning` consumes) |
 | [`dh-setup`](dh-setup/SKILL.md) | Environment — audits system software (chrome/uv/nvm/osv-scanner/docker/jq/xq/yq/graphify/phpenv), user MCPs + plugins, and scaffolds project QA (hooks + stack tools) |
 | [`dh-code-ruler`](dh-code-ruler/SKILL.md) | Rules — grills the user + analyzes code to generate `{project_root}/CODE_RULES.md` (style, patterns, security/perf constraints, stack best practices); run by dh-software-architect |
+| [`dh-semver`](dh-semver/SKILL.md) | Release — analyzes commits since the last tag, determines the version bump, generates a changelog, and creates a local tag (harness adaptation of the global `semver` skill) |
 
 ## Agents
 
