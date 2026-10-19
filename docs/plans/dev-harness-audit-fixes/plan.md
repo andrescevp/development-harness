@@ -7,7 +7,7 @@ description: >
   (7 agents + 17 skills), @opencode/plugin version consistency, and the
   stale scripts/audit.mjs comment.
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-10-19
 status: Pending
 active: true
 tags: [plan]
@@ -333,7 +333,7 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 ### Phase 5: Verification and closeout (AC1–AC5)
 
-- **Status:** In Progress
+- **Status:** Completed
 
 #### Sub-Task 5.1: Build + full gate validation (tests, audit, check-links, rg checks)
 
@@ -377,7 +377,7 @@ the harness: git commands run via `@dh-executor`; invocation sources are
 
 #### Sub-Task 5.3: Closeout: docs/plans/index.md row, plan statuses, follow-ups
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Close the plan properly and leave the deferred items recorded.
 - **Related Requirements:** AC1–AC5 (process)
 - **Dependencies and Preconditions:** 5.1 + 5.2 complete.
@@ -401,3 +401,4 @@ the harness: git commands run via `@dh-executor`; invocation sources are
   - Audit point 5 — stale config assets: `scripts/link-dh-global.sh` (orphaned, disproven v2.0.18 rationale), `opencode.example.jsonc` (stale checklist), `demo-project/*` (native agent-map workaround, pinned model).
   - Audit point 6 — "Bundled scope" note in `skills/index.md` naming non-bundled dependencies (`evolve`, `state-sync`, `semver`, commands). Partially mitigated: versioning is now bundled as `dh-semver`.
   - `demo-project/docs/index.md` — counts (16 skills) and underscore tool refs (`dh_read_sheet` on line ~66).
+  - Source-code comments — underscore tool names remain in `src/tools/sheet-tools.ts`, `src/tools/logged-command.ts`, and `src/__tests__/sheet-tools.test.ts` header comments (outside R2's documentation scope; cosmetic).

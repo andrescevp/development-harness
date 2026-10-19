@@ -456,3 +456,40 @@ Format: one section per sub-task, findings P0–P3 with disposition.
 - [ ] Sub-Task 5.3 — closeout (index row, follow-ups).
 
 ---
+
+## Sub-Task Review: 5.3 — Closeout: docs/plans/index.md row, plan statuses, follow-ups
+
+**Reviewed against:** Sub-Task 5.3 (plan.md, Phase 5) · **Overall risk:** Low · **Verdict:** Approve
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Index row accurate (dates, description, format) | PASS | Created 2026-10-18 / Updated 2026-10-19; description includes the source-map-js override; 7-column format intact |
+| Status flip correctly deferred | PASS | `Pending`/`Yes` retained pending dh-execute-plan Step 4.5 (post-final-review) — flipping early would violate the final-review gate |
+| Plan.md frontmatter + Open Questions follow-ups | PASS | `updated: 2026-10-19`; follow-ups list now covers points 5/6, demo-project, and the source-comment bullet (R1 from 5.2) |
+| Lifecycle state | PASS | Phases 1–4 Completed; Phase 5 closes with this sub-task; 1.1–5.2 Completed |
+| Scope + parser invariants | PASS | Only index.md + plan.md changed; `dh.plan_read` parses cleanly |
+
+### Findings
+
+- **[P0] Blocking:** none. **[P1] High:** none. **[P2] Medium:** none. **[P3] Low:** none.
+- Informational: index.md lacks a trailing newline (pre-existing).
+
+### Validation Results
+
+- Statuses verified via tool parse; index table column-checked; diff limited to the three expected hunks.
+
+### Regression Risk Assessment
+
+- Breaking changes detected: none — bookkeeping only.
+
+### Scope Compliance
+
+- In scope: verified. Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [ ] Final review (dh-final-review) — plan-level sign-off.
+
+---
