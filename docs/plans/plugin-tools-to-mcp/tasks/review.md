@@ -1,4 +1,11 @@
-# Sub-Task Review: 1.1 Server factory + MCP test harness + tools/list contract
+# Sub-Task Reviews — plugin-tools-to-mcp
+
+Reviews produced by the `dh-review` skill during `dh-execute-plan` orchestration.
+Format: one section per sub-task, findings P0–P3 with disposition.
+
+---
+
+## Sub-Task Review: 1.1 — Server factory + MCP test harness + tools/list contract
 
 **Reviewed against:** Sub-Task 1.1 (`docs/plans/plugin-tools-to-mcp/plan.md`, Phase 1)
 **Overall risk:** Low
@@ -99,3 +106,72 @@ crash-later behavior); emitted `inputSchema` has correct `required`/`enum` shape
 - [ ] 1.3 must pick up: path-ACL extraction, adapter-helper consolidation, symlink
       hardening, input-validation deviation record, `INITIAL_PHASE_STATUS`.
 - [ ] 1.5 must honor exclusive-create semantics in the atomic-write helper.
+
+---
+
+## Sub-Task Review: 1.2 — Workspace root resolution ACL
+
+**Reviewed against:** Sub-Task 1.2 (plan.md, Phase 1) · **Overall risk:** Low · **Verdict:** Approve with comments
+
+### Acceptance Criteria Verification
+
+| Criteria | Status | Notes |
+|---|---|---|
+| Env set → used (absolute resolution) | PASS | `DH_WORKSPACE_ROOT` non-blank wins, `path.resolve(cwd, value)`; relative values anchor on the provided cwd (documented precedence) |
+| Env unset → cwd default | PASS | `path.resolve(cwd)`; defaults read at CALL time (pinned by a stub-after-import test) |
+| Blank/whitespace override → treated as unset | PASS | `rawOverride?.trim() || undefined` |
+| Blank cwd → descriptive error | PASS | `no workspace root available: cwd is empty (… )`, pinned to `/cwd is empty/` |
+| Zero direct env/cwd reads outside `workspace.ts` | PASS | grep over production code: only `src/mcp/workspace.ts:27-28`; handlers/factory take the injected root |
+
+### Findings
+
+- **[P0] Blocking:** none.
+- **[P1] High:** none.
+- **[P2] Medium:** none.
+- **[P3] Padded override silently mis-anchored** (`workspace.ts` override handling):
+  `' /overrides/ws '` degraded to a cwd-relative path. **Addressed** — override is now
+  trimmed *as a value* (`rawOverride?.trim() || undefined`) while the cwd stays verbatim
+  (machine-supplied; asymmetry documented in the JSDoc); revalidated.
+- **[P3] Missing coverage of the padded branch:** **Addressed** — 2 new tests (padded
+  override; env-only with cwd defaulted); workspace suite now 9 tests, total 106.
+- **[P3] `process.cwd()` ENOENT failure mode** (deleted cwd → raw opaque error before
+  the override is consulted): **Routed to Sub-Task 2.1** — plan.md 2.1 scope now
+  requires wrapping `process.cwd()` failures in the descriptive workspace-root error
+  at the entry.
+- **Informational (no action):** depcruise `no-orphans` exemption verified minimal and
+  load-bearing (independently reproduced: its removal yields exactly one violation);
+  `TODO(2.1)` removal trigger embedded. Env-precedence security cleared (host-owned
+  knob; containment unchanged). Pre-existing inert `not-to-node-builtins` rule noted,
+  unrelated.
+
+### Validation Results
+
+- Tests present: yes — precedence matrix (absolute/relative/unset/blank/padded),
+  normalization, blank-cwd guard, call-time defaults.
+- Validation commands: `pnpm test` PASS (11 files / 106 tests) · `pnpm typecheck` PASS ·
+  `pnpm lint:biome` / `lint:knip` / `lint:depcruise` PASS — re-run independently via
+  `@dh-executor`.
+- Simplify pass (three lenses): reuse — clean; efficiency — clean; quality — 5 P3s,
+  all applied in the final revision.
+- Web validation (MCP Chrome): not applicable.
+- Architecture: pure lexical resolver; call-time env reads; factory consumes the
+  injected root (ACL criterion verified).
+
+### Regression Risk Assessment
+
+- Breaking changes: none — new module + tests; `.dependency-cruiser.json` gains a
+  narrow named-rule override with an embedded removal trigger.
+- Interface/config changes: `resolveWorkspaceRoot` is new surface, not yet consumed
+  (Sub-Task 2.1 wires it at the stdio entry).
+
+### Scope Compliance
+
+- In scope: verified (`workspace.ts` + tests + the QA-config exemption required to keep
+  the depcruise gate green).
+- Out of scope detected: none.
+
+### Suggested Next Steps
+
+- [x] Proceed to Sub-Task 1.3 — it must pick up the recorded consolidations (path-ACL
+      extraction → `src/tools/plan-paths.ts` first, adapter-helper consolidation, symlink
+      hardening, input-validation deviation record, `INITIAL_PHASE_STATUS`).

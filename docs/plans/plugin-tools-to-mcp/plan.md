@@ -184,7 +184,7 @@ return { content: [{ type: 'text', text: message }], isError: true };
 
 #### Sub-Task 1.2: Workspace root resolution ACL
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Implement `src/mcp/workspace.ts` — `resolveWorkspaceRoot({ env, cwd })`: `DH_WORKSPACE_ROOT` wins when set (resolved absolute), else `process.cwd()`; rejects empty/missing results with a descriptive error; unit tests for override precedence, cwd default, and rejection.
 - **Related Requirements:** R4, AC2
 - **Dependencies and Preconditions:** 1.1 (module layout).
@@ -252,7 +252,7 @@ return { content: [{ type: 'text', text: message }], isError: true };
 - **Objective:** Create `src/mcp/stdio.ts` — the `bin` entry: `serveStdio(factory)` building the server with `resolveWorkspaceRoot()` at connection time, the short harness `instructions` string, a `console.error` readiness banner (stderr only), and clean shutdown (SIGINT/SIGTERM close handler; stdin EOF teardown relies on the SDK).
 - **Related Requirements:** R3, R6, R9, R12, AC3
 - **Dependencies and Preconditions:** Phase 1 complete (factory + workspace ACL).
-- **In Scope for This Sub-Task:** `src/mcp/stdio.ts`; package version resolution for `McpServer({ name, version })` (read `../../package.json` relative to `import.meta.url` with a hard-coded fallback constant — must work from the npx cache layout); `instructions` text (one line: plan lifecycle under `docs/plans`, workspace-anchored, phase-gate rules); error-path logging to stderr.
+- **In Scope for This Sub-Task:** `src/mcp/stdio.ts`; package version resolution for `McpServer({ name, version })` (read `../../package.json` relative to `import.meta.url` with a hard-coded fallback constant — must work from the npx cache layout); `instructions` text (one line: plan lifecycle under `docs/plans`, workspace-anchored, phase-gate rules); error-path logging to stderr; wrap `process.cwd()` failures (e.g. a deleted cwd → raw ENOENT) in the same descriptive workspace-root error at the entry.
 - **Out of Scope for This Sub-Task:** build/tsup wiring and the shebang (2.2); spawn smoke (2.3).
 - **Instructions:** instantiate a fresh `McpServer` inside the factory (per-connection instance per SDK v2 `serveStdio` semantics); never write to stdout — a single `console.log` breaks the protocol channel; keep the process alive only via the transport (no timers/watchers). Verify against the v2 API reference the exact mechanism for server `instructions` (constructor option or server capability) — implement with whichever the SDK exposes, noted in the task notes.
 - **Acceptance Criteria:** importing the module does not start the server (entry executes on run, keeps testability); running `node dist/mcp/stdio.js < /dev/null` (after 2.2 build) exits 0 without stdout output; in-memory tests can construct the same server factory and read the instructions via the client (SDK accessor — verified during implementation).

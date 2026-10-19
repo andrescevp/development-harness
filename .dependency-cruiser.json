@@ -8,6 +8,16 @@
       "comment": "Plugin code runs inside the opencode host (node), but accidental node builtin imports in shared libs should stay explicit.",
       "from": {},
       "to": { "path": "^node:" }
+    },
+    {
+      "name": "no-orphans",
+      "severity": "error",
+      "comment": "Extends recommended-strict's no-orphans. Entry modules wired by their consumer instead of a src import are excepted: the MCP workspace resolver is consumed by the (separately built) stdio entry. The replaced base from.pathNot only filtered dotfiles/configs, of which none live under src/. TODO(2.1): drop this override once src/mcp/stdio.ts imports this module and the base rule can be restored.",
+      "from": {
+        "orphan": true,
+        "pathNot": "^src/mcp/workspace\\.ts$"
+      },
+      "to": {}
     }
   ],
   "options": {
