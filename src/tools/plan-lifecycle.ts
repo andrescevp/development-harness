@@ -18,8 +18,11 @@ import { parse } from 'yaml';
 import { splitFrontmatter } from '../lib/frontmatter.js';
 import { planScaffold } from './plan-template.js';
 
-export type PhaseStatus = 'Pending' | 'In Progress' | 'Completed';
-const PHASE_STATUSES: readonly PhaseStatus[] = ['Pending', 'In Progress', 'Completed'];
+/** Canonical status/target domains shared by parser, editors, and adapters. */
+export const PHASE_STATUSES = ['Pending', 'In Progress', 'Completed'] as const;
+export type PhaseStatus = (typeof PHASE_STATUSES)[number];
+export const STATUS_TARGETS = ['phase', 'subtask'] as const;
+export type StatusTarget = (typeof STATUS_TARGETS)[number];
 
 interface PlanSubTask {
   /** Canonical "N.M" ref (phase.subtask). */
@@ -207,7 +210,7 @@ function sectionEnd(contents: string, headerLine: number): number {
  */
 export function setStatus(
   contents: string,
-  target: 'phase' | 'subtask',
+  target: StatusTarget,
   ref: string,
   status: PhaseStatus
 ): { contents: string; plan: PlanDocument } {
