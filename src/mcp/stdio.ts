@@ -7,8 +7,8 @@
  * this module is side-effect free; the entry runs only as the main module.
  */
 import fs from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { serveStdio } from '@modelcontextprotocol/server/stdio';
+import { isMainEntry as isMainEntryFor } from '../lib/main-entry.js';
 import { buildServer } from './server.js';
 import { resolveWorkspaceRoot } from './workspace.js';
 
@@ -63,12 +63,7 @@ export function resolveRoot(): string {
  * Realpath-based: npm/npx bin symlinks and relative invocations still match.
  */
 export function isMainEntry(entry: string | undefined = process.argv[1]): boolean {
-  if (entry === undefined) return false;
-  try {
-    return fs.realpathSync(entry) === fs.realpathSync(fileURLToPath(import.meta.url));
-  } catch {
-    return false;
-  }
+  return isMainEntryFor(import.meta.url, entry);
 }
 
 /** Run the stdio entry (invoked only when this module is the process main). */

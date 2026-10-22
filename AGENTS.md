@@ -96,6 +96,22 @@ bundled agent names — no mapping is needed.
   project-scope `dh` MCP server is connected (`opencode mcp list`) so the
   harness tools are available.
 
+## Repository layout
+
+```text
+index.ts          source-mode plugin entry (re-exports src/plugin.ts)
+agents/           bundled agent definitions (7)
+skills/           bundled skills (17)
+src/cli/          installer CLI: args, scope, prompt/output, JSONC, config, manifest, commands
+src/mcp/          stdio MCP server + workspace resolver
+src/tools/        plan/sheet/logged-command tool implementations
+src/lib/          shared assets, records, atomic writes, package metadata, main guard
+scripts/          QA, smoke (load/MCP/install/pack), Docker runner, audit
+docker/test/      derived OpenCode test image (pinned 2.0.18)
+docs/             loading/operations docs and phased plans
+test/             legacy test directory
+```
+
 ## QA tooling
 
 Full QA stack — the release gate `pnpm qa:check:full` runs all of these (the fast subset is `pnpm qa:check`):
@@ -112,9 +128,12 @@ Full QA stack — the release gate `pnpm qa:check:full` runs all of these (the f
 | Vitest | `pnpm test` | unit tests |
 | Smoke (plugin) | `node scripts/smoke-load.mjs` | loads the built plugin bundle in isolation |
 | Smoke (MCP) | `node scripts/smoke-mcp.mjs` | spawns the built stdio server: 7 tools, plan round-trip, symlink launch |
+| Smoke (installer CLI) | `node scripts/smoke-install.mjs` | built CLI install/status/uninstall in isolated HOME/project scopes |
+| Smoke (npm tarball) | `node scripts/smoke-pack.mjs` | packs, inspects, installs offline, imports the plugin, checks bins/MCP/assets |
+| Docker (opt-in) | `scripts/docker-test.sh --local` / `--remote --ref <branch>` | derived `ghcr.io/anomalyco/opencode:2.0.18` image, read-only credential mounts, container lifecycle |
 
-Full gate: `pnpm qa:check:full` = qa:check → build → test → typecheck → audit → smoke-load → smoke-mcp
-(build precedes test so the bundle/registration tests run against fresh artifacts).
+Full gate: `pnpm qa:check:full` = qa:check → build → smoke-install → smoke-pack → test → typecheck → audit → smoke-load → smoke-mcp
+(build precedes the smokes/tests so they run against fresh artifacts; the Docker runner is opt-in and needs credentials/network).
 Note: `pnpm audit` collides with pnpm's security audit — the harness audit is `pnpm run audit`.
 
 ## Git Flow (repository workflow)

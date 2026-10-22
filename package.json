@@ -1,29 +1,44 @@
 {
   "name": "dev-harness-skills",
-  "version": "0.4.0",
+  "version": "0.5.0-rc.1",
   "type": "module",
   "description": "OpenCode V2 plugin with an opinionated development harness based in plan execution loop architecture",
-  "main": "./index.ts",
+  "main": "./dist/plugin.js",
+  "types": "./dist/plugin.d.ts",
   "exports": {
-    ".": "./index.ts"
+    ".": {
+      "types": "./dist/plugin.d.ts",
+      "import": "./dist/plugin.js",
+      "default": "./dist/plugin.js"
+    },
+    "./package.json": "./package.json"
   },
   "bin": {
-    "dev-harness-mcp": "./dist/mcp/stdio.js"
+    "dev-harness": "dist/cli.js",
+    "dev-harness-skills": "dist/cli.js",
+    "dev-harness-mcp": "dist/mcp/stdio.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup && tsc --emitDeclarationOnly && npm run copy-assets",
     "build:runtime": "tsup && npm run copy-assets",
     "copy-assets": "node scripts/copy-assets.mjs",
+    "prepack": "npm run build 1>&2",
     "prepare": "node scripts/prepare.mjs",
     "audit": "node scripts/audit.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "smoke-load": "node scripts/smoke-load.mjs",
+    "smoke-install": "node scripts/smoke-install.mjs",
     "smoke-mcp": "node scripts/smoke-mcp.mjs",
+    "smoke-pack": "node scripts/smoke-pack.mjs",
     "lint:biome": "biome check src/ scripts/",
     "format:biome": "biome check --write src/ scripts/",
     "format:biome:check": "biome check src/ scripts/",
@@ -34,7 +49,7 @@
     "scan:code": "docker run --rm -v \"${PWD}:/src\" semgrep/semgrep semgrep --config=p/typescript --config=p/security-audit --metrics=off /src/src",
     "qa:fix": "pnpm format:biome",
     "qa:check": "pnpm lint:biome && pnpm format:biome:check && pnpm lint:knip && pnpm lint:dup && pnpm lint:depcruise && pnpm lint:links && pnpm scan:deps && pnpm scan:code",
-    "qa:check:full": "pnpm qa:check && pnpm build && pnpm test && pnpm typecheck && pnpm run audit && node scripts/smoke-load.mjs && node scripts/smoke-mcp.mjs",
+    "qa:check:full": "pnpm qa:check && pnpm build && node scripts/smoke-install.mjs && node scripts/smoke-pack.mjs && pnpm test && pnpm typecheck && pnpm run audit && node scripts/smoke-load.mjs && node scripts/smoke-mcp.mjs",
     "lint:links": "node scripts/check-links.mjs"
   },
   "engines": {
@@ -44,6 +59,7 @@
     "@modelcontextprotocol/server": "^2.3.1",
     "@opencode/plugin": "^2.0.20",
     "duckdb": "^1.4.4",
+    "jsonc-parser": "^3.3.1",
     "yaml": "^2.9.1",
     "zod": "^4.6.5"
   },
@@ -56,7 +72,8 @@
     "knip": "^6.38.0",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "vitest": "^5.0.2"
+    "vite": "8.3.3",
+    "vitest": "^5.0.3"
   },
   "knip": {
     "$schema": "https://unpkg.com/knip@6/schema.json",

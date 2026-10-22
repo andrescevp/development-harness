@@ -1,0 +1,8 @@
+# The Docker test image copies nothing from the build context. Exclude
+# everything so repo files, plans, build output, reports, and credentials
+# never reach the daemon. The Dockerfile is still read by the builder, but
+# keep it explicit so `docker build -f docker/test/Dockerfile .` is obvious.
+*
+!docker/
+!docker/test/
+!docker/test/Dockerfile

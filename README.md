@@ -13,40 +13,64 @@ An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated develop
 
 ## Installation
 
-### Global (all projects)
+### npx installer (recommended)
 
-Clone the repository into your global OpenCode plugins directory:
+The installer materializes a self-contained plugin directory and wires the
+`dh` MCP server for the selected scope:
 
 ```sh
-git clone https://github.com/andrescevp/development-harness.git ~/.config/opencode/plugins/dev-harness-skills
-cd ~/.config/opencode/plugins/dev-harness-skills && pnpm install
+# npm registry (after publication)
+npx -y dev-harness-skills install --global
+npx -y dev-harness-skills install --project --path .
+
+# Git channel (available before publication / private use)
+npx -y github:andrescevp/development-harness install --global
+npx -y github:andrescevp/development-harness install --project --path .
 ```
 
-OpenCode automatically discovers plugin package directories containing an `index.ts` entry under its plugins folder. **Restart OpenCode after cloning** — plugins load at server startup; a session started before the install shows nothing. The plugin registers its 7 `dh-*` agents and 17 `dh-*` skills automatically (requires `@opencode/plugin` ≥ 2.0.20; pinned `^2.0.20` in the repo).
+| Scope | Plugin directory | MCP config |
+|---|---|---|
+| `--global` | `${OPENCODE_CONFIG_DIR:-${XDG_CONFIG_HOME:-~/.config}/opencode}/plugins/dev-harness-skills` | global `opencode.jsonc` |
+| `--project` | `<project>/.opencode/plugins/dev-harness-skills` | `<project>/opencode.jsonc` |
 
-### Per-project
-
-To scope the harness to a specific project, clone into the project plugins folder with the same install step:
+- Re-running is idempotent; a newer CLI upgrades the managed copy.
+- `--dry-run` reports intended changes; `--force` replaces an unmanaged target
+  or a conflicting `dh` entry; `--no-mcp` skips config wiring.
+- `status` reports plugin/config drift (`--json` for scripts);
+  `uninstall` removes only installer-owned artifacts.
+- A TTY prompts for global/project when no scope flag is given. Non-interactive
+  runs must pass `--global` or `--project`; `--yes` never guesses a scope.
+- **Restart OpenCode after installing** — plugins load at server startup.
 
 ```sh
-mkdir -p <project>/.opencode/plugins
-git clone https://github.com/andrescevp/development-harness.git <project>/.opencode/plugins/dev-harness-skills
-cd <project>/.opencode/plugins/dev-harness-skills && pnpm install
+npx -y dev-harness-skills status --global --json
+npx -y dev-harness-skills uninstall --project --dry-run
 ```
 
 ### Managed via OpenCode CLI
 
-Install the plugin directly using the OpenCode CLI:
+`opencode plugin add` installs the plugin into OpenCode's **global**
+configuration and does not wire MCP servers:
 
 ```sh
+# npm registry (after publication)
+opencode plugin add dev-harness-skills
+
+# Git repository (available now; works with private repositories)
 opencode plugin add github:andrescevp/development-harness
 ```
 
-This works with private repositories through your existing Git credentials. To refresh the plugin:
+Then wire only the `dh` MCP entry (no second plugin copy):
 
 ```sh
-opencode plugin update
+npx -y dev-harness-skills install --global --mcp-only
+# Git-wired installs:
+npx -y dev-harness-skills install --global --mcp-only --mcp-source github
 ```
+
+Choose one plugin channel: an `opencode plugin add` entry plus a managed copy
+loads the plugin twice, and the CLI warns about it. To refresh a managed
+plugin, `opencode plugin update`; remove it with `opencode plugin remove`.
 
 ### From source / development
 
@@ -59,27 +83,29 @@ pnpm install
 pnpm build
 ```
 
-Then load via `file:///path/to/dev-harness-skills` in your `opencode.json` or `opencode.jsonc` plugins array:
+Then load via `file:///path/to/development-harness` in your `opencode.json` or
+`opencode.jsonc` plugins array (or clone the repo into a `plugins/` folder):
 
 ```json
 {
   "plugins": [
-    "file:///path/to/dev-harness-skills"
+    "file:///path/to/development-harness"
   ]
 }
 ```
 
 The plugin installation above loads agents and skills only; the harness tools
 require the project-scope `mcp.servers.dh` entry described in
-[MCP server (`dh`)](#mcp-server-dh).
+[MCP server (`dh`)](#mcp-server-dh). For a git-only checkout, run
+`npx -y github:andrescevp/development-harness install --project --mcp-only`.
 
 ## Quickstart
 
 1. Check that the plugin loaded successfully:
 
 ```sh
-opencode debug agents   # expect the 7 dh-* agents
-opencode debug config   # expect the plugin entry, and mcp.servers.dh once wired
+opencode debug agents   # 7 dh-* agents (when the build surfaces plugin agents)
+opencode debug config   # plugin entry, and mcp.servers.dh once wired
 opencode mcp list       # expect: dh connected (server/status only)
 ```
 
@@ -129,7 +155,9 @@ in that project's `opencode.jsonc`:
     "servers": {
       "dh": {
         "type": "local",
-        "command": ["npx", "-y", "--package=github:andrescevp/development-harness", "dev-harness-mcp"],
+        // npm channel (after publication); use
+        // --package=github:andrescevp/development-harness for a Git-wired install.
+        "command": ["npx", "-y", "--package=dev-harness-skills", "dev-harness-mcp"],
         "protocol": "2026-07-28",
         // Cold first npx install can take ~20–25 s; prewarm makes later starts fast.
         "timeout": { "startup": 300000 }
@@ -208,6 +236,8 @@ pnpm typecheck
 pnpm build
 node scripts/smoke-load.mjs
 node scripts/smoke-mcp.mjs
+node scripts/smoke-install.mjs
+node scripts/smoke-pack.mjs
 pnpm qa:check
 pnpm qa:check:full
 pnpm format:biome
@@ -215,22 +245,39 @@ pnpm format:biome
 
 Use `pnpm run audit` to run the harness consistency audit (`pnpm audit` runs pnpm's package security audit).
 
+Docker test (opt-in; needs Docker and GitHub credentials for `--remote`):
+
+```sh
+scripts/docker-test.sh --local
+scripts/docker-test.sh --remote --ref <branch>
+```
+
+The runner derives from the pinned `ghcr.io/anomalyco/opencode:2.0.18` image,
+adds Node/npm/git/ssh/gcompat, mounts existing host Git credentials read-only,
+and keeps HOME/XDG/OpenCode/project paths isolated. It is not part of the
+offline `pnpm qa:check:full` gate.
+
 ## Repository layout
 
 ```text
 index.ts         Root plugin entry point for OpenCode plugin discovery (source mode)
 agents/          Markdown definitions and system prompts for the 7 bundled agents
 skills/          Instructions, templates, and references for the 17 bundled skills
-src/             TypeScript source code, asset loaders, type definitions, and tools
-scripts/         Audit, asset packaging, and smoke-testing scripts
+src/cli/         Installer CLI (args, scope, JSONC config, manifest, commands)
+src/mcp/         Local stdio MCP server and workspace resolver
+src/tools/       Plan/sheet/logged-command tool implementations
+src/lib/         Shared assets, records, atomic writes, package metadata, main guard
+scripts/         Audit, smoke tests (load/MCP/install/pack), Docker runner
+docker/test/     Derived OpenCode test image (pinned 2.0.18)
 test/            Vitest unit and registration tests
-docs/            Plugin documentation, loading guides, and phased implementation plans
+docs/            Plugin documentation, loading guides, release runbook, plans
 ```
 
 ## Documentation
 
 - [`AGENTS.md`](AGENTS.md) — Runtime contract: skills loop, phase lifecycle, tools, and delegation routing.
-- [`docs/LOADING.md`](docs/LOADING.md) — Plugin loading methods, verification checklists, and troubleshooting.
+- [`docs/LOADING.md`](docs/LOADING.md) — Install channels, verification checklists, and troubleshooting.
+- [`docs/RELEASING.md`](docs/RELEASING.md) — Manual npm publish runbook and post-publish verification.
 
 ## Contributing
 
