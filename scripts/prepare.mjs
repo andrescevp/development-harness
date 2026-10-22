@@ -12,8 +12,8 @@
  * All diagnostics go to STDERR so `npm pack --dry-run --json` stays
  * machine-parseable.
  */
-import { execSync } from 'node:child_process';
-import { existsSync, statSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -40,16 +40,26 @@ if (isComplete()) {
 
 // Production installs (`--omit=dev`) carry no tsup; packaged consumers get
 // dist from the tarball, so a missing toolchain is a skip, not a failure.
+const require = createRequire(import.meta.url);
+let tsupManifest;
 try {
-  createRequire(import.meta.url).resolve('tsup');
+  tsupManifest = require.resolve('tsup/package.json');
 } catch {
   console.error('[prepare] build tooling not installed (dev dependencies omitted) — skipping build');
   process.exit(0);
 }
 
-console.error('[prepare] dist missing — running npm run build:runtime');
+// Run tsup/copy-assets directly instead of `npm run`: OpenCode's bundled npm
+// invokes prepare with a restricted PATH, and shelling out to `npm` there fails
+// even though plain npm/git installs work. Direct node execution is portable.
+const tsupBin = join(dirname(tsupManifest), JSON.parse(readFileSync(tsupManifest, 'utf8')).bin.tsup);
+console.error('[prepare] dist missing — running tsup + copy-assets');
 try {
-  execSync('npm run build:runtime', { cwd: root, stdio: ['ignore', 2, 2] });
+  execFileSync(process.execPath, [tsupBin], { cwd: root, stdio: ['ignore', 2, 2] });
+  execFileSync(process.execPath, [join(root, 'scripts', 'copy-assets.mjs')], {
+    cwd: root,
+    stdio: ['ignore', 2, 2],
+  });
 } catch (error) {
   // Numeric status → propagate it; signal termination has no numeric status.
   if (typeof error.status === 'number') process.exit(error.status);
