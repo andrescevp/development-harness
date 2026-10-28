@@ -1,10 +1,10 @@
 /**
  * server.test.ts — `tools/list` contract for the MCP server factory.
  *
- * Proves the factory registers exactly the 7 harness capabilities with
+ * Proves the factory registers exactly the 4 harness capabilities with
  * meaningful descriptions, and that plan handlers anchor on the injected
  * workspace root. Payload/error parity is covered by the dedicated
- * plan/sheet/command parity suites.
+ * plan/command parity suites.
  */
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { McpTestHarness } from '../../__tests__/helpers/mcp.js';
@@ -12,15 +12,7 @@ import { createMcpTestHarness } from '../../__tests__/helpers/mcp.js';
 import type { PlanPayload } from '../../__tests__/helpers/plan-fixtures.js';
 import { plansFile } from '../../__tests__/helpers/plan-fixtures.js';
 
-const HARNESS_TOOLS = [
-  'logged_command',
-  'plan_create',
-  'plan_read',
-  'plan_update_status',
-  'read_sheet',
-  'sheet_schema',
-  'update_sheet',
-].sort();
+const HARNESS_TOOLS = ['logged_command', 'plan_create', 'plan_read', 'plan_update_status'].sort();
 
 describe('MCP server tools/list contract', () => {
   let harness: McpTestHarness | undefined;
@@ -33,7 +25,7 @@ describe('MCP server tools/list contract', () => {
     await harness?.close();
   });
 
-  it('exposes exactly the 7 harness tools', async () => {
+  it('exposes exactly the 4 harness tools', async () => {
     const { tools } = await harness!.listTools();
     expect(tools.map((tool) => tool.name).sort()).toEqual(HARNESS_TOOLS);
   });

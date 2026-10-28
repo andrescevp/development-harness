@@ -69,7 +69,7 @@ scripts/docker-test.sh --remote --ref <branch>
 ```
 
 The runner derives from the pinned `ghcr.io/anomalyco/opencode:2.0.18` image,
-adds Node/npm/git/ssh/gcompat, mounts existing host Git credentials read-only,
+adds Node/npm/git/ssh, mounts existing host Git credentials read-only,
 and uses isolated HOME/XDG/OPENCODE/project paths. It is not part of the
 offline `pnpm qa:check:full` gate.
 
@@ -175,7 +175,7 @@ opencode mcp list       → `dh` connected (server/status only)
 
 The plugin also registers 17 skills (there is no skills debug subcommand on
 v2.0.18 — the bundled list lives in `skills/index.md`). Zero tools are
-registered by the plugin: the 7 tools come from the MCP server below.
+registered by the plugin: the 4 tools come from the MCP server below.
 
 ## MCP server (`dh`)
 
@@ -233,17 +233,14 @@ retired by this release.
 | `dh_plan_read` | `{ slug }` or `{ path }` (relative to `docs/plans`) | `{ ok, path, plan }` — parsed phases/sub-tasks with statuses |
 | `dh_plan_update_status` | `{ slug?, path?, target: phase\|subtask, index: "N"\|"N.M", status }` | `{ ok, path, plan }` — line-aware status edit |
 | `dh_plan_create` | `{ slug, title, objective, phases: [{title, subTasks:[{title}]}], updateIndex? }` | `{ ok, path, plan }` — scaffolds a phased plan |
-| `dh_read_sheet` | `{ path, query?, limit? }` | `{ ok, columns, rowCount, rows }` — csv by default; xlsx via a `read_xlsx(...)` query when the DuckDB extension loads |
-| `dh_update_sheet` | `{ path, query }` | `{ ok, columns, rowCount, rows }` — applies UPDATE/INSERT/DELETE, writes the CSV back |
-| `dh_sheet_schema` | `{ path }` | `{ ok, columns, rowCount, rows }` — columns as `name:type` |
 | `dh_logged_command` | `{ command, logName?, timeoutMs? }` | `{ ok, exitCode, logPath, head, tail, truncated }` — log in the OS temp dir + head/tail window; the command runs with the MCP server's OS permissions |
 
 Phase → `Completed` is gated: it fails while any sub-task of the phase is not
 `Completed`. Plan reads/writes are anchored under `<workspace>/docs/plans`;
 `..` escapes, absolute paths outside the anchor, symlinks, and missing
-workspace roots are rejected with descriptive errors. Sheet tools take
-absolute paths; helper failures return `{ ok: false, error }` payloads (not
-protocol errors).
+workspace roots are rejected with descriptive errors. Plan helper failures
+surface as protocol errors; `logged_command` reports non-zero exits in its
+payload.
 
 ### Verify
 
@@ -255,7 +252,7 @@ MCP servers connect at session start — restart opencode after adding or
 changing the project entry. The in-repo gates are
 `src/__tests__/registration.test.ts` (exactly 7 agents + 17 skills, zero tool
 transforms) and `node scripts/smoke-mcp.mjs` (spawns the built binary, lists
-the 7 tools, and round-trips plan create/read/update).
+the 4 tools, and round-trips plan create/read/update).
 
 ## Troubleshooting
 

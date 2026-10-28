@@ -7,7 +7,7 @@ An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated develop
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks with strict halt-on-blocker safeguards.
 - **7 agents and 17 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
-- **`dh` MCP server (7 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents and skills only.
+- **`dh` MCP server (4 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents and skills only.
 - **Full QA gate**: Thorough verification suite integrating Biome, Knip, jscpd, dependency-cruiser, OSV-Scanner, Semgrep, Vitest, and TypeScript.
 - **Source-mode loading**: Automatic discovery by OpenCode via root `index.ts` with direct asset loading from the repository.
 
@@ -145,7 +145,7 @@ Plans are stored under `docs/plans/<slug>/plan.md` using a phased structure. Eve
 
 ### MCP server (`dh`)
 
-The plugin registers **no tools**. The 7 harness tools are served by a local
+The plugin registers **no tools**. The 4 harness tools are served by a local
 stdio MCP server (`@modelcontextprotocol/server` v2), enabled **per project**
 in that project's `opencode.jsonc`:
 
@@ -172,9 +172,6 @@ in that project's `opencode.jsonc`:
 | `dh_plan_read` | Parse a phased plan (`docs/plans/<slug>/plan.md`) into structured JSON |
 | `dh_plan_update_status` | Edit phase/sub-task status markers (phase completion is gated) |
 | `dh_plan_create` | Scaffold a phased plan; optionally append the `index.md` row |
-| `dh_read_sheet` | Query tabular data with DuckDB — csv by default; xlsx via a `read_xlsx(...)` query when the extension loads |
-| `dh_update_sheet` | Apply UPDATE/INSERT/DELETE and write the CSV back |
-| `dh_sheet_schema` | Describe columns as `name:type` |
 | `dh_logged_command` | Run a command with its log in the OS temp dir (runs with the MCP server's OS permissions); return head/tail + log path |
 
 Full inputs/returns contract: [`docs/LOADING.md` → Tools](docs/LOADING.md#tools).
@@ -253,7 +250,7 @@ scripts/docker-test.sh --remote --ref <branch>
 ```
 
 The runner derives from the pinned `ghcr.io/anomalyco/opencode:2.0.18` image,
-adds Node/npm/git/ssh/gcompat, mounts existing host Git credentials read-only,
+adds Node/npm/git/ssh, mounts existing host Git credentials read-only,
 and keeps HOME/XDG/OpenCode/project paths isolated. It is not part of the
 offline `pnpm qa:check:full` gate.
 
@@ -265,7 +262,7 @@ agents/          Markdown definitions and system prompts for the 7 bundled agent
 skills/          Instructions, templates, and references for the 17 bundled skills
 src/cli/         Installer CLI (args, scope, JSONC config, manifest, commands)
 src/mcp/         Local stdio MCP server and workspace resolver
-src/tools/       Plan/sheet/logged-command tool implementations
+src/tools/       Plan/logged-command tool implementations
 src/lib/         Shared assets, records, atomic writes, package metadata, main guard
 scripts/         Audit, smoke tests (load/MCP/install/pack), Docker runner
 docker/test/     Derived OpenCode test image (pinned 2.0.18)

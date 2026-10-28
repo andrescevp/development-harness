@@ -17,15 +17,7 @@ import { readJson, tail } from './pack-utils.mjs';
 
 const REQUEST_TIMEOUT_MS = 5_000;
 const PACKAGE_NAME = 'dev-harness-skills';
-const EXPECTED_TOOLS = [
-  'logged_command',
-  'plan_create',
-  'plan_read',
-  'plan_update_status',
-  'read_sheet',
-  'sheet_schema',
-  'update_sheet',
-].sort();
+const EXPECTED_TOOLS = ['logged_command', 'plan_create', 'plan_read', 'plan_update_status'].sort();
 /** Packages copied for real: the installed MCP bin must resolve these. */
 const REAL_DEPS = new Set(['@modelcontextprotocol/server', '@modelcontextprotocol/core', 'zod']);
 
@@ -161,10 +153,10 @@ async function checkMcp(prefix, env, check) {
     await client.connect(transport, { timeout: REQUEST_TIMEOUT_MS });
     const { tools } = await client.listTools(undefined, { timeout: REQUEST_TIMEOUT_MS });
     const names = tools.map((tool) => tool.name).sort();
-    check('installed MCP bin lists the 7 harness tools', names.join(',') === EXPECTED_TOOLS.join(','), names.join(','));
+    check('installed MCP bin lists the 4 harness tools', names.join(',') === EXPECTED_TOOLS.join(','), names.join(','));
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    check('installed MCP bin lists the 7 harness tools', false, `${message}${stderr ? ` — ${tail(stderr)}` : ''}`);
+    check('installed MCP bin lists the 4 harness tools', false, `${message}${stderr ? ` — ${tail(stderr)}` : ''}`);
   } finally {
     await client.close().catch(() => undefined);
   }

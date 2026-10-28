@@ -20,8 +20,7 @@ const FALLBACK_VERSION = '0.0.0';
 export const HARNESS_INSTRUCTIONS =
   'Harness for plan-driven development. The tools manage phased plans under ' +
   'docs/plans/<slug>/plan.md of the workspace (a phase cannot be Completed while any ' +
-  'sub-task is open), read csv/xlsx and update csv sheets by absolute path, and run ' +
-  'shell commands whose output is logged to the system temp dir.';
+  'sub-task is open) and run shell commands whose output is logged to the system temp dir.';
 
 let cachedVersion: string | undefined;
 

@@ -46,10 +46,10 @@ sub-tasks Complete around a blocker. The rule applies at phase boundaries too:
 a blocked sub-task blocks its phase — do not mark the phase `Completed` around
 a blocker.
 
-**Harness tools (MCP server `dh`):** the plugin registers no tools; the 7
+**Harness tools (MCP server `dh`):** the plugin registers no tools; the 4
 tools (`dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`,
-`dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, `dh_logged_command`)
-are served by a project-scope local stdio MCP server (`@modelcontextprotocol/server` v2). Under Code Mode call them as `tools.dh.<tool>` (direct names use
+`dh_logged_command`) are served by a project-scope local stdio MCP server
+(`@modelcontextprotocol/server` v2). Under Code Mode call them as `tools.dh.<tool>` (direct names use
 `<server>_<tool>`; consumer permissions match `dh_*`). Loop skills and planner
 agents prefer these tools over manual plan.md edits (fall back to manual edits
 only when the server is unavailable). Format contract:
@@ -104,7 +104,7 @@ agents/           bundled agent definitions (7)
 skills/           bundled skills (17)
 src/cli/          installer CLI: args, scope, prompt/output, JSONC, config, manifest, commands
 src/mcp/          stdio MCP server + workspace resolver
-src/tools/        plan/sheet/logged-command tool implementations
+src/tools/        plan/logged-command tool implementations
 src/lib/          shared assets, records, atomic writes, package metadata, main guard
 scripts/          QA, smoke (load/MCP/install/pack), Docker runner, audit
 docker/test/      derived OpenCode test image (pinned 2.0.18)
@@ -127,7 +127,7 @@ Full QA stack — the release gate `pnpm qa:check:full` runs all of these (the f
 | TypeScript | `tsc -b` (in `pnpm build`) | strict typecheck (typescript 6.x — dependency-cruiser requires <7) |
 | Vitest | `pnpm test` | unit tests |
 | Smoke (plugin) | `node scripts/smoke-load.mjs` | loads the built plugin bundle in isolation |
-| Smoke (MCP) | `node scripts/smoke-mcp.mjs` | spawns the built stdio server: 7 tools, plan round-trip, symlink launch |
+| Smoke (MCP) | `node scripts/smoke-mcp.mjs` | spawns the built stdio server: 4 tools, plan round-trip, symlink launch |
 | Smoke (installer CLI) | `node scripts/smoke-install.mjs` | built CLI install/status/uninstall in isolated HOME/project scopes |
 | Smoke (npm tarball) | `node scripts/smoke-pack.mjs` | packs, inspects, installs offline, imports the plugin, checks bins/MCP/assets |
 | Docker (opt-in) | `scripts/docker-test.sh --local` / `--remote --ref <branch>` | derived `ghcr.io/anomalyco/opencode:2.0.18` image, read-only credential mounts, container lifecycle |

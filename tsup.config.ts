@@ -13,8 +13,6 @@ import { defineConfig } from 'tsup';
  *   bundle must not evaluate any bare specifier at load time. The MCP bundle
  *   runs with a real node_modules (npx cache) and keeps its SDK deps
  *   external instead.
- * - `duckdb` (CJS-only native module) stays external and is lazy-required
- *   inside sheet-tools, so it is only evaluated when a sheet tool runs.
  * - The shebang banner makes `dist/mcp/stdio.js` and `dist/cli.js` directly
  *   executable; it is harmless in the ESM plugin bundle (Node strips shebangs
  *   in ESM).
@@ -31,7 +29,6 @@ export default defineConfig({
   platform: 'node',
   target: 'node20',
   banner: { js: '#!/usr/bin/env node' },
-  external: ['duckdb'],
   // jsonc-parser is bundled so `dist/cli.js` runs with Node builtins only
   // (no node_modules lookups from npx/Git installs). It is not imported by
   // the plugin or MCP entries.

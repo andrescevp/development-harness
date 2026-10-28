@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-10-19T04:17:23.949Z",
+    "generated": "2026-10-28T17:15:06.688Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -35,9 +35,9 @@
       },
       {
         "name": "Cross-references",
-        "count": 1,
+        "count": 2,
         "sev": "WARN",
-        "note": "433 resolved; 1 code-context; 0 allowlisted; 133 prose tokens (warn)"
+        "note": "433 resolved; 0 code-context; 0 allowlisted; 138 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
@@ -101,7 +101,14 @@
   "atMentions": [
     {
       "file": "skills/dh-setup/SKILL.md",
-      "line": 90,
+      "line": 63,
+      "mention": "@playwright",
+      "severity": "warn",
+      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
+    },
+    {
+      "file": "skills/dh-setup/SKILL.md",
+      "line": 80,
       "mention": "@graphify",
       "severity": "warn",
       "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
@@ -118,6 +125,18 @@
         "agents/dh-reviewer.md",
         "agents/dh-software-architect.md",
         "agents/dh-software-engineer.md"
+      ]
+    },
+    {
+      "token": "project-scope",
+      "count": 8,
+      "files": [
+        "agents/dh-executor.md",
+        "skills/dh-execute-plan/SKILL.md",
+        "skills/dh-execute-plan-task/SKILL.md",
+        "skills/dh-final-review/SKILL.md",
+        "skills/dh-planning/SKILL.md",
+        "skills/dh-review/SKILL.md"
       ]
     },
     {
@@ -169,6 +188,14 @@
       ]
     },
     {
+      "token": "best-effort",
+      "count": 3,
+      "files": [
+        "skills/dh-create-documentation/SKILL.md",
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
       "token": "implementation-agnostic",
       "count": 3,
       "files": [
@@ -192,6 +219,13 @@
     },
     {
       "token": "pre-commit",
+      "count": 3,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "development-harness",
       "count": 3,
       "files": [
         "skills/dh-setup/SKILL.md"
@@ -243,10 +277,10 @@
       ]
     },
     {
-      "token": "best-effort",
+      "token": "round-trip",
       "count": 2,
       "files": [
-        "skills/dh-create-documentation/SKILL.md",
+        "skills/dh-coding/SKILL.md",
         "skills/dh-setup/SKILL.md"
       ]
     },
@@ -289,6 +323,13 @@
     },
     {
       "token": "user-level",
+      "count": 2,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "dev-harness-mcp",
       "count": 2,
       "files": [
         "skills/dh-setup/SKILL.md"
@@ -492,13 +533,6 @@
     },
     {
       "token": "keep-alive",
-      "count": 1,
-      "files": [
-        "skills/dh-coding/SKILL.md"
-      ]
-    },
-    {
-      "token": "round-trip",
       "count": 1,
       "files": [
         "skills/dh-coding/SKILL.md"
@@ -925,6 +959,20 @@
       ]
     },
     {
+      "token": "long-lived",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "mcp-server-dh",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
       "token": "ls-files",
       "count": 1,
       "files": [
@@ -1168,7 +1216,7 @@
     {
       "file": "agents/dh-documentor.md",
       "kind": "agent",
-      "lines": 56,
+      "lines": 53,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1405,7 +1453,7 @@
     {
       "file": "skills/dh-create-documentation/SKILL.md",
       "kind": "skill",
-      "lines": 204,
+      "lines": 202,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1585,7 +1633,7 @@
     {
       "file": "skills/dh-setup/SKILL.md",
       "kind": "skill",
-      "lines": 240,
+      "lines": 247,
       "frontmatter": {
         "status": "ok",
         "errors": [],
