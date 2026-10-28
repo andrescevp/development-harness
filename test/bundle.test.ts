@@ -4,8 +4,8 @@
  * from the ~/.config/opencode/plugins directory (documented limitation),
  * so the bundle must not evaluate any bare specifier during module load.
  *
- * Strategy: @opencode/plugin and yaml are bundled in by tsup; duckdb is a
- * lazy require() inside sheet-tools (only evaluated when a sheet tool runs).
+ * Strategy: @opencode/plugin and yaml are bundled in by tsup; every harness
+ * tool lives in the MCP server, not the plugin.
  * This test loads dist/plugin.js from an isolated directory with NO
  * node_modules and asserts the module evaluates (builtins + relative paths
  * only at top level).
@@ -47,9 +47,8 @@ const BUILTIN_MODULES = new Set([
   'process',
 ]);
 
-/** Nothing is allowed: the tool cut removed the lazy duckdb require from the
- * plugin bundle — all harness tools (and their native dependency) live in the
- * MCP server now. */
+/** Nothing is allowed: the tool cut removed every lazy external from the
+ * plugin bundle — all harness tools live in the MCP server now. */
 const ALLOWED_LAZY_EXTERNALS = new Set<string>();
 
 describe('dist/plugin.js self-contained bundle', () => {
@@ -70,9 +69,9 @@ describe('dist/plugin.js self-contained bundle', () => {
     expect(bare).toEqual([]);
   });
 
-  it('carries no harness-tool code or duckdb references (hard cut)', () => {
+  it('carries no harness-tool code (hard cut)', () => {
     const src = fs.readFileSync(DIST_PLUGIN, 'utf8');
-    const forbidden = /duckdb|plan_read|plan_update_status|plan_create|read_sheet|update_sheet|sheet_schema|logged_command/;
+    const forbidden = /plan_read|plan_update_status|plan_create|logged_command/;
     expect(src.match(forbidden)).toBeNull();
   });
 

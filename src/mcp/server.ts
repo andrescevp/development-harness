@@ -1,7 +1,7 @@
 /**
  * server.ts — MCP server factory for the harness tools.
  *
- * Serves the 7 plan/sheet/command capabilities of the `dh` tool namespace.
+ * Serves the 4 plan/command capabilities of the `dh` tool namespace.
  * The opencode plugin registers agents and skills only; these tools live here
  * and are served over stdio by `src/mcp/stdio.ts`. Handlers are thin adapters
  * over the pure helpers in `src/tools/*`; the workspace root is injected by
@@ -19,7 +19,6 @@ import { runLoggedCommand } from '../tools/logged-command.js';
 import { appendPlanIndexRow, assertPlanIndexWritable, readPlanFile } from '../tools/plan-io.js';
 import { buildPlanTemplate, PHASE_STATUSES, parsePlan, STATUS_TARGETS, setStatus } from '../tools/plan-lifecycle.js';
 import { resolvePlanPath } from '../tools/plan-paths.js';
-import { readSheet, sheetSchema, updateSheet } from '../tools/sheet-tools.js';
 
 export interface BuildServerOptions {
   /** Absolute workspace root; plan paths anchor under `<root>/docs/plans`. */
@@ -160,56 +159,6 @@ export function buildServer({ workspaceRoot, version, instructions }: BuildServe
         }
         if (updateIndex) appendPlanIndexRow(workspaceRoot, slug, title);
         return textResult({ ok: true, path: file, plan });
-      })
-  );
-
-  server.registerTool(
-    'read_sheet',
-    {
-      description:
-        'Read tabular data (csv/xlsx) with DuckDB: returns columns, rows (JSON) and row count. csv read via read_csv_auto; xlsx via read_xlsx when the extension loads. Optional query (SELECT/WITH/DESCRIBE/SHOW) and limit. Use to retrieve data from generated sheets/documents.',
-      inputSchema: z.object({
-        path: z.string().describe('Absolute path to the csv/xlsx file'),
-        query: z.string().describe('Optional SQL (SELECT/WITH/DESCRIBE/SHOW) — can use read_csv_auto(?)').optional(),
-        limit: z.number().describe('Max rows to return').optional(),
-      }),
-    },
-    async ({ path: sheetPath, query, limit }) =>
-      guardedAsync(async () => {
-        const result = await readSheet(sheetPath, query, limit);
-        return textResult(result);
-      })
-  );
-
-  server.registerTool(
-    'update_sheet',
-    {
-      description:
-        "Apply an UPDATE/INSERT/DELETE query to a csv file via DuckDB and write the result back as CSV (HEADER, OVERWRITE_OR_IGNORE). Reads the file into a temp table named t — reference it in the query (e.g. UPDATE t SET col='x' WHERE id=1). Returns the updated rows + row count.",
-      inputSchema: z.object({
-        path: z.string().describe('Absolute path to the csv file'),
-        query: z.string().describe('UPDATE/INSERT/DELETE SQL against temp table t'),
-      }),
-    },
-    async ({ path: sheetPath, query }) =>
-      guardedAsync(async () => {
-        const result = await updateSheet(sheetPath, query);
-        return textResult(result);
-      })
-  );
-
-  server.registerTool(
-    'sheet_schema',
-    {
-      description: 'Describe a csv/xlsx file with DuckDB: returns column names + inferred types (column:type).',
-      inputSchema: z.object({
-        path: z.string(),
-      }),
-    },
-    async ({ path: sheetPath }) =>
-      guardedAsync(async () => {
-        const result = await sheetSchema(sheetPath);
-        return textResult(result);
       })
   );
 

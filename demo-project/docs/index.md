@@ -65,11 +65,3 @@ flowchart LR
 |  Try:  ask dh-software-architect to plan a task   |
 +--------------------------------------------------+
 ```
-
-## Tabular data demo
-
-`docs/data/people.csv` is queryable through the `dh` MCP server's DuckDB tools:
-
-```
-dh_read_sheet { path: "demo-project/docs/data/people.csv", query: "SELECT name FROM read_csv_auto(?) WHERE age > 30" }
-```

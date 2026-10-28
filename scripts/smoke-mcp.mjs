@@ -4,7 +4,7 @@
  *
  * The child's cwd is a fresh, canonicalised temp workspace (DH_WORKSPACE_ROOT
  * forced empty), so `process.cwd()` anchoring is exercised end-to-end. Checks:
- *   - tools/list exposes exactly the 7 harness tools (direct + symlink launch);
+ *   - tools/list exposes exactly the 4 harness tools (direct + symlink launch);
  *   - plan_create (updateIndex) returns { ok, path }, writes the file, appends
  *     the index row, and leaves no *.tmp residue;
  *   - plan_read returns the same path with phases/sub-tasks;
@@ -27,15 +27,7 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 const STDIO_ENTRY = path.join(REPO_ROOT, 'dist', 'mcp', 'stdio.js');
 const LOG = '[smoke-mcp]';
 const REQUEST_TIMEOUT_MS = 5_000;
-const EXPECTED_TOOLS = [
-  'logged_command',
-  'plan_create',
-  'plan_read',
-  'plan_update_status',
-  'read_sheet',
-  'sheet_schema',
-  'update_sheet',
-].sort();
+const EXPECTED_TOOLS = ['logged_command', 'plan_create', 'plan_read', 'plan_update_status'].sort();
 
 const startedAt = Date.now();
 let failures = 0;

@@ -13,8 +13,7 @@
 ARG OPENCODE_IMAGE=ghcr.io/anomalyco/opencode@sha256:aa0e5ac93543f24c99dfcc72a6ea7df335faec131dafc16f7607a2c7d3173d28
 FROM ${OPENCODE_IMAGE}
 
-# gcompat supplies the glibc loader that duckdb's native binding needs on musl.
-RUN apk add --no-cache nodejs npm git openssh-client gcompat
+RUN apk add --no-cache nodejs npm git openssh-client
 
 ARG UID=1000
 ARG GID=1000
@@ -27,10 +26,7 @@ RUN addgroup -g "${GID}" tester \
 WORKDIR /home/tester
 USER tester
 
-# Build-time smoke: fail if the toolchain or the gcompat loader is missing.
-# duckdb is deliberately not installed here; if a later layer adds it, this
-# run proves the glibc-linked binding can load. Otherwise the loader check is
-# the harmless gcompat assertion required by the plan.
+# Build-time smoke: fail if the toolchain is missing.
 RUN set -eu; \
     export HOME=/tmp/dh-smoke \
       XDG_CONFIG_HOME=/tmp/dh-smoke/.config \
@@ -45,11 +41,4 @@ RUN set -eu; \
     git --version; \
     ssh -V; \
     node -e 'const [major, minor] = process.versions.node.split(".").map(Number); if (major < 20 || (major === 20 && minor < 11)) { throw new Error("Node >= 20.11 required, found " + process.versions.node); }'; \
-    if node -e "require.resolve('duckdb')" >/dev/null 2>&1; then \
-      node -e "require('duckdb')"; \
-    else \
-      test -x /lib/ld-linux-x86-64.so.2; \
-      ldd --version >/dev/null 2>&1 || true; \
-      echo "duckdb module absent; gcompat glibc loader present"; \
-    fi; \
     rm -rf /tmp/dh-smoke

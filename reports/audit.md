@@ -1,10 +1,10 @@
 # Audit Report — dev-harness-skills plugin
 
-Generated 2026-10-19T04:17:23.949Z by `scripts/audit.mjs`.
+Generated 2026-10-28T17:15:06.688Z by `scripts/audit.mjs`.
 
 ## Verdict
 
-**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 141. Documented schema deviations: 0.
+**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 147. Documented schema deviations: 0.
 
 ## Summary verdict table
 
@@ -14,7 +14,7 @@ Generated 2026-10-19T04:17:23.949Z by `scripts/audit.mjs`.
 | Frontmatter parse | 25 | PASS | 25 files on audit surface |
 | Name regex | 24 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 1 | WARN | 433 resolved; 1 code-context; 0 allowlisted; 133 prose tokens (warn) |
+| Cross-references | 2 | WARN | 433 resolved; 0 code-context; 0 allowlisted; 138 prose tokens (warn) |
 | Loop membership | 24 | PASS | 17/17 skills present; 7/7 agents present |
 | Secret scan | 26 | PASS | 26 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
@@ -68,35 +68,36 @@ _None._
 
 | File | Line | Mention | Note |
 |---|---|---|---|
-| skills/dh-setup/SKILL.md | 90 | @graphify | unresolved @mention (external role/product or prose) — warn-only per plan |
+| skills/dh-setup/SKILL.md | 63 | @playwright | unresolved @mention (external role/product or prose) — warn-only per plan |
+| skills/dh-setup/SKILL.md | 80 | @graphify | unresolved @mention (external role/product or prose) — warn-only per plan |
 
 Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; full list in reports/audit.json):
 
 - `project-name` × 23
+- `project-scope` × 8
 - `osv-scanner` × 7
 - `phased-plan-template` × 5
 - `bounded-context` × 4
 - `mobile-mcp` × 4
 - `state-sync` × 3
 - `non-blocking` × 3
+- `best-effort` × 3
 - `implementation-agnostic` × 3
 - `chrome-devtools-mcp` × 3
 - `opencode-rules` × 3
 - `pre-commit` × 3
+- `development-harness` × 3
 - `dependency-cruiser` × 2
 - `language-standard` × 2
 - `system-wide` × 2
 - `project-level` × 2
 - `knip-style` × 2
 - `per-item` × 2
-- `best-effort` × 2
+- `round-trip` × 2
 - `domain-check` × 2
 - `anti-corruption` × 2
 - `re-running` × 2
 - `code-level` × 2
-- `re-review` × 2
-- `user-level` × 2
-- `cross-references` × 1
 
 ## Secret scan
 

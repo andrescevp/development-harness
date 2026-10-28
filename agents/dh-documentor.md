@@ -41,10 +41,7 @@ update, delete, retrieve) — everything EXCEPT plan documents
 - Retrieve information from documents with:
   - `notesmd-cli search-content "<term>" --vault "<project>"` (preferred),
   - `obsidian search query="<term>"`, or `rg` as fallback.
-- Parse extra formats with:
-  - `jq` (json), `yq` (yaml), `xq` (xml),
-  - **DuckDB** via the `dh` MCP server tools `dh_read_sheet`, `dh_update_sheet`,
-    `dh_sheet_schema` (csv/xlsx: query, update, describe). These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
+- Parse extra formats with `jq` (json), `yq` (yaml), and `xq` (xml).
 
 ## Operating Rules
 

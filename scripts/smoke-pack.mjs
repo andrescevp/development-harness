@@ -14,7 +14,7 @@
  *      lib/pack-install.mjs). `--legacy-peer-deps` skips peers the bundled
  *      plugin does not need; `--offline` fails on any registry request.
  *   4. Import `dev-harness-skills` by name, assert `{ id, setup }`, run both
- *      CLIs, and perform a minimal MCP handshake listing the 7 tools.
+ *      CLIs, and perform a minimal MCP handshake listing the 4 tools.
  *   5. Assert the installed `dist/assets` inventory (7 agents / 17 skills).
  *   6. Source mode: repo-root `index.ts` must remain and re-export
  *      `./src/plugin.js`. OpenCode directory discovery resolves `<dir>/index`

@@ -14,8 +14,8 @@
     // - Relative directory form from your project root:
     //   "../shared/dev-harness-skills"
   ],
-  // Project-scope MCP server serving the 7 harness tools (plan lifecycle,
-  // sheets, logged commands). The plugin itself registers agents + skills
+  // Project-scope MCP server serving the 4 harness tools (plan lifecycle and
+  // logged commands). The plugin itself registers agents + skills
   // only — add this block to the PROJECT's opencode.jsonc. The server starts
   // per project via npx from the git repository; `protocol` pins the native
   // MCP revision (legacy initialize clients are still served).
@@ -41,9 +41,7 @@
   //   opencode debug config → the plugin entry + mcp.servers.dh
   //   opencode mcp list     → `dh` connected (server/status only)
   //   expected tools        → dh_plan_read, dh_plan_update_status,
-  //                           dh_plan_create, dh_read_sheet,
-  //                           dh_update_sheet, dh_sheet_schema,
-  //                           dh_logged_command
+  //                           dh_plan_create, dh_logged_command
   //
   // Troubleshooting: see docs/LOADING.md.
 }
