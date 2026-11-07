@@ -30,6 +30,7 @@ const REQUIRED_KEYS = [
   'branch',
   'base_commit',
   'worktree_dirty',
+  'worktree_fingerprint',
   'plan_sha256',
   'phase_index',
   'subtask_index',
@@ -55,12 +56,20 @@ const REQUIRED_SECTIONS = [
 ] as const;
 
 const HISTORY_EVENTS = ['paused', 'resumed', 're-paused'] as const;
-const PAUSE_MARKERS = ['dh_plan_read', 'plan_sha256', 'status: paused', 're-paused', 'dh-resume-plan'];
+const PAUSE_MARKERS = [
+  'dh_plan_read',
+  'plan_sha256',
+  'worktree_fingerprint',
+  'status: paused',
+  're-paused',
+  'dh-resume-plan',
+];
 const RESUME_MARKERS = [
   'handoff_version',
   'status: paused',
   'merge-base --is-ancestor',
   'plan_sha256',
+  'worktree_fingerprint',
   '--diff-filter=U',
   'status: resumed',
   'resumed_at',
@@ -125,6 +134,7 @@ describe('handoff worked example', () => {
     expect(data.subtask_index).toBe('2.3');
     expect(data.phase_index).toBe(2);
     expect(data.tags).toEqual(['handoff', 'plan']);
+    expect(String(data.worktree_fingerprint)).toMatch(/^[a-f0-9]{64}$/);
     expect(String(data.progress)).toMatch(/^\d+\/\d+$/);
   });
 

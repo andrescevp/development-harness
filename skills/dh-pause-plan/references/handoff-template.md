@@ -5,10 +5,8 @@ Canonical format for `handoff.md` (written by `dh-pause-plan`, consumed by
 
 ## Contract overview
 
-- **Sidecar, not a second plan.** `plan.md` stays the only source of truth for
-  task status; the handoff never overrides it and captures session continuity.
-- **Session continuity.** It records where execution stopped, why, what is in
-  flight, what was decided, what was validated, and how to continue.
+- **Sidecar, not a second plan.** `plan.md` stays the source of truth for task status; the handoff never overrides it.
+- **Session continuity.** Records where execution stopped, why, what is in flight, what was decided, what was validated, and how to continue.
 - **One handoff per plan.** Re-pausing refreshes the snapshot and appends
   history; earlier rows are never discarded.
 - **Git is optional.** Unknown values are `null`; resume degrades to `plan_sha256` plus file evidence.
@@ -36,7 +34,8 @@ Quote timestamps and `subtask_index` (`"2.3"`); ISO-8601 UTC with `Z` is require
 | `resumed_at` | string \| null | Consuming resume timestamp; `null` while `status: paused`. |
 | `branch` | string \| null | Current git branch; `null` when git is unavailable or HEAD is detached (record the short SHA in Snapshot). |
 | `base_commit` | string \| null | Full 40-hex SHA of `HEAD` at pause; `null` when git is unavailable. |
-| `worktree_dirty` | boolean \| null | Whether `git status --porcelain` listed paths after excluding the handoff and `*.tmp`; `null` when git is unavailable. |
+| `worktree_dirty` | boolean \| null | Whether non-handoff, non-`*.tmp` worktree paths exist; content is covered by `worktree_fingerprint`; `null` when git is unavailable. |
+| `worktree_fingerprint` | string \| null | Lowercase SHA-256 over sorted `status<TAB>path<TAB>blob-SHA` lines for the recorded paths (`DELETED` when missing; untracked directories expanded with `git ls-files --others --exclude-standard`, `DIR_EMPTY` when empty), excluding the handoff and `*.tmp`; `null` when git or a hashing tool is unavailable (path set/content unknown). |
 | `plan_sha256` | string \| null | Lowercase SHA-256 of `plan.md` (`sha256sum` / `shasum -a 256`); `null` when no hashing tool exists. |
 | `phase_index` | integer \| null | 1-based phase number, e.g. `2`; `null` when no phase is active. |
 | `subtask_index` | string \| null | Sub-task id `"N.M"`, e.g. `"2.3"`; `null` when no sub-task is active. |
@@ -52,7 +51,7 @@ Quote timestamps and `subtask_index` (`"2.3"`); ISO-8601 UTC with `Z` is require
 - `## Current Position` — phase/sub-task index, title and status, previous completed, next in order, `progress`, ambiguity.
 - `## Work Completed` — one line per completed sub-task: outcome plus paths and review/commit ids (never contents).
 - `## Work In Flight` — files touched, intent, exact stopping point, what remains.
-- `## Uncommitted Changes` — paths only, grouped modified/added/deleted/untracked with a one-line purpose, excluding the handoff and `*.tmp`; `worktree_dirty` reflects the remaining paths; `None` when clean, `Unverifiable` without git.
+- `## Uncommitted Changes` — paths + content fingerprint, grouped modified/added/deleted/untracked with a one-line purpose, excluding the handoff and `*.tmp`; `worktree_dirty`/`worktree_fingerprint` reflect the remaining paths; `None` when clean, `Unverifiable` without git.
 - `## Decisions and Rationale` — decisions and why; constraints the next session must respect.
 - `## Blockers and Risks` — hard blockers, P0/P1 findings with their review path, risks, user input needed.
 - `## Validation State` — commands actually run with observed pass/fail/not run, and what to re-run. Never invent results.
@@ -69,10 +68,10 @@ the file for audit. Re-pause refreshes every snapshot field, sets
 row — prior rows are never deleted, reordered, or rewritten. An already
 `resumed` handoff is consumed: report it, never silently reuse it. Resume
 changes only `status`, `resumed_at`, `updated`, and the history row; the
-paused narrative remains the record.
+paused narrative remains the record. Content changes to a recorded dirty path
+are material on resume even when the path set is unchanged.
 
-Pause History columns: `Timestamp` | `Event` (`paused` | `resumed` | `re-paused`) |
-`Position` (`Phase N / Sub-Task N.M`, `—` if missing) | `Note` (no secrets, diffs, or contents).
+Pause History columns: `Timestamp` | `Event` (`paused` | `resumed` | `re-paused`) | `Position` (`Phase N / Sub-Task N.M`, `—` if missing) | `Note` (no secrets, diffs, or contents).
 
 ## Safety and redaction rules
 
@@ -104,6 +103,7 @@ resumed_at: null
 branch: feature/example-plan-execution
 base_commit: 4f2c9ab7d1e8c3a5b6d0e9f8a7c6b5d4e3f2a1b0
 worktree_dirty: true
+worktree_fingerprint: 3f786850e387550fdab836ed7e6dc881de23001b9f1f2f1a3c4d5e6f708192a3
 plan_sha256: 9b1d2f3a4c5e6b7a8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b
 phase_index: 2
 subtask_index: "2.3"

@@ -72,6 +72,9 @@ phased markers), and `sdd.md` when present. Require:
 - `plan_slug` and `plan_path` matching the requested plan and existing on
   disk;
 - every frontmatter field from the template, with its documented type;
+- `worktree_fingerprint` present as a lowercase 64-hex string or `null`;
+  missing or unknown stops the resume, and an unavailable hash is
+  `unverifiable` with confirmation;
 - all 11 required sections present and non-empty;
 - `status: paused`.
 
@@ -94,10 +97,13 @@ Collect evidence and classify it as **clean**, **explainable**, or **material**:
   explainable, but any changed path intersecting the handoff's recorded
   in-flight/uncommitted paths or `plan.md` is material and must be asked
   about.
-- **Worktree:** `git status --porcelain=v1` vs `worktree_dirty` and the paths
-  recorded in `## Uncommitted Changes`; matching state is clean, unrelated
-  additions are explainable, unexpected or missing recorded changes are
-  material.
+- **Worktree:** compare the path set from `git status --porcelain=v1` (minus
+  the handoff and `*.tmp`) with the recorded paths first; missing, unexpected,
+  or dirty-state mismatch changes are material/explainable as before. When the
+  set matches, recompute `worktree_fingerprint` over those paths
+  (`git hash-object` per file, `DELETED` when missing, sorted lines, SHA-256)
+  and compare: any difference is material. A null/uncomputable fingerprint is
+  unverifiable and requires confirmation — never clean or explainable.
 - **Plan hash:** recompute `plan_sha256` and compare; a mismatch is material
   and overrides any worktree "explainable" classification for `plan.md` —
   report the overall result as material, never as merely explainable. A null

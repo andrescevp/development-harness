@@ -43,6 +43,7 @@ so no separate assertion is needed.
 | F | Clean resume + consume | resume Steps 0–5 | clean; position 1.2; `resumed` + history; delegate | clean; `resumed`; delegation recorded | PASS |
 | G | Already resumed | resume again | reports consumed; no silent execution; no hash change | `already_resumed`; hashes unchanged | PASS |
 | H | Non-git degradation | pause + resume validation without git | null git fields; hash present; unverifiable + ask | nulls; `unverifiable`; ask | PASS |
+| I | Content-only drift (same paths) | edit already-dirty `src/feature.txt`; validate; edit `notes-wip.md`; validate | fingerprint mismatch → material; STOP | `d7b64f5c…` → `a945e5f5…` / `e7e53b0d…`; material | PASS |
 
 ## Key Evidence
 
@@ -58,6 +59,7 @@ blocked: false
 branch: master
 base_commit: 8a6e3f23f11a5b824ad3371a90d4ae1d93b6c19a
 worktree_dirty: true
+worktree_fingerprint: d7b64f5c0c0dfa8ec012ed0f889c15143979345d7f4e41e8657b9d15b6f69d44
 plan_sha256: 87acdbf2ef3a82c806adb7f42d56f67ac55cdf612f4078407c57c728e47f2e89
 created: 2026-11-07T05:07:24Z
 updated: 2026-11-07T05:07:24Z
@@ -65,10 +67,12 @@ updated: 2026-11-07T05:07:24Z
 
 After pause: HEAD unchanged, `plan.md` SHA-256 unchanged, commit count still 1,
 no stash, and the only new path was `docs/plans/demo-plan/handoff.md`. All 11
-sections present, 19 frontmatter keys, history contained one `paused` row.
+sections present, 20 frontmatter keys, history contained one `paused` row.
 Pre-pause status was ` M src/feature.txt` + `?? notes-wip.md`; the handoff
 recorded both paths (and not `rc/feature.txt`). The handoff file itself was
-excluded from the path list — it is the artifact, not in-flight work.
+excluded from the path list — it is the artifact, not in-flight work. The
+original A run predates `worktree_fingerprint`; the value shown is the
+equivalent scenario-I pause fingerprint for the same path set (paths + content).
 
 ### B — Re-pause
 
@@ -160,6 +164,7 @@ status: paused
 branch: null
 base_commit: null
 worktree_dirty: null
+worktree_fingerprint: null   # git unavailable: path set/content unknown
 plan_sha256: 87acdbf2ef3a82c806adb7f42d56f67ac55cdf612f4078407c57c728e47f2e89
 ```
 
@@ -169,6 +174,24 @@ worktree=unverifiable, conflicts=unverifiable, plan_hash=clean`;
 handoff remained `paused`. The body recorded `Git unavailable` and
 `Unverifiable (no git)`.
 
+### I — Content-only drift (same paths)
+
+Recorded at pause: paths `src/feature.txt` + `notes-wip.md`,
+`worktree_fingerprint: d7b64f5c…b6f69d44`. Editing `src/feature.txt` again
+kept the path set but changed the content:
+
+```
+path_set_equal: true
+fingerprint: d7b64f5c… -> a945e5f5…
+plan_hash: clean
+worktree: material (content fingerprint differs)
+overall: material | action: STOP and ask | handoff: paused
+```
+
+Editing `notes-wip.md` next: same path set, fingerprint
+`d7b64f5c… -> e7e53b0d…`, material, handoff `paused`. Restoring both files by
+copy (no destructive git) returned the fingerprint to `d7b64f5c…` and validation to `clean`.
+
 ## Post-clarification Checks
 
 Scratch `/tmp/dh-pause-clarify`: `git init`, tiny phased plan (1.1
@@ -176,20 +199,20 @@ Scratch `/tmp/dh-pause-clarify`: `git init`, tiny phased plan (1.1
 the clarified pause rules and inspected the written handoff.
 
 **(a) Only the handoff untracked.** After pause: `worktree_dirty: false`;
-`## Uncommitted Changes` = `None.`; the handoff appears in `git status` after
-the write but is excluded from the recorded path list.
+`## Uncommitted Changes` = `None.`; the handoff is excluded from the path list.
 
-**(b) `scratch.tmp` present (untracked).** Raw status listed
-`docs/plans/tiny-plan/handoff.md` and `scratch.tmp`; both were excluded;
-`listed_paths: []`; `worktree_dirty: false`; `scratch.tmp` is not listed in
+**(b) `scratch.tmp` present (untracked).** Raw status: handoff + `scratch.tmp`;
+both excluded; `listed_paths: []`; `worktree_dirty: false`; not listed in
 `## Uncommitted Changes`.
 
-**(c) Manual body edit, then re-pause.** Handoff edited to
-`KEEP-COMPLETED-ENTRY` (Work Completed), `KEEP-DECISION-ENTRY` (Decisions), and
-`MANUAL IN-FLIGHT EDIT` (Work In Flight). After re-pause: `created` preserved
-(`2026-11-07T06:08:42Z`), both KEEP entries preserved, Work In Flight
-regenerated (manual marker gone), history `paused, re-paused, re-paused`, and
-`worktree_dirty: false` (handoff + `*.tmp` excluded).
+**(c) Manual body edit, then re-pause.** Set `KEEP-COMPLETED-ENTRY`,
+`KEEP-DECISION-ENTRY`, and `MANUAL IN-FLIGHT EDIT`. After re-pause: both KEEP
+entries preserved, Work In Flight regenerated, history `paused, re-paused,
+re-paused`, `created` preserved, `worktree_dirty: false`.
+
+**(d) Untracked directory expansion.** `?? wip/` expanded to `wip/a.txt` +
+`wip/b.txt`; fingerprint `1f750a17…`, changing `wip/a.txt` produced
+`e759b9ef…` (differs).
 
 ## Resolved Ambiguities and Deviations
 
@@ -210,6 +233,8 @@ regenerated (manual marker gone), history `paused, re-paused, re-paused`, and
 - **Drift check overlap — resolved by** `dh-resume-plan` Step 2 plan-hash
   precedence: a `plan_sha256` mismatch is material and overrides any worktree
   "explainable" classification for `plan.md`.
+- **Content-only drift (P2) — resolved by** the additive `worktree_fingerprint`
+  field (template, pause Step 2, resume Step 2): same paths + changed content is material.
 - **Method (deviation note).** The steps were executed with a small local
   rehearsal helper (scratch only) that composed the handoff and evaluated the
   drift checks; the skills themselves were not invoked through an agent runner.
@@ -221,5 +246,5 @@ regenerated (manual marker gone), history `paused, re-paused, re-paused`, and
 ## Cleanup
 
 All scratch workspaces (`/tmp/dh-pause-rehearsal`,
-`/tmp/dh-pause-rehearsal-nogit`, `/tmp/dh-pause-clarify`) were removed after
-capturing this evidence.
+`/tmp/dh-pause-rehearsal-nogit`, `/tmp/dh-pause-clarify`,
+`/tmp/dh-pause-fingerprint`) were removed after capturing this evidence.

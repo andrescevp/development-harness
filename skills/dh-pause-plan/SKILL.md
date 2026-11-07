@@ -107,6 +107,16 @@ Run only read-only commands; never capture full diffs or file contents.
   path list; `worktree_dirty` reflects the remaining paths. If the handoff is
   the only untracked path, record `worktree_dirty: false` — the handoff is
   the artifact, not in-flight work.
+- `worktree_fingerprint`: over the non-handoff, non-`*.tmp` paths, build
+  `status<TAB>path<TAB>content-hash` lines (`git hash-object -- <path>` for
+  existing files, `DELETED` when missing), sort them, SHA-256 the
+  newline-joined block, and record lowercase 64-hex; `null` when git or a
+  hashing tool is unavailable (path set/content unknown). For an untracked
+  directory entry (`?? dir/`), expand it with
+  `git ls-files --others --exclude-standard -- <dir>/` and hash each file,
+  using a deterministic `DIR_EMPTY` sentinel when empty; record the expanded
+  file paths (not the directory) in the path list so resume compares the same
+  set. Refresh it on re-pause from current content.
 - `plan_sha256`: `sha256sum docs/plans/<slug>/plan.md` or
   `shasum -a 256 docs/plans/<slug>/plan.md`; `null` when neither exists.
 - Integrity snapshot: when `plan_sha256` is `null` (or always, as a cheap
@@ -128,7 +138,8 @@ do not restate or extend the contract here.
 
 - Frontmatter: every field in the template table, with `handoff_version: 1`,
   `status: paused`, `resumed_at: null`, `updated` = `paused_at` (ISO-8601
-  UTC), `created` preserved on re-pause, and `next_action` equal to
+  UTC), `created` preserved on re-pause, `worktree_fingerprint` refreshed from
+  current content like `worktree_dirty`, and `next_action` equal to
   `## Next Steps` step 1. Quote timestamps and `subtask_index`.
 - Sections: `## Snapshot`, `## Current Position`, `## Work Completed`,
   `## Work In Flight`, `## Uncommitted Changes`,
@@ -137,9 +148,10 @@ do not restate or extend the contract here.
   `## Pause History`.
 - `blocked: true` only for a hard blocker or open P0/P1 finding; explain it in
   `## Blockers and Risks`.
-- Uncommitted changes: paths grouped modified/added/deleted/untracked with a
-  one-line purpose, excluding `docs/plans/<slug>/handoff.md` and `*.tmp`;
-  `None` when clean, `Unverifiable` without git.
+- Uncommitted changes: paths grouped modified/added/deleted/untracked
+  (directories expanded to files) with a one-line purpose, excluding
+  `docs/plans/<slug>/handoff.md` and `*.tmp`; `None` when clean,
+  `Unverifiable` without git.
 - Re-pause: regenerate the changeable body sections (`## Work In Flight`,
   `## Uncommitted Changes`, `## Blockers and Risks`, `## Validation State`,
   `## Next Steps`, `## Current Position`, `## Snapshot`) from current state;
@@ -154,8 +166,10 @@ do not restate or extend the contract here.
 ### Step 4: Validate before reporting
 
 1. Frontmatter parses as YAML with exactly the template fields and types,
-   `handoff_version: 1`, `status: paused`, `resumed_at: null`, and
-   `plan_slug` / `plan_path` matching the plan directory.
+   `handoff_version: 1`, `status: paused`, `resumed_at: null`,
+   `plan_slug` / `plan_path` matching the plan directory, and
+   `worktree_fingerprint` as a lowercase 64-hex string or `null`; when `null`,
+   state that content drift is `unverifiable` — never fabricate it.
 2. All 11 required sections are present and non-empty.
 3. Plan integrity: recompute the SHA-256 of `docs/plans/<slug>/plan.md` and
    compare it with the Step 2 `plan_sha256`. When both are non-null they must

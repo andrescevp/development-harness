@@ -63,6 +63,35 @@ plan review.
 - `dist/` is gitignored and was rebuilt for the gate.
 - `/tmp/pause-resume-qa.log` and the grep logs remain local evidence.
 
+## Post-P2 Re-run
+
+Re-ran after the P2 re-review fixes: Biome formatting of the contract test,
+untracked-directory fingerprint expansion, git-unavailable null wording, and
+rehearsal evidence corrections.
+
+| Step | Result | Evidence |
+|---|---|---|
+| `lint:biome` | PASS | 101 files; 0 errors (5 warnings, 11 infos) |
+| `format:biome:check` | PASS | exit 0 |
+| `build` | PASS | tsup 3 entries + declarations; assets 7 agents / 19 skills |
+| `test` | PASS | 40 files, 669 tests |
+| `typecheck` | PASS | `tsc --noEmit` exit 0 |
+| `lint:links` | PASS | 34 references, no dead links |
+| `smoke-load` | PASS | valid `Plugin.define` bundle |
+| `smoke-mcp` | PASS | all smoke checks passed (227 ms) |
+| `smoke-pack` | PASS | tarball installs; 7 agents / 19 skills |
+| `vitest handoff-contract` | PASS | 11 tests |
+| Line caps | PASS | template 199, pause 244, resume 218, contract test 202 |
+| Untracked-directory check | PASS | `?? wip/` → `wip/a.txt` + `wip/b.txt`; `1f750a17…` → `e759b9ef…` on edit |
+
+Focused content-drift evidence (scenario I) remains in `rehearsal.md`: the path
+set is unchanged while `worktree_fingerprint` moves `d7b64f5c…` →
+`a945e5f5…` / `e7e53b0d…`, classified material/STOP.
+
+Scope: the six allowed files changed for this re-run; `tasks/review.md` is the
+reviewer's pre-existing uncommitted change and was not touched. The accepted
+`scan:deps` exception stands; Docker scanners were not re-run.
+
 ## Verdict
 
 **PASS with a documented, pre-existing dependency-scan exception.** All other
