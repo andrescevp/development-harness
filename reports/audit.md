@@ -1,10 +1,10 @@
 # Audit Report — dev-harness-skills plugin
 
-Generated 2026-11-07T06:18:30.476Z by `scripts/audit.mjs`.
+Generated 2026-11-07T14:06:53.974Z by `scripts/audit.mjs`.
 
 ## Verdict
 
-**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 174. Documented schema deviations: 0.
+**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 180. Documented schema deviations: 0.
 
 ## Summary verdict table
 
@@ -14,7 +14,7 @@ Generated 2026-11-07T06:18:30.476Z by `scripts/audit.mjs`.
 | Frontmatter parse | 27 | PASS | 27 files on audit surface |
 | Name regex | 26 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 2 | WARN | 492 resolved; 0 code-context; 0 allowlisted; 165 prose tokens (warn) |
+| Cross-references | 2 | WARN | 492 resolved; 0 code-context; 0 allowlisted; 171 prose tokens (warn) |
 | Loop membership | 26 | PASS | 19/19 skills present; 7/7 agents present |
 | Secret scan | 38 | PASS | 38 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
@@ -78,8 +78,8 @@ Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; f
 - `project-name` × 25
 - `project-scope` × 11
 - `osv-scanner` × 7
+- `re-pause` × 6
 - `handoff-template` × 6
-- `re-pause` × 5
 - `phased-plan-template` × 5
 - `bounded-context` × 4
 - `status-based` × 4

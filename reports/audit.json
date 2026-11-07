@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-11-07T06:18:30.476Z",
+    "generated": "2026-11-07T14:06:53.974Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 2,
         "sev": "WARN",
-        "note": "492 resolved; 0 code-context; 0 allowlisted; 165 prose tokens (warn)"
+        "note": "492 resolved; 0 code-context; 0 allowlisted; 171 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
@@ -148,7 +148,7 @@
       ]
     },
     {
-      "token": "handoff-template",
+      "token": "re-pause",
       "count": 6,
       "files": [
         "skills/dh-pause-plan/SKILL.md",
@@ -156,8 +156,8 @@
       ]
     },
     {
-      "token": "re-pause",
-      "count": 5,
+      "token": "handoff-template",
+      "count": 6,
       "files": [
         "skills/dh-pause-plan/SKILL.md",
         "skills/dh-resume-plan/SKILL.md"
@@ -414,6 +414,22 @@
       "files": [
         "skills/dh-pause-plan/SKILL.md",
         "skills/dh-resume-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "hash-object",
+      "count": 2,
+      "files": [
+        "skills/dh-pause-plan/SKILL.md",
+        "skills/dh-resume-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "ls-files",
+      "count": 2,
+      "files": [
+        "skills/dh-pause-plan/SKILL.md",
+        "skills/dh-setup/SKILL.md"
       ]
     },
     {
@@ -960,6 +976,34 @@
       ]
     },
     {
+      "token": "non-handoff",
+      "count": 1,
+      "files": [
+        "skills/dh-pause-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "content-hash",
+      "count": 1,
+      "files": [
+        "skills/dh-pause-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "newline-joined",
+      "count": 1,
+      "files": [
+        "skills/dh-pause-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "exclude-standard",
+      "count": 1,
+      "files": [
+        "skills/dh-pause-plan/SKILL.md"
+      ]
+    },
+    {
       "token": "brand-new",
       "count": 1,
       "files": [
@@ -1003,6 +1047,13 @@
     },
     {
       "token": "is-ancestor",
+      "count": 1,
+      "files": [
+        "skills/dh-resume-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "dirty-state",
       "count": 1,
       "files": [
         "skills/dh-resume-plan/SKILL.md"
@@ -1171,13 +1222,6 @@
     },
     {
       "token": "mcp-server-dh",
-      "count": 1,
-      "files": [
-        "skills/dh-setup/SKILL.md"
-      ]
-    },
-    {
-      "token": "ls-files",
       "count": 1,
       "files": [
         "skills/dh-setup/SKILL.md"
@@ -1773,7 +1817,7 @@
     {
       "file": "skills/dh-pause-plan/SKILL.md",
       "kind": "skill",
-      "lines": 231,
+      "lines": 245,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1827,7 +1871,7 @@
     {
       "file": "skills/dh-resume-plan/SKILL.md",
       "kind": "skill",
-      "lines": 213,
+      "lines": 219,
       "frontmatter": {
         "status": "ok",
         "errors": [],
