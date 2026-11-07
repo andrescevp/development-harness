@@ -883,3 +883,477 @@ None.
 - [ ] Mark the four ambiguities resolved in the rehearsal file (or add a resolution column), and add the handoff-only/`*.tmp` + re-pause-body assertions.
 - [ ] Add/mention the SDD fixture (or disclose its omission).
 - [ ] Commit the evidence file with the plan artifacts, then proceed to Sub-Task 4.2 and 4.3.
+
+---
+
+## Final Plan Review
+
+**Plan:** `pause-resume-plan-skills` · **Branch:** `feature/pause-resume-plan-skills`
+**Range reviewed:** `ef87c61...HEAD` (`701007d` feature, `0000726` audit refresh, `7be0da4` QA/release evidence) plus the working tree
+**Review date:** 2026-11-07
+**Overall risk:** Low–Medium
+**Verdict: Approve with comments**
+
+This is the binding plan-level sign-off. There are **no P0/P1 findings**. One non-blocking P2 (worktree
+content-dirtiness is not fingerprinted) and several P3 polish/evidence items are recorded below. The plan
+meets R1–R12 and AC1–AC12; the only non-green QA step is the documented, user-accepted `scan:deps`
+exception.
+
+### Status consistency
+
+| Phase | Plan status | Sub-tasks | Review status |
+|---|---|---|---|
+| Phase 1 — Handoff contract and skill authoring | Completed | 1.1, 1.2, 1.3 Completed | 1.1, 1.2 (+re-review), 1.3 (+re-review) approved; template 199 lines, both skills valid |
+| Phase 2 — Harness workflow integration | Completed | 2.1, 2.2 Completed | 2.1 and 2.2 approved; the 2.1 P3 (loop 2.4 pause note) is now closed |
+| Phase 3 — Inventory and automated enforcement | Completed | 3.1, 3.2, 3.3 Completed | 3.1 approved; 3.2 re-review approved; 3.3 approved |
+| Phase 4 — Validation and release readiness | **In Progress** | 4.1, 4.2 Completed; 4.3 **In Progress** (this review) | Rehearsal and QA evidence complete; this review is the final gate |
+
+- No status inconsistency: Phase 1–3 are `Completed`; Phase 4 remains `In Progress` until 4.3 closes.
+- Plan frontmatter (`plan.md:7`) and the `docs/plans/index.md:10` row are still `Pending`. That is the
+  required pre-sign-off state; both must be flipped to `Completed` in the sign-off commit after this
+  verdict. This review does not modify them.
+- Diff scope is clean: no `package.json`/`pnpm-lock.yaml`, parser, `PHASE_STATUSES`, MCP tool, commands,
+  or prompts changed.
+- Disclosed deviations (accepted, non-blocking): the 4.1 rehearsal used a local helper rather than an
+  agent runner and omitted the scratch `sdd.md` fixture, exercising the absent-SDD path
+  (`tasks/rehearsal.md:26-31,213-219`). The behavior evidence is still complete for A–H.
+
+### Requirements coverage
+
+| ID | Result | Evidence |
+|---|---|---|
+| R1 — `dh-pause-plan` triggers + safe workflow | PASS | `skills/dh-pause-plan/SKILL.md:2-14` (pause/suspend/stop/end-session/handoff/save-progress triggers), Steps 0–5 at 55–191 |
+| R2 — `dh-resume-plan` triggers + validated workflow | PASS | `skills/dh-resume-plan/SKILL.md:2-14`, Steps 0–5 at 51–169 |
+| R3 — versioned `handoff.md` beside `plan.md` | PASS | Template 19 fields / 11 sections at `skills/dh-pause-plan/references/handoff-template.md:27-61`; path contract 3–14 |
+| R4 — pause read-only, idempotent, history-preserving | PASS | Core rules 30–51; no status/commit/stash/reset/checkout/branch mutation; re-pause 143–152; rehearsal A/B and post-clarification (c) |
+| R5 — resume validates and detects material drift | PASS with P2 comment | Version/slug/fields/sections/status at 65–80; branch/ancestry/worktree/plan-hash/conflicts at 82–116. Worktree drift is path-level only — see the P2 below |
+| R6 — plan truth, rehydrate, consume, delegate | PASS | Reconcile 118–133; summary 135–149; consume only after availability check at 151–166 |
+| R7 — execute-plan guard + task pause recommendations | PASS | `skills/dh-execute-plan/SKILL.md:23,43,105,112`; `skills/dh-execute-plan-task/SKILL.md:79,122,161` |
+| R8 — no `Paused` status/parser/MCP change | PASS | `src/tools/plan-lifecycle.ts:21` still exactly 3 statuses; no `src/mcp` diff; contract test 182–187 |
+| R9 — 17 → 19 inventory everywhere | PASS | `src/cli/plugin-artifact.ts:34`, `scripts/lib/shared.mjs:28-49`, smoke/install/pack/docker scripts, tests, AGENTS/README/LOADING/index/audit; stale-count grep is zero on the active surface |
+| R10 — automated handoff contract test | PASS | `src/__tests__/handoff-contract.test.ts` 192 lines / 11 tests; parses the real template table and required-sections list (93–113), example (115–160), both skills (163–180), 3-status guard (182–187) |
+| R11 — rehearsal + full QA gate | PASS with accepted exception | `tasks/rehearsal.md` A–H + post-clarification checks; `tasks/qa-gate.md`; only `scan:deps` is non-green (documented/accepted) |
+| R12 — docs + plans index | PASS | `AGENTS.md:12-16,51-57`, `README.md:3,9,146,213-218`, `skills/index.md:3-5,20-34,76-81,88-110`, `docs/LOADING.md`, `opencode.example.jsonc`; plan row `docs/plans/index.md:10` (Pending until sign-off) |
+
+### Acceptance criteria coverage
+
+| AC | Result | Evidence |
+|---|---|---|
+| AC1 — pause creates the versioned handoff; plan byte-identical; no commit/stash/reset/checkout | PASS | Rehearsal A (46–71); skill Step 4 hash comparison 160–170; Core Rules 32–35 |
+| AC2 — re-pause refreshes + appends history, preserving rows | PASS | Rehearsal B (73–81) and E2 (119–129); skill 143–152 |
+| AC3 — no secrets/diffs/contents; paths only | PASS | Template safety 77–90; pause 36–41, 140–142; audit 0 high-signature; no secret-like values in the diff |
+| AC4 — clean resume validates, summarizes, marks resumed, delegates | PASS | Rehearsal F (131–146); resume 135–166 |
+| AC5 — branch/HEAD/plan-hash drift stops; no destructive git | PASS | Rehearsal C/D/E (83–129); resume 82–116 and 31–33. (Path-level worktree caveat: P2) |
+| AC6 — already-resumed reports consumed | PASS (explicit slug) | Rehearsal G (148–154); resume Step 0.3 (61–63). P3: a no-argument scan reports “none” rather than the consumed handoff |
+| AC7 — multiple paused asks; non-git pauses/resumes with warning | PASS | Resume 55–60, 109–112, 185–186; Rehearsal H (156–170). Multiple-paused is text-only (P3 evidence gap) |
+| AC8 — execute-plan redirects to resume | PASS | `skills/dh-execute-plan/SKILL.md:23,43-47,105,112` |
+| AC9 — parser stays three-valued; existing tests pass | PASS | `PHASE_STATUSES` unchanged; 669/669 tests pass |
+| AC10 — inventory gates 19; contract test fails on removed field/section | PASS | Inventory/audit/smoke; contract test parses table/list/example; prior negative-case simulation (18 fields / 10 sections would fail) |
+| AC11 — full QA gate + rehearsal coverage | PASS with accepted exception | `tasks/qa-gate.md`; independent re-run of test/typecheck/biome/links/build/smokes below |
+| AC12 — docs/index consistent; pack unchanged except new skill assets | PASS | 19-skill counts across active docs; `smoke-pack` 7 agents/19 skills, no docs/plans; index row pending until sign-off |
+
+### Findings
+
+#### [P0] Blocking
+
+None.
+
+#### [P1] High
+
+None.
+
+#### [P2] Worktree drift is path-only; same dirty path with changed content is classified clean
+
+- **Location:** `skills/dh-resume-plan/SKILL.md:97-100`; contract at
+  `skills/dh-pause-plan/references/handoff-template.md:39,55`
+- **Why it matters:** The handoff records only paths (and a boolean), never a content fingerprint for
+  uncommitted files. On resume, “matching state is clean” means only that the same paths are still dirty.
+  A concurrent session can edit a file that was already listed under `## Uncommitted Changes`, leave it
+  dirty, and resume will not detect it — then execute the next step against changed content. This
+  contradicts the plan’s stated mitigation “Concurrent sessions → no lock; detect drift and warn rather
+  than overwrite” (`plan.md:63`).
+- **Evidence:** Pause records paths and one-line purposes only (`skills/dh-pause-plan/SKILL.md:140-142`;
+  template 55); the only resume worktree test is `git status --porcelain=v1` vs the recorded path set
+  (97–100); rehearsal E covers a *committed* recorded path, not a changed dirty path.
+- **Fix:** Record a per-path fingerprint at pause — e.g. `git hash-object <path>` blob SHAs for modified
+  files plus a hash of untracked file contents, or a `git diff --numstat` summary — and compare on resume;
+  content changes to a recorded path become material. Alternatively, downgrade “matching paths” to
+  “content-unverified/explainable” and require confirmation whenever a recorded path is still dirty.
+  This is an additive contract change, so it can be a follow-up (no full diffs, no secrets).
+
+#### [P3] Additive versioning rule conflicts with strict resume validation
+
+- **Location:** `skills/dh-pause-plan/references/handoff-template.md:18-21` vs
+  `skills/dh-resume-plan/SKILL.md:70-76`
+- **Why it matters:** The template says additive field/section changes do **not** bump
+  `handoff_version`, while resume accepts only version `1` and requires “every frontmatter field from the
+  template” and “all 11 required sections”. After a future additive change, a valid version-1 handoff
+  written before it would be rejected as incomplete. The contract test only covers the current snapshot.
+- **Fix:** Either bump the version whenever a required field/section is added, or allow missing
+  additive fields/sections with documented defaults in resume (and state which are optional).
+
+#### [P3] Stale “future consumer” wording for `dh-resume-plan`
+
+- **Location:** `skills/dh-pause-plan/SKILL.md:222`
+- **Why it matters:** The pause skill still describes `dh-resume-plan` as a “future consumer”, but the
+  resume skill is bundled in this change. This is a small documentation inconsistency in a skill that
+  agents read as current instructions.
+- **Fix:** Change to “consumer that validates the handoff and re-enters execution”.
+
+#### [P3] No-argument resume does not report an already-consumed handoff
+
+- **Location:** `skills/dh-resume-plan/SKILL.md:55-63`
+- **Why it matters:** AC6 is satisfied when the user passes the slug (Step 0.3), but with no argument the
+  scan selects only `status: paused`; a consumed (`resumed`) handoff is reported as “0 paused handoffs”
+  and the user is sent to status-based execution without being told it was already consumed. The result is
+  safe, but it loses the explicit consumed report AC6 calls for.
+- **Fix:** Scan all `docs/plans/*/handoff.md`; when no paused handoff exists, report any `resumed` handoff
+  as consumed before suggesting status-based `dh-execute-plan`.
+
+#### [P3] Delegation failure after consume has no recovery path
+
+- **Location:** `skills/dh-resume-plan/SKILL.md:151-166`; error handling 188-189
+- **Why it matters:** Step 5 verifies `dh-execute-plan` availability before editing the handoff, but if
+  the invocation itself fails after the handoff is marked `resumed`, the handoff is consumed while
+  execution never started. Error Handling only covers a handoff write failure, so the user must discover
+  that a fresh `dh-pause-plan` is the recovery.
+- **Fix:** State that a failed delegation leaves the handoff `resumed` and requires a fresh pause, or
+  restore `status: paused` on delegation failure.
+
+#### [P3] Null recorded branch is ambiguous between non-git pause and detached HEAD
+
+- **Location:** `skills/dh-resume-plan/SKILL.md:86-88` vs 109-112
+- **Why it matters:** Pause writes `branch: null` when git was unavailable **or** HEAD was detached. At
+  resume, a named branch now with a null recorded branch can be read as “a different branch → material”
+  (86–88) instead of “branch is unverifiable” (109–112). The outcome is safe (it asks), but a non-git
+  pause later resumed in a git checkout is misclassified as material.
+- **Fix:** State explicitly that a null recorded `branch`/`base_commit` is always unverifiable, regardless
+  of the current git state; only a non-null recorded branch that differs is material.
+
+#### [P3] Rehearsal evidence gaps and helper method disclosure
+
+- **Location:** `docs/plans/pause-resume-plan-skills/tasks/rehearsal.md:35-45,213-219`
+- **Why it matters:** The required A–H scenarios pass, but the rehearsal does not cover multiple paused
+  handoffs, detached HEAD at pause, corrupt/unknown-version handoffs, a missing `plan.md`, or a
+  hashing-tool-unavailable resume. The plan’s 4.1 setup also called for a scratch `sdd.md`; the rehearsal
+  deliberately omits it and exercises the absent-SDD path (`rehearsal.md:26-31`). The method note also
+  discloses that a local helper, not the skills through an agent runner, executed the steps. These are
+  evidence-completeness gaps and a disclosed deviation, not observed behavior failures.
+- **Fix:** Add one short scenario per missing branch (or explicitly defer them with rationale) and keep
+  the helper/SDD disclosures; no production change is implied.
+
+#### [P3] Contract test does not guard the execute-plan/task integration
+
+- **Location:** `src/__tests__/handoff-contract.test.ts:163-180`
+- **Why it matters:** R7’s integration is text-only: the contract test asserts the handoff template and
+  both lifecycle skills, but not the paused-handoff guard in `dh-execute-plan` or the pause
+  recommendations in `dh-execute-plan-task`. A future edit could remove the guard while all tests stay
+  green. R10 does not require it, so this is an enhancement.
+- **Fix:** Add structural markers for the guard and task pause recommendations (as `PAUSE_MARKERS`/
+  `RESUME_MARKERS` already do for the two new skills).
+
+### Dependency-scan exception disposition
+
+**Accepted — no action in this plan.** `scan:deps` reports 20 known vulnerabilities on this branch
+(`zod`, `undici`, `minimatch`, `glob`, `ip-address`) versus 28 on `develop`; this diff changes neither
+`package.json` nor `pnpm-lock.yaml`, so it does not introduce or worsen them. The exception is recorded
+in `tasks/qa-gate.md:37-47` and `tasks/release-checks.md:77-82`; the user accepted it on 2026-11-07.
+No gate was skipped, weakened, or re-pointed. Remediation is dependency-upgrade work outside this
+plan’s scope. All other `qa:check:full` steps are green.
+
+### Independent validation (this review)
+
+- `pnpm test` → 40 files, **669/669** passed; no skipped/only tests in the diff.
+- `pnpm typecheck` → exit 0; `pnpm lint:biome` → 101 files, 0 errors (pre-existing 5 warnings/11 infos);
+  `pnpm lint:links` → **34** references, 0 dead (the evidence files record 32 at their earlier run);
+  `pnpm lint:knip`, `pnpm lint:dup` (0 clones), `pnpm lint:depcruise` (39 modules/92 deps, no violations)
+  → clean.
+- `pnpm build` → 3 entries + declarations; `dist/assets` = **7 agents / 19 skill dirs** (+ `index.md`);
+  `dist/assets/skills/dh-pause-plan/references/handoff-template.md` is present.
+- `node scripts/smoke-load.mjs`, `smoke-mcp.mjs`, `smoke-pack.mjs` (206 files, 7/19, no src/docs/tests/
+  plans), and `smoke-install.mjs` → all pass.
+- `reports/audit.md`/`audit.json` (committed in `0000726`) → verdict **PASS**, 0 fails, 0 high-signature
+  secrets, 19/19 skills present. `pnpm run audit` was not re-run to avoid rewriting tracked reports.
+- Working tree was clean at review start; this review only appends this section. `dist/` and
+  `report/jscpd-report.md` are gitignored.
+
+### Security, rollback, and regression notes
+
+- **Secrets:** no sensitive files or credential-shaped values in the diff; audit high-signature count 0.
+  The handoff examples use fake hashes and contain only redaction rules.
+- **Rollback:** revert `701007d` (feature), `0000726` (audit refresh), and `7be0da4` (evidence) as a unit;
+  rebuild `dist/` because it is gitignored. No schema/data migration exists. Handoff files are inert
+  documents; plan statuses were never part of the mutation, and removing the guard restores the previous
+  status-based execute-plan path.
+- **Regressions:** no parser/MCP/runtime changes; the 19-skill inventory is consistent across source,
+  tests, smoke, audit, and active docs; the no-handoff execution path is unchanged.
+
+### Deferred items
+
+- **P2 worktree content fingerprint** — follow-up (contract additive change + test); non-blocking.
+- **P3 versioning rule / stale wording / no-arg consumed report / delegation-failure recovery /
+  branch-null ambiguity** — documentation and robustness polish; no runtime impact.
+- **P3 rehearsal gaps and R7 contract markers** — evidence/test improvements for a future pass.
+- **Post-sign-off (required to close):** mark Sub-Task 4.3 and Phase 4 `Completed`, set `plan.md`
+  frontmatter `status: Completed`, and set the `docs/plans/index.md:10` row to `Completed`; commit the
+  final review and status update. Do not tag without approval.
+
+### Release recommendation
+
+**Minor version bump.** The change adds two bundled skills and is additive/non-breaking; the current
+package is `0.5.0-rc.1` and the latest tag is `v0.4.0`. Recommend `0.5.0` (or `0.5.0-rc.2` if the RC line
+is being continued) — **no major bump**, and **no tag** until explicitly approved and the post-sign-off
+status/index commit lands.
+
+### Final decision
+
+**Approve with comments.** R1–R12 and AC1–AC12 are met; no P0/P1 findings; the P2 is a non-blocking
+drift-hardening follow-up and the P3s are documentation/evidence polish. The plan is release-ready once
+the 4.3 sign-off status and plans-index row are committed.
+
+---
+
+## P2 Resolution Re-review
+
+**Reviewed against:** the Final Plan Review’s P2 — worktree drift was path-only and classified same-path
+content changes as clean (`skills/dh-resume-plan/SKILL.md:97-100`, `handoff-template.md:39,55`).
+**Scope:** uncommitted changes since that review only: `skills/dh-pause-plan/SKILL.md`,
+`skills/dh-pause-plan/references/handoff-template.md`, `skills/dh-resume-plan/SKILL.md`,
+`src/__tests__/handoff-contract.test.ts`, and `docs/plans/pause-resume-plan-skills/tasks/rehearsal.md`.
+No plan-status or index changes were made.
+**Verdict: Approve with comments** — the P2 behavior fix is accepted; one new **P2 release-gate
+regression** (Biome formatting) and P3 evidence/clarity items remain.
+
+### P2 resolution
+
+| Original P2 | Status | Evidence |
+|---|---|---|
+| Same-path content edits were classified clean; concurrent edits could be missed | **FIXED** | Template adds `worktree_fingerprint` (`handoff-template.md:37-38`); status lifecycle makes content changes material even with an unchanged path set (71–72); pause computes a sorted `status<TAB>path<TAB>blob-SHA` SHA-256 (`dh-pause-plan/SKILL.md:110-114`); resume compares the path set first and then the fingerprint, with any difference material (`dh-resume-plan/SKILL.md:97-108`) |
+| Null/missing fingerprint could be treated as clean/explainable | **FIXED** | Resume Step 1 requires the field and accepts only lowercase 64-hex or `null`; missing/unknown stops; unavailable hash is unverifiable with confirmation (`dh-resume-plan/SKILL.md:75-77`); Step 2 states “null/uncomputable … never clean or explainable” (105–108) |
+| Evidence must prove the content-only case | **PASS** | Rehearsal I: equal path set, fingerprint `d7b64f5c…` → `a945e5f5…` / `e7e53b0d…`, plan hash clean, worktree/overall material, STOP, handoff paused (`rehearsal.md:176-193`). Independent simulation in a throwaway git repo also changed the fingerprint with the same paths (`9fbbf585…` → `080cb73c…`) |
+
+**No migration needed for this branch:** no `handoff.md` exists in the repository or git history, and
+the pause/resume feature is unreleased (latest tag `v0.4.0`). The new field is part of the initial
+unreleased v1 contract. If v1 had already shipped, adding a *required* field would be a breaking change;
+the existing P3 about the additive-versioning rule versus strict resume validation therefore remains
+relevant for future contract evolution.
+
+### Contract, limits, and tests
+
+- Template `199` lines (≤200); `dh-pause-plan` `238` and `dh-resume-plan` `218` lines (≤250);
+  `handoff-contract.test.ts` `195` lines.
+- Contract test has **20** required keys, asserts the example’s 64-hex fingerprint, and still parses the
+  authoritative `## Frontmatter fields` table and `## Required sections` list. Full suite: **40 files /
+  669 tests passed**.
+- `pnpm typecheck` → 0; `pnpm lint:links` → 34 references, 0 dead; `pnpm build` → 7 agents / 19 skills;
+  `pnpm lint:knip`, `lint:dup` (0 clones), `lint:depcruise` (39 modules/92 deps) → pass.
+- No changes to the 19-skill inventory, parser/`PHASE_STATUSES`, MCP tools, execute-plan guard, or
+  execute-plan-task pause recommendations.
+- R1–R12/AC1–AC12 coverage: R3/R5/R10 are strengthened by the new field; R11/AC11 is not fully
+  re-certified until the Biome fix and gate re-run; all other requirements and criteria are unchanged.
+
+### Findings
+
+#### [P0] Blocking
+
+None.
+
+#### [P1] High
+
+None.
+
+#### [P2] Biome formatting gate regression in the contract test
+
+- **Location:** `src/__tests__/handoff-contract.test.ts:59`
+- **Why it matters:** The new `PAUSE_MARKERS` array is a single line that Biome’s formatter wants split
+  across multiple lines. `pnpm lint:biome` and `pnpm format:biome:check` now exit **1** with
+  “Formatter would have printed the following content”, so the repository’s `qa:check` gate fails at its
+  first step. The tests themselves pass, but the release gate is not green after the P2 fix, and the
+  existing QA evidence predates this change.
+- **Evidence:** `pnpm exec biome check src/__tests__/handoff-contract.test.ts` → 1 error at line 59;
+  full `pnpm lint:biome` → “Found 1 error” (plus the pre-existing 5 warnings/11 infos). The failure is
+  caused by adding `'worktree_fingerprint'` to the previously single-line array.
+- **Fix:** Run `pnpm format:biome` (or break `PAUSE_MARKERS` into the multi-line form shown by Biome),
+  then re-run `pnpm qa:check:full` (or at minimum `lint:biome`, `format:biome:check`, and the test suite)
+  and refresh the QA evidence. This is mechanical; no functional change is implied.
+
+#### [P3] Rehearsal evidence is partially stale after adding the field
+
+- **Location:** `docs/plans/pause-resume-plan-skills/tasks/rehearsal.md:70` (A) and `160-174` (H)
+- **Why it matters:** Scenario A still says “19 frontmatter keys” although the contract now has 20, and
+  the non-git scenario H does not show `worktree_fingerprint: null` (or otherwise demonstrate the field’s
+  non-git value). A reader cannot confirm the 20-key contract or the null-handling path from the evidence.
+- **Fix:** Update A to 20 keys and add the missing `worktree_fingerprint: null` line/assertion to H (or
+  state explicitly that H is a partial frontmatter excerpt).
+
+#### [P3] `worktree_fingerprint` null condition omits git-unavailable
+
+- **Location:** `skills/dh-pause-plan/references/handoff-template.md:38`; `skills/dh-pause-plan/SKILL.md:110-114`
+- **Why it matters:** The field table says `null` when no hashing tool exists, but not when git (and thus
+  the path set) is unavailable. In a non-git pause, the algorithm’s “over the non-handoff paths” input is
+  undefined; an agent could hash an empty block and record a valid-looking 64-hex fingerprint with no
+  path set. Resume still marks the handoff unverifiable because `branch`/`base_commit` are null, but the
+  field semantics should be explicit.
+- **Fix:** State that `worktree_fingerprint` is `null` when either no hashing tool exists **or** git is
+  unavailable (path set unknown), and never fabricate an empty-block hash for an unknown worktree.
+
+#### [P3] Fingerprint algorithm does not address untracked directories
+
+- **Location:** `skills/dh-pause-plan/SKILL.md:110-114`; `skills/dh-resume-plan/SKILL.md:101-108`
+- **Why it matters:** `git status --porcelain=v1` can list an untracked directory as `?? dir/`; in that
+  case the path is not a file and `git hash-object -- dir/` fails. The algorithm only defines the
+  existing-file and `DELETED` cases, so an untracked directory can make the fingerprint uncomputable or
+  produce an improvised value. Resume’s “uncomputable → unverifiable” rule keeps this safe, but the
+  pause-side behavior should be defined.
+- **Fix:** Use `git status --porcelain=v1 -uall` and expand directory entries to files (or mark the
+  fingerprint uncomputable/unverifiable when a path is not a regular file).
+
+#### Existing P3s (still deferred)
+
+The previously recorded P3s remain: the additive-versioning rule versus strict resume validation; the
+stale “future consumer” wording (`skills/dh-pause-plan/SKILL.md:222`); no-argument resume not reporting
+an already-consumed handoff; delegation-failure recovery after consume; null-branch ambiguity between
+non-git and detached HEAD; the broader rehearsal gaps (multiple paused, detached HEAD, corrupt/missing
+plan, hashing-unavailable) and disclosed helper/no-SDD method; and the missing contract-test markers for
+the execute-plan/task integration. The P2 fix is additive and does not worsen these.
+
+### Updated verdict
+
+**Approve with comments.** The original P2 is genuinely resolved: a same-path content edit now produces
+a material fingerprint mismatch, and a null/missing fingerprint is unverifiable with confirmation, not
+clean. No new functional P0/P1/P2 was introduced; the only new **P2** is the mechanical Biome formatting
+failure above, which must be fixed and the QA gate re-run before merge/release. The P3s are evidence and
+edge-case clarity items and may remain deferred.
+
+Release recommendation is unchanged: **minor** (`0.5.0`, or `0.5.0-rc.2` if continuing the RC line);
+**do not tag** until the formatting fix, the refreshed QA gate, and the post-sign-off plan/index status
+commit are complete.
+
+---
+
+## Final Verification
+
+**Plan:** `pause-resume-plan-skills` · **Branch:** `feature/pause-resume-plan-skills`
+**Range/state:** current working tree on top of `7be0da4`; changes since the P2 re-review are the
+`worktree_fingerprint` contract, pause/resume fingerprint rules, untracked-directory expansion, test
+formatting, rehearsal evidence, and the post-P2 QA evidence.
+**Reviewer scope:** verification only; no implementation, plan-status, or index changes were made by this
+review. The only file written by this section is this review.
+**Overall risk:** Low.
+**Verdict: Approve with comments** — P3-only comments; no P0/P1/P2.
+
+This is the final binding verification for the 4.3 close-out. The P2 content-drift gap is resolved, the
+formatting gate is green, and the plan is ready to close once the post-sign-off status/index update is
+committed. The remaining comments are non-blocking P3 evidence/edge-case items.
+
+### Verification matrix
+
+| Area | Result | Evidence |
+|---|---|---|
+| Biome lint | **PASS** | `pnpm lint:biome` → 101 files, 0 errors (5 pre-existing warnings, 11 infos), exit 0 |
+| Biome format | **PASS** | `pnpm format:biome:check` → exit 0 |
+| Unit tests | **PASS** | `pnpm test` → 40 files, **669/669** tests |
+| Typecheck | **PASS** | `pnpm typecheck` → exit 0 |
+| Markdown links | **PASS** | `pnpm lint:links` → 34 references, 0 dead |
+| Build/artifacts | **PASS** | `pnpm build` → 3 tsup entries + declarations; assets 7 agents / 19 skill dirs (+ `index.md`) |
+| Smoke load/MCP/pack/install | **PASS** | `smoke-load`, `smoke-mcp`, `smoke-pack` (206 files; 7/19; no src/docs/tests/plans), `smoke-install` all exit 0 |
+| Knip/duplication/dependency-cruiser | **PASS** | `lint:knip` exit 0; `lint:dup` 0 clones; `lint:depcruise` 39 modules/92 deps, no violations |
+| Harness audit | **PASS** | Independent `node scripts/audit.mjs` → verdict PASS, exit 0, 0 failures/0 high-signature secrets (reports restored; see P3 evidence note) |
+| Contract test | **PASS** | 20 required keys; 11 tests; parses the authoritative field table, required-sections list, and worked example |
+| Line limits | **PASS** | Template 199 ≤200; pause 244 and resume 218 ≤250; contract test 202 ≤220 |
+| Status model | **PASS** | `PHASE_STATUSES` exactly `Pending | In Progress | Completed`; no parser or MCP change |
+| Dependency scan | **ACCEPTED EXCEPTION** | 20 vulns vs 28 on `develop`; no `package.json`/`pnpm-lock.yaml` change; user accepted; no gate weakened |
+
+### P2/P3 disposition
+
+| Item | Status | Evidence |
+|---|---|---|
+| P2 — same-path content drift classified clean | **FIXED** | `worktree_fingerprint` is a required 20th v1 field; pause computes sorted `status<TAB>path<TAB>blob-SHA` lines; resume compares path set first, then fingerprint, and any difference is material (`dh-resume-plan/SKILL.md:100-108`); null/missing is unverifiable with confirmation (`75-77`, `105-108`) |
+| P2 evidence — content-only edits | **PASS** | Rehearsal I: equal path set, `d7b64f5c…` → `a945e5f5…` / `e7e53b0d…`, plan hash clean, material/STOP, handoff paused (`rehearsal.md:177-193`) |
+| P3 — untracked directory expansion | **PARTIAL (P3 remains)** | Pause expands `?? dir/` with `git ls-files --others --exclude-standard`, hashes each file, uses `DIR_EMPTY`, and records expanded file paths (`dh-pause-plan/SKILL.md:114-118`; template 38; rehearsal (d) `213-215`). Resume still derives its path set from raw `git status --porcelain=v1` (`dh-resume-plan/SKILL.md:100-108`), so a clean untracked directory can look like a path-set mismatch (false material/explainable, not false clean) |
+| P3 — git-unavailable/null fingerprint | **FIXED** | Template and pause state `null` when git or hashing is unavailable (path set/content unknown); H shows `worktree_fingerprint: null` and unverifiable/ask (`rehearsal.md:160-175`) |
+| P3 — rehearsal counts | **FIXED** | A now says 20 frontmatter keys (`rehearsal.md:70`); H shows the null fingerprint; (d) shows directory expansion |
+| P3 — Biome formatting regression | **FIXED** | `PAUSE_MARKERS` is multi-line and both Biome gates exit 0 |
+| Additive field vs version-1 | **NO MIGRATION NEEDED** | No `handoff.md` exists in the repo or git history; the feature is unreleased (latest tag `v0.4.0`), so this is the initial v1 contract. If v1 had shipped, the required additive field would be breaking; the future-versioning P3 remains |
+
+### Requirements / acceptance criteria
+
+| Coverage | Result |
+|---|---|
+| R1–R12 | **PASS** — R5/AC5 are strengthened by the content fingerprint; R10 covers the 20-key contract; R7 guard/task paths unchanged; R8 parser/MCP/status unchanged; R9 19-skill inventory unchanged; R12 docs/index unchanged |
+| AC1–AC12 | **PASS** — AC3 no secrets/diffs; AC5 content drift material; AC6 consumed handling unchanged; AC7 non-git is unverifiable with confirmation; AC10 contract test covers the 20-key table/list/example; AC11 rehearsal + gate (accepted `scan:deps` exception); AC12 pack/docs/index |
+| Regression check | No new P0/P1/P2; no runtime/parser/MCP changes; no test weakening; no stale active-surface 17-skill claims; 19/19 skills consistent |
+
+### Findings
+
+#### [P0] Blocking
+
+None.
+
+#### [P1] High
+
+None.
+
+#### [P2] Medium
+
+None.
+
+#### [P3] Resume path-set comparison does not expand untracked directories
+
+- **Location:** `skills/dh-resume-plan/SKILL.md:100-108` (path set from raw `git status --porcelain=v1`) vs
+  `skills/dh-pause-plan/SKILL.md:114-118` and `handoff-template.md:38`
+- **Why it matters:** Pause records expanded file paths for an untracked directory; resume compares the
+  raw status entry (`?? dir/`) with those recorded files. On an unchanged worktree this can be reported as
+  an unexpected/missing path (material/explainable) instead of clean, causing a false-positive stop. It does
+  not create a false clean and does not undermine the P2 fix.
+- **Fix:** Apply the same `git ls-files --others --exclude-standard -- <dir>/` expansion (and
+  `DIR_EMPTY`/directory handling) to resume’s path set before comparison, or record the directory along
+  with its expanded files.
+
+#### [P3] Post-P2 QA table is focused; audit report is stale
+
+- **Location:** `docs/plans/pause-resume-plan-skills/tasks/qa-gate.md:66-93`; `reports/audit.json` /
+  `reports/audit.md`
+- **Why it matters:** The post-P2 table covers the affected lint/format/build/test/typecheck/links/smokes
+  and contract checks, but omits `smoke-install`, `lint:knip`, `lint:dup`, `lint:depcruise`, and `audit`.
+  The committed audit report still records the pre-P2 skill line counts (231/213) versus the current
+  244/218. I independently re-ran the omitted checks and all pass (audit PASS, exit 0), but the evidence
+  file is not literally a full current gate record.
+- **Fix:** Add the omitted non-Docker results (or state they were unaffected) and refresh
+  `reports/audit.*` before the final sign-off if the audit report is part of the release evidence.
+
+#### Deferred P3s (explicit)
+
+- Additive field/versioning rule versus strict resume validation (future contract evolution; no migration
+  for this unreleased v1).
+- Stale “future consumer” wording for `dh-resume-plan` (`skills/dh-pause-plan/SKILL.md:222`).
+- No-argument resume does not report an already-consumed handoff.
+- Delegation failure after consume has no explicit recovery path.
+- Null recorded branch is ambiguous between non-git pause and detached HEAD.
+- Broader rehearsal gaps (multiple paused plans, detached HEAD, corrupt/missing plan,
+  hashing-unavailable) and the disclosed helper/no-SDD method.
+- Contract test does not guard the execute-plan/task integration (R7 markers).
+- The new resume untracked-directory path-set expansion and QA/audit evidence freshness above.
+
+### Docs, status, and close-out
+
+- Active docs remain consistent at **19 skills**: AGENTS, README, `skills/index.md`, `docs/LOADING.md`,
+  `opencode.example.jsonc`, demo docs, and the audit inventory. No stale 17-skill claim remains on the
+  active surface.
+- Plan statuses are consistent: Phases 1–3 `Completed`; Phase 4 `In Progress`; Sub-Tasks 4.1 and 4.2
+  `Completed`; 4.3 `In Progress` (this review). Plan frontmatter and the `docs/plans/index.md` row remain
+  `Pending` until the 4.3 close-out commit, as required.
+- Security/rollback: no secrets or credential-shaped values in the diff; no package/lockfile, parser, or
+  MCP changes. Reverting the feature/audit/evidence commits remains the recovery path; handoff files are
+  inert documents and plan statuses were never mutated by the skills.
+- **Semver:** minor only — `0.5.0` (or `0.5.0-rc.2` if continuing the current RC line); no major bump and
+  **no tag** until explicitly approved.
+- **4.3 close-out:** ready. Mark 4.3 and Phase 4 `Completed`, set the plan frontmatter `status:
+  Completed`, set the plans-index row to `Completed`, commit the final review/status update, and do not
+  tag. The P3s may be deferred and recorded in the plan’s close-out notes.
+
+### Final binding verdict
+
+**Approve with comments (P3-only).** P2 is resolved, the formatting gate is green, R1–R12/AC1–AC12 remain
+covered, and there are no P0/P1/P2 findings. The plan is ready for the 4.3 close-out with the remaining P3
+items deferred.

@@ -4,8 +4,8 @@ slug: pause-resume-plan-skills
 description: Add dh-pause-plan and dh-resume-plan with a durable handoff.md contract, drift-safe resume, an execute-plan guard, and 19-skill inventory updates.
 created: 2026-11-07
 updated: 2026-11-07
-status: Pending
-active: true
+status: Completed
+active: false
 tags: [plan]
 project: dev-harness-skills
 ---
@@ -219,7 +219,7 @@ fresh snapshot and preserves prior history.
 
 ### Phase 4: Validation and release readiness
 
-- **Status:** In Progress
+- **Status:** Completed
 
 #### Sub-Task 4.1: Rehearse pause, drift, and resume end-to-end
 
@@ -253,7 +253,7 @@ fresh snapshot and preserves prior history.
 
 #### Sub-Task 4.3: Final review, documentation, and release readiness
 
-- **Status:** In Progress
+- **Status:** Completed
 - **Objective:** Close the plan with the harness's sign-off and documentation steps.
 - **Related Requirements:** R11, R12
 - **Dependencies and Preconditions:** Sub-Task 4.2.
