@@ -238,7 +238,7 @@ fresh snapshot and preserves prior history.
 
 #### Sub-Task 4.2: Run the full QA gate and grep gates
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Prove the change passes the repository's release gate with no stale contracts.
 - **Related Requirements:** R9, R10, R11
 - **Dependencies and Preconditions:** Sub-Tasks 3.1–3.3 and 4.1.
@@ -253,7 +253,7 @@ fresh snapshot and preserves prior history.
 
 #### Sub-Task 4.3: Final review, documentation, and release readiness
 
-- **Status:** Pending
+- **Status:** In Progress
 - **Objective:** Close the plan with the harness's sign-off and documentation steps.
 - **Related Requirements:** R11, R12
 - **Dependencies and Preconditions:** Sub-Task 4.2.
