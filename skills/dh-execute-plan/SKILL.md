@@ -20,6 +20,7 @@ Orchestrate the complete execution of a plan from start to finish. Iterate throu
   - if working in monorepos with git submodules create a branch per submodule along with the branch of the main repository to align and trace commints between repositories.
 - Read the plan with the `dh_plan_read` tool (`{ slug }` → structured JSON: meta, phases[].title/status, subTasks[].phase/title/status). Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually, following the phased template markers (`## Phases` → `### Phase N: <title>` → `#### Sub-Task N.M: <title>` with `- **Status:**` bullets). These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 - If the plan file does not exist, stop and report — suggest running the `dh-planning` skill first.
+- **Paused handoff guard:** if `./docs/plans/<plan-slug>/handoff.md` exists with `status: paused`, do not start execution from plan statuses. Stop and direct the user to `dh-resume-plan` for that slug (it rehydrates context and detects drift). Bypass only on an explicit user instruction to skip rehydration.
 - Iterate **phases in order**; within each phase, iterate its sub-tasks in order.
 - Phase lifecycle: a phase becomes `In Progress` when its first sub-task starts; it becomes `Completed` only when ALL its sub-tasks are `Completed`.
 - Do not re-execute sub-tasks already marked `Completed`.
@@ -39,6 +40,7 @@ Orchestrate the complete execution of a plan from start to finish. Iterate throu
 
 Read the plan (via `dh_plan_read`; fallback: manual read) and determine the starting point using this ordered priority:
 
+0. Paused handoff: if `./docs/plans/<plan-slug>/handoff.md` exists with `status: paused`, stop and direct the user to `dh-resume-plan`. Do not apply priorities 1–4 until the handoff is `resumed` or the user explicitly bypasses it.
 1. If all sub-tasks are `Completed` (every phase `Completed`), run `dh-final-review` skill only and proceed to Step 3. Skip the execution loop.
 2. Resume mode: if one or more phases are `In Progress`, start from the FIRST `In Progress` phase, then its FIRST sub-task marked `In Progress` or `Pending`.
 3. If all phases are `Pending` (all sub-tasks `Pending`), start from Phase 1's first sub-task.
@@ -100,12 +102,14 @@ After final sign-off passes and before marking the plan complete:
 
 The execution loop automatically handles interruptions:
 
+- A paused handoff takes precedence over status-based resume: run `dh-resume-plan` first. If the handoff is absent or already `resumed`, continue with the phase-aware priority in Step 1.
 - Step 2.0 explicitly marks the current sub-task as `In Progress` before delegating to `dh-execute-plan-task`. If the tool is interrupted, the next invocation reads the plan and finds this `In Progress` sub-task.
 - Resume from Step 1, which detects the phase-aware state (priority 2: first `In Progress` phase → its first `In Progress`/`Pending` sub-task) and continues the loop from there.
 - If interruption occurs after review but before the `Completed` mark, the sub-task remains `In Progress` on resume — re-run the review to verify before marking Complete.
 
 ## Error Handling
 
+- **Paused handoff present:** do not execute around it — redirect to `dh-resume-plan` or get explicit confirmation to bypass.
 - **Sub-task execution fails** (validation keeps failing): `dh-execute-plan-task` stops after 3 validation attempts and reports the failure. Do not proceed to the next sub-task — the blocked sub-task blocks its phase (loop rule 2.4: never mark the phase `Completed` around a blocker).
 - **Review produces blocking findings**: Stop the execution loop. Recommend fixing the findings (using the `address-review` pattern) and re-running `dh-execute-plan`.
 - **Final review fails**: Report the verdict — do not mark the plan complete until findings are addressed.
@@ -133,7 +137,9 @@ worked around — the loop STOPS: report the blocker and ask the user for
 guidance. Never silently continue, never skip the blocked step, and never mark
 sub-tasks Complete around a blocker. The rule applies at phase boundaries
 too: a blocked sub-task blocks its phase — do not mark the phase `Completed`
-around a blocker.
+around a blocker. Before stopping for a hard blocker or ending the session,
+run `dh-pause-plan` to preserve the phase/sub-task, git state, decisions,
+blockers, and next steps in `handoff.md`; resume later with `dh-resume-plan`.
 
 ## References
 

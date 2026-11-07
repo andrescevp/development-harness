@@ -24,7 +24,7 @@ npx -y github:andrescevp/development-harness install --project --path .
 | `--project` | `<project>/.opencode/plugins/dev-harness-skills` | `<project>/opencode.jsonc` (or existing `opencode.json`) |
 
 The managed layout is self-contained: `index.ts`, package metadata,
-`dist/plugin.js`, `dist/assets` (7 agents, 17 skills), and
+`dist/plugin.js`, `dist/assets` (7 agents, 19 skills), and
 `.dev-harness-install.json`; no `pnpm install` is needed in the target.
 
 Common flags:
@@ -173,7 +173,7 @@ opencode debug config   → the plugin entry, and mcp.servers.dh once wired
 opencode mcp list       → `dh` connected (server/status only)
 ```
 
-The plugin also registers 17 skills (there is no skills debug subcommand on
+The plugin also registers 19 skills (there is no skills debug subcommand on
 v2.0.18 — the bundled list lives in `skills/index.md`). Zero tools are
 registered by the plugin: the 7 tools come from the MCP server below.
 
@@ -253,7 +253,7 @@ opencode mcp list   # expect the `dh` server, connected
 
 MCP servers connect at session start — restart opencode after adding or
 changing the project entry. The in-repo gates are
-`src/__tests__/registration.test.ts` (exactly 7 agents + 17 skills, zero tool
+`src/__tests__/registration.test.ts` (exactly 7 agents + 19 skills, zero tool
 transforms) and `node scripts/smoke-mcp.mjs` (spawns the built binary, lists
 the 7 tools, and round-trips plan create/read/update).
 
@@ -303,7 +303,7 @@ the 7 tools, and round-trips plan create/read/update).
   was started **before** the plugin was installed: plugins load at server
   startup, and a long-lived opencode session keeps its original registry.
   Restart opencode (or reload the config) and both the 7 `dh-*` agents and
-  17 `dh-*` skills appear — the plugin registers agents via `agent.transform`
+  19 `dh-*` skills appear — the plugin registers agents via `agent.transform`
   exactly like skills, no `agent` map in config is needed.
 - **`pnpm audit` vs `pnpm run audit`** — `pnpm audit` is pnpm's **dependency
   security audit** (currently reports 1 low dev-only esbuild advisory and

@@ -1,12 +1,12 @@
 # dev-harness-skills
 
-An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 7 agents and 17 skills.
+An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 7 agents and 19 skills.
 
 ## Features
 
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks with strict halt-on-blocker safeguards.
-- **7 agents and 17 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
+- **7 agents and 19 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
 - **`dh` MCP server (7 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents and skills only.
 - **Full QA gate**: Thorough verification suite integrating Biome, Knip, jscpd, dependency-cruiser, OSV-Scanner, Semgrep, Vitest, and TypeScript.
 - **Source-mode loading**: Automatic discovery by OpenCode via root `index.ts` with direct asset loading from the repository.
@@ -109,7 +109,7 @@ opencode debug config   # plugin entry, and mcp.servers.dh once wired
 opencode mcp list       # expect: dh connected (server/status only)
 ```
 
-The plugin also registers 17 skills (there is no skills debug subcommand on
+The plugin also registers 19 skills (there is no skills debug subcommand on
 v2.0.18 — see `skills/index.md`) and zero tools; the harness tools come from
 the project-scope MCP server — see [MCP server (`dh`)](#mcp-server-dh).
 
@@ -134,7 +134,7 @@ Plan execution inside the plugin runs the 5-step skills loop:
    - 2.1 `dh-execute-plan-task` — Implements the sub-task code using `dh-coding`.
    - 2.2 `dh-simplify` — Refactors and simplifies changed code for clarity and reuse.
    - 2.3 `dh-review` + `dh-code-review` — Verifies acceptance criteria and code correctness.
-   - 2.4 Hard blockers — If 3 consecutive validation failures occur or unresolved P0/P1 review findings arise, the loop stops and asks the user for guidance.
+   - 2.4 Hard blockers — If 3 consecutive validation failures occur or unresolved P0/P1 review findings arise, the loop stops and asks the user for guidance. Run `dh-pause-plan` before ending the session so the blocker and context are preserved in `handoff.md`.
 3. `dh-preflight` + `dh-artifact-check` — Runs static analysis, tests, and build artifact validation.
 4. `dh-final-review` — Reports per-phase completion and provides final plan-level sign-off.
 5. `dh-create-documentation` — Generates and updates project documentation.
@@ -142,6 +142,8 @@ Plan execution inside the plugin runs the 5-step skills loop:
 ### Phased plan model
 
 Plans are stored under `docs/plans/<slug>/plan.md` using a phased structure. Every phase and sub-task maintains a dual status marker (`Pending`, `In Progress`, or `Completed`). A phase cannot transition to `Completed` until all of its sub-tasks are marked `Completed`. When a hard blocker is reached, automation halts immediately so that blockers are never bypassed.
+
+**Pause/resume (cross-cutting).** A plan can pause at any point without changing its statuses: `dh-pause-plan` writes `docs/plans/<slug>/handoff.md` with the active phase/sub-task, git/worktree state, decisions, blockers, validation, and next steps. `dh-resume-plan` validates the handoff, detects drift, rehydrates context, marks it `resumed`, and re-enters step 2. `dh-execute-plan` redirects when a paused handoff exists. The handoff is a sidecar, not a fourth status.
 
 ### MCP server (`dh`)
 
@@ -188,7 +190,7 @@ retired. Consumer permission actions match `dh_*`. Full wiring, verification
 
 ## Agents & skills
 
-The plugin defines 7 agents and 17 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
+The plugin defines 7 agents and 19 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
 
 ### Agents
 
@@ -211,6 +213,8 @@ The plugin defines 7 agents and 17 skills using the `@opencode/plugin` SDK. Zero
 | `dh-contingency` | Generates Plan A/B/C architectural alternatives with risk, complexity, and trade-off analysis. |
 | `dh-execute-plan` | Orchestrates the end-to-end execution and status tracking of phased plans. |
 | `dh-execute-plan-task` | Executes an individual sub-task by delegating to `@dh-software-engineer`. |
+| `dh-pause-plan` | Snapshots an active plan into `docs/plans/<slug>/handoff.md` without changing statuses or code. |
+| `dh-resume-plan` | Validates a handoff, detects drift, rehydrates context, and resumes execution via `dh-execute-plan`. |
 | `dh-coding` | Applies TDD best practices and enforces rules from `CODE_RULES.md`. |
 | `dh-simplify` | Streamlines changed code to remove redundancy and reduce complexity. |
 | `dh-review` | Verifies sub-task implementations against specified acceptance criteria. |
@@ -262,7 +266,7 @@ offline `pnpm qa:check:full` gate.
 ```text
 index.ts         Root plugin entry point for OpenCode plugin discovery (source mode)
 agents/          Markdown definitions and system prompts for the 7 bundled agents
-skills/          Instructions, templates, and references for the 17 bundled skills
+skills/          Instructions, templates, and references for the 19 bundled skills
 src/cli/         Installer CLI (args, scope, JSONC config, manifest, commands)
 src/mcp/         Local stdio MCP server and workspace resolver
 src/tools/       Plan/sheet/logged-command tool implementations

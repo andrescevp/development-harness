@@ -7,7 +7,7 @@
  *   1. `npm pack --ignore-scripts --json` into a temp dir (build already on
  *      disk; `--ignore-scripts` keeps stdout pure JSON).
  *   2. Audit the pack list: entrypoints/declarations/assets, exactly 7 agents
- *      and 17 skills, no src/docs/tests/.env/plans/node_modules.
+ *      and 19 skills, no src/docs/tests/.env/plans/node_modules.
  *   3. `npm install <tarball> --offline` into a clean temp prefix. The prefix
  *      is seeded for offline resolution: real MCP deps (server/core/zod) are
  *      copied, and bundled/lazy direct deps get version stubs (see
@@ -15,7 +15,7 @@
  *      plugin does not need; `--offline` fails on any registry request.
  *   4. Import `dev-harness-skills` by name, assert `{ id, setup }`, run both
  *      CLIs, and perform a minimal MCP handshake listing the 7 tools.
- *   5. Assert the installed `dist/assets` inventory (7 agents / 17 skills).
+ *   5. Assert the installed `dist/assets` inventory (7 agents / 19 skills).
  *   6. Source mode: repo-root `index.ts` must remain and re-export
  *      `./src/plugin.js`. OpenCode directory discovery resolves `<dir>/index`
  *      (index.ts) and never reads package main/exports, so source/directory
@@ -64,8 +64,8 @@ function checkTarball(files, source) {
   );
   check(
     `exactly ${source.skills.length} skill SKILL.md files`,
-    source.skills.length === 17 && skillCount === 17 && missingSkills.length === 0,
-    `${missingSkills.length ? `missing: ${missingSkills.join(',')}` : ''}${skillCount !== 17 ? ` found ${skillCount}` : ''}`
+    source.skills.length === 19 && skillCount === 19 && missingSkills.length === 0,
+    `${missingSkills.length ? `missing: ${missingSkills.join(',')}` : ''}${skillCount !== 19 ? ` found ${skillCount}` : ''}`
   );
   check('no src, docs, tests, .env, plans, node_modules, or .git', violations.length === 0, violations.join(','));
 }

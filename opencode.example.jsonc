@@ -37,7 +37,7 @@
   //                           dh-software-engineer, dh-reviewer,
   //                           dh-final-reviewer, dh-executor, dh-explorer,
   //                           dh-documentor
-  //   (17 skills: no debug subcommand on v2.0.18 — see skills/index.md)
+  //   (19 skills: no debug subcommand on v2.0.18 — see skills/index.md)
   //   opencode debug config → the plugin entry + mcp.servers.dh
   //   opencode mcp list     → `dh` connected (server/status only)
   //   expected tools        → dh_plan_read, dh_plan_update_status,
