@@ -3,7 +3,7 @@ title: Demo Project Index
 tags: [documentation, demo]
 project: demo-project
 created: 2026-09-29
-updated: 2026-10-19
+updated: 2026-11-07
 stack: markdown, opencode
 feature: demo
 epic: plugin-demo

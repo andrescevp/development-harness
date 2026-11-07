@@ -233,7 +233,7 @@ orchestrator's phase lifecycle, or `dh-final-review`.
 
 - [`references/handoff-template.md`](references/handoff-template.md): the `handoff.md` contract (fields, sections, lifecycle, redaction).
 - `dh-execute-plan`: position priority and resume mode this skill mirrors.
-- `dh-resume-plan`: future consumer that validates the handoff and re-enters execution.
+- `dh-resume-plan`: consumer that validates the handoff and re-enters execution.
 - `dh-review`: source of open P0/P1 findings recorded in the handoff.
 - `dh-final-review`: recommended when the plan is already complete.
 
