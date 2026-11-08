@@ -16,8 +16,9 @@ metadata:
 
 Resume a paused plan safely: validate `docs/plans/<slug>/handoff.md`, detect
 drift, rehydrate the session context, and re-enter the execution loop through
-`dh-execute-plan`. The handoff supplements `plan.md`; `plan.md` remains the
-source of truth for task status — there is no `Paused` status.
+`dh-execute-plan-fast` when a fast mirror exists, otherwise `dh-execute-plan`.
+The handoff supplements `plan.md`; `plan.md` remains the source of truth for
+task status — there is no `Paused` status.
 
 **Use when:** the user asks to resume, continue, or pick up a paused plan, or
 a paused handoff exists before execution starts.
@@ -43,8 +44,9 @@ plan truth.
   proceeding; never assume a clean state.
 - **No secret or diff dumps.** Summarize evidence; never include secrets or
   full diffs.
-- **Delegate execution.** Do not implement or orchestrate work here — hand
-  off to `dh-execute-plan`.
+- **Delegate execution.** Do not implement or orchestrate work here — hand off
+  to the selected orchestrator: `dh-execute-plan-fast` when
+  `docs/plans/<slug>/plan_fast.md` exists, otherwise `dh-execute-plan`.
 
 ## Workflow
 
@@ -158,8 +160,10 @@ Step 5.
 
 When execution is about to start:
 
-1. Verify `dh-execute-plan` is available before consuming the handoff. If it
-   is unavailable, report the exact resume instruction and leave
+1. **Select the orchestrator:** `docs/plans/<slug>/plan_fast.md` exists → fast
+   mode (`dh-execute-plan-fast`); absent → standard (`dh-execute-plan`). Verify
+   the selected orchestrator is available **before** consuming the handoff. If
+   it is unavailable, report the exact resume instruction and leave
    `status: paused` so the handoff is not consumed without execution.
 2. Edit `docs/plans/<slug>/handoff.md`: set `status: resumed`, set
    `resumed_at` and `updated` to the current ISO-8601 UTC timestamp, append a
@@ -167,9 +171,14 @@ When execution is about to start:
    rewrite the paused `## Snapshot` narrative; only these fields and the
    history row change.
 3. Never touch `plan.md` statuses or any other file.
-4. Invoke `dh-execute-plan` in resume mode for the slug so it continues from
-   the plan position (first `In Progress` phase → first
-   `In Progress`/`Pending` sub-task).
+4. After the handoff is `resumed`, invoke the selected orchestrator for the
+   slug:
+   - `plan_fast.md` exists → `dh-execute-plan-fast`; it reads the mirror,
+     validates `source_sha256`, and continues fast execution from the mirror
+     position.
+   - absent → `dh-execute-plan` resume mode (status-based position).
+5. **State the chosen mode** (fast or standard) in the resume report, with the
+   evidence used to choose it.
 
 If execution pauses again, `dh-pause-plan` reopens the handoff and appends
 history.
@@ -191,6 +200,8 @@ history.
 - **Non-git or unverifiable:** warn, ask for confirmation, continue only with
   consent.
 - **Multiple paused plans:** list and ask; never auto-pick.
+- **Selected orchestrator unavailable:** leave the handoff `paused`; report the
+  exact command to run once the orchestrator is available.
 - **Handoff write failure:** stop; report the error and that execution did not
   start.
 
@@ -198,16 +209,19 @@ Every case stops with a concrete next action — never a destructive fix.
 
 ## Loop Integration (bundled)
 
-Resume re-enters the harness loop at step 2 (`dh-execute-plan` resume mode).
-Pause is cross-cutting and may occur at loop step 2.4 hard blockers or when a
-session ends. Resume does not replace the execution loop and performs no plan
-status mutation — the orchestrator owns status transitions.
+Resume re-enters the harness loop at step 2. When `plan_fast.md` exists it
+re-enters **fast mode** (`dh-execute-plan-fast`); otherwise the standard
+`dh-execute-plan` resume mode. Pause is cross-cutting and may occur at loop step
+2.4 hard blockers or when a session ends. Resume does not replace the execution
+loop and performs no plan status mutation — the orchestrator owns status
+transitions.
 
 ## References
 
 - [`../dh-pause-plan/references/handoff-template.md`](../dh-pause-plan/references/handoff-template.md): the `handoff.md` contract this skill validates.
 - `dh-pause-plan`: writes and refreshes the handoff, including re-pause.
-- `dh-execute-plan`: the execution loop resume mode this skill delegates to.
+- `dh-execute-plan`: standard execution loop resume mode (no `plan_fast.md`).
+- `dh-execute-plan-fast`: fast execution/end-gate loop used when `plan_fast.md` exists.
 - `dh-review`: source of open P0/P1 findings that may block the resume.
 - `dh-final-review`: recommended when no work remains.
 

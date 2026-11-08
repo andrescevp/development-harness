@@ -1,7 +1,7 @@
 ---
 name: dh-review
 description: >
-  Verify a plan sub-task against acceptance criteria, scope, done-when; review diff, validation, regression risk; structured verdict to tasks/review.md. Use after implementation or to review/verify the sub-task.
+  Verify a plan sub-task against acceptance criteria, scope, done-when; review diff, validation, regression risk; structured verdict to tasks/review.md. Plan Alignment Mode (fast execution) is a separate mode: no sub-task selection, no diff review, no code review — it compares plan.md with plan_fast.md and writes tasks/review-fast.md (pre-execution) or tasks/review-fast-final.md (plan-end). Use after implementation, to review/verify the sub-task, or to check fast-plan alignment.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: read, write, bash
@@ -10,7 +10,7 @@ metadata:
   workflow: development
 ---
 
-Verify that a single sub-task implementation meets its plan-defined acceptance criteria, stays within scope, and passes code quality review. Write the findings to `./docs/plans/<plan-slug>/tasks/review.md`.
+Verify that a single sub-task implementation meets its plan-defined acceptance criteria, stays within scope, and passes code quality review. Write the findings to `./docs/plans/<plan-slug>/tasks/review.md`; Plan Alignment Mode writes to the caller-specified fast report instead (see below).
 
 ## Core Rules
 
@@ -18,9 +18,63 @@ Verify that a single sub-task implementation meets its plan-defined acceptance c
 - This skill is loop step 2.3 (`dh-review` + `dh-code-review`); the full loop 1–5 lives in repo-root AGENTS.md (pointer only, no duplication).
 - Do not review code outside the sub-task scope.
 - Delegate code quality checks to `@dh-reviewer` agent — do not duplicate the `dh-code-review` skill.
-- Write all findings to `./docs/plans/<plan-slug>/tasks/review.md`.
+- Write all findings to `./docs/plans/<plan-slug>/tasks/review.md`. **Exception:** Plan Alignment Mode writes to the caller-specified path — default `tasks/review-fast.md` (pre-execution) or `tasks/review-fast-final.md` (plan-end).
 - Use severity levels from the `dh-code-review` skill: P0 (blocking), P1 (high), P2 (medium), P3 (low).
 - If no sub-task is In Progress, review the most recently Completed sub-task and state that assumption.
+
+## Plan Alignment Mode (fast execution)
+
+A **separate mode**, not a variant of the sub-task review. Trigger it when the
+caller asks to compare `plan.md` with `plan_fast.md` for fast execution.
+
+**Skip Workflow Steps 1–7 entirely.** In this mode there is no sub-task
+selection, no diff review, no `@dh-reviewer`, no `dh-code-review`, and no
+`dh-domain-check`. This mode performs **no code review** and writes no standard
+review report.
+
+**Input:** `phase: pre-execution | plan-end`, plus the report path.
+
+- `pre-execution` — validate a newly created or resumed mirror.
+  `plan_fast.md` may be ahead of `plan.md` **only in statuses**; `plan.md` ahead
+  of the mirror is a finding.
+- `plan-end` — validate the final mirror. Phase/sub-task statuses must match
+  **exactly** in both files.
+
+Read `./docs/plans/<plan-slug>/plan.md` and
+`./docs/plans/<plan-slug>/plan_fast.md` (`dh_plan_read`; manual fallback).
+
+**Allowed differences** (never findings):
+
+- `plan_fast.md` intentionally omits `## Objective`, `## Requirements Snapshot`,
+  `## Scope`, `## Assumptions and Constraints`,
+  `## Risks and Areas Requiring Care`, `## Core concepts`, and
+  `## Open Questions`. Compare the `## Phases` region and sub-task fields
+  against `plan.md`, and use `plan.md` for requirements/scope checks. Do **not**
+  flag those omitted top-level sections as missing.
+- The fast sections `## Fast Execution Policy`, `## Alignment Contract`, and
+  `## Final Verification`.
+- Status progression (within the phase rules above).
+
+**Compare:** phase/sub-task coverage, IDs, titles, and order; requirements
+mapping (`Related Requirements`); acceptance criteria; done-when; scope
+boundaries. Missing, extra, reordered, or renamed phases/sub-tasks, altered
+requirements/criteria, or any scope change → **P0/P1**.
+
+**Status findings**
+
+- `pre-execution`: mismatch → P2; `plan.md` ahead of the mirror → P1.
+- `plan-end`: any mismatch → P1 (the close is blocked until both are identical).
+
+**Report:** always write to the caller-specified path; default
+`./docs/plans/<plan-slug>/tasks/review-fast.md` for `pre-execution` and
+`./docs/plans/<plan-slug>/tasks/review-fast-final.md` for `plan-end` (a distinct
+file from the pre-execution report). Never overwrite `tasks/review.md` or the
+pre-execution report. Keep the standard verdict shape
+(`**Verdict:** Approve / Approve with comments / Request changes`).
+
+**Verdict:** `Request changes` when any P0/P1 remains; `Approve with comments`
+for P2/P3 only; `Approve` when fully aligned. Misalignment is fixed in
+`plan_fast.md`; this mode never authorizes editing `plan.md` scope.
 
 ## Review Dimensions
 

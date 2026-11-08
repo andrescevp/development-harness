@@ -20,6 +20,11 @@ const PACKAGE_NAME = 'dev-harness-skills';
 const EXPECTED_TOOLS = [
   'logged_command',
   'plan_create',
+  'plan_fast_create',
+  'plan_fast_read',
+  'plan_fast_skip_check',
+  'plan_fast_sync',
+  'plan_fast_update_status',
   'plan_read',
   'plan_update_status',
   'read_sheet',
@@ -161,10 +166,14 @@ async function checkMcp(prefix, env, check) {
     await client.connect(transport, { timeout: REQUEST_TIMEOUT_MS });
     const { tools } = await client.listTools(undefined, { timeout: REQUEST_TIMEOUT_MS });
     const names = tools.map((tool) => tool.name).sort();
-    check('installed MCP bin lists the 7 harness tools', names.join(',') === EXPECTED_TOOLS.join(','), names.join(','));
+    check(
+      'installed MCP bin lists the 12 harness tools',
+      names.join(',') === EXPECTED_TOOLS.join(','),
+      names.join(',')
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    check('installed MCP bin lists the 7 harness tools', false, `${message}${stderr ? ` — ${tail(stderr)}` : ''}`);
+    check('installed MCP bin lists the 12 harness tools', false, `${message}${stderr ? ` — ${tail(stderr)}` : ''}`);
   } finally {
     await client.close().catch(() => undefined);
   }
@@ -182,7 +191,7 @@ function checkAssets(prefix, source, check) {
     .map((entry) => entry.name)
     .sort();
   check('installed dist/assets has 7 agents', agents.length === 7, String(agents.length));
-  check('installed dist/assets has 19 skills', skills.length === 19, String(skills.length));
+  check('installed dist/assets has 21 skills', skills.length === 21, String(skills.length));
   check('installed dist/assets has skills/index.md', fs.existsSync(path.join(assets, 'skills', 'index.md')));
   check(
     'installed agent/skill inventory matches source',

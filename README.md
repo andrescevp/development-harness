@@ -1,13 +1,13 @@
 # dev-harness-skills
 
-An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 7 agents and 19 skills.
+An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 7 agents and 21 skills.
 
 ## Features
 
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks with strict halt-on-blocker safeguards.
-- **7 agents and 19 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
-- **`dh` MCP server (7 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents and skills only.
+- **7 agents and 21 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
+- **`dh` MCP server (12 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents and skills only.
 - **Full QA gate**: Thorough verification suite integrating Biome, Knip, jscpd, dependency-cruiser, OSV-Scanner, Semgrep, Vitest, and TypeScript.
 - **Source-mode loading**: Automatic discovery by OpenCode via root `index.ts` with direct asset loading from the repository.
 
@@ -109,7 +109,7 @@ opencode debug config   # plugin entry, and mcp.servers.dh once wired
 opencode mcp list       # expect: dh connected (server/status only)
 ```
 
-The plugin also registers 19 skills (there is no skills debug subcommand on
+The plugin also registers 21 skills (there is no skills debug subcommand on
 v2.0.18 — see `skills/index.md`) and zero tools; the harness tools come from
 the project-scope MCP server — see [MCP server (`dh`)](#mcp-server-dh).
 
@@ -147,7 +147,7 @@ Plans are stored under `docs/plans/<slug>/plan.md` using a phased structure. Eve
 
 ### MCP server (`dh`)
 
-The plugin registers **no tools**. The 7 harness tools are served by a local
+The plugin registers **no tools**. The 12 harness tools are served by a local
 stdio MCP server (`@modelcontextprotocol/server` v2), enabled **per project**
 in that project's `opencode.jsonc`:
 
@@ -174,6 +174,11 @@ in that project's `opencode.jsonc`:
 | `dh_plan_read` | Parse a phased plan (`docs/plans/<slug>/plan.md`) into structured JSON |
 | `dh_plan_update_status` | Edit phase/sub-task status markers (phase completion is gated) |
 | `dh_plan_create` | Scaffold a phased plan; optionally append the `index.md` row |
+| `dh_plan_fast_create` | Create `plan_fast.md` from `plan.md` and seed the skipped-check ledger |
+| `dh_plan_fast_read` | Parse `plan_fast.md`; report the source hash, stale flag, and ledger path |
+| `dh_plan_fast_update_status` | Update a phase/sub-task in **both** plans (fast mirror + source) |
+| `dh_plan_fast_sync` | Pre-execution dry-run/apply fast→plan reconciliation; plan-end is an equality gate (no writes) |
+| `dh_plan_fast_skip_check` | Append skipped-check rows to `plan_fast_skip_checks.md` (append-only) |
 | `dh_read_sheet` | Query tabular data with DuckDB — csv by default; xlsx via a `read_xlsx(...)` query when the extension loads |
 | `dh_update_sheet` | Apply UPDATE/INSERT/DELETE and write the CSV back |
 | `dh_sheet_schema` | Describe columns as `name:type` |
@@ -190,7 +195,7 @@ retired. Consumer permission actions match `dh_*`. Full wiring, verification
 
 ## Agents & skills
 
-The plugin defines 7 agents and 19 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
+The plugin defines 7 agents and 21 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
 
 ### Agents
 
@@ -212,9 +217,11 @@ The plugin defines 7 agents and 19 skills using the `@opencode/plugin` SDK. Zero
 | `dh-domain-check` | Validates domain boundaries and SOLID design during planning and execution. |
 | `dh-contingency` | Generates Plan A/B/C architectural alternatives with risk, complexity, and trade-off analysis. |
 | `dh-execute-plan` | Orchestrates the end-to-end execution and status tracking of phased plans. |
+| `dh-execute-plan-fast` | Fast alternative: executes from `plan_fast.md`, defers critical gates to plan end, records skipped checks. |
 | `dh-execute-plan-task` | Executes an individual sub-task by delegating to `@dh-software-engineer`. |
+| `dh-execute-plan-task-fast` | Fast alternative for one sub-task: dual-plan status, per-task ledger rows, no per-task gates. |
 | `dh-pause-plan` | Snapshots an active plan into `docs/plans/<slug>/handoff.md` without changing statuses or code. |
-| `dh-resume-plan` | Validates a handoff, detects drift, rehydrates context, and resumes execution via `dh-execute-plan`. |
+| `dh-resume-plan` | Validates a handoff, detects drift, rehydrates context, and resumes via `dh-execute-plan-fast` when `plan_fast.md` exists, otherwise `dh-execute-plan`. |
 | `dh-coding` | Applies TDD best practices and enforces rules from `CODE_RULES.md`. |
 | `dh-simplify` | Streamlines changed code to remove redundancy and reduce complexity. |
 | `dh-review` | Verifies sub-task implementations against specified acceptance criteria. |
@@ -266,7 +273,7 @@ offline `pnpm qa:check:full` gate.
 ```text
 index.ts         Root plugin entry point for OpenCode plugin discovery (source mode)
 agents/          Markdown definitions and system prompts for the 7 bundled agents
-skills/          Instructions, templates, and references for the 19 bundled skills
+skills/          Instructions, templates, and references for the 21 bundled skills
 src/cli/         Installer CLI (args, scope, JSONC config, manifest, commands)
 src/mcp/         Local stdio MCP server and workspace resolver
 src/tools/       Plan/sheet/logged-command tool implementations

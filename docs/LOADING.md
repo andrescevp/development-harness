@@ -24,7 +24,7 @@ npx -y github:andrescevp/development-harness install --project --path .
 | `--project` | `<project>/.opencode/plugins/dev-harness-skills` | `<project>/opencode.jsonc` (or existing `opencode.json`) |
 
 The managed layout is self-contained: `index.ts`, package metadata,
-`dist/plugin.js`, `dist/assets` (7 agents, 19 skills), and
+`dist/plugin.js`, `dist/assets` (7 agents, 21 skills), and
 `.dev-harness-install.json`; no `pnpm install` is needed in the target.
 
 Common flags:
@@ -173,9 +173,9 @@ opencode debug config   → the plugin entry, and mcp.servers.dh once wired
 opencode mcp list       → `dh` connected (server/status only)
 ```
 
-The plugin also registers 19 skills (there is no skills debug subcommand on
+The plugin also registers 21 skills (there is no skills debug subcommand on
 v2.0.18 — the bundled list lives in `skills/index.md`). Zero tools are
-registered by the plugin: the 7 tools come from the MCP server below.
+registered by the plugin: the 12 tools come from the MCP server below.
 
 ## MCP server (`dh`)
 
@@ -233,6 +233,11 @@ retired by this release.
 | `dh_plan_read` | `{ slug }` or `{ path }` (relative to `docs/plans`) | `{ ok, path, plan }` — parsed phases/sub-tasks with statuses |
 | `dh_plan_update_status` | `{ slug?, path?, target: phase\|subtask, index: "N"\|"N.M", status }` | `{ ok, path, plan }` — line-aware status edit |
 | `dh_plan_create` | `{ slug, title, objective, phases: [{title, subTasks:[{title}]}], updateIndex? }` | `{ ok, path, plan }` — scaffolds a phased plan |
+| `dh_plan_fast_create` | `{ slug, replace? }` | `{ ok, path, plan, sourceSha256, skipChecksPath }` — creates the fast mirror + seeds the ledger |
+| `dh_plan_fast_read` | `{ slug }` | `{ ok, path, plan, sourcePlanPath, sourceSha256, stale, skipChecksPath }` |
+| `dh_plan_fast_update_status` | `{ slug, target: phase\|subtask, index: "N"\|"N.M", status }` | `{ ok, path, plan, mirroredPath, mirroredPlan }` — updates both plans |
+| `dh_plan_fast_sync` | `{ slug, apply?, phase?: pre-execution\|plan-end }` | Dry run `{ ok, aligned, differences, sourceSha256, stale }`; pre-execution apply `{ ok, applied, differences, plan, fastPlan, sourceSha256, stale }`; plan-end is equality-only (`{ ok:false, requiresConfirmation:true, differences }` on any difference) |
+| `dh_plan_fast_skip_check` | `{ slug, checks: string[], scope, reason, disposition }` | `{ ok, path, appended, rows }` — append-only ledger rows |
 | `dh_read_sheet` | `{ path, query?, limit? }` | `{ ok, columns, rowCount, rows }` — csv by default; xlsx via a `read_xlsx(...)` query when the DuckDB extension loads |
 | `dh_update_sheet` | `{ path, query }` | `{ ok, columns, rowCount, rows }` — applies UPDATE/INSERT/DELETE, writes the CSV back |
 | `dh_sheet_schema` | `{ path }` | `{ ok, columns, rowCount, rows }` — columns as `name:type` |
@@ -253,9 +258,9 @@ opencode mcp list   # expect the `dh` server, connected
 
 MCP servers connect at session start — restart opencode after adding or
 changing the project entry. The in-repo gates are
-`src/__tests__/registration.test.ts` (exactly 7 agents + 19 skills, zero tool
+`src/__tests__/registration.test.ts` (exactly 7 agents + 21 skills, zero tool
 transforms) and `node scripts/smoke-mcp.mjs` (spawns the built binary, lists
-the 7 tools, and round-trips plan create/read/update).
+the 12 tools, and round-trips plan create/read/update + fast create/read/update/skip).
 
 ## Troubleshooting
 
@@ -303,7 +308,7 @@ the 7 tools, and round-trips plan create/read/update).
   was started **before** the plugin was installed: plugins load at server
   startup, and a long-lived opencode session keeps its original registry.
   Restart opencode (or reload the config) and both the 7 `dh-*` agents and
-  19 `dh-*` skills appear — the plugin registers agents via `agent.transform`
+  21 `dh-*` skills appear — the plugin registers agents via `agent.transform`
   exactly like skills, no `agent` map in config is needed.
 - **`pnpm audit` vs `pnpm run audit`** — `pnpm audit` is pnpm's **dependency
   security audit** (currently reports 1 low dev-only esbuild advisory and

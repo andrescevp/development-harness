@@ -25,6 +25,7 @@ Produce a comprehensive final sign-off review for a completed plan. Verify all s
 - Do not modify any implementation files — this skill is review-only.
 - If sdd.md does not exist, use plan.md's requirements snapshot as the fallback requirements source.
 - **For software projects:** run `dh-artifact-check` and `dh-preflight` for release readiness validation, and determine the recommended version bump with the `dh-semver` skill in the final report.
+- **Fast mode:** when invoked by `dh-execute-plan-fast`, reuse the pre-run preflight/artifact-check/semver results it already recorded instead of re-running them.
 
 ## Workflow
 
