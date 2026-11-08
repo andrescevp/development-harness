@@ -142,10 +142,10 @@ flowchart TD
   real Node path. At close-out, a repeat without that workaround reproduced
   the isolated-HOME nvm-shim failure; it passed with `NVM_DIR` exported and
   the real Node `bin` directory first on `PATH` (see observation).
-- Release: **unreleased** — `package.json` is `0.5.0-rc.1`, the latest tag is
-  `v0.4.0`, and the work sits on `feature/agent-selection-skills`. The final
-  review recommends a **minor 0.5.0** bump with a BREAKING changelog entry for
-  the removed agents; no tag was created.
+- Release: **v0.5.0** (2026-11-08) — `package.json` finalized from
+  `0.5.0-rc.1`; the release branch is merged to `main` and tagged `v0.5.0`.
+  The changelog includes a BREAKING entry for the removed agents. npm publish
+  remains a manual authenticated step.
 
 ## Follow-ups
 
