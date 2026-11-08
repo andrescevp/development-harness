@@ -30,6 +30,7 @@ export const LOOP = {
     'dh-execute-plan-task-fast',
     'dh-final-review',
     'dh-grill-sdd',
+    'dh-mermaid',
     'dh-pause-plan',
     'dh-planning',
     'dh-preflight',

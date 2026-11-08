@@ -41,7 +41,7 @@ function isDhEntry(entry) {
   );
 }
 
-/** Require the built CLI, bundle, and the 7-agent/21-skill corpus. */
+/** Require the built CLI, bundle, and the 7-agent/22-skill corpus. */
 export function preflight(repoRoot, check) {
   const cli = path.join(repoRoot, 'dist', 'cli.js');
   const plugin = path.join(repoRoot, 'dist', 'plugin.js');
@@ -58,13 +58,13 @@ export function preflight(repoRoot, check) {
   check('dist/plugin.js exists and is non-empty', isFileWithContent(plugin), 'run pnpm build');
   check('dist/assets exists', isDirectory(assets), 'run pnpm build');
   check('dist/assets has exactly 7 agent files', agents.length === 7, `found ${agents.length}`);
-  check('dist/assets has exactly 21 skill directories', skillDirs.length === 21, `found ${skillDirs.length}`);
+  check('dist/assets has exactly 22 skill directories', skillDirs.length === 22, `found ${skillDirs.length}`);
   return (
     isFileWithContent(cli) &&
     isFileWithContent(plugin) &&
     isDirectory(assets) &&
     agents.length === 7 &&
-    skillDirs.length === 21
+    skillDirs.length === 22
   );
 }
 

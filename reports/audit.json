@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-11-08T01:55:21.881Z",
+    "generated": "2026-11-08T12:07:25.897Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -11,19 +11,19 @@
     "dimensions": [
       {
         "name": "Inventory & structure",
-        "count": 28,
+        "count": 29,
         "sev": "PASS",
-        "note": "7 agents, 21 skill dirs + index.md; no commands/, no prompts/"
+        "note": "7 agents, 22 skill dirs + index.md; no commands/, no prompts/"
       },
       {
         "name": "Frontmatter parse",
-        "count": 29,
+        "count": 30,
         "sev": "PASS",
-        "note": "29 files on audit surface"
+        "note": "30 files on audit surface"
       },
       {
         "name": "Name regex",
-        "count": 28,
+        "count": 29,
         "sev": "PASS",
         "note": "/^[a-z0-9]+(-[a-z0-9]+)*$/"
       },
@@ -37,19 +37,19 @@
         "name": "Cross-references",
         "count": 2,
         "sev": "WARN",
-        "note": "632 resolved; 0 code-context; 0 allowlisted; 207 prose tokens (warn)"
+        "note": "645 resolved; 0 code-context; 0 allowlisted; 224 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
-        "count": 28,
+        "count": 29,
         "sev": "PASS",
-        "note": "21/21 skills present; 7/7 agents present"
+        "note": "22/22 skills present; 7/7 agents present"
       },
       {
         "name": "Secret scan",
-        "count": 38,
+        "count": 40,
         "sev": "PASS",
-        "note": "38 low-signature prose hits (instructional), 0 high-signature"
+        "note": "40 low-signature prose hits (instructional), 0 high-signature"
       },
       {
         "name": "Junk scan",
@@ -117,7 +117,7 @@
   "kebabList": [
     {
       "token": "project-name",
-      "count": 27,
+      "count": 28,
       "files": [
         "agents/dh-executor.md",
         "agents/dh-explorer.md",
@@ -610,6 +610,21 @@
       ]
     },
     {
+      "token": "high-risk",
+      "count": 2,
+      "files": [
+        "skills/dh-mermaid/SKILL.md",
+        "skills/dh-planning/SKILL.md"
+      ]
+    },
+    {
+      "token": "plan-diagrams",
+      "count": 2,
+      "files": [
+        "skills/dh-mermaid/SKILL.md"
+      ]
+    },
+    {
       "token": "abbrev-ref",
       "count": 2,
       "files": [
@@ -683,6 +698,13 @@
       "count": 2,
       "files": [
         "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "plan-diagram",
+      "count": 1,
+      "files": [
+        "agents/dh-documentor.md"
       ]
     },
     {
@@ -1232,6 +1254,97 @@
       ]
     },
     {
+      "token": "mermaid-skill",
+      "count": 1,
+      "files": [
+        "skills/dh-mermaid/SKILL.md"
+      ]
+    },
+    {
+      "token": "config-tidy-tree",
+      "count": 1,
+      "files": [
+        "skills/dh-mermaid/SKILL.md"
+      ]
+    },
+    {
+      "token": "config-theming",
+      "count": 1,
+      "files": [
+        "skills/dh-mermaid/SKILL.md"
+      ]
+    },
+    {
+      "token": "config-directives",
+      "count": 1,
+      "files": [
+        "skills/dh-mermaid/SKILL.md"
+      ]
+    },
+    {
+      "token": "diagram-level",
+      "count": 1,
+      "files": [
+        "skills/dh-mermaid/SKILL.md"
+      ]
+    },
+    {
+      "token": "config-layouts",
+      "count": 1,
+      "files": [
+        "skills/dh-mermaid/SKILL.md"
+      ]
+    },
+    {
+      "token": "config-configuration",
+      "count": 1,
+      "files": [
+        "skills/dh-mermaid/SKILL.md"
+      ]
+    },
+    {
+      "token": "config-math",
+      "count": 1,
+      "files": [
+        "skills/dh-mermaid/SKILL.md"
+      ]
+    },
+    {
+      "token": "current-state",
+      "count": 1,
+      "files": [
+        "skills/dh-mermaid/SKILL.md"
+      ]
+    },
+    {
+      "token": "desired-state",
+      "count": 1,
+      "files": [
+        "skills/dh-mermaid/SKILL.md"
+      ]
+    },
+    {
+      "token": "critical-changes",
+      "count": 1,
+      "files": [
+        "skills/dh-mermaid/SKILL.md"
+      ]
+    },
+    {
+      "token": "data-model",
+      "count": 1,
+      "files": [
+        "skills/dh-mermaid/SKILL.md"
+      ]
+    },
+    {
+      "token": "built-in",
+      "count": 1,
+      "files": [
+        "skills/dh-mermaid/SKILL.md"
+      ]
+    },
+    {
       "token": "re-deriving",
       "count": 1,
       "files": [
@@ -1296,6 +1409,13 @@
     },
     {
       "token": "software-specific",
+      "count": 1,
+      "files": [
+        "skills/dh-planning/SKILL.md"
+      ]
+    },
+    {
+      "token": "non-structural",
       "count": 1,
       "files": [
         "skills/dh-planning/SKILL.md"
@@ -1631,7 +1751,7 @@
       ]
     }
   ],
-  "secretLow": 38,
+  "secretLow": 40,
   "secretHigh": [],
   "junkList": [],
   "symlinkCount": 0,
@@ -1687,6 +1807,10 @@
       },
       {
         "name": "dh-grill-sdd",
+        "status": "present"
+      },
+      {
+        "name": "dh-mermaid",
         "status": "present"
       },
       {
@@ -1757,7 +1881,7 @@
     {
       "file": "agents/dh-documentor.md",
       "kind": "agent",
-      "lines": 56,
+      "lines": 76,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -1994,7 +2118,7 @@
     {
       "file": "skills/dh-create-documentation/SKILL.md",
       "kind": "skill",
-      "lines": 230,
+      "lines": 232,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2136,6 +2260,24 @@
       "findings": []
     },
     {
+      "file": "skills/dh-mermaid/SKILL.md",
+      "kind": "skill",
+      "lines": 168,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-mermaid",
+          "description": "Generate Mermaid diagrams for plans and documentation: current state, desired state after the plan, critical changes needing visual explanation, component/architecture graphs, flows, sequences, states, data models, timelines. Use when the user asks to diagram, visualize, map components, or explain a change visually.",
+          "license": "MIT",
+          "compatibility": "opencode, copilot, antigravity",
+          "allowed-tools": "read, write, edit",
+          "metadata": "audience: developers workflow: documentation"
+        }
+      },
+      "findings": []
+    },
+    {
       "file": "skills/dh-pause-plan/SKILL.md",
       "kind": "skill",
       "lines": 245,
@@ -2156,7 +2298,7 @@
     {
       "file": "skills/dh-planning/SKILL.md",
       "kind": "skill",
-      "lines": 113,
+      "lines": 116,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2282,7 +2424,7 @@
     {
       "file": "skills/index.md",
       "kind": "index",
-      "lines": 136,
+      "lines": 137,
       "frontmatter": {
         "status": "none-expected"
       },

@@ -20,21 +20,41 @@ update, delete, retrieve) — everything EXCEPT plan documents
 - **READ ONLY:** `docs/plans/**` (plan documents are owned by
   `@dh-software-architect` via `dh-planning` / `dh-execute-plan` /
   `dh-final-review`).
-- Use the `dh-create-documentation` skill for structure and vault push;
-  run `dh-code-ruler`-style analysis only when asked to document rules.
+
+## Key Skills
+
+- `dh-create-documentation` — document structure, vault push, evolution and
+  observation notes.
+- `dh-mermaid` — complex diagrams: architecture, current/desired state,
+  critical changes, and component graphs.
+- `dh-code-ruler` — rule analysis, only when asked to document conventions.
 
 ## Documentation Rules (enforced on every document)
 
 1. **Markdown is the primary format.** Complementary information and tables
    may use `csv`, `xml`, `yaml`, or `json`.
 2. **Mermaid diagrams** are mandatory to explain complex workflows or
-   designs (native in Obsidian).
+   designs (native in Obsidian). Use `dh-mermaid` for complex diagrams
+   (architecture, current/desired state, critical changes, component graphs)
+   instead of ad-hoc Mermaid.
 3. **ASCII wireframes** are mandatory to represent UI (code blocks).
 4. **Obsidian frontmatter** is mandatory on every document: `title`, `tags`,
    `project`, `created`, `updated`, `stack`, `feature` (see
    dh-create-documentation references).
 5. Documents live in the Obsidian vault = `{project_root}`; all documentation
    under `{project_root}/docs`.
+
+## Diagram Workflow
+
+1. Choose the diagram set: current state, target state, critical changes, and
+   components (split when a diagram exceeds ~20 nodes).
+2. Use `dh-mermaid` and its plan-diagram contract for frontmatter, structure,
+   and syntax; write under `./docs/diagrams/<topic>/` or alongside the
+   document.
+3. Keep Obsidian frontmatter (`title`, `tags`, `project`, `created`,
+   `updated`, `stack`, `feature`, `epic`, `diagram_type`).
+4. Link the diagram from the document section it explains; keep the diagram's
+   `## Related` links pointing back to the document.
 
 ## Retrieval and Parsing
 

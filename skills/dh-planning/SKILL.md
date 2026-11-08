@@ -15,7 +15,7 @@ Create a practical execution plan in `./docs/plans/<plan-slug>/plan.md`, not imp
 ## Core Rules
 
 - Plan only when the request needs implementation work or a formal plan.
-- Do not modify any file other than `./docs/plans/<plan-slug>/plan.md`.
+- Do not modify any file other than `./docs/plans/<plan-slug>/plan.md`, `./docs/plans/<plan-slug>/diagrams/**` (the `dh-mermaid` output), and `./docs/plans/index.md` (the plan index).
 - Do not invent scope, requirements, or constraints.
 - Treat `./docs/plans/<plan-slug>/sdd.md` as the implementation-agnostic requirements contract when it exists.
 - Preserve explicit problem statements, in-scope items, acceptance criteria, edge cases, out-of-scope items, constraints, and open questions from `./docs/plans/<plan-slug>/sdd.md` when present.
@@ -38,6 +38,7 @@ Create a practical execution plan in `./docs/plans/<plan-slug>/plan.md`, not imp
     - Include a documentation sub-task (referencing `dh-create-documentation`) in the plan for any new modules, APIs, or public interfaces.
   - For **non-software projects**: skip delegation to `@dh-software-architect` and `@dh-software-engineer` — these produce software-specific output that is not applicable. Use `@dh-software-engineer` if builder input is needed.
 - Delegate to `@*-qa` agents for concrete languages or frameworks if available to get testing suggestions.
+- **Visual context:** when the plan changes architecture, data flow, components, lifecycle, or has critical/high-risk modifications, use `dh-mermaid` to create `./docs/plans/<plan-slug>/diagrams/` and link it from the plan's `## Visual Context`. Small or non-structural plans write `None — no structural change`.
 - Set properly obsidian frontmatter metadata in all files
 
 ## Workflow
@@ -78,13 +79,14 @@ Before leaving interview mode, confirm the collected answers provide enough info
 6. For each sub-task, list the related requirements so downstream agents can trace the work back to the approved task.
 7. For each sub-task, include its objective, dependencies, in-scope work, explicit non-goals, key risks, implementation suggestions, and validation guidance.
 8. **For software projects:** Include a documentation sub-task that references the `dh-create-documentation` skill for any new modules, APIs, or public interfaces introduced by the plan.
-9. Initialize each newly created sub-task as `Pending` and each phase as `Pending`, and use explicit status markers such as `Pending`, `In Progress`, and `Completed` so agents can reliably pick the next sub-task. Status lines go immediately after the phase/sub-task header (parser contract).
-10. Prefer concrete validation commands or checks when known.
-11. Explain core concepts with appropriate code example when necessary.
-12. Write a self-contained plan that can be executed without the conversation.
-13. **Tools:** create the plan scaffold with the `dh_plan_create` tool when available (then fill details), and read/verify with `dh_plan_read`; fall back to manual writes using `references/phased-plan-template.md` when the tools are not installed. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
-14. Update `./docs/plans/index.md` to add the new plan or reflect the update, including title, slug, description, timestamps and status.
-15. Optionally use chrome mcp tools to validate the work via web if it is possible to do so, and include the results in the plan.
+9. **Create visual context:** invoke `dh-mermaid` for current state, desired state, critical changes, and component graph when applicable; write the diagrams under `./docs/plans/<plan-slug>/diagrams/` and link them from `## Visual Context`. Produce optional timeline/gantt diagrams only after phases are defined.
+10. Initialize each newly created sub-task as `Pending` and each phase as `Pending`, and use explicit status markers such as `Pending`, `In Progress`, and `Completed` so agents can reliably pick the next sub-task. Status lines go immediately after the phase/sub-task header (parser contract).
+11. Prefer concrete validation commands or checks when known.
+12. Explain core concepts with appropriate code example when necessary.
+13. Write a self-contained plan that can be executed without the conversation.
+14. **Tools:** create the plan scaffold with the `dh_plan_create` tool when available (then fill details), and read/verify with `dh_plan_read`; fall back to manual writes using `references/phased-plan-template.md` when the tools are not installed. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
+15. Update `./docs/plans/index.md` to add the new plan or reflect the update, including title, slug, description, timestamps and status.
+16. Optionally use chrome mcp tools to validate the work via web if it is possible to do so, and include the results in the plan.
 
 ## Required Output Template
 
@@ -103,6 +105,7 @@ not emit a flat `## Sub-Tasks` section in new plans.
 - Each newly created sub-task starts as `Pending`.
 - Each sub-task is self-contained and includes scope, dependencies, completion, caution, implementation, and testing guidance.
 - Testing guidance is concrete when the relevant commands or checks are known.
+- `## Visual Context` exists and its links resolve (or it explicitly says `None — no structural change`).
 - The plan stays within the requested scope.
 
 ## Doc search
