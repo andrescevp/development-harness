@@ -9,11 +9,12 @@ runtime delegation routing.
 The `dev-harness-skills` OpenCode V2 plugin bundles a self-contained dev harness for
 plan-driven development: **7 agents** — `dh-software-architect`,
 `dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-executor`, `dh-explorer`, `dh-documentor` —
-and **19 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
-`dh-execute-plan-task`, `dh-pause-plan`, `dh-resume-plan`, `dh-coding`,
-`dh-contingency`, `dh-simplify`, `dh-review`, `dh-code-review`, `dh-preflight`,
-`dh-artifact-check`, `dh-final-review`, `dh-create-documentation`, `dh-grill-sdd`,
-`dh-setup`, `dh-code-ruler`, `dh-semver`. The plugin registers
+and **21 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
+`dh-execute-plan-fast`, `dh-execute-plan-task`, `dh-execute-plan-task-fast`,
+`dh-pause-plan`, `dh-resume-plan`, `dh-coding`, `dh-contingency`, `dh-simplify`,
+`dh-review`, `dh-code-review`, `dh-preflight`, `dh-artifact-check`,
+`dh-final-review`, `dh-create-documentation`, `dh-grill-sdd`, `dh-setup`,
+`dh-code-ruler`, `dh-semver`. The plugin registers
 agents and skills only; the harness tools are served by the shipped
 `dev-harness-mcp` MCP server (no tools, commands, or prompts are registered).
 All plan execution inside the plugin runs the skills loop below.
@@ -33,6 +34,11 @@ Completed). The loop:
 3. `dh-preflight` + `dh-artifact-check`
 4. `dh-final-review` (reports per-phase completion)
 5. `dh-create-documentation` (also writes the evolution and observation notes under `docs/evolution/`)
+
+**Fast execution (alternative).** `dh-execute-plan-fast` +
+`dh-execute-plan-task-fast` execute the same phased plan from `plan_fast.md`,
+defer per-task gates to plan end, and record skipped checks in
+`plan_fast_skip_checks.md`. The standard loop above remains the default.
 
 **Close-out documentation.** Step 5's `dh-create-documentation` also creates
 the plan's evolution note (`docs/evolution/<date>-<slug>.md`) and observation
@@ -61,10 +67,12 @@ detects drift, rehydrates context, marks it `resumed`, and re-enters step 2.
 `dh-execute-plan` redirects to `dh-resume-plan` when a paused handoff exists.
 `handoff.md` is a sidecar, not a fourth status.
 
-**Harness tools (MCP server `dh`):** the plugin registers no tools; the 7
+**Harness tools (MCP server `dh`):** the plugin registers no tools; the 12
 tools (`dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`,
-`dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, `dh_logged_command`)
-are served by a project-scope local stdio MCP server (`@modelcontextprotocol/server` v2). Under Code Mode call them as `tools.dh.<tool>` (direct names use
+`dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`,
+`dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`,
+`dh_update_sheet`, `dh_sheet_schema`, `dh_logged_command`) are served by a
+project-scope local stdio MCP server (`@modelcontextprotocol/server` v2). Under Code Mode call them as `tools.dh.<tool>` (direct names use
 `<server>_<tool>`; consumer permissions match `dh_*`). Loop skills and planner
 agents prefer these tools over manual plan.md edits (fall back to manual edits
 only when the server is unavailable). Format contract:
@@ -85,14 +93,14 @@ bundled agent names — no mapping is needed.
   owned by this repository — the repo is self-contained and independent
   (no external source, no extraction step).
 - OpenCode-only — no copilot/gemini variants.
-- Exactly **7 agents + 19 skills** are bundled. Commands, prompts, and all
+- Exactly **7 agents + 21 skills** are bundled. Commands, prompts, and all
   other non-bundled harness content are intentionally NOT bundled.
 - The `dh-` names are canonical in the repo files; bundled agents ship
   without the `permission` and `tools` frontmatter keys.
 
 ## Plugin registration and loading
 
-- The V2 plugin (`Plugin.define`) registers the 7 agents and 19 skills via
+- The V2 plugin (`Plugin.define`) registers the 7 agents and 21 skills via
   synchronous domain transforms (`ctx.agent.transform`, `ctx.skill.transform`)
   from frontmatter-parsed assets (repo `agents/` + `skills/` in source mode,
   `dist/assets/` in the bundle). Zero tool or command transforms (tools live
@@ -106,7 +114,7 @@ bundled agent names — no mapping is needed.
   `opencode.json(c)` pointing at the repo directory (`pnpm install` only; no
   build needed for source loading), or the installed package name. See
   [`docs/LOADING.md`](docs/LOADING.md).
-- **Verify:** launch opencode and confirm the 7 agents and 19 skills appear
+- **Verify:** launch opencode and confirm the 7 agents and 21 skills appear
   (including `dh-coding`) and no commands are registered; then confirm the
   project-scope `dh` MCP server is connected (`opencode mcp list`) so the
   harness tools are available.
@@ -116,7 +124,7 @@ bundled agent names — no mapping is needed.
 ```text
 index.ts          source-mode plugin entry (re-exports src/plugin.ts)
 agents/           bundled agent definitions (7)
-skills/           bundled skills (19)
+skills/           bundled skills (21)
 src/cli/          installer CLI: args, scope, prompt/output, JSONC, config, manifest, commands
 src/mcp/          stdio MCP server + workspace resolver
 src/tools/        plan/sheet/logged-command tool implementations
@@ -142,7 +150,7 @@ Full QA stack — the release gate `pnpm qa:check:full` runs all of these (the f
 | TypeScript | `tsc -b` (in `pnpm build`) | strict typecheck (typescript 6.x — dependency-cruiser requires <7) |
 | Vitest | `pnpm test` | unit tests |
 | Smoke (plugin) | `node scripts/smoke-load.mjs` | loads the built plugin bundle in isolation |
-| Smoke (MCP) | `node scripts/smoke-mcp.mjs` | spawns the built stdio server: 7 tools, plan round-trip, symlink launch |
+| Smoke (MCP) | `node scripts/smoke-mcp.mjs` | spawns the built stdio server: 12 tools, plan + fast round-trip, symlink launch |
 | Smoke (installer CLI) | `node scripts/smoke-install.mjs` | built CLI install/status/uninstall in isolated HOME/project scopes |
 | Smoke (npm tarball) | `node scripts/smoke-pack.mjs` | packs, inspects, installs offline, imports the plugin, checks bins/MCP/assets |
 | Docker (opt-in) | `scripts/docker-test.sh --local` / `--remote --ref <branch>` | derived `ghcr.io/anomalyco/opencode:2.0.18` image, read-only credential mounts, container lifecycle |

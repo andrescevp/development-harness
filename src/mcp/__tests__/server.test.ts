@@ -1,7 +1,7 @@
 /**
  * server.test.ts — `tools/list` contract for the MCP server factory.
  *
- * Proves the factory registers exactly the 7 harness capabilities with
+ * Proves the factory registers exactly the 12 harness capabilities with
  * meaningful descriptions, and that plan handlers anchor on the injected
  * workspace root. Payload/error parity is covered by the dedicated
  * plan/sheet/command parity suites.
@@ -15,6 +15,11 @@ import { plansFile } from '../../__tests__/helpers/plan-fixtures.js';
 const HARNESS_TOOLS = [
   'logged_command',
   'plan_create',
+  'plan_fast_create',
+  'plan_fast_read',
+  'plan_fast_skip_check',
+  'plan_fast_sync',
+  'plan_fast_update_status',
   'plan_read',
   'plan_update_status',
   'read_sheet',
@@ -33,7 +38,7 @@ describe('MCP server tools/list contract', () => {
     await harness?.close();
   });
 
-  it('exposes exactly the 7 harness tools', async () => {
+  it('exposes exactly the 12 harness tools', async () => {
     const { tools } = await harness!.listTools();
     expect(tools.map((tool) => tool.name).sort()).toEqual(HARNESS_TOOLS);
   });

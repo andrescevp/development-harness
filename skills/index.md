@@ -1,6 +1,6 @@
 # Skills Index — dev-harness-skills plugin
 
-> The plugin bundles **19 skills** (incl. `dh-grill-sdd` SDD interviewer,
+> The plugin bundles **21 skills** (incl. `dh-grill-sdd` SDD interviewer,
 > `dh-setup` harness setup, `dh-contingency` planning support, and
 > `dh-pause-plan` / `dh-resume-plan` lifecycle support).
 > Loading a skill injects its instructions and resources into the current
@@ -80,12 +80,21 @@ detects drift, rehydrates context, marks it `resumed`, and re-enters step 2.
 `dh-execute-plan` redirects when a paused handoff exists; it is not a fourth
 status.
 
+**Fast execution (alternative).** `dh-execute-plan-fast` runs the same phased
+plan from `docs/plans/<slug>/plan_fast.md` with no per-task gates. Status is
+mirrored to both `plan_fast.md` and `plan.md`, skipped checks are appended to
+`plan_fast_skip_checks.md`, and the critical gates (alignment, simplify,
+code-review, domain-check when architectural, preflight, artifact-check, final
+review, docs, semver) run once across plan end. `dh-execute-plan-task-fast`
+handles one sub-task; `dh_plan_fast_sync` + `dh-review` Plan Alignment Mode
+verify mirror alignment.
+
 **Plan lifecycle tools:** use `dh_plan_read` to parse a phased plan,
 `dh_plan_update_status` to flip phase/sub-task status markers, and
 `dh_plan_create` to scaffold a new plan — fall back to direct plan.md
 edits only when the tools are unavailable. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 
-## The 19 bundled skills
+## The 21 bundled skills
 
 | Skill | Role in the loop |
 |---|---|
@@ -93,7 +102,9 @@ edits only when the tools are unavailable. These tools are exposed by the projec
 | [`dh-domain-check`](dh-domain-check/SKILL.md) | During planning + before complex implementation — DDD/SOLID validation |
 | [`dh-contingency`](dh-contingency/SKILL.md) | Planning support — generate Plan A/B/C alternatives with risk, complexity, and trade-off analysis (`docs/plans/<slug>/contingency.md`) |
 | [`dh-execute-plan`](dh-execute-plan/SKILL.md) | Step 2 — orchestrate full plan execution, review each sub-task, resume mode |
+| [`dh-execute-plan-fast`](dh-execute-plan-fast/SKILL.md) | Fast step 2 — execute from `plan_fast.md` with no per-task gates; critical gates at plan end, skipped-check ledger |
 | [`dh-execute-plan-task`](dh-execute-plan-task/SKILL.md) | Step 2.1 — execute one sub-task (project-type-aware delegation) |
+| [`dh-execute-plan-task-fast`](dh-execute-plan-task-fast/SKILL.md) | Fast step 2.1 — one sub-task from the mirror: dual-plan status + per-task ledger rows, no per-task gates |
 | [`dh-pause-plan`](dh-pause-plan/SKILL.md) | Cross-cutting — snapshot the active plan into `handoff.md`; read-only pause, no status changes |
 | [`dh-resume-plan`](dh-resume-plan/SKILL.md) | Cross-cutting — validate the handoff, detect drift, rehydrate context, and resume execution |
 | [`dh-coding`](dh-coding/SKILL.md) | **NEW** — TDD best practices; reads `CODE_RULES.md` at project root |

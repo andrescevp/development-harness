@@ -1,21 +1,21 @@
 # Audit Report — dev-harness-skills plugin
 
-Generated 2026-11-07T14:06:53.974Z by `scripts/audit.mjs`.
+Generated 2026-11-08T01:55:21.881Z by `scripts/audit.mjs`.
 
 ## Verdict
 
-**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 180. Documented schema deviations: 0.
+**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 216. Documented schema deviations: 0.
 
 ## Summary verdict table
 
 | Dimension | Count | Status | Notes |
 |---|---|---|---|
-| Inventory & structure | 26 | PASS | 7 agents, 19 skill dirs + index.md; no commands/, no prompts/ |
-| Frontmatter parse | 27 | PASS | 27 files on audit surface |
-| Name regex | 26 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
+| Inventory & structure | 28 | PASS | 7 agents, 21 skill dirs + index.md; no commands/, no prompts/ |
+| Frontmatter parse | 29 | PASS | 29 files on audit surface |
+| Name regex | 28 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 2 | WARN | 492 resolved; 0 code-context; 0 allowlisted; 171 prose tokens (warn) |
-| Loop membership | 26 | PASS | 19/19 skills present; 7/7 agents present |
+| Cross-references | 2 | WARN | 632 resolved; 0 code-context; 0 allowlisted; 207 prose tokens (warn) |
+| Loop membership | 28 | PASS | 21/21 skills present; 7/7 agents present |
 | Secret scan | 38 | PASS | 38 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
 
@@ -47,7 +47,9 @@ _None._
 | skill | dh-create-documentation | present |
 | skill | dh-domain-check | present |
 | skill | dh-execute-plan | present |
+| skill | dh-execute-plan-fast | present |
 | skill | dh-execute-plan-task | present |
+| skill | dh-execute-plan-task-fast | present |
 | skill | dh-final-review | present |
 | skill | dh-grill-sdd | present |
 | skill | dh-pause-plan | present |
@@ -75,31 +77,31 @@ _None._
 
 Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; full list in reports/audit.json):
 
-- `project-name` × 25
-- `project-scope` × 11
+- `project-name` × 27
+- `per-task` × 17
+- `pre-execution` × 13
+- `project-scope` × 12
+- `plan-end` × 12
+- `plan-fast-skip-checks` × 8
 - `osv-scanner` × 7
+- `plan-fast-template` × 6
+- `skip-checks` × 6
+- `artifact-check` × 6
 - `re-pause` × 6
 - `handoff-template` × 6
+- `domain-check` × 5
+- `status-based` × 5
+- `read-only` × 5
 - `phased-plan-template` × 5
 - `bounded-context` × 4
-- `status-based` × 4
-- `read-only` × 4
+- `re-enter` × 4
+- `dry-run` × 4
+- `review-fast` × 4
+- `review-fast-final` × 4
+- `end-of-plan` × 4
+- `re-enters` × 4
 - `mobile-mcp` × 4
 - `cross-cutting` × 3
-- `state-sync` × 3
-- `non-blocking` × 3
-- `best-effort` × 3
-- `one-line` × 3
-- `implementation-agnostic` × 3
-- `auto-pick` × 3
-- `in-flight` × 3
-- `pre-write` × 3
-- `re-pausing` × 3
-- `chrome-devtools-mcp` × 3
-- `opencode-rules` × 3
-- `pre-commit` × 3
-- `development-harness` × 3
-- `dependency-cruiser` × 2
 
 ## Secret scan
 

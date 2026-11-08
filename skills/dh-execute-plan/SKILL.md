@@ -139,6 +139,7 @@ blockers, and next steps in `handoff.md`; resume later with `dh-resume-plan`.
 
 ## References
 
+- Fast variant: `dh-execute-plan-fast` executes from `plan_fast.md` with no per-task gates and defers critical verification to plan end; `plan.md` stays the scope truth.
 - `dh-execute-plan-task` skill: executes a single sub-task.
 - `dh-review` skill: verifies a single sub-task result.
 - `dh-final-review` skill: produces plan-level sign-off.

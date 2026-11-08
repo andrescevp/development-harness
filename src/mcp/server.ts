@@ -1,7 +1,7 @@
 /**
  * server.ts — MCP server factory for the harness tools.
  *
- * Serves the 7 plan/sheet/command capabilities of the `dh` tool namespace.
+ * Serves the 12 plan/sheet/command capabilities of the `dh` tool namespace.
  * The opencode plugin registers agents and skills only; these tools live here
  * and are served over stdio by `src/mcp/stdio.ts`. Handlers are thin adapters
  * over the pure helpers in `src/tools/*`; the workspace root is injected by
@@ -11,15 +11,17 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import type { CallToolResult } from '@modelcontextprotocol/server';
 import { McpServer } from '@modelcontextprotocol/server';
 import * as z from 'zod/v4';
 import { writeFileAtomic, writeFileExclusiveAtomic } from '../lib/atomic-write.js';
 import { runLoggedCommand } from '../tools/logged-command.js';
+import { appendSkipChecks, createFastPlan, readFastPlan, updateFastStatus } from '../tools/plan-fast.js';
+import { syncFastPlan } from '../tools/plan-fast-sync.js';
 import { appendPlanIndexRow, assertPlanIndexWritable, readPlanFile } from '../tools/plan-io.js';
 import { buildPlanTemplate, PHASE_STATUSES, parsePlan, STATUS_TARGETS, setStatus } from '../tools/plan-lifecycle.js';
 import { resolvePlanPath } from '../tools/plan-paths.js';
 import { readSheet, sheetSchema, updateSheet } from '../tools/sheet-tools.js';
+import { guarded, guardedAsync, textResult } from './tool-results.js';
 
 export interface BuildServerOptions {
   /** Absolute workspace root; plan paths anchor under `<root>/docs/plans`. */
@@ -31,49 +33,6 @@ export interface BuildServerOptions {
 }
 
 const SERVER_NAME = 'dev-harness-skills';
-
-/** Serialize a tool payload into the MCP text-content result contract. */
-function textResult(payload: unknown): CallToolResult {
-  return { content: [{ type: 'text', text: JSON.stringify(payload) }] };
-}
-
-/** MCP error-result contract (parity error messages survive verbatim). */
-function errorResult(message: string): CallToolResult {
-  return { content: [{ type: 'text', text: message }], isError: true };
-}
-
-/** Map a thrown value onto the MCP error-result contract. */
-function toErrorResult(err: unknown): CallToolResult {
-  return errorResult(err instanceof Error ? err.message : String(err));
-}
-
-/**
- * Run a synchronous tool body, mapping thrown helper errors to `isError`.
- * Synchronous on purpose: read-modify-write bodies keep no `await` between
- * their `readPlanFile` read and `writeFileAtomic` rename. The SDK also maps
- * handler throws to this shape; the guard keeps the parity contract explicit
- * and SDK-independent.
- */
-function guarded(body: () => CallToolResult): CallToolResult {
-  try {
-    return body();
-  } catch (err) {
-    return toErrorResult(err);
-  }
-}
-
-/**
- * Async-safe variant of `guarded` for handlers delegating to async helpers.
- * The SDK also maps handler throws to the same `{ content, isError }` shape;
- * the guard keeps the parity contract explicit and SDK-independent.
- */
-async function guardedAsync(body: () => Promise<CallToolResult>): Promise<CallToolResult> {
-  try {
-    return await body();
-  } catch (err) {
-    return toErrorResult(err);
-  }
-}
 
 /** Fresh server instance per connection — never share one across transports. */
 export function buildServer({ workspaceRoot, version, instructions }: BuildServerOptions): McpServer {
@@ -161,6 +120,82 @@ export function buildServer({ workspaceRoot, version, instructions }: BuildServe
         if (updateIndex) appendPlanIndexRow(workspaceRoot, slug, title);
         return textResult({ ok: true, path: file, plan });
       })
+  );
+
+  server.registerTool(
+    'plan_fast_create',
+    {
+      description:
+        'Create docs/plans/<slug>/plan_fast.md from plan.md and seed plan_fast_skip_checks.md with the six standard rows when missing. replace=true recreates only an all-Pending mirror and never overwrites the ledger. Input: slug, optional replace.',
+      inputSchema: z.object({
+        slug: z.string().describe('Plan slug (docs/plans/<slug>)'),
+        replace: z.boolean().describe('Recreate an existing all-Pending fast mirror').optional(),
+      }),
+    },
+    async ({ slug, replace }) => guarded(() => textResult(createFastPlan(workspaceRoot, slug, replace ?? false)))
+  );
+
+  server.registerTool(
+    'plan_fast_read',
+    {
+      description:
+        'Read/parse plan_fast.md and return the fast plan, source plan path, recomputed source_sha256, the stale flag, and the skipped-check ledger path. Input: slug.',
+      inputSchema: z.object({
+        slug: z.string().describe('Plan slug (docs/plans/<slug>)'),
+      }),
+    },
+    async ({ slug }) => guarded(() => textResult(readFastPlan(workspaceRoot, slug)))
+  );
+
+  server.registerTool(
+    'plan_fast_update_status',
+    {
+      description:
+        'Update a phase or sub-task status in BOTH plan_fast.md and plan.md, restoring the fast file if the plan mirror write fails. target=phase→index "N"; target=subtask→"N.M". status ∈ Pending | In Progress | Completed.',
+      inputSchema: z.object({
+        slug: z.string().describe('Plan slug (docs/plans/<slug>)'),
+        target: z.enum(STATUS_TARGETS),
+        index: z.string().describe('Phase "N" or sub-task "N.M"'),
+        status: z.enum(PHASE_STATUSES),
+      }),
+    },
+    async ({ slug, target, index, status }) =>
+      guarded(() => textResult(updateFastStatus(workspaceRoot, slug, target, index, status)))
+  );
+
+  server.registerTool(
+    'plan_fast_sync',
+    {
+      description:
+        'Compare plan_fast.md with plan.md (structure, statuses, completed phases). Dry-run by default; apply=true mirrors fast→plan only at pre-execution. phase=plan-end is an equality gate: any difference returns requiresConfirmation and never writes.',
+      inputSchema: z.object({
+        slug: z.string().describe('Plan slug (docs/plans/<slug>)'),
+        apply: z.boolean().describe('Apply fast→plan differences and phase closes').optional(),
+        phase: z
+          .enum(['pre-execution', 'plan-end'])
+          .describe('Reconciliation phase (default pre-execution)')
+          .optional(),
+      }),
+    },
+    async ({ slug, apply, phase }) =>
+      guarded(() => textResult(syncFastPlan(workspaceRoot, slug, apply ?? false, phase ?? 'pre-execution')))
+  );
+
+  server.registerTool(
+    'plan_fast_skip_check',
+    {
+      description:
+        'Append one or more skipped-check rows to plan_fast_skip_checks.md (append-only), seeding the six standard rows first when the ledger is missing. Input: slug, checks[], scope, reason, disposition.',
+      inputSchema: z.object({
+        slug: z.string().describe('Plan slug (docs/plans/<slug>)'),
+        checks: z.array(z.string()).min(1).describe('Check names to record (one row each)'),
+        scope: z.string().describe('Plan, End gates, or Sub-Task N.M'),
+        reason: z.string().describe('Why the check was skipped/deferred'),
+        disposition: z.string().describe('deferred to end-of-plan | end-of-plan | run: PASS/FAIL | not applicable'),
+      }),
+    },
+    async ({ slug, checks, scope, reason, disposition }) =>
+      guarded(() => textResult(appendSkipChecks(workspaceRoot, slug, checks, scope, reason, disposition)))
   );
 
   server.registerTool(

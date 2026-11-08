@@ -4,11 +4,13 @@
  *
  * The child's cwd is a fresh, canonicalised temp workspace (DH_WORKSPACE_ROOT
  * forced empty), so `process.cwd()` anchoring is exercised end-to-end. Checks:
- *   - tools/list exposes exactly the 7 harness tools (direct + symlink launch);
+ *   - tools/list exposes exactly the 12 harness tools (direct + symlink launch);
  *   - plan_create (updateIndex) returns { ok, path }, writes the file, appends
  *     the index row, and leaves no *.tmp residue;
  *   - plan_read returns the same path with phases/sub-tasks;
  *   - plan_update_status round-trips a sub-task status through a disk re-read;
+ *   - plan_fast_create/read/update_status/skip_check round-trip the fast mirror
+ *     and append the skipped-check ledger;
  *   - the entry launched THROUGH a symlink (npm/npx `.bin` shape) handshakes.
  *
  * Check assertions are collected; thrown spawn/payload errors fail fast. Exit 0
@@ -30,6 +32,11 @@ const REQUEST_TIMEOUT_MS = 5_000;
 const EXPECTED_TOOLS = [
   'logged_command',
   'plan_create',
+  'plan_fast_create',
+  'plan_fast_read',
+  'plan_fast_skip_check',
+  'plan_fast_sync',
+  'plan_fast_update_status',
   'plan_read',
   'plan_update_status',
   'read_sheet',
@@ -235,6 +242,75 @@ async function runChecks(root) {
     );
     const persistedStatus = persisted.plan?.phases?.[0]?.subTasks?.[0]?.status;
     check('plan_update_status persisted to disk', persistedStatus === 'In Progress', String(persistedStatus));
+
+    const fastCreated = payload(
+      'plan_fast_create',
+      await client.callTool({ name: 'plan_fast_create', arguments: { slug: 'smoke' } }, { timeout: REQUEST_TIMEOUT_MS })
+    );
+    check(
+      'plan_fast_create returns mirror + seeded ledger',
+      fastCreated?.ok === true &&
+        typeof fastCreated.path === 'string' &&
+        typeof fastCreated.skipChecksPath === 'string' &&
+        /^[0-9a-f]{64}$/.test(String(fastCreated.sourceSha256)) &&
+        fs.existsSync(fastCreated.path) &&
+        fs.existsSync(fastCreated.skipChecksPath),
+      JSON.stringify(fastCreated)
+    );
+
+    const fastRead = payload(
+      'plan_fast_read',
+      await client.callTool({ name: 'plan_fast_read', arguments: { slug: 'smoke' } }, { timeout: REQUEST_TIMEOUT_MS })
+    );
+    check(
+      'plan_fast_read reports a fresh mirror',
+      fastRead?.path === fastCreated.path && fastRead?.stale === false && fastRead?.plan?.phases?.length === 1,
+      JSON.stringify({ stale: fastRead?.stale, phases: fastRead?.plan?.phases?.length })
+    );
+
+    const fastUpdated = payload(
+      'plan_fast_update_status',
+      await client.callTool(
+        {
+          name: 'plan_fast_update_status',
+          arguments: { slug: 'smoke', target: 'subtask', index: '1.1', status: 'Completed' },
+        },
+        { timeout: REQUEST_TIMEOUT_MS }
+      )
+    );
+    const fastStatus = fastUpdated?.plan?.phases?.[0]?.subTasks?.[0]?.status;
+    const mirroredStatus = fastUpdated?.mirroredPlan?.phases?.[0]?.subTasks?.[0]?.status;
+    check(
+      'plan_fast_update_status mirrors both plans',
+      fastStatus === 'Completed' && mirroredStatus === 'Completed',
+      JSON.stringify({ fastStatus, mirroredStatus })
+    );
+
+    const fastSkip = payload(
+      'plan_fast_skip_check',
+      await client.callTool(
+        {
+          name: 'plan_fast_skip_check',
+          arguments: {
+            slug: 'smoke',
+            checks: ['dh-review'],
+            scope: 'Sub-Task 1.1',
+            reason: 'smoke round-trip',
+            disposition: 'end-of-plan',
+          },
+        },
+        { timeout: REQUEST_TIMEOUT_MS }
+      )
+    );
+    check(
+      'plan_fast_skip_check appends a ledger row',
+      fastSkip?.ok === true &&
+        fastSkip?.appended === 1 &&
+        typeof fastSkip?.path === 'string' &&
+        fs.readFileSync(fastSkip.path, 'utf8').includes('| dh-review | Sub-Task 1.1 |'),
+      JSON.stringify(fastSkip)
+    );
+    checkNoTmpResidue('fast tools leave no *.tmp residue', [path.dirname(planPath), plansDir]);
   });
 
   // npm/npx `.bin` shape: launch the symlink itself (shebang + exec bit).

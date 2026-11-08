@@ -164,6 +164,7 @@ section. Executing a sub-task sits inside loop step 2:
 
 ## References
 
+- Fast variant: `dh-execute-plan-task-fast` executes one sub-task from `plan_fast.md` with dual-plan status writes, per-task skipped-check rows, and no per-task gates.
 - `dh-domain-check` skill: validates architecture against DDD bounded contexts and SOLID principles before complex implementation (software projects only).
 - `dh-simplify` skill: reviews changed code for reuse, quality, and efficiency after validation (software projects only).
 - `dh-create-documentation` skill: generates docs for new modules, APIs, and interfaces after simplify (software projects only).
