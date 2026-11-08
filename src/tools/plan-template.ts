@@ -96,6 +96,12 @@ None — no structural change.
 
 > \`dh-mermaid\` replaces this line with links under \`./diagrams/\` when the plan has visual impact.
 
+## Agent Selection
+
+None — no specialized agent required.
+
+> Replace this line with the selection protocol's table (\`| Role | Selected agent | Why | Fallback |\`) when the plan delegates work; keep the table before \`## Phases\`.
+
 ## Phases
 
 ${phaseBlocks}

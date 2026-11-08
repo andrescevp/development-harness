@@ -1,7 +1,7 @@
 ---
 name: dh-execute-plan-task
 description: >
-  Execute a single sub-task from plan.md: select the active one (In Progress phase first), implement (TDD), validate via dh-executor, update status; project-type aware. Use for the next sub-task or continuing work — not orchestration.
+  Execute a single sub-task from plan.md: select the active one (In Progress phase first), implement (TDD), validate via dh-execute-cli, update status; project-type aware. Use for the next sub-task or continuing work — not orchestration.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: read, write, edit, bash
@@ -16,12 +16,13 @@ Execute one self-contained sub-task from `./docs/plans/<plan-slug>/plan.md`.
 
 - Read the plan with the `dh_plan_read` tool (`{ slug }` → structured JSON: meta, phases[].title/status, subTasks[].phase/title/status) to find the active sub-task. Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually, following the phased template markers (`## Phases` → `### Phase N: <title>` → `#### Sub-Task N.M: <title>` with `- **Status:**` bullets). If the plan does not exist, stop and report that no plan was found — suggest running the `dh-planning` skill first. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 - Treat the sub-task entry in plan.md as the full implementation brief.
-- **ALL sub-task execution is delegated to `@dh-software-engineer`** (the harness's single task executor). There is no complexity- or type-based builder split: simple, standard, complex, and non-software work ALL go to `@dh-software-engineer`.
+- **Resolve agents from `## Agent Selection`:** read the plan's selection table and use its implementation and review rows. If the section, or a required role row, is absent (including a `None — no specialized agent required` table) or stale, run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md), record the rows, and continue. A selected agent missing with no capability fallback stops the run — never substitute silently.
+- **ALL sub-task execution is delegated to the plan's selected implementation agent** (the single task executor). There is no complexity- or type-based builder split: simple, standard, complex, and non-software work ALL go to that one agent.
 - **Detect project type** before the post-steps: it determines whether `dh-domain-check`, `dh-simplify`, and `dh-create-documentation` run (software projects only) — it does NOT change who implements.
 - For **software projects**: run `dh-domain-check` before complex implementation, `dh-simplify` after validation, and `dh-create-documentation` for new modules/APIs.
-- For **non-software projects**: skip the `dh-simplify`, `dh-domain-check`, and `dh-create-documentation` steps entirely; implementation still goes to `@dh-software-engineer`.
-- Delegate validation to `@dh-executor` for tests, linters, and builds.
-- Delegate review to `@dh-reviewer` for code quality and acceptance criteria checks.
+- For **non-software projects**: skip the `dh-simplify`, `dh-domain-check`, and `dh-create-documentation` steps entirely; implementation still goes to the selected implementation agent.
+- Use the `dh-execute-cli` skill for tests, linters, and builds.
+- Delegate review to the plan's selected review agent for code quality and acceptance criteria checks.
 - Do not modify files outside the sub-task scope.
 - Update the sub-task status only after review passes — via `dh_plan_update_status` (`target: "subtask"`, status `Completed`); fallback: manual plan.md edit per the marker rules.
 - If the sub-task has dependencies on earlier sub-tasks, verify they are Completed before starting.
@@ -40,11 +41,15 @@ Check the project root for software marker files to determine project type. This
 4. If uncertain (e.g., a `Makefile` with no other code), check for source code directories (`src/`, `lib/`, `app/`) as secondary indicators.
 
 Implementation delegation is IDENTICAL for both types: **every sub-task is
-implemented by `@dh-software-engineer`**.
+implemented by the plan's selected implementation agent**.
 
 > **Why this matters:** Non-software projects (docs repos, config repos, design assets) don't benefit from architecture/engineering agents or code-level simplification. Using the wrong agent type wastes context and produces irrelevant findings.
 
 ## Workflow
+
+### Step 0: Resolve the delegated agents
+
+Read `## Agent Selection` in `plan.md` and take the implementation and review roles from it. If the section — or a required role row — is absent or stale, run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md) (runtime agent list → project config/agent directories → global definitions), record the rows, and continue. If a selected agent is unavailable and no bundled capability covers the role, stop and report the gap.
 
 ### Step 1: Select the active sub-task
 
@@ -57,12 +62,12 @@ Read the plan with the `dh_plan_read` tool (`{ slug }`) and find exactly one sub
 
 ### Step 2: Implement the sub-task
 
-Follow the sub-task's instructions, in-scope list, and implementation suggestions. **Every sub-task is delegated to `@dh-software-engineer`**:
+Follow the sub-task's instructions, in-scope list, and implementation suggestions. **Every sub-task is delegated to the plan's selected implementation agent**:
 
-- Delegate the FULL sub-task brief to `@dh-software-engineer` — for complex work (multi-file, architectural decisions, new modules), run the `dh-domain-check` skill first and include its findings in the delegation.
-- The implementation follows the `dh-coding` skill through `@dh-software-engineer` (test-first TDD; `CODE_RULES.md` at project root when present).
-- **TDD**: the failing test is written first, then the minimal change to make it pass — performed inside the `@dh-software-engineer` implementation pass.
-- Do NOT implement sub-task work directly and do NOT seek another builder: `@dh-software-engineer` is the single task executor in this harness.
+- Delegate the FULL sub-task brief to the selected implementation agent — for complex work (multi-file, architectural decisions, new modules), run the `dh-domain-check` skill first and include its findings in the delegation.
+- The implementation follows the `dh-coding` skill through the selected implementation agent (test-first TDD; `CODE_RULES.md` at project root when present).
+- **TDD**: the failing test is written first, then the minimal change to make it pass — performed inside the selected implementation agent's pass.
+- Do NOT implement sub-task work directly and do NOT seek another builder: the selected implementation agent is the single task executor for this plan.
 
 **General rules:**
 - Stay within the sub-task's in-scope boundaries. Do not widen scope.
@@ -70,7 +75,7 @@ Follow the sub-task's instructions, in-scope list, and implementation suggestion
 
 ### Step 3: Run validation
 
-Ask `@dh-executor` to run the smallest relevant validation for the changed code:
+Use the `dh-execute-cli` skill to run the smallest relevant validation for the changed code:
 
 - Run tests related to the changed files.
 - Run linters and static analysis.
@@ -87,7 +92,7 @@ Run the `dh-simplify` skill to review all changed code for reuse opportunities, 
 1. Invoke the `dh-simplify` skill with the full diff context from the sub-task implementation.
 2. Wait for all three simplify agents (code reuse, quality, efficiency) to report findings.
 3. Fix all P0/P1 issues found by simplify. For P2/P3 findings, use judgment — fix if meaningful, defer if low impact.
-4. If fixes were made, re-run validation via `@dh-executor` to ensure nothing broke.
+4. If fixes were made, re-run validation via the `dh-execute-cli` skill to ensure nothing broke.
 5. **For non-software projects:** skip this entire step — the `dh-simplify` skill is code-focused and would produce irrelevant findings.
 
 ### Step 3b: Generate documentation (software projects only)
@@ -103,7 +108,7 @@ Run the `dh-create-documentation` skill to generate or update API references, mo
 
 ### Step 4: Request review
 
-(Orchestration note) When invoked from `dh-execute-plan` orchestrator, skip this step — the orchestrator runs the `dh-review` skill after this sub-task completes. When invoked standalone, ask `@dh-reviewer` to review the changes against the active sub-task's acceptance criteria, scope boundaries, and done-when conditions. The reviewer writes findings to `./docs/plans/<plan-slug>/tasks/review.md`.
+(Orchestration note) When invoked from `dh-execute-plan` orchestrator, skip this step — the orchestrator runs the `dh-review` skill after this sub-task completes. When invoked standalone, ask the plan's selected review agent to review the changes against the active sub-task's acceptance criteria, scope boundaries, and done-when conditions. The reviewer writes findings to `./docs/plans/<plan-slug>/tasks/review.md`.
 
 ### Step 5: Address review feedback
 
@@ -111,14 +116,14 @@ Read the review and address findings:
 
 - For P0/P1 (blocking/high): fix immediately, then proceed to Step 5a.
 - For P2/P3: use judgment — fix if meaningful, defer if low impact.
-- After fixes, ask `@dh-executor` to re-run the relevant validation.
+- After fixes, re-run the relevant validation with the `dh-execute-cli` skill.
 - Update `./docs/plans/<plan-slug>/tasks/review.md` marking each finding as `Addressed` or `Not Addressed` with a brief rationale.
 - If re-validation fails 2 additional times after initial fixes, stop and report the failure with full error output — do not proceed; recommend `dh-pause-plan` to preserve state in `handoff.md` (resume with `dh-resume-plan`).
 
 ### Step 5a: Confirm review resolution
 
 - If the reviewer approved (no outstanding P0/P1 findings), proceed to Step 6.
-- If P0/P1 findings remain unaddressed, fix them and request a re-review from `@dh-reviewer` (loop back to Step 4).
+- If P0/P1 findings remain unaddressed, fix them and request a re-review from the selected review agent (loop back to Step 4).
 - If P0/P1 findings cannot be resolved in-session, recommend `dh-pause-plan` before stopping; do not mark the sub-task or phase `Completed`.
 - If only P2/P3 findings remain and you have addressed or explicitly deferred them with rationale, proceed to Step 6.
 
@@ -132,15 +137,17 @@ Read the review and address findings:
 ## Execution Delegation Guide
 
 **Single executor policy:** every sub-task — software, non-software, simple,
-standard, complex — is implemented by `@dh-software-engineer`.
+standard, complex — is implemented by the plan's selected implementation agent.
+There is no builder split.
 
 | Work | Delegate to | Post-steps |
 |---|---|---|
-| Software (complex, architectural) | `@dh-software-engineer` | `dh-domain-check` first, then `dh-simplify` + `dh-create-documentation` |
-| Software (other) | `@dh-software-engineer` | `dh-simplify` after validation |
-| Non-software | `@dh-software-engineer` | none (skip `dh-simplify`/`dh-domain-check`/`dh-create-documentation`) |
+| Software (complex, architectural) | selected implementation agent | `dh-domain-check` first, then `dh-simplify` + `dh-create-documentation` |
+| Software (other) | selected implementation agent | `dh-simplify` after validation |
+| Non-software | selected implementation agent | none (skip `dh-simplify`/`dh-domain-check`/`dh-create-documentation`) |
 
-Validation always runs through `@dh-executor`; review through `@dh-reviewer`.
+Validation always runs through the `dh-execute-cli` skill; review through the
+plan's selected review agent.
 
 ## Loop Integration (bundled)
 
@@ -165,12 +172,14 @@ section. Executing a sub-task sits inside loop step 2:
 ## References
 
 - Fast variant: `dh-execute-plan-task-fast` executes one sub-task from `plan_fast.md` with dual-plan status writes, per-task skipped-check rows, and no per-task gates.
+- [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): capability→agent resolution (discovery, ranking, fallback, re-validation).
+- `dh-execute-cli` skill: runs commands, tests, linters, and builds with logged, compact output.
 - `dh-domain-check` skill: validates architecture against DDD bounded contexts and SOLID principles before complex implementation (software projects only).
 - `dh-simplify` skill: reviews changed code for reuse, quality, and efficiency after validation (software projects only).
 - `dh-create-documentation` skill: generates docs for new modules, APIs, and interfaces after simplify (software projects only).
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

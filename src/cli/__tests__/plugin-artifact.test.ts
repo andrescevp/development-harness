@@ -184,11 +184,11 @@ describe('buildStagedPlugin', () => {
   const LAYOUT_CASES: ReadonlyArray<{ name: string; options: FixtureOptions; pattern: RegExp }> = [
     { name: 'a missing bundle', options: { withBundle: false }, pattern: /dist\/plugin\.js is missing.*pnpm build/ },
     { name: 'missing assets', options: { withAssets: false }, pattern: /dist\/assets is missing/ },
-    { name: 'too few agents', options: { agents: 6 }, pattern: /expected 7 agent files.*found 6 agents and 22 skills/ },
+    { name: 'too few agents', options: { agents: 4 }, pattern: /expected 5 agent files.*found 4 agents and 24 skills/ },
     {
       name: 'too few skills',
       options: { skills: 16 },
-      pattern: /expected 7 agent files and 22 skill directories.*found 7 agents and 16 skills/,
+      pattern: /expected 5 agent files and 24 skill directories.*found 5 agents and 16 skills/,
     },
   ];
 

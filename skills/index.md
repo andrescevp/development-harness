@@ -1,6 +1,6 @@
 # Skills Index — dev-harness-skills plugin
 
-> The plugin bundles **22 skills** (incl. `dh-grill-sdd` SDD interviewer,
+> The plugin bundles **24 skills** (incl. `dh-grill-sdd` SDD interviewer,
 > `dh-setup` harness setup, `dh-contingency` planning support, and
 > `dh-pause-plan` / `dh-resume-plan` lifecycle support).
 > Loading a skill injects its instructions and resources into the current
@@ -94,7 +94,7 @@ verify mirror alignment.
 `dh_plan_create` to scaffold a new plan — fall back to direct plan.md
 edits only when the tools are unavailable. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 
-## The 22 bundled skills
+## The 24 bundled skills
 
 | Skill | Role in the loop |
 |---|---|
@@ -108,6 +108,8 @@ edits only when the tools are unavailable. These tools are exposed by the projec
 | [`dh-pause-plan`](dh-pause-plan/SKILL.md) | Cross-cutting — snapshot the active plan into `handoff.md`; read-only pause, no status changes |
 | [`dh-resume-plan`](dh-resume-plan/SKILL.md) | Cross-cutting — validate the handoff, detect drift, rehydrate context, and resume execution |
 | [`dh-coding`](dh-coding/SKILL.md) | **NEW** — TDD best practices; reads `CODE_RULES.md` at project root |
+| [`dh-execute-cli`](dh-execute-cli/SKILL.md) | Utility — execute commands, tests, builds, linters, and validation via the logged-command strategy (`dh_logged_command` or temp-log head/tail); compact reports |
+| [`dh-explore`](dh-explore/SKILL.md) | Utility — codebase exploration with glob, grep, and targeted reads; compact evidence with exact file references |
 | [`dh-simplify`](dh-simplify/SKILL.md) | Step 2.2 — reuse/quality/efficiency pass on changed code (software only) |
 | [`dh-review`](dh-review/SKILL.md) | Step 2.3 — verify a sub-task against acceptance criteria |
 | [`dh-code-review`](dh-code-review/SKILL.md) | Step 2.3 — code-level correctness/security/robustness review |
@@ -118,18 +120,30 @@ edits only when the tools are unavailable. These tools are exposed by the projec
 | [`dh-mermaid`](dh-mermaid/SKILL.md) | Planning + docs — Mermaid diagrams: current/desired state, critical changes, component graphs; plan output under `docs/plans/<slug>/diagrams/` |
 | [`dh-grill-sdd`](dh-grill-sdd/SKILL.md) | Pre-planning — interviews the user and produces `./docs/plans/<slug>/sdd.md` (the requirements contract `dh-planning` consumes) |
 | [`dh-setup`](dh-setup/SKILL.md) | Environment — audits system software (chrome/uv/nvm/osv-scanner/docker/jq/xq/yq/graphify/phpenv), user MCPs + plugins, and scaffolds project QA (hooks + stack tools) |
-| [`dh-code-ruler`](dh-code-ruler/SKILL.md) | Rules — grills the user + analyzes code to generate `{project_root}/CODE_RULES.md` (style, patterns, security/perf constraints, stack best practices); run by dh-software-architect |
+| [`dh-code-ruler`](dh-code-ruler/SKILL.md) | Rules — grills the user + analyzes code to generate `{project_root}/CODE_RULES.md` (style, patterns, security/perf constraints, stack best practices); run by the selected architecture agent |
 | [`dh-semver`](dh-semver/SKILL.md) | Release — analyzes commits since the last tag, determines the version bump, generates a changelog, and creates a local tag (harness adaptation of the global `semver` skill) |
 
 ## Agents
 
-The 7 bundled agents used by the skills loop (see `AGENTS.md` → Runtime
-delegation):
+The 5 bundled agents available as harness capabilities (see `AGENTS.md` →
+Runtime delegation):
 
-`dh-software-architect` (planning, execute-plan, create-documentation) ·
-`dh-software-engineer` (execute-plan-task, coding) · `dh-reviewer` (simplify,
-review, code-review) · `dh-final-reviewer` (final-review) · `dh-executor` (all
-validation/execution) · `dh-explorer` (codebase exploration), `dh-documentor` (documentation owner).
+`dh-software-architect` (architecture, planning support) ·
+`dh-software-engineer` (implementation, TDD coding) · `dh-reviewer` (review,
+code-review) · `dh-final-reviewer` (final sign-off) · `dh-documentor`
+(documentation owner).
+
+Delegation is capability-based: skills resolve the architecture,
+implementation, testing/QA, review, final-review, and documentation roles
+against the current environment using
+[`dh-planning/references/agent-selection.md`](dh-planning/references/agent-selection.md)
+(runtime agent list → project config/agent directories → global definitions;
+project-specific agents win over bundled fallbacks). `dh-planning` records the
+chosen agents and generic fallbacks in the plan's `## Agent Selection` table;
+execution re-validates them before delegating.
+
+Command execution and codebase exploration are skill instruction layers
+(`dh-execute-cli`, `dh-explore`), not selectable agents.
 
 ## Out of scope
 

@@ -92,7 +92,8 @@ updated: <YYYY-MM-DD>
 - `plan_fast.md` intentionally omits these top-level sections (never findings):
   `## Objective`, `## Requirements Snapshot`, `## Scope`,
   `## Assumptions and Constraints`, `## Risks and Areas Requiring Care`,
-  `## Core concepts`, `## Visual Context`, `## Open Questions`. Use `plan.md`
+  `## Core concepts`, `## Visual Context`, `## Agent Selection`,
+  `## Open Questions`. Use `plan.md`
   for those checks.
 - Allowed fast sections: `## Fast Execution Policy`, `## Alignment Contract`,
   `## Final Verification`.

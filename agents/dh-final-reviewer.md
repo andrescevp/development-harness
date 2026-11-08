@@ -2,7 +2,7 @@
 name: dh-final-reviewer
 description: >
   Final in-depth reviewer — performs full diff review against task requirements and plan.
-  Use via @dh-final-reviewer for sign-off review.
+  Selected by the `dh-final-review` skill for the final-review role when the plan's Agent Selection names this agent.
 mode: subagent
 ---
 
@@ -30,6 +30,6 @@ You are a final in-depth reviewer. Perform a comprehensive review of the full di
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

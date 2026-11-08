@@ -33,6 +33,8 @@ implements work, edits code, or replaces `dh-review` / `dh-final-review`.
   statuses, never edit `plan.md` or source files, never commit, stash, reset,
   checkout, or switch branches. The only file written is
   `docs/plans/<plan-slug>/handoff.md`.
+- **Commands via the `dh-execute-cli` skill.** Run every git snapshot and
+  verification command through that skill; never run bash directly.
 - **No secrets.** Never record secrets, tokens, credentials, API keys,
   passwords, environment values, full diffs, or file contents; record paths,
   commit ids, and one-line summaries only.
@@ -239,6 +241,6 @@ orchestrator's phase lifecycle, or `dh-final-review`.
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

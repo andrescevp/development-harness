@@ -17,7 +17,8 @@ Verify that a single sub-task implementation meets its plan-defined acceptance c
 - Read the plan to find the active sub-task and its criteria — via `dh_plan_read` (`{ slug }`) when available, else manual read of `./docs/plans/<plan-slug>/plan.md` following the phased marker rules. If the plan does not exist, stop and report that no plan was found. The plan tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 - This skill is loop step 2.3 (`dh-review` + `dh-code-review`); the full loop 1–5 lives in repo-root AGENTS.md (pointer only, no duplication).
 - Do not review code outside the sub-task scope.
-- Delegate code quality checks to `@dh-reviewer` agent — do not duplicate the `dh-code-review` skill.
+- **Resolve the review agent (standard review only):** read `## Agent Selection` in `plan.md` and use its Review row. If the section or row is absent or stale, run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md), record the row, and continue. A selected reviewer that is unavailable and has no capability fallback stops the run — never substitute silently.
+- Delegate code quality checks to the selected review agent — do not duplicate the `dh-code-review` skill.
 - Write all findings to `./docs/plans/<plan-slug>/tasks/review.md`. **Exception:** Plan Alignment Mode writes to the caller-specified path — default `tasks/review-fast.md` (pre-execution) or `tasks/review-fast-final.md` (plan-end).
 - Use severity levels from the `dh-code-review` skill: P0 (blocking), P1 (high), P2 (medium), P3 (low).
 - If no sub-task is In Progress, review the most recently Completed sub-task and state that assumption.
@@ -28,9 +29,9 @@ A **separate mode**, not a variant of the sub-task review. Trigger it when the
 caller asks to compare `plan.md` with `plan_fast.md` for fast execution.
 
 **Skip Workflow Steps 1–7 entirely.** In this mode there is no sub-task
-selection, no diff review, no `@dh-reviewer`, no `dh-code-review`, and no
-`dh-domain-check`. This mode performs **no code review** and writes no standard
-review report.
+selection, no diff review, no review-agent delegation, no `dh-code-review`, and
+no `dh-domain-check`. This mode performs **no code review** and writes no
+standard review report.
 
 **Input:** `phase: pre-execution | plan-end`, plus the report path.
 
@@ -48,9 +49,10 @@ Read `./docs/plans/<plan-slug>/plan.md` and
 - `plan_fast.md` intentionally omits `## Objective`, `## Requirements Snapshot`,
   `## Scope`, `## Assumptions and Constraints`,
   `## Risks and Areas Requiring Care`, `## Core concepts`, `## Visual Context`,
-  and `## Open Questions`. Compare the `## Phases` region and sub-task fields
-  against `plan.md`, and use `plan.md` for requirements/scope checks. Do **not**
-  flag those omitted top-level sections as missing.
+  `## Agent Selection`, and `## Open Questions`. Compare the `## Phases` region
+  and sub-task fields against `plan.md`, and use `plan.md` for
+  requirements/scope checks. Do **not** flag those omitted top-level sections
+  as missing.
 - The fast sections `## Fast Execution Policy`, `## Alignment Contract`, and
   `## Final Verification`.
 - Status progression (within the phase rules above).
@@ -105,7 +107,7 @@ Review the implementation against these dimensions, in order:
 - Are the module boundaries, dependencies, and interfaces consistent with the architecture defined during planning?
 
 ### 6. Code quality (delegated)
-- Delegate to `@dh-reviewer` agent for detailed code quality review using the `dh-code-review` skill.
+- Delegate to the plan's selected review agent for detailed code quality review using the `dh-code-review` skill.
 - Incorporate the reviewer's findings into the final report.
 
 ## Workflow
@@ -128,11 +130,11 @@ If the sub-task involves cross-module changes, architectural decisions, or inter
 
 ### Step 4: Delegate code quality review
 
-Ask `@dh-reviewer` to perform a detailed code review using the `dh-code-review` skill. Provide the active sub-task's context and acceptance criteria for awareness. Instruct `@dh-reviewer` to focus on code-level correctness, security, and robustness. The plan-level acceptance criteria verification (does the feature exist and behave as specified?) is handled directly in Steps 1-2 and should not be duplicated.
+Ask the plan's selected review agent to perform a detailed code review using the `dh-code-review` skill. Provide the active sub-task's context and acceptance criteria for awareness. Instruct the reviewer to focus on code-level correctness, security, and robustness. The plan-level acceptance criteria verification (does the feature exist and behave as specified?) is handled directly in Steps 1-2 and should not be duplicated.
 
 ### Step 5: Consolidate findings
 
-Combine your plan-level review (steps 1–2), the `dh-domain-check` architecture findings (step 3), and the `@dh-reviewer`'s code quality findings (step 4) into a single structured report.
+Combine your plan-level review (steps 1–2), the `dh-domain-check` architecture findings (step 3), and the selected review agent's code quality findings (step 4) into a single structured report.
 
 ### Step 6: Write review report
 
@@ -185,11 +187,12 @@ Return the review verdict to the caller. If P0/P1 findings exist, recommend fixe
 
 ## References
 
-- `dh-code-review` skill: the detailed code review methodology delegated to `@dh-reviewer`.
+- [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): review-role resolution and re-validation.
+- `dh-code-review` skill: the detailed code review methodology delegated to the selected review agent.
 - `dh-domain-check` skill: architecture validation for cross-module changes (software projects only).
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

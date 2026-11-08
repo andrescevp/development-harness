@@ -48,6 +48,10 @@ Phases group sub-tasks; status lines sit immediately after headers.
 
 None — no structural change.
 
+## Agent Selection
+
+None — no specialized agent required.
+
 ## Phases
 
 ### Phase 1: Foundation

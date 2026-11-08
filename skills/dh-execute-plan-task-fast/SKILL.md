@@ -1,7 +1,7 @@
 ---
 name: dh-execute-plan-task-fast
 description: >
-  Execute exactly one sub-task from docs/plans/<slug>/plan_fast.md in fast mode: read the fast mirror first, select the active sub-task (In Progress first), record the six per-task skipped-check rows, delegate implementation to @dh-software-engineer with TDD, run only a narrow sanity check, and update status in both plans via dh_plan_fast_update_status. Use for the next fast sub-task or continuing fast execution — no per-task review, simplify, code-review, preflight, artifact-check, or domain-check.
+  Execute exactly one sub-task from docs/plans/<slug>/plan_fast.md in fast mode: read the fast mirror first, select the active sub-task (In Progress first), record the six per-task skipped-check rows, delegate implementation to the plan's selected implementation agent with TDD, run only a narrow sanity check, and update status in both plans via dh_plan_fast_update_status. Use for the next fast sub-task or continuing fast execution — no per-task review, simplify, code-review, preflight, artifact-check, or domain-check.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: read, write, edit, bash
@@ -32,10 +32,16 @@ and records status.
   as the full implementation brief (objective, requirements, in/out of scope,
   instructions, acceptance criteria, cautionary points, testing suggestions,
   done-when).
-- **ALL implementation is delegated to `@dh-software-engineer`** (the harness's
-  single task executor). There is no complexity- or type-based builder split:
-  simple, standard, complex, and non-software work all go to
-  `@dh-software-engineer`.
+- **Agent selection comes from `plan.md`.** The mirror intentionally omits
+  `## Agent Selection`; resolve the implementation role from the source plan's
+  table, or run
+  [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md)
+  when it is absent, incomplete, or stale. A selected agent that is unavailable
+  and has no bundled capability fallback stops the run.
+- **ALL implementation is delegated to the plan's selected implementation
+  agent** (the single task executor). There is no complexity- or type-based
+  builder split: simple, standard, complex, and non-software work all go to
+  that one agent.
 - **Detect project type once** from the full marker list used by
   `dh-execute-plan-task`: `package.json`, `pyproject.toml`, `Cargo.toml`,
   `composer.json`, `go.mod`, `CMakeLists.txt`, `setup.py`, `setup.cfg`,
@@ -46,7 +52,7 @@ and records status.
 - **No per-task gates.** Do not run `dh-review`, `dh-simplify`,
   `dh-code-review`, `dh-preflight`, `dh-artifact-check`, or `dh-domain-check`.
   Keep the smallest relevant validation (tests/lint for the changed files)
-  through `@dh-executor`; it is a sanity check, not a review gate.
+  through the `dh-execute-cli` skill; it is a sanity check, not a review gate.
 - **Skip-check ledger:** after selecting the sub-task, append its six per-task
   rows with `dh_plan_fast_skip_check` (one call, `checks: [...]`, scope
   `Sub-Task N.M`, reason `fast mode defers per-task verification`).
@@ -105,18 +111,19 @@ Use the phase-aware priority on `plan_fast.md`:
    dispositions from the Core Rule. Missing ledger → stop; the orchestrator
    recreates it before any work.
 
-### Step 3: Implement through the single executor
+### Step 3: Implement through the selected implementation agent
 
-- Delegate the full sub-task brief from `plan_fast.md` to
-  `@dh-software-engineer`; include the project type and `CODE_RULES.md`
+- Delegate the full sub-task brief from `plan_fast.md` to the plan's selected
+  implementation agent (resolved from `plan.md`'s `## Agent Selection`, or via
+  the selection protocol); include the project type and `CODE_RULES.md`
   guidance when present.
 - The implementation follows the `dh-coding` skill inside that pass (failing
   test first, then the minimal change; TDD).
 - Stay within the sub-task's in-scope boundaries. Do not widen scope, add
   sub-tasks, or refactor unrelated code.
-- Do not implement the work yourself and do not seek another builder:
-  `@dh-software-engineer` is the only executor.
-- Ask `@dh-executor` to run only the smallest relevant validation for the
+- Do not implement the work yourself and do not seek another builder: the
+  selected implementation agent is the only executor for this plan.
+- Use the `dh-execute-cli` skill to run only the smallest relevant validation for the
   changed files (targeted tests, linters, type checks). Do **not** run the full
   preflight or artifact checks.
 - If validation fails 3 consecutive times, stop and report the full error
@@ -151,12 +158,12 @@ confirmation. Then either:
 ## Execution Delegation Guide
 
 **Single executor policy:** every sub-task — software, non-software, simple,
-standard, complex — is implemented by `@dh-software-engineer`.
+standard, complex — is implemented by the plan's selected implementation agent.
 
 | Work | Delegate to | Per-task post-steps |
 |---|---|---|
-| Software (any complexity) | `@dh-software-engineer` | Narrow validation via `@dh-executor` only |
-| Non-software | `@dh-software-engineer` | Narrow validation via `@dh-executor` only |
+| Software (any complexity) | selected implementation agent | Narrow validation via the `dh-execute-cli` skill only |
+| Non-software | selected implementation agent | Narrow validation via the `dh-execute-cli` skill only |
 
 No per-task `dh-domain-check`, `dh-simplify`, `dh-create-documentation`,
 `dh-review`, or `dh-code-review` runs here. `dh-domain-check` is deferred to
@@ -202,10 +209,11 @@ never skip a deferred gate.
 - [`../dh-execute-plan-fast/references/plan-fast-template.md`](../dh-execute-plan-fast/references/plan-fast-template.md): the `plan_fast.md` contract.
 - [`../dh-execute-plan-fast/references/plan-fast-skip-checks.md`](../dh-execute-plan-fast/references/plan-fast-skip-checks.md): the ledger contract and manual fallback.
 - Fast tools: `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_skip_check`.
-- `dh-coding` skill: TDD and `CODE_RULES.md` enforcement used by `@dh-software-engineer`.
+- [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): capability→agent resolution for the implementation role.
+- `dh-coding` skill: TDD and `CODE_RULES.md` enforcement used by the selected implementation agent.
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

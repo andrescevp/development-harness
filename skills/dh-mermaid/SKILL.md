@@ -159,8 +159,9 @@ Generated Mermaid code must:
 ## Doc search
 
 **Documentation management:** delegate create / update / delete / retrieve of
-generated documents (excluding docs/plans) to `@dh-documentor` — the main and
-only documentation owner (see dh-create-documentation).
+generated documents (excluding docs/plans) to the best available documentation
+agent (bundled documentation capability as fallback) — the main and only
+documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly:
 `notesmd-cli search-content "<term>" --vault "<project-name>"` or

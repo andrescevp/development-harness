@@ -24,7 +24,7 @@ npx -y github:andrescevp/development-harness install --project --path .
 | `--project` | `<project>/.opencode/plugins/dev-harness-skills` | `<project>/opencode.jsonc` (or existing `opencode.json`) |
 
 The managed layout is self-contained: `index.ts`, package metadata,
-`dist/plugin.js`, `dist/assets` (7 agents, 22 skills), and
+`dist/plugin.js`, `dist/assets` (5 agents, 24 skills), and
 `.dev-harness-install.json`; no `pnpm install` is needed in the target.
 
 Common flags:
@@ -168,14 +168,29 @@ After loading, confirm the harness is registered (opencode v2.0.18 exposes
 only the `agents`, `config`, and `paths` debug subcommands):
 
 ```
-opencode debug agents   → the 7 dh-* agents (when the build surfaces plugin agents; otherwise verify in a session)
+opencode debug agents   → the 5 dh-* agents (when the build surfaces plugin agents; otherwise verify in a session)
 opencode debug config   → the plugin entry, and mcp.servers.dh once wired
 opencode mcp list       → `dh` connected (server/status only)
 ```
 
-The plugin also registers 22 skills (there is no skills debug subcommand on
+The plugin also registers 24 skills (there is no skills debug subcommand on
 v2.0.18 — the bundled list lives in `skills/index.md`). Zero tools are
 registered by the plugin: the 12 tools come from the MCP server below.
+
+## Agent selection
+
+Skills do not name fixed agents; they name a capability (architecture,
+implementation, testing/QA, review, final review, documentation) and resolve it
+at runtime. The protocol in
+[`../skills/dh-planning/references/agent-selection.md`](../skills/dh-planning/references/agent-selection.md)
+discovers agents from the runtime list first, then project config/agent
+directories, then global definitions; it ranks project-specific agents with
+domain instructions above specialized project agents, above the bundled harness
+capability fallback. `dh-planning` records the chosen agents, rationale, and
+generic fallbacks in the plan's `## Agent Selection` table (before
+`## Phases`); execution re-validates availability and stops rather than
+substituting silently. Command execution/validation and codebase exploration
+are skills (`dh-execute-cli`, `dh-explore`), not selectable agents.
 
 ## MCP server (`dh`)
 
@@ -258,7 +273,7 @@ opencode mcp list   # expect the `dh` server, connected
 
 MCP servers connect at session start — restart opencode after adding or
 changing the project entry. The in-repo gates are
-`src/__tests__/registration.test.ts` (exactly 7 agents + 22 skills, zero tool
+`src/__tests__/registration.test.ts` (exactly 5 agents + 24 skills, zero tool
 transforms) and `node scripts/smoke-mcp.mjs` (spawns the built binary, lists
 the 12 tools, and round-trips plan create/read/update + fast create/read/update/skip).
 
@@ -307,8 +322,8 @@ the 12 tools, and round-trips plan create/read/update + fast create/read/update/
 - **Agents missing after installing (skills visible)** — the running session
   was started **before** the plugin was installed: plugins load at server
   startup, and a long-lived opencode session keeps its original registry.
-  Restart opencode (or reload the config) and both the 7 `dh-*` agents and
-  22 `dh-*` skills appear — the plugin registers agents via `agent.transform`
+  Restart opencode (or reload the config) and both the 5 `dh-*` agents and
+  24 `dh-*` skills appear — the plugin registers agents via `agent.transform`
   exactly like skills, no `agent` map in config is needed.
 - **`pnpm audit` vs `pnpm run audit`** — `pnpm audit` is pnpm's **dependency
   security audit** (currently reports 1 low dev-only esbuild advisory and
@@ -330,7 +345,7 @@ the 12 tools, and round-trips plan create/read/update + fast create/read/update/
   `docs/plans/dev-harness-v2-plugin/tasks/verification.md`: an early
   observation reported that plugin-registered agents did not surface through
   the tested load forms. Later verification (with the global plugins-directory
-  clone + a fresh server) showed the opposite: the plugin registers all 7
+  clone + a fresh server) showed the opposite: the plugin registers all 5
   agents automatically — the earlier miss was a stale long-lived session
   started before the plugin was installed. If agents do not appear, restart
   opencode first, then confirm the load form and rebuild `dist/assets` if

@@ -30,7 +30,9 @@ Orchestrate the complete execution of a plan from start to finish. Iterate throu
 - If a review produces P0/P1 findings, stop and report — do not continue to the next sub-task (a blocked sub-task blocks its phase).
 - After the final sub-task, run the `dh-final-review` skill for sign-off.
 - Update `./docs/plans/index.md` when the plan is fully complete.
-- **Project type awareness is delegated to `dh-execute-plan-task`.** The orchestrator does not re-detect project type — it relies on `dh-execute-plan-task` to handle agent selection based on whether the project is software or non-software. Do not hardcode agent choices (e.g., `@dh-software-engineer`) in the orchestration loop that would conflict with this.
+- **Resolve agents once per plan:** before the first delegation, read `## Agent Selection` in `plan.md` and use its rows for the implementation, review, and final-review roles. If the section or a required row is absent or stale (a named agent no longer exists), run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): discover the runtime agent list, then project config/agent directories, then global definitions; record the choices and generic fallbacks in the plan before continuing.
+- **Single implementation agent per sub-task:** there is no complexity- or type-based builder split. If no available agent or bundled capability covers a required role, stop and report the gap — never name a fixed agent or substitute one silently.
+- **Project type awareness is delegated to `dh-execute-plan-task`.** The orchestrator does not re-detect project type — the task skill runs the software/non-software post-steps. Do not hardcode implementation, review, or final-review agent choices in the orchestration loop.
 - **After plan completion (all projects):** invoke `dh-create-documentation` to update docs and create the plan's evolution + observation notes (see its Custom Directives). This ensures knowledge persists beyond the active session.
 - **After plan completion (software projects only):** invoke `dh-semver` for determining the next version bump.
 
@@ -51,6 +53,8 @@ Read the plan (via `dh_plan_read`; fallback: manual read) and determine the star
 Iterate **phases in order** (skip phases already `Completed`); within each phase, iterate its sub-tasks starting from the determined starting point:
 
 0. **Mark In Progress**: Ensure the active sub-task is marked `In Progress` via `dh_plan_update_status` (`target: "subtask"`). If it is already `In Progress` (resume), leave the state. Marking the first sub-task of a phase also moves that phase to `In Progress` (phase lifecycle). Fallback: manual plan.md edit per the marker rules. This ensures resume works if interrupted.
+
+0b. **Resolve agents**: confirm the plan's `## Agent Selection` names available agents for implementation, review, and (at the end) final review. Absent or stale → run the selection protocol ([`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md)), update the table, and tell the user before delegating. A selected agent missing with no capability fallback stops the run.
 
 1. **Execute**: Follow the `dh-execute-plan-task` skill to implement this sub-task. Since this is called from the orchestrator, `dh-execute-plan-task` skips its internal review and completion steps (per its orchestration guard).
 
@@ -140,6 +144,7 @@ blockers, and next steps in `handoff.md`; resume later with `dh-resume-plan`.
 ## References
 
 - Fast variant: `dh-execute-plan-fast` executes from `plan_fast.md` with no per-task gates and defers critical verification to plan end; `plan.md` stays the scope truth.
+- [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): discovery, ranking, recording, and re-validation protocol for every delegated role.
 - `dh-execute-plan-task` skill: executes a single sub-task.
 - `dh-review` skill: verifies a single sub-task result.
 - `dh-final-review` skill: produces plan-level sign-off.
@@ -147,6 +152,6 @@ blockers, and next steps in `handoff.md`; resume later with `dh-resume-plan`.
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

@@ -1,7 +1,7 @@
 /**
  * install-harness.ts — isolated fixture for install-command tests (4.1).
  *
- * Builds a temp root with a fixture package (`dist/plugin.js`, 7 agents, 22
+ * Builds a temp root with a fixture package (`dist/plugin.js`, 5 agents, 24
  * skills), an isolated HOME/XDG/OPENCODE config dir, and a project directory.
  * Every path is under the temp root and removed by `withTempDir` in `finally`.
  */
@@ -14,8 +14,8 @@ import { parseJsonc } from '../../jsonc.js';
 
 export const FIXTURE_VERSION = '1.2.3';
 const FIXTURE_BUNDLE = "export default { id: 'dev-harness-skills', setup() {} };\n";
-const EXPECTED_AGENTS = 7;
-const EXPECTED_SKILLS = 22;
+const EXPECTED_AGENTS = 5;
+const EXPECTED_SKILLS = 24;
 
 class StringWriter {
   text = '';

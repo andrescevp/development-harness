@@ -5,6 +5,7 @@ This file is the **canonical format specification** for phased plans. The
 `plan_update_status` tools (ST2) parse exactly this shape. If anything
 changes here, update the canonical fixture
 (`src/__tests__/fixtures/plans/phased-plan.md`) in the same change.
+Agent choices follow [`agent-selection.md`](agent-selection.md).
 
 ## Marker rules (parser contract)
 
@@ -25,6 +26,8 @@ changes here, update the canonical fixture
    sub-task maps to requirements via its `Related Requirements` field.
 9. The phases region runs from `## Phases` to the next top-level `##`
    heading (e.g. `## Final Integration & Verification`) or EOF.
+10. `## Agent Selection` sits before `## Phases`; it is outside the phases
+    region, so the parser ignores it for phase/sub-task extraction.
 
 ## Template
 
@@ -73,6 +76,14 @@ Explain core concepts with code level example if necessary.
 None — no structural change.
 
 > `dh-mermaid` replaces this line with links under `./diagrams/` when the plan has visual impact.
+
+## Agent Selection
+
+| Role | Selected agent | Why | Fallback |
+|---|---|---|---|
+| [role] | [agent or None] | [reason] | [generic fallback] |
+
+> Populate with the agent-selection protocol; write `None — no specialized agent required` when no delegation is needed.
 
 ## Phases
 
