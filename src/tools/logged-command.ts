@@ -8,7 +8,7 @@
  *
  * Pure helper `buildLoggedCommand` is unit-testable per platform; the
  * `runLoggedCommand` handler executes via node:child_process on the same
- * machine/user as the plugin server.
+ * machine/user as the MCP server.
  */
 import { exec } from 'node:child_process';
 import crypto from 'node:crypto';

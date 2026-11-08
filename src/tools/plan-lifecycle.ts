@@ -8,18 +8,20 @@
  *   - status lines are the first `- **Status:**` bullet in their section;
  *     only blank lines may precede them.
  *
- * Framework-free (string/line operations) so the helpers are unit-testable
- * and the plugin tools stay thin. CRLF-tolerant: all markers accept an
- * optional trailing `\r` and edits preserve the original line ending.
+ * Node built-ins only (no framework): string/line edits, so the helpers are
+ * unit-testable and the tools stay thin; plan-file I/O lives in plan-io.ts.
+ * CRLF-tolerant: all markers accept an optional trailing `\r` and edits
+ * preserve the original line ending.
  */
-import fs from 'node:fs';
-import path from 'node:path';
 import { parse } from 'yaml';
 import { splitFrontmatter } from '../lib/frontmatter.js';
 import { planScaffold } from './plan-template.js';
 
-export type PhaseStatus = 'Pending' | 'In Progress' | 'Completed';
-const PHASE_STATUSES: readonly PhaseStatus[] = ['Pending', 'In Progress', 'Completed'];
+/** Canonical status/target domains shared by parser, editors, and adapters. */
+export const PHASE_STATUSES = ['Pending', 'In Progress', 'Completed'] as const;
+export type PhaseStatus = (typeof PHASE_STATUSES)[number];
+export const STATUS_TARGETS = ['phase', 'subtask'] as const;
+export type StatusTarget = (typeof STATUS_TARGETS)[number];
 
 interface PlanSubTask {
   /** Canonical "N.M" ref (phase.subtask). */
@@ -207,7 +209,7 @@ function sectionEnd(contents: string, headerLine: number): number {
  */
 export function setStatus(
   contents: string,
-  target: 'phase' | 'subtask',
+  target: StatusTarget,
   ref: string,
   status: PhaseStatus
 ): { contents: string; plan: PlanDocument } {
@@ -255,42 +257,4 @@ export interface PlanScaffold {
 /** Build the phased plan markdown from a scaffold (all statuses Pending). */
 export function buildPlanTemplate(input: PlanScaffold): string {
   return planScaffold(input);
-}
-
-/**
- * Resolve a plan file path, anchored under <workspaceRoot>/docs/plans.
- * Rejects `..` escapes, absolute paths outside the anchor, slugs containing
- * path separators, and symlink traversal. Requires a non-empty workspaceRoot
- * (never falls back to the process CWD).
- */
-export function resolvePlanPath(workspaceRoot: string, slug?: string, explicitPath?: string): string {
-  if (!workspaceRoot) throw new Error('no workspace root available; pass an explicit `path` input');
-  const base = path.resolve(workspaceRoot, 'docs', 'plans');
-  const baseWithSep = base + path.sep;
-
-  let resolved: string;
-  if (explicitPath !== undefined) {
-    resolved = path.resolve(base, explicitPath);
-  } else {
-    if (!slug) throw new Error('either slug or path is required');
-    if (slug.includes('..') || slug.includes('/') || slug.includes('\\')) throw new Error(`invalid slug: ${slug}`);
-    resolved = path.resolve(base, slug, 'plan.md');
-  }
-  if (!resolved.startsWith(baseWithSep)) throw new Error(`path escapes docs/plans: ${explicitPath ?? slug}`);
-
-  assertNoSymlinks(base, resolved);
-  return resolved;
-}
-
-/** Reject symlink components between the anchor and the resolved target. */
-function assertNoSymlinks(base: string, target: string): void {
-  const rel = path.relative(base, target);
-  if (!rel || rel === '.') return;
-  let current = base;
-  for (const seg of rel.split(path.sep)) {
-    current = path.join(current, seg);
-    if (fs.existsSync(current) && fs.lstatSync(current).isSymbolicLink()) {
-      throw new Error(`path traverses a symlink: ${current}`);
-    }
-  }
 }

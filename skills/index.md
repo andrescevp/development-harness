@@ -4,8 +4,8 @@
 > `dh-setup` harness setup, and `dh-contingency` planning support).
 > Loading a skill injects its instructions and resources into the current
 > conversation. Plans are **phased** (phases → sub-tasks, dual status
-> markers); plan lifecycle is managed via the bundled `dh` tools
-> (`dh.plan_read`, `dh.plan_update_status`, `dh.plan_create` —
+> markers); plan lifecycle is managed via the `dh` MCP server tools
+> (`dh_plan_read`, `dh_plan_update_status`, `dh_plan_create` —
 > see `docs/LOADING.md`). All plan execution follows the skills loop below.
 
 ```mermaid
@@ -67,10 +67,10 @@ it and ask the user for guidance — never silently continue or mark sub-tasks
 Complete around a blocker (see repo-root `AGENTS.md`). A blocked sub-task
 blocks its phase.
 
-**Plan lifecycle tools:** use `dh.plan_read` to parse a phased plan,
-`dh.plan_update_status` to flip phase/sub-task status markers, and
-`dh.plan_create` to scaffold a new plan — fall back to direct plan.md
-edits only when the tools are unavailable.
+**Plan lifecycle tools:** use `dh_plan_read` to parse a phased plan,
+`dh_plan_update_status` to flip phase/sub-task status markers, and
+`dh_plan_create` to scaffold a new plan — fall back to direct plan.md
+edits only when the tools are unavailable. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 
 ## The 17 bundled skills
 

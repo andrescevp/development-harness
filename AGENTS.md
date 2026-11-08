@@ -12,7 +12,8 @@ plan-driven development: **7 agents** — `dh-software-architect`,
 and **17 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
 `dh-execute-plan-task`, `dh-coding`, `dh-contingency`, `dh-simplify`, `dh-review`, `dh-code-review`, `dh-preflight`,
 `dh-artifact-check`, `dh-final-review`, `dh-create-documentation`, `dh-grill-sdd`, `dh-setup`, `dh-code-ruler`, `dh-semver`. The plugin registers
-agents and skills only; **no commands, no prompts** are bundled or registered.
+agents and skills only; the harness tools are served by the shipped
+`dev-harness-mcp` MCP server (no tools, commands, or prompts are registered).
 All plan execution inside the plugin runs the skills loop below.
 
 ## The skills loop (harness runtime contract)
@@ -45,13 +46,15 @@ sub-tasks Complete around a blocker. The rule applies at phase boundaries too:
 a blocked sub-task blocks its phase — do not mark the phase `Completed` around
 a blocker.
 
-**Plan lifecycle tools (bundled harness namespace):** `dh.plan_read`,
-`dh.plan_update_status`, `dh.plan_create` — read/parse phased plans,
-update phase/sub-task status markers, and scaffold new phased plans from
-`docs/plans`. Loop skills and the planner agents prefer these tools over
-manual plan.md edits (fall back to manual edits only when the tools are
-unavailable). Format contract:
-`skills/dh-planning/references/phased-plan-template.md`.
+**Harness tools (MCP server `dh`):** the plugin registers no tools; the 7
+tools (`dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`,
+`dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, `dh_logged_command`)
+are served by a project-scope local stdio MCP server (`@modelcontextprotocol/server` v2). Under Code Mode call them as `tools.dh.<tool>` (direct names use
+`<server>_<tool>`; consumer permissions match `dh_*`). Loop skills and planner
+agents prefer these tools over manual plan.md edits (fall back to manual edits
+only when the server is unavailable). Format contract:
+`skills/dh-planning/references/phased-plan-template.md`. Wiring and
+verification: [`docs/LOADING.md`](docs/LOADING.md#mcp-server-dh).
 
 ## Runtime delegation
 
@@ -77,20 +80,41 @@ bundled agent names — no mapping is needed.
 - The V2 plugin (`Plugin.define`) registers the 7 agents and 17 skills via
   synchronous domain transforms (`ctx.agent.transform`, `ctx.skill.transform`)
   from frontmatter-parsed assets (repo `agents/` + `skills/` in source mode,
-  `dist/assets/` in the bundle). Zero command transforms (commands are out
-  of scope). The root `index.ts` is the plugin-directory discovery entry:
+  `dist/assets/` in the bundle). Zero tool or command transforms (tools live
+  in the MCP server; commands are out of scope). The root `index.ts` is the
+  plugin-directory discovery entry:
   cloning this repo into `~/.config/opencode/plugins/` (global) or
   `<project>/.opencode/plugins/` loads the plugin from source — no build or
   config entry needed.
 - **Loading alternatives:** `opencode plugin add github:andrescevp/development-harness`
   (managed install, private-repo friendly), a `file://`/relative entry in
-  `opencode.json(c)` pointing at a built clone (`pnpm build` first), or the
-  installed package name. See [`docs/LOADING.md`](docs/LOADING.md).
+  `opencode.json(c)` pointing at the repo directory (`pnpm install` only; no
+  build needed for source loading), or the installed package name. See
+  [`docs/LOADING.md`](docs/LOADING.md).
 - **Verify:** launch opencode and confirm the 7 agents and 17 skills appear
-  (including `dh-coding`) and no commands are registered.
+  (including `dh-coding`) and no commands are registered; then confirm the
+  project-scope `dh` MCP server is connected (`opencode mcp list`) so the
+  harness tools are available.
+
+## Repository layout
+
+```text
+index.ts          source-mode plugin entry (re-exports src/plugin.ts)
+agents/           bundled agent definitions (7)
+skills/           bundled skills (17)
+src/cli/          installer CLI: args, scope, prompt/output, JSONC, config, manifest, commands
+src/mcp/          stdio MCP server + workspace resolver
+src/tools/        plan/sheet/logged-command tool implementations
+src/lib/          shared assets, records, atomic writes, package metadata, main guard
+scripts/          QA, smoke (load/MCP/install/pack), Docker runner, audit
+docker/test/      derived OpenCode test image (pinned 2.0.18)
+docs/             loading/operations docs and phased plans
+test/             legacy test directory
+```
+
 ## QA tooling
 
-Full QA stack wired through `pnpm qa:check` (fails on any finding):
+Full QA stack — the release gate `pnpm qa:check:full` runs all of these (the fast subset is `pnpm qa:check`):
 
 | Tool | Script | Scope |
 |---|---|---|
@@ -102,8 +126,14 @@ Full QA stack wired through `pnpm qa:check` (fails on any finding):
 | Semgrep | `pnpm scan:code` (docker) | security patterns |
 | TypeScript | `tsc -b` (in `pnpm build`) | strict typecheck (typescript 6.x — dependency-cruiser requires <7) |
 | Vitest | `pnpm test` | unit tests |
+| Smoke (plugin) | `node scripts/smoke-load.mjs` | loads the built plugin bundle in isolation |
+| Smoke (MCP) | `node scripts/smoke-mcp.mjs` | spawns the built stdio server: 7 tools, plan round-trip, symlink launch |
+| Smoke (installer CLI) | `node scripts/smoke-install.mjs` | built CLI install/status/uninstall in isolated HOME/project scopes |
+| Smoke (npm tarball) | `node scripts/smoke-pack.mjs` | packs, inspects, installs offline, imports the plugin, checks bins/MCP/assets |
+| Docker (opt-in) | `scripts/docker-test.sh --local` / `--remote --ref <branch>` | derived `ghcr.io/anomalyco/opencode:2.0.18` image, read-only credential mounts, container lifecycle |
 
-Full gate: `pnpm qa:check:full` = qa:check + test + typecheck + audit + build + smoke-load.
+Full gate: `pnpm qa:check:full` = qa:check → build → smoke-install → smoke-pack → test → typecheck → audit → smoke-load → smoke-mcp
+(build precedes the smokes/tests so they run against fresh artifacts; the Docker runner is opt-in and needs credentials/network).
 Note: `pnpm audit` collides with pnpm's security audit — the harness audit is `pnpm run audit`.
 
 ## Git Flow (repository workflow)

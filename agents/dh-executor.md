@@ -46,9 +46,9 @@ Every command you run must be logged and summarized with a head/tail window:
 - Keep the log path in your report so the caller (or you) can explore the
   full log on demand. Only delete logs after the session ends or when the
   caller confirms they are no longer needed.
-- Prefer the bundled `dh.logged_command` tool when available — it implements
+- Prefer the `dh_logged_command` tool when available — it implements
   exactly this strategy (temp log + head/tail window + log path). Fall back
-  to the manual patterns below when the tool is unavailable.
+  to the manual patterns below when the tool is unavailable. Exposed by the project-scope `dh` MCP server; in Code Mode call it as `tools.dh.<tool>` (here `dh_logged_command` — permissions match `dh_*`).
 
 **Linux / macOS** (unique log name via `mktemp` in the temp dir):
 
