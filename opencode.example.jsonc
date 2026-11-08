@@ -3,9 +3,16 @@
   // NOTE (verified against opencode v2.0.18): `plugins` entries that are
   // `file://` URLs must point to a DIRECTORY, not a plugin.js file — the
   // file form is rejected with "configured plugin path must be a directory".
+  // Bundled surface: 5 agents + 24 skills (the `dh` MCP server adds 12 tools).
+  // Delegation is capability-based: skills resolve each role through
+  // skills/dh-planning/references/agent-selection.md (discover the runtime
+  // agents, prefer project-specific matches, fall back to the bundled
+  // capability) and record the choice in the plan's `## Agent Selection`.
+  // Command execution/validation and codebase exploration use the
+  // `dh-execute-cli` / `dh-explore` skills, not agents.
   "$schema": "https://opencode.ai/config.json",
   "plugins": [
-    // Local package directory form (works after `pnpm build` in the repo):
+    // Local package directory form (works after `pnpm install`; no build needed):
     "file:///home/andres/workspace/dev-harness-skills"
 
     // Alternatives (pick ONE at a time):
@@ -14,16 +21,37 @@
     // - Relative directory form from your project root:
     //   "../shared/dev-harness-skills"
   ],
-  // Verification checklist after loading:
-  //   opencode debug agents   → software-architect, software-engineer,
-  //                             reviewer, final-reviewer, executor, explorer
-  //                             must appear alongside existing agents
-  //   opencode debug skills   → artifact-check, simplify, domain-check,
-  //                             coding, code-review, execute-plan,
-  //                             execute-plan-task, final-review, planning,
-  //                             preflight, review, create-documentation
-  //   opencode debug commands → none added by this plugin (commands are out
-  //                             of scope)
+  // Project-scope MCP server serving the 12 harness tools (plan lifecycle,
+  // sheets, logged commands). The plugin itself registers agents + skills
+  // only — add this block to the PROJECT's opencode.jsonc. The server starts
+  // per project via npx from the git repository; `protocol` pins the native
+  // MCP revision (legacy initialize clients are still served).
+  "mcp": {
+    "servers": {
+      "dh": {
+        "type": "local",
+        "command": ["npx", "-y", "--package=github:andrescevp/development-harness", "dev-harness-mcp"],
+        "protocol": "2026-07-28",
+        // Cold first npx install can take ~20–25 s; prewarm makes later starts fast.
+        "timeout": { "startup": 300000 }
+        // Optional workspace override (defaults to the project cwd):
+        // ,"environment": { "DH_WORKSPACE_ROOT": "/absolute/workspace" }
+      }
+    }
+  },
+  // Verification checklist after loading (opencode v2.0.18):
+  //   opencode debug agents → the 5 dh-* agents: dh-software-architect,
+  //                           dh-software-engineer, dh-reviewer,
+  //                           dh-final-reviewer, dh-documentor
+  //   (24 skills: no debug subcommand on v2.0.18 — see skills/index.md)
+  //   opencode debug config → the plugin entry + mcp.servers.dh
+  //   opencode mcp list     → `dh` connected (server/status only)
+  //   expected tools        → dh_plan_read, dh_plan_update_status,
+  //                           dh_plan_create, dh_plan_fast_create,
+  //                           dh_plan_fast_read, dh_plan_fast_update_status,
+  //                           dh_plan_fast_sync, dh_plan_fast_skip_check,
+  //                           dh_read_sheet, dh_update_sheet,
+  //                           dh_sheet_schema, dh_logged_command
   //
   // Troubleshooting: see docs/LOADING.md.
 }

@@ -1,5 +1,5 @@
 /**
- * logged-command.test.ts — logged command strategy helpers (M: executor
+ * logged-command.test.ts — logged command strategy helpers (dh-execute-cli
  * directive). Tests the pure string builder (POSIX/Windows), temp-log naming,
  * and the real execution handler with trivial commands (no network, no
  * destructive operations).

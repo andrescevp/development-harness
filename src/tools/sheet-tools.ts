@@ -17,9 +17,8 @@ type DuckDbModule = {
 };
 
 let duckdbModule: DuckDbModule | undefined;
-/** Lazy duckdb load — keeps the plugin bundle free of top-level bare imports
- * (the v2.0.18 global-plugin loader cannot resolve them); only evaluated
- * when a sheet tool actually runs. */
+/** Lazy duckdb load — keeps the MCP entry's initialize path free of the
+ * native module; only evaluated when a sheet tool actually runs. */
 function getDuckdb(): DuckDbModule {
   const mod = duckdbModule ?? (require('duckdb') as DuckDbModule);
   duckdbModule = mod;

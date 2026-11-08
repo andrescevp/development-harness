@@ -8,11 +8,34 @@
     // "file:///home/andres/workspace/dev-harness-skills"
     "../"
   ],
+  // Project-scope MCP server for the harness tools (plan lifecycle, sheets,
+  // logged commands). This in-repo demo uses the LOCAL build — run
+  // `pnpm build` in the repo first; the command path resolves from this demo
+  // workspace (project cwd). Shipped projects use the npx-from-git form:
+  //   ["npx", "-y", "--package=github:andrescevp/development-harness", "dev-harness-mcp"]
+  // See README / docs/LOADING.md for production wiring.
+  "mcp": {
+    "servers": {
+      "dh": {
+        "type": "local",
+        "command": ["node", "../dist/mcp/stdio.js"],
+        "protocol": "2026-07-28"
+        // Optional on slow hosts (cold npx start in shipped projects):
+        // ,"timeout": { "startup": 300000 }
+      }
+    }
+  },
   // Native agent registration — hosts that do not load local directory
   // plugins (opencode v2.0.18 limitation) still register config agents.
   // The plugin ALSO registers these agents when it loads; the config map
   // guarantees visibility on this host. Prompt files live in the harness
   // repo (frontmatter + body; the plugin's assets mirror them).
+  // Delegation is capability-based: the plan's selected agent (protocol in
+  // skills/dh-planning/references/agent-selection.md, recorded in the plan's
+  // `## Agent Selection`) wins when a project agent matches the role; the
+  // entries below are the bundled capabilities/fallbacks. Command execution
+  // and validation run through `dh-execute-cli`; exploration through
+  // `dh-explore` — utility skills, not agents.
   "agent": {
     "dh-software-architect": {
       "description": "Software architect agent — planning, execute-plan, create-documentation; runs dh-code-ruler for CODE_RULES.md.",
@@ -21,7 +44,7 @@
       "prompt": "{file:../agents/dh-software-architect.md}"
     },
     "dh-software-engineer": {
-      "description": "Software engineer agent — execute-plan-task and coding; single task executor of the harness.",
+      "description": "Software engineer agent — execute-plan-task and coding; bundled implementation capability (fallback) for the plan's selected implementation agent.",
       "mode": "all",
       "model": "opencode-go/deepseek-v4-flash",
       "prompt": "{file:../agents/dh-software-engineer.md}"
@@ -37,18 +60,6 @@
       "mode": "subagent",
       "model": "opencode-go/deepseek-v4-flash",
       "prompt": "{file:../agents/dh-final-reviewer.md}"
-    },
-    "dh-executor": {
-      "description": "Executes commands/tests/builds on behalf of other agents (logged-command strategy).",
-      "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-flash",
-      "prompt": "{file:../agents/dh-executor.md}"
-    },
-    "dh-explorer": {
-      "description": "Fast codebase exploration via glob, grep, targeted reads (quick/medium/very thorough).",
-      "mode": "subagent",
-      "model": "opencode-go/deepseek-v4-flash",
-      "prompt": "{file:../agents/dh-explorer.md}"
     },
     "dh-documentor": {
       "description": "Documentation owner — create/update/delete/retrieve generated documents (excluding docs/plans).",

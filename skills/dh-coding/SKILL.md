@@ -17,7 +17,7 @@ Apply test-first TDD and clean code best practices when implementing or fixing c
 - **Test-first, always:** write a failing test before any implementation; then implement the minimal change that makes it pass; then refactor. Repeat the red → green → refactor loop until the change is complete.
 - **Rules precedence:** code rules are always project-level — `CODE_RULES.md` at the project root is the only rule source; when absent, analyze the code and CREATE it before implementing (see Resolution Order); kept updated via `dh-create-documentation`. No dependency on global guideline files.
 - **Project type aware:** detect software vs non-software before choosing how to implement and which builder agent to delegate to.
-- **Validation through `@dh-executor`:** never run bash, tests, or builds directly — delegate to `@dh-executor` and act on its summarized output.
+- **Validation through `dh-execute-cli`:** never run bash, tests, or builds directly — use the `dh-execute-cli` skill and act on its summarized output.
 - **Tight scope:** change only what the active sub-task requires; do not add extra features, abstractions, or refactors beyond the task.
 - **Stop on repeated failure:** if validation fails 3 consecutive times, stop and report the failure with full error output — do not loop indefinitely or proceed to review.
 - **Never capture secrets:** no secrets, tokens, API keys, or credentials in code, logs, tests, comments, or output.
@@ -49,22 +49,22 @@ files.
 
 Follow the red → green → refactor loop for every behavioral change:
 
-1. **Red:** write a failing test that captures the expected behavior. Run it via `@dh-executor` and confirm it fails for the right reason before implementing.
+1. **Red:** write a failing test that captures the expected behavior. Run it via the `dh-execute-cli` skill and confirm it fails for the right reason before implementing.
 2. **Green:** implement the minimal change that makes the test pass. Do not add unrelated code.
 3. **Refactor:** clean up the implementation and the test — keep them readable, focused, and deterministic — then re-run the tests to confirm still green.
-4. **Validate:** run the smallest relevant validation for the change (tests, linter, typecheck, build) through `@dh-executor`.
-5. **On failure:** fix the issue and re-run via `@dh-executor`. If validation fails 3 consecutive times, stop and report the full error output — do not proceed.
+4. **Validate:** run the smallest relevant validation for the change (tests, linter, typecheck, build) through the `dh-execute-cli` skill.
+5. **On failure:** fix the issue and re-run via the `dh-execute-cli` skill. If validation fails 3 consecutive times, stop and report the full error output — do not proceed.
 
 Cover happy paths, edge cases, and regressions relevant to the change; follow the project's existing test conventions and keep tests deterministic.
 
 ## Project Type Awareness
 
-Detect the project type before delegating or implementing. Check the project root by listing it (the `read` tool on the root directory, or `ls` via `@dh-executor`):
+Detect the project type before delegating or implementing. Check the project root by listing it (the `read` tool on the root directory, or `ls` via the `dh-execute-cli` skill):
 
 - **Software project markers** (any present at the project root): `package.json`, `pyproject.toml`, `Cargo.toml`, `composer.json`, `go.mod`, `CMakeLists.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `pubspec.yaml`, `build.gradle`, `*.csproj`, `*.sln`, and similar language build files.
 - **Language/toolkit detection:** infer the stack and its tooling from the marker — for example `package.json` → npm/pnpm/bun, `pyproject.toml` → uv/poetry/pip, `Cargo.toml` → cargo, `composer.json` → composer. Use the project's own tooling and lockfiles; do not introduce a different package manager or toolchain.
-- **Software projects:** delegate ALL implementation to `@dh-software-engineer` (the harness's single task executor); run validation through `@dh-executor`. When invoked from the skills loop, `dh-domain-check` runs before complex implementation and `dh-simplify` runs after validation.
-- **Non-software projects** (docs, config, design assets — no marker files): delegate implementation to `@dh-software-engineer` as well; skip the `dh-simplify`, `dh-domain-check`, and `dh-create-documentation` steps.
+- **Software projects:** delegate ALL implementation to the plan's selected implementation agent (the single task executor, resolved via `## Agent Selection` or [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md)); run validation through the `dh-execute-cli` skill. When invoked from the skills loop, `dh-domain-check` runs before complex implementation and `dh-simplify` runs after validation.
+- **Non-software projects** (docs, config, design assets — no marker files): delegate implementation to the selected implementation agent as well; skip the `dh-simplify`, `dh-domain-check`, and `dh-create-documentation` steps.
 
 ## Coding Best Practices
 
@@ -88,7 +88,7 @@ Everyday coding-quality guidance, applied to every change alongside TDD:
 - Follow SOLID and clean code practices: focused functions and modules, descriptive names, no duplicated logic.
 - Keep changes tightly scoped to the active sub-task.
 - Never expose secrets, tokens, or credentials in code, logs, or output.
-- Run all bash commands, tests, and builds through `@dh-executor`.
+- Run all bash commands, tests, and builds through the `dh-execute-cli` skill.
 
 ## Performance Directives
 
@@ -135,6 +135,6 @@ Apply where the change touches these areas:
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

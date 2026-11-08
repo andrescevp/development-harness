@@ -3,7 +3,7 @@ name: dh-code-ruler
 description: >
   Interview + code analysis to generate {project_root}/CODE_RULES.md (style
   guide, design patterns, security/performance constraints, stack best
-  practices; websearch allowed). Executed by dh-software-architect;
+  practices; websearch allowed). Executed by the selected architecture agent;
   dh-coding runs it when absent. Use to create or refresh code rules.
 license: MIT
 compatibility: opencode
@@ -17,8 +17,8 @@ metadata:
 
 Produce the project's strict rules contract at `{project_root}/CODE_RULES.md`
 by grilling the user and analyzing the codebase. `dh-coding` enforces this
-file; `dh-code-ruler` is executed by `dh-software-architect` (or invoked by
-`dh-coding` when the file is missing).
+file; `dh-code-ruler` is executed by the selected architecture agent (or
+invoked by `dh-coding` when the file is missing).
 
 ## When to use
 
@@ -104,6 +104,6 @@ file; `dh-code-ruler` is executed by `dh-software-architect` (or invoked by
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

@@ -3,7 +3,7 @@ title: Demo Project Index
 tags: [documentation, demo]
 project: demo-project
 created: 2026-09-29
-updated: 2026-10-02
+updated: 2026-11-08
 stack: markdown, opencode
 feature: demo
 epic: plugin-demo
@@ -12,30 +12,48 @@ epic: plugin-demo
 # Demo Project
 
 Demo folder that links the `dev-harness-skills` plugin: run it isolated and
-exercise the bundled harness (7 agents, 16 skills, `dh_*` tools).
+exercise the bundled harness (5 agents, 24 skills, and the project-scope `dh`
+MCP server tools).
 
 ## Quickstart
 
 ```bash
 cd demo-project
 ./demo.sh          # opencode TUI with the plugin loaded
-./demo.sh validate # config resolution + load status + in-process registration gate
+./demo.sh validate # version + config + agents + MCP connectivity + in-process gate
 ```
 
 > Note: opencode v2.0.18 does not load directory/local plugins (documented
 > host limitation) — `validate` reports the load status transparently and
-> gates plugin behavior via the harness test suite (89 tests, in-process
-> registration of the 7 agents / 16 skills / dh_* tools).
+> gates plugin behavior via the harness test suite (in-process
+> registration of the 5 agents / 24 skills; the tools come from the `dh` MCP
+> server wired in `opencode.jsonc`).
 
 ## How it is wired
 
 1. `opencode.jsonc` — `"plugins": ["../"]` links the parent repo (plugin
    package directory form, per the v2 loading contract).
-2. `.obsidian/` — the project root IS an Obsidian vault (dh-setup mandate),
+2. `opencode.jsonc` — `mcp.servers.dh` wires the project-scope MCP server with
+   the LOCAL build: `["node", "../dist/mcp/stdio.js"]` (run `pnpm build` in the
+   repo first). Shipped projects use the npx form (see README / docs/LOADING.md).
+   `validate` step 4/5 connects through it on a fresh data dir. Restart the
+   shared opencode service after rebuilding — it can keep a stale MCP child
+   alive, so the gate would re-evaluate against the old process.
+3. `.obsidian/` — the project root IS an Obsidian vault (dh-setup mandate),
    so `notesmd-cli search-content "..." --vault "demo-project"` works.
-3. `docs/` — every generated document follows the documentation contract:
+4. `docs/` — every generated document follows the documentation contract:
    markdown primary, csv/json/yaml/xml complementary, mermaid for workflows,
    ASCII wireframes for UI, obsidian frontmatter.
+
+## Agent selection (capability-based)
+
+Skills resolve delegation at runtime: `dh-planning` follows the
+[`agent-selection` protocol](../../skills/dh-planning/references/agent-selection.md)
+(runtime agent list → project config → global definitions), prefers
+project-specific agents over the bundled capabilities, and records the choice
+in the plan's `## Agent Selection`. Utility roles are skills, not agents:
+`dh-execute-cli` runs commands, tests, builds, and validation; `dh-explore`
+maps the codebase. The bundled surface stays 5 agents / 24 skills.
 
 ## Example workflow (plugin usage)
 
@@ -53,14 +71,14 @@ flowchart LR
 +--------------------------------------------------+
 | demo-project          [sdd] [plan] [review] [docs]|
 +--------------------------------------------------+
-|  Harness loaded: 7 agents / 16 skills / dh_* tools|
-|  Try:  ask dh-software-architect to plan a task   |
+|  Harness loaded: 5 agents / 24 skills / dh MCP   |
+|  Try:  dh-planning -> Agent Selection -> execute |
 +--------------------------------------------------+
 ```
 
 ## Tabular data demo
 
-`docs/data/people.csv` is queryable through the plugin's DuckDB tools:
+`docs/data/people.csv` is queryable through the `dh` MCP server's DuckDB tools:
 
 ```
 dh_read_sheet { path: "demo-project/docs/data/people.csv", query: "SELECT name FROM read_csv_auto(?) WHERE age > 30" }

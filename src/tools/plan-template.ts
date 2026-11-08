@@ -4,7 +4,10 @@
  * Mirrors skills/planning/references/phased-plan-template.md structure.
  */
 
-const SUB_TASK_SKELETON = `- **Status:** Pending
+/** Status every scaffolded phase/sub-task starts with (index rows reuse it). */
+export const INITIAL_PHASE_STATUS = 'Pending' as const;
+
+const SUB_TASK_SKELETON = `- **Status:** ${INITIAL_PHASE_STATUS}
 - **Objective:** [What this sub-task should accomplish]
 - **Related Requirements:** [Requirement IDs]
 - **Dependencies and Preconditions:** [Prerequisites]
@@ -27,7 +30,7 @@ function phaseBlock(phaseNumber: number, title: string, subTaskBlocks: string[])
   const subs = subTaskBlocks.join('\n\n');
   return `### Phase ${phaseNumber}: ${title}
 
-- **Status:** Pending
+- **Status:** ${INITIAL_PHASE_STATUS}
 
 ${subs}`;
 }
@@ -55,7 +58,7 @@ slug: ${input.slug}
 description: ${input.title}
 created: ${today}
 updated: ${today}
-status: Pending
+status: ${INITIAL_PHASE_STATUS}
 active: true
 tags: [plan]
 project: ${input.slug}
@@ -86,6 +89,18 @@ ${input.objective}
 ## Core concepts
 
 Explain core concepts with code level example if necessary.
+
+## Visual Context
+
+None — no structural change.
+
+> \`dh-mermaid\` replaces this line with links under \`./diagrams/\` when the plan has visual impact.
+
+## Agent Selection
+
+None — no specialized agent required.
+
+> Replace this line with the selection protocol's table (\`| Role | Selected agent | Why | Fallback |\`) when the plan delegates work; keep the table before \`## Phases\`.
 
 ## Phases
 

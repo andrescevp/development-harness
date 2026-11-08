@@ -7,12 +7,17 @@ runtime delegation routing.
 ## Role summary
 
 The `dev-harness-skills` OpenCode V2 plugin bundles a self-contained dev harness for
-plan-driven development: **7 agents** — `dh-software-architect`,
-`dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-executor`, `dh-explorer`, `dh-documentor` —
-and **17 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
-`dh-execute-plan-task`, `dh-coding`, `dh-contingency`, `dh-simplify`, `dh-review`, `dh-code-review`, `dh-preflight`,
-`dh-artifact-check`, `dh-final-review`, `dh-create-documentation`, `dh-grill-sdd`, `dh-setup`, `dh-code-ruler`, `dh-semver`. The plugin registers
-agents and skills only; **no commands, no prompts** are bundled or registered.
+plan-driven development: **5 agents** — `dh-software-architect`,
+`dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-documentor` —
+and **24 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
+`dh-execute-plan-fast`, `dh-execute-plan-task`, `dh-execute-plan-task-fast`,
+`dh-pause-plan`, `dh-resume-plan`, `dh-coding`, `dh-execute-cli`, `dh-explore`,
+`dh-contingency`, `dh-simplify`,
+`dh-review`, `dh-code-review`, `dh-preflight`, `dh-artifact-check`,
+`dh-final-review`, `dh-create-documentation`, `dh-mermaid`, `dh-grill-sdd`, `dh-setup`,
+`dh-code-ruler`, `dh-semver`. The plugin registers
+agents and skills only; the harness tools are served by the shipped
+`dev-harness-mcp` MCP server (no tools, commands, or prompts are registered).
 All plan execution inside the plugin runs the skills loop below.
 
 ## The skills loop (harness runtime contract)
@@ -21,7 +26,7 @@ Plans are **phased**: a plan is an ordered set of phases, each containing
 sub-tasks, with status markers at BOTH levels (Pending | In Progress |
 Completed). The loop:
 
-1. `dh-planning` → use `dh-domain-check` while planning (creates phased plans)
+1. `dh-planning` → use `dh-domain-check` while planning and `dh-mermaid` for visual context (creates phased plans)
 2. `dh-execute-plan` (iterates phases in order → their sub-tasks)
    2.1 `dh-execute-plan-task` → use `dh-coding`
    2.2 `dh-simplify`
@@ -29,7 +34,17 @@ Completed). The loop:
    2.4 IF hard blockers → stop and ask guidance; otherwise keep `dh-execute-plan-task` loop
 3. `dh-preflight` + `dh-artifact-check`
 4. `dh-final-review` (reports per-phase completion)
-5. `dh-create-documentation`
+5. `dh-create-documentation` (also writes the evolution and observation notes under `docs/evolution/`)
+
+**Fast execution (alternative).** `dh-execute-plan-fast` +
+`dh-execute-plan-task-fast` execute the same phased plan from `plan_fast.md`,
+defer per-task gates to plan end, and record skipped checks in
+`plan_fast_skip_checks.md`. The standard loop above remains the default.
+
+**Close-out documentation.** Step 5's `dh-create-documentation` also creates
+the plan's evolution note (`docs/evolution/<date>-<slug>.md`) and observation
+note (`docs/evolution/observations/<date>-<hhmm>-<slug>.md`), and updates
+`docs/evolution/index.md`. `docs/evolve/` is historical and stays untouched.
 
 **Phase lifecycle:** a phase becomes `In Progress` when its first sub-task
 starts and `Completed` only when ALL its sub-tasks are `Completed`. Resume
@@ -45,21 +60,53 @@ sub-tasks Complete around a blocker. The rule applies at phase boundaries too:
 a blocked sub-task blocks its phase — do not mark the phase `Completed` around
 a blocker.
 
-**Plan lifecycle tools (bundled harness namespace):** `dh.plan_read`,
-`dh.plan_update_status`, `dh.plan_create` — read/parse phased plans,
-update phase/sub-task status markers, and scaffold new phased plans from
-`docs/plans`. Loop skills and the planner agents prefer these tools over
-manual plan.md edits (fall back to manual edits only when the tools are
-unavailable). Format contract:
-`skills/dh-planning/references/phased-plan-template.md`.
+**Pause/resume (cross-cutting).** A plan can pause at any point without
+changing its statuses: `dh-pause-plan` writes `docs/plans/<slug>/handoff.md`
+with the active phase/sub-task, git/worktree state, decisions, blockers,
+validation state, and next steps. `dh-resume-plan` validates the handoff,
+detects drift, rehydrates context, marks it `resumed`, and re-enters step 2.
+`dh-execute-plan` redirects to `dh-resume-plan` when a paused handoff exists.
+`handoff.md` is a sidecar, not a fourth status.
+
+**Harness tools (MCP server `dh`):** the plugin registers no tools; the 12
+tools (`dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`,
+`dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`,
+`dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`,
+`dh_update_sheet`, `dh_sheet_schema`, `dh_logged_command`) are served by a
+project-scope local stdio MCP server (`@modelcontextprotocol/server` v2). Under Code Mode call them as `tools.dh.<tool>` (direct names use
+`<server>_<tool>`; consumer permissions match `dh_*`). Loop skills and planner
+agents prefer these tools over manual plan.md edits (fall back to manual edits
+only when the server is unavailable). Format contract:
+`skills/dh-planning/references/phased-plan-template.md`. Wiring and
+verification: [`docs/LOADING.md`](docs/LOADING.md#mcp-server-dh).
 
 ## Runtime delegation
 
-**Single task executor:** ALL sub-task implementation in this harness is
-delegated to `@dh-software-engineer`. There is no complexity- or type-based
-builder split; `dh-execute-plan-task` and `dh-coding` route every task there.
-Architectural guidance comes from `@dh-software-architect`. These are the
-bundled agent names — no mapping is needed.
+**Capability-based selection.** Skills do not name fixed agents: they state the
+capability they need (architecture/design, implementation, testing/QA, review,
+final review, documentation, domain specialist) and resolve it against the
+environment. The authoritative protocol is
+[`skills/dh-planning/references/agent-selection.md`](skills/dh-planning/references/agent-selection.md):
+discover the runtime agent list first, then project config/agent directories,
+then global definitions; rank project-specific agents with domain instructions
+above specialized project agents, above the bundled harness capability
+fallback. `dh-planning` records the chosen agents, the evidence (`Why`), and the
+generic fallback in the plan's `## Agent Selection` table (before `## Phases`);
+execution re-validates the choices before delegating, updates the table when an
+agent disappears or is renamed, and stops rather than substituting silently.
+When no delegation is needed, the table says
+`None — no specialized agent required`.
+
+**Single task executor.** ALL sub-task implementation in this harness is
+delegated to the one implementation agent selected for the plan. There is no
+complexity- or type-based builder split; `dh-execute-plan-task` and `dh-coding`
+route every task there. Architectural guidance comes from the selected
+architecture agent. Bundled agents remain available as capability fallbacks but
+project-specific agents win whenever they match the role.
+
+**Utility roles are skills.** Command execution/validation and codebase
+exploration are instruction layers, not selectable personas: run them with the
+`dh-execute-cli` and `dh-explore` skills.
 
 ## Provenance
 
@@ -67,30 +114,51 @@ bundled agent names — no mapping is needed.
   owned by this repository — the repo is self-contained and independent
   (no external source, no extraction step).
 - OpenCode-only — no copilot/gemini variants.
-- Exactly **7 agents + 17 skills** are bundled. Commands, prompts, and all
+- Exactly **5 agents + 24 skills** are bundled. Commands, prompts, and all
   other non-bundled harness content are intentionally NOT bundled.
 - The `dh-` names are canonical in the repo files; bundled agents ship
   without the `permission` and `tools` frontmatter keys.
 
 ## Plugin registration and loading
 
-- The V2 plugin (`Plugin.define`) registers the 7 agents and 17 skills via
+- The V2 plugin (`Plugin.define`) registers the 5 agents and 24 skills via
   synchronous domain transforms (`ctx.agent.transform`, `ctx.skill.transform`)
   from frontmatter-parsed assets (repo `agents/` + `skills/` in source mode,
-  `dist/assets/` in the bundle). Zero command transforms (commands are out
-  of scope). The root `index.ts` is the plugin-directory discovery entry:
+  `dist/assets/` in the bundle). Zero tool or command transforms (tools live
+  in the MCP server; commands are out of scope). The root `index.ts` is the
+  plugin-directory discovery entry:
   cloning this repo into `~/.config/opencode/plugins/` (global) or
   `<project>/.opencode/plugins/` loads the plugin from source — no build or
   config entry needed.
 - **Loading alternatives:** `opencode plugin add github:andrescevp/development-harness`
   (managed install, private-repo friendly), a `file://`/relative entry in
-  `opencode.json(c)` pointing at a built clone (`pnpm build` first), or the
-  installed package name. See [`docs/LOADING.md`](docs/LOADING.md).
-- **Verify:** launch opencode and confirm the 7 agents and 17 skills appear
-  (including `dh-coding`) and no commands are registered.
+  `opencode.json(c)` pointing at the repo directory (`pnpm install` only; no
+  build needed for source loading), or the installed package name. See
+  [`docs/LOADING.md`](docs/LOADING.md).
+- **Verify:** launch opencode and confirm the 5 agents and 24 skills appear
+  (including `dh-coding`) and no commands are registered; then confirm the
+  project-scope `dh` MCP server is connected (`opencode mcp list`) so the
+  harness tools are available.
+
+## Repository layout
+
+```text
+index.ts          source-mode plugin entry (re-exports src/plugin.ts)
+agents/           bundled agent definitions (5)
+skills/           bundled skills (24)
+src/cli/          installer CLI: args, scope, prompt/output, JSONC, config, manifest, commands
+src/mcp/          stdio MCP server + workspace resolver
+src/tools/        plan/sheet/logged-command tool implementations
+src/lib/          shared assets, records, atomic writes, package metadata, main guard
+scripts/          QA, smoke (load/MCP/install/pack), Docker runner, audit
+docker/test/      derived OpenCode test image (pinned 2.0.18)
+docs/             loading/operations docs and phased plans
+test/             legacy test directory
+```
+
 ## QA tooling
 
-Full QA stack wired through `pnpm qa:check` (fails on any finding):
+Full QA stack — the release gate `pnpm qa:check:full` runs all of these (the fast subset is `pnpm qa:check`):
 
 | Tool | Script | Scope |
 |---|---|---|
@@ -102,8 +170,14 @@ Full QA stack wired through `pnpm qa:check` (fails on any finding):
 | Semgrep | `pnpm scan:code` (docker) | security patterns |
 | TypeScript | `tsc -b` (in `pnpm build`) | strict typecheck (typescript 6.x — dependency-cruiser requires <7) |
 | Vitest | `pnpm test` | unit tests |
+| Smoke (plugin) | `node scripts/smoke-load.mjs` | loads the built plugin bundle in isolation |
+| Smoke (MCP) | `node scripts/smoke-mcp.mjs` | spawns the built stdio server: 12 tools, plan + fast round-trip, symlink launch |
+| Smoke (installer CLI) | `node scripts/smoke-install.mjs` | built CLI install/status/uninstall in isolated HOME/project scopes |
+| Smoke (npm tarball) | `node scripts/smoke-pack.mjs` | packs, inspects, installs offline, imports the plugin, checks bins/MCP/assets |
+| Docker (opt-in) | `scripts/docker-test.sh --local` / `--remote --ref <branch>` | derived `ghcr.io/anomalyco/opencode:2.0.18` image, read-only credential mounts, container lifecycle |
 
-Full gate: `pnpm qa:check:full` = qa:check + test + typecheck + audit + build + smoke-load.
+Full gate: `pnpm qa:check:full` = qa:check → build → smoke-install → smoke-pack → test → typecheck → audit → smoke-load → smoke-mcp
+(build precedes the smokes/tests so they run against fresh artifacts; the Docker runner is opt-in and needs credentials/network).
 Note: `pnpm audit` collides with pnpm's security audit — the harness audit is `pnpm run audit`.
 
 ## Git Flow (repository workflow)

@@ -1,7 +1,7 @@
 ---
 name: dh-create-documentation
 description: >
-  Create structured docs (Markdown/HTML/Mermaid): project docs, API refs, READMEs, guides; Obsidian vault = {project_root}, ALL docs under {project_root}/docs, frontmatter metadata. Use to document this, write a README, or generate documentation.
+  Create structured docs (Markdown/HTML/Mermaid): project docs, API refs, READMEs, guides, plus evolution and observation notes recording software evolution and session learnings; Obsidian vault = {project_root}, ALL docs under {project_root}/docs, frontmatter metadata. Use to document this, write a README, generate documentation, create evolution/observation notes, or capture learnings.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: bash, read, write, edit, glob
@@ -16,15 +16,18 @@ Generate structured, cross-referenced documentation in any format, at any locati
 
 ## Documentation Contract (mandatory)
 
-- **Owner:** `@dh-documentor` is the main and only responsible agent for
-  create/update/delete/retrieve of generated documents (EXCLUDING
-  `docs/plans/`). All document work is delegated to it; this skill is the
-  tool it uses.
+- **Owner:** the best available documentation agent (bundled documentation
+  capability as fallback, resolved with
+  [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md))
+  is the main and only responsible role for create/update/delete/retrieve of
+  generated documents (EXCLUDING `docs/plans/`). All document work is delegated
+  to it; this skill is the tool it uses.
 - **Format:** Markdown is the PRIMARY format for every document.
   Complementary information and tables may use `csv`, `xml`, `yaml`, or
   `json`.
 - **Mermaid:** every complex workflow or design MUST include a mermaid
-  diagram (native in Obsidian — no conversion needed).
+  diagram (native in Obsidian — no conversion needed). For complex diagrams,
+  invoke the `dh-mermaid` skill.
 - **ASCII wireframes:** every UI representation MUST include an ASCII
   wireframe (code block).
 - **Obsidian frontmatter:** REQUIRED on every document (`title`, `tags`,
@@ -33,8 +36,35 @@ Generate structured, cross-referenced documentation in any format, at any locati
   "<project>"` (preferred) or `obsidian search query="<term>"` to retrieve
   information from documents; `rg` as fallback.
 - **Parsing extra formats:** use `jq` (json), `yq` (yaml), `xq` (xml), and
-  DuckDB (`dh.read_sheet`, `dh.update_sheet`, `dh.sheet_schema`) for
-  tabular data.
+  DuckDB (`dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`) for
+  tabular data. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
+- **Command execution:** run retrieval, search, and vault-push commands
+  through the `dh-execute-cli` skill; never run bash directly.
+
+## Custom Directives: Evolution & Observation Notes
+
+After plan completion, a release, an architecture change, or session learnings
+worth keeping, create BOTH notes and register them:
+
+- **Evolution note** — how the software evolved (what changed, why,
+  architecture/modules, validation/release, follow-ups):
+  `{project_root}/docs/evolution/<YYYY-MM-DD>-<slug>.md`
+- **Observation note** — session learnings (what worked, what didn't,
+  decisions, follow-ups):
+  `{project_root}/docs/evolution/observations/<YYYY-MM-DD>-<HHMM>-<slug>.md`
+- **Index** — prepend one row per note to
+  `{project_root}/docs/evolution/index.md` (newest first).
+
+Rules:
+
+- All paths stay under `{project_root}/docs`; never write notes under
+  `docs/plans/`.
+- `docs/evolve/` is historical: do not migrate, delete, or rewrite it — new
+  notes go to `docs/evolution/`.
+- These directives replace the external `evolve`/`state-sync` workflow for
+  plan close-out.
+- Templates, rules, workflow, and verification:
+  [`references/evolution-notes.md`](references/evolution-notes.md).
 
 ## Workflow
 
@@ -137,6 +167,8 @@ Use these detailed references only when the specific sub-task requires them:
 | Format guide | User requests HTML or Mermaid output, or detailed Markdown formatting examples | `references/format-guide.md` |
 | Obsidian push | Time to push documentation to Obsidian (Step 5 of the workflow) | `references/obsidian-push.md` |
 | Complete example | User wants to see a full end-to-end example | `references/complete-example.md` |
+| Evolution & observation notes | Plan completion, release, architecture change, or "capture learnings" | `references/evolution-notes.md` |
+| Complex diagrams | Architecture, current/desired state, critical changes, or component graphs | [dh-mermaid](../dh-mermaid/SKILL.md) |
 
 ## Step 4: Content Standards
 
@@ -198,6 +230,6 @@ After generating documentation:
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

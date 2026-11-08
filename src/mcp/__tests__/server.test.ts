@@ -1,0 +1,68 @@
+/**
+ * server.test.ts — `tools/list` contract for the MCP server factory.
+ *
+ * Proves the factory registers exactly the 12 harness capabilities with
+ * meaningful descriptions, and that plan handlers anchor on the injected
+ * workspace root. Payload/error parity is covered by the dedicated
+ * plan/sheet/command parity suites.
+ */
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import type { McpTestHarness } from '../../__tests__/helpers/mcp.js';
+import { createMcpTestHarness } from '../../__tests__/helpers/mcp.js';
+import type { PlanPayload } from '../../__tests__/helpers/plan-fixtures.js';
+import { plansFile } from '../../__tests__/helpers/plan-fixtures.js';
+
+const HARNESS_TOOLS = [
+  'logged_command',
+  'plan_create',
+  'plan_fast_create',
+  'plan_fast_read',
+  'plan_fast_skip_check',
+  'plan_fast_sync',
+  'plan_fast_update_status',
+  'plan_read',
+  'plan_update_status',
+  'read_sheet',
+  'sheet_schema',
+  'update_sheet',
+].sort();
+
+describe('MCP server tools/list contract', () => {
+  let harness: McpTestHarness | undefined;
+
+  beforeEach(async () => {
+    harness = await createMcpTestHarness();
+  });
+
+  afterEach(async () => {
+    await harness?.close();
+  });
+
+  it('exposes exactly the 12 harness tools', async () => {
+    const { tools } = await harness!.listTools();
+    expect(tools.map((tool) => tool.name).sort()).toEqual(HARNESS_TOOLS);
+  });
+
+  it('gives every tool a meaningful description', async () => {
+    const { tools } = await harness!.listTools();
+    expect(tools).toHaveLength(HARNESS_TOOLS.length);
+    for (const tool of tools) {
+      expect(tool.description?.length ?? 0).toBeGreaterThan(20);
+    }
+  });
+
+  it('anchors plan handlers on the injected workspace root', async () => {
+    const created = await harness!.callToolJson<PlanPayload>('plan_create', {
+      slug: 'demo',
+      title: 'Demo Plan',
+      objective: 'Prove workspace anchoring',
+      phases: [{ title: 'Phase One', subTasks: [{ title: 'First task' }] }],
+    });
+    expect(created.ok).toBe(true);
+    expect(created.path).toBe(plansFile(harness!.workspaceRoot, 'demo'));
+    expect(created.plan.title).toBe('Demo Plan');
+
+    const read = await harness!.callToolJson<PlanPayload>('plan_read', { slug: 'demo' });
+    expect(read.path).toBe(created.path);
+  });
+});

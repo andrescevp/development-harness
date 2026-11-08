@@ -18,27 +18,31 @@ Orchestrate the complete execution of a plan from start to finish. Iterate throu
   - Check you are in main branch and create the feature branch.
   - If not in feature branch, ask user permission to continue before any change.
   - if working in monorepos with git submodules create a branch per submodule along with the branch of the main repository to align and trace commints between repositories.
-- Read the plan with the `dh.plan_read` tool (`{ slug }` → structured JSON: meta, phases[].title/status, subTasks[].phase/title/status). Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually, following the phased template markers (`## Phases` → `### Phase N: <title>` → `#### Sub-Task N.M: <title>` with `- **Status:**` bullets).
+- Read the plan with the `dh_plan_read` tool (`{ slug }` → structured JSON: meta, phases[].title/status, subTasks[].phase/title/status). Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually, following the phased template markers (`## Phases` → `### Phase N: <title>` → `#### Sub-Task N.M: <title>` with `- **Status:**` bullets). These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 - If the plan file does not exist, stop and report — suggest running the `dh-planning` skill first.
+- **Paused handoff guard:** if `./docs/plans/<plan-slug>/handoff.md` exists with `status: paused`, do not start execution from plan statuses. Stop and direct the user to `dh-resume-plan` for that slug (it rehydrates context and detects drift). Bypass only on an explicit user instruction to skip rehydration.
 - Iterate **phases in order**; within each phase, iterate its sub-tasks in order.
 - Phase lifecycle: a phase becomes `In Progress` when its first sub-task starts; it becomes `Completed` only when ALL its sub-tasks are `Completed`.
 - Do not re-execute sub-tasks already marked `Completed`.
 - If a sub-task is marked `In Progress`, resume from it (don't restart from the beginning).
-- Update statuses with the `dh.plan_update_status` tool (`{ slug, target: "phase"|"subtask", index: "N"|"N.M", status }`): mark a sub-task `In Progress` before execution, `Completed` after its review passes, and a phase `Completed` only when all its sub-tasks are `Completed`. Fallback when the tool is unavailable: manual plan.md edits following the marker rules (only blank lines precede status bullets).
+- Update statuses with the `dh_plan_update_status` tool (`{ slug, target: "phase"|"subtask", index: "N"|"N.M", status }`): mark a sub-task `In Progress` before execution, `Completed` after its review passes, and a phase `Completed` only when all its sub-tasks are `Completed`. Fallback when the tool is unavailable: manual plan.md edits following the marker rules (only blank lines precede status bullets).
 - After each sub-task execution, run the `dh-review` skill before proceeding to the next.
 - If a review produces P0/P1 findings, stop and report — do not continue to the next sub-task (a blocked sub-task blocks its phase).
 - After the final sub-task, run the `dh-final-review` skill for sign-off.
 - Update `./docs/plans/index.md` when the plan is fully complete.
-- **Project type awareness is delegated to `dh-execute-plan-task`.** The orchestrator does not re-detect project type — it relies on `dh-execute-plan-task` to handle agent selection based on whether the project is software or non-software. Do not hardcode agent choices (e.g., `@dh-software-engineer`) in the orchestration loop that would conflict with this.
-- **After plan completion (all projects):** invokes `evolve` and `state-sync` to capture what was learned and update documentation. This ensures knowledge persists beyond the active session.
-- **After plan completion (software projects only):** invokes `dh-create-documentation` for generating/updating project docs, and `dh-semver` for determining the next version bump.
+- **Resolve agents once per plan:** before the first delegation, read `## Agent Selection` in `plan.md` and use its rows for the implementation, review, and final-review roles. If the section or a required row is absent or stale (a named agent no longer exists), run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): discover the runtime agent list, then project config/agent directories, then global definitions; record the choices and generic fallbacks in the plan before continuing.
+- **Single implementation agent per sub-task:** there is no complexity- or type-based builder split. If no available agent or bundled capability covers a required role, stop and report the gap — never name a fixed agent or substitute one silently.
+- **Project type awareness is delegated to `dh-execute-plan-task`.** The orchestrator does not re-detect project type — the task skill runs the software/non-software post-steps. Do not hardcode implementation, review, or final-review agent choices in the orchestration loop.
+- **After plan completion (all projects):** invoke `dh-create-documentation` to update docs and create the plan's evolution + observation notes (see its Custom Directives). This ensures knowledge persists beyond the active session.
+- **After plan completion (software projects only):** invoke `dh-semver` for determining the next version bump.
 
 ## Workflow
 
 ### Step 1: Read plan and assess state
 
-Read the plan (via `dh.plan_read`; fallback: manual read) and determine the starting point using this ordered priority:
+Read the plan (via `dh_plan_read`; fallback: manual read) and determine the starting point using this ordered priority:
 
+0. Paused handoff: if `./docs/plans/<plan-slug>/handoff.md` exists with `status: paused`, stop and direct the user to `dh-resume-plan`. Do not apply priorities 1–4 until the handoff is `resumed` or the user explicitly bypasses it.
 1. If all sub-tasks are `Completed` (every phase `Completed`), run `dh-final-review` skill only and proceed to Step 3. Skip the execution loop.
 2. Resume mode: if one or more phases are `In Progress`, start from the FIRST `In Progress` phase, then its FIRST sub-task marked `In Progress` or `Pending`.
 3. If all phases are `Pending` (all sub-tasks `Pending`), start from Phase 1's first sub-task.
@@ -48,7 +52,9 @@ Read the plan (via `dh.plan_read`; fallback: manual read) and determine the star
 
 Iterate **phases in order** (skip phases already `Completed`); within each phase, iterate its sub-tasks starting from the determined starting point:
 
-0. **Mark In Progress**: Ensure the active sub-task is marked `In Progress` via `dh.plan_update_status` (`target: "subtask"`). If it is already `In Progress` (resume), leave the state. Marking the first sub-task of a phase also moves that phase to `In Progress` (phase lifecycle). Fallback: manual plan.md edit per the marker rules. This ensures resume works if interrupted.
+0. **Mark In Progress**: Ensure the active sub-task is marked `In Progress` via `dh_plan_update_status` (`target: "subtask"`). If it is already `In Progress` (resume), leave the state. Marking the first sub-task of a phase also moves that phase to `In Progress` (phase lifecycle). Fallback: manual plan.md edit per the marker rules. This ensures resume works if interrupted.
+
+0b. **Resolve agents**: confirm the plan's `## Agent Selection` names available agents for implementation, review, and (at the end) final review. Absent or stale → run the selection protocol ([`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md)), update the table, and tell the user before delegating. A selected agent missing with no capability fallback stops the run.
 
 1. **Execute**: Follow the `dh-execute-plan-task` skill to implement this sub-task. Since this is called from the orchestrator, `dh-execute-plan-task` skips its internal review and completion steps (per its orchestration guard).
 
@@ -56,9 +62,9 @@ Iterate **phases in order** (skip phases already `Completed`); within each phase
 
 3. **Check findings**: Read the review output:
    - If P0/P1 findings exist: stop the execution loop and report the blocking issues. Do not mark this sub-task `Completed` — a blocked sub-task blocks its phase (loop rule 2.4). Recommend fixing findings and re-running.
-   - If no P0/P1 findings: mark the sub-task `Completed` via `dh.plan_update_status` (`target: "subtask"`, status `Completed`). Fallback: manual edit.
+   - If no P0/P1 findings: mark the sub-task `Completed` via `dh_plan_update_status` (`target: "subtask"`, status `Completed`). Fallback: manual edit.
 
-3a. **Close the phase**: When ALL sub-tasks of the current phase are `Completed`, mark the phase `Completed` via `dh.plan_update_status` (`target: "phase"`, status `Completed`; the tool refuses phase → `Completed` while any sub-task is open) and report the phase completion. Fallback: manual edit.
+3a. **Close the phase**: When ALL sub-tasks of the current phase are `Completed`, mark the phase `Completed` via `dh_plan_update_status` (`target: "phase"`, status `Completed`; the tool refuses phase → `Completed` while any sub-task is open) and report the phase completion. Fallback: manual edit.
 
 4. **Repeat**: Continue to the next sub-task, then the next phase, until all phases are completed.
 
@@ -71,41 +77,39 @@ After all sub-tasks are completed and verified:
 3. If the verdict is `Request changes`: report the findings — do not mark the plan complete.
 4. If the verdict is `Approve` or `Approve with comments`: proceed to Step 4.
 
-### Step 4: Capture learnings and close
+### Step 4: Document evolution and close
 
 After final sign-off passes and before marking the plan complete:
 
-1. **Capture learnings (all projects):** Invoke the `evolve` skill to capture session observations — what patterns emerged, what worked, what didn't, what decisions were made. This feeds into the agent learning pipeline.
+1. **Generate documentation (all projects):** Invoke the `dh-create-documentation` skill to update project docs and create `docs/evolution/<date>-<slug>.md` (evolution note) + `docs/evolution/observations/<date>-<hhmm>-<slug>.md` (observation note), following its Custom Directives.
 
-2. **Sync project state (all projects):** Invoke the `state-sync` skill to update knowledge management systems and relational documentation to reflect architecture changes, new modules, or configuration changes made during this plan.
+2. **Version bump (software projects only):** Invoke the `dh-semver` skill to determine the correct version bump from commit history, generate a changelog, and create a git tag. **Backfill:** after `dh-semver` determines the version/tag, update the evolution note's `version` and the index `Plan/Release` entry with the new version/tag.
 
-3. **Generate documentation (software projects only):** Invoke the `dh-create-documentation` skill to generate or update API references, architecture overviews, READMEs, or other technical docs based on the sub-task implementation.
-
-4. **Version bump (software projects only):** Invoke the `dh-semver` skill to determine the correct version bump from commit history, generate a changelog, and create a git tag.
-
-5. **Mark plan complete** in `./docs/plans/index.md`:
+3. **Mark plan complete** in `./docs/plans/index.md`:
    - Locate the row for `<plan-slug>` and update the Status to `Completed` and Updated timestamp columns. If the slug is not found, append a new row.
    - Set the plan status to `Completed`.
 
-6. Report the plan completion with a summary:
+4. Report the plan completion with a summary:
    - Total sub-tasks completed
    - Final review verdict
    - Any deferred P2/P3 findings
    - Documentation generated (yes/no — details)
    - Version bump (if applicable)
-   - Learnings captured (yes/no)
+   - Evolution & observation notes (paths)
    - Plan ready for merge
 
 ## Resume Mode
 
 The execution loop automatically handles interruptions:
 
+- A paused handoff takes precedence over status-based resume: run `dh-resume-plan` first. If the handoff is absent or already `resumed`, continue with the phase-aware priority in Step 1.
 - Step 2.0 explicitly marks the current sub-task as `In Progress` before delegating to `dh-execute-plan-task`. If the tool is interrupted, the next invocation reads the plan and finds this `In Progress` sub-task.
 - Resume from Step 1, which detects the phase-aware state (priority 2: first `In Progress` phase → its first `In Progress`/`Pending` sub-task) and continues the loop from there.
 - If interruption occurs after review but before the `Completed` mark, the sub-task remains `In Progress` on resume — re-run the review to verify before marking Complete.
 
 ## Error Handling
 
+- **Paused handoff present:** do not execute around it — redirect to `dh-resume-plan` or get explicit confirmation to bypass.
 - **Sub-task execution fails** (validation keeps failing): `dh-execute-plan-task` stops after 3 validation attempts and reports the failure. Do not proceed to the next sub-task — the blocked sub-task blocks its phase (loop rule 2.4: never mark the phase `Completed` around a blocker).
 - **Review produces blocking findings**: Stop the execution loop. Recommend fixing the findings (using the `address-review` pattern) and re-running `dh-execute-plan`.
 - **Final review fails**: Report the verdict — do not mark the plan complete until findings are addressed.
@@ -124,7 +128,7 @@ order — do not skip steps and never silently continue past a blocker:
    2.4 IF hard blockers → stop and ask guidance; otherwise keep the `dh-execute-plan-task` loop
 3. `dh-preflight` + `dh-artifact-check`
 4. `dh-final-review`
-5. `dh-create-documentation`
+5. `dh-create-documentation` (also writes the evolution and observation notes)
 
 **Step 2.4 halts automation.** When `dh-execute-plan-task` (or any loop step)
 hits a hard blocker — repeated validation failures (3 consecutive strikes),
@@ -133,17 +137,21 @@ worked around — the loop STOPS: report the blocker and ask the user for
 guidance. Never silently continue, never skip the blocked step, and never mark
 sub-tasks Complete around a blocker. The rule applies at phase boundaries
 too: a blocked sub-task blocks its phase — do not mark the phase `Completed`
-around a blocker.
+around a blocker. Before stopping for a hard blocker or ending the session,
+run `dh-pause-plan` to preserve the phase/sub-task, git state, decisions,
+blockers, and next steps in `handoff.md`; resume later with `dh-resume-plan`.
 
 ## References
 
+- Fast variant: `dh-execute-plan-fast` executes from `plan_fast.md` with no per-task gates and defers critical verification to plan end; `plan.md` stays the scope truth.
+- [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): discovery, ranking, recording, and re-validation protocol for every delegated role.
 - `dh-execute-plan-task` skill: executes a single sub-task.
 - `dh-review` skill: verifies a single sub-task result.
 - `dh-final-review` skill: produces plan-level sign-off.
-- `dh-create-documentation` skill: generates docs after plan completion (software projects only).
+- `dh-create-documentation` skill: updates docs and writes the evolution/observation notes after plan completion (all projects).
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

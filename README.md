@@ -1,54 +1,76 @@
 # dev-harness-skills
 
-An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 7 agents and 17 skills.
+An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 5 agents and 24 skills.
 
 ## Features
 
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks with strict halt-on-blocker safeguards.
-- **7 agents and 17 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
-- **Plan lifecycle tools**: Built-in `dh.plan_read`, `dh.plan_update_status`, and `dh.plan_create` tools for programmatic plan management in `docs/plans`.
-- **DuckDB sheet tools**: Integrated tools (`dh.read_sheet`, `dh.update_sheet`, `dh.sheet_schema`) for SQL querying and editing of tabular data.
-- **Logged executor strategy**: `dh.logged_command` captures full command execution logs in the OS temp directory while streaming head/tail windows.
+- **5 agents and 24 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
+- **`dh` MCP server (12 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents and skills only.
 - **Full QA gate**: Thorough verification suite integrating Biome, Knip, jscpd, dependency-cruiser, OSV-Scanner, Semgrep, Vitest, and TypeScript.
 - **Source-mode loading**: Automatic discovery by OpenCode via root `index.ts` with direct asset loading from the repository.
 
 ## Installation
 
-### Global (all projects)
+### npx installer (recommended)
 
-Clone the repository into your global OpenCode plugins directory:
+The installer materializes a self-contained plugin directory and wires the
+`dh` MCP server for the selected scope:
 
 ```sh
-git clone https://github.com/andrescevp/development-harness.git ~/.config/opencode/plugins/dev-harness-skills
-cd ~/.config/opencode/plugins/dev-harness-skills && pnpm install
+# npm registry (after publication)
+npx -y dev-harness-skills install --global
+npx -y dev-harness-skills install --project --path .
+
+# Git channel (available before publication / private use)
+npx -y github:andrescevp/development-harness install --global
+npx -y github:andrescevp/development-harness install --project --path .
 ```
 
-OpenCode automatically discovers plugin package directories containing an `index.ts` entry under its plugins folder. **Restart OpenCode after cloning** — plugins load at server startup; a session started before the install shows nothing. The plugin registers its 7 `dh-*` agents and 17 `dh-*` skills automatically (requires `@opencode/plugin` ≥ 2.0.20; pinned `^2.0.20` in the repo).
+| Scope | Plugin directory | MCP config |
+|---|---|---|
+| `--global` | `${OPENCODE_CONFIG_DIR:-${XDG_CONFIG_HOME:-~/.config}/opencode}/plugins/dev-harness-skills` | global `opencode.jsonc` |
+| `--project` | `<project>/.opencode/plugins/dev-harness-skills` | `<project>/opencode.jsonc` |
 
-### Per-project
-
-To scope the harness to a specific project, clone into the project plugins folder with the same install step:
+- Re-running is idempotent; a newer CLI upgrades the managed copy.
+- `--dry-run` reports intended changes; `--force` replaces an unmanaged target
+  or a conflicting `dh` entry; `--no-mcp` skips config wiring.
+- `status` reports plugin/config drift (`--json` for scripts);
+  `uninstall` removes only installer-owned artifacts.
+- A TTY prompts for global/project when no scope flag is given. Non-interactive
+  runs must pass `--global` or `--project`; `--yes` never guesses a scope.
+- **Restart OpenCode after installing** — plugins load at server startup.
 
 ```sh
-mkdir -p <project>/.opencode/plugins
-git clone https://github.com/andrescevp/development-harness.git <project>/.opencode/plugins/dev-harness-skills
-cd <project>/.opencode/plugins/dev-harness-skills && pnpm install
+npx -y dev-harness-skills status --global --json
+npx -y dev-harness-skills uninstall --project --dry-run
 ```
 
 ### Managed via OpenCode CLI
 
-Install the plugin directly using the OpenCode CLI:
+`opencode plugin add` installs the plugin into OpenCode's **global**
+configuration and does not wire MCP servers:
 
 ```sh
+# npm registry (after publication)
+opencode plugin add dev-harness-skills
+
+# Git repository (available now; works with private repositories)
 opencode plugin add github:andrescevp/development-harness
 ```
 
-This works with private repositories through your existing Git credentials. To refresh the plugin:
+Then wire only the `dh` MCP entry (no second plugin copy):
 
 ```sh
-opencode plugin update
+npx -y dev-harness-skills install --global --mcp-only
+# Git-wired installs:
+npx -y dev-harness-skills install --global --mcp-only --mcp-source github
 ```
+
+Choose one plugin channel: an `opencode plugin add` entry plus a managed copy
+loads the plugin twice, and the CLI warns about it. To refresh a managed
+plugin, `opencode plugin update`; remove it with `opencode plugin remove`.
 
 ### From source / development
 
@@ -61,30 +83,39 @@ pnpm install
 pnpm build
 ```
 
-Then load via `file:///path/to/dev-harness-skills` in your `opencode.json` or `opencode.jsonc` plugins array:
+Then load via `file:///path/to/development-harness` in your `opencode.json` or
+`opencode.jsonc` plugins array (or clone the repo into a `plugins/` folder):
 
 ```json
 {
   "plugins": [
-    "file:///path/to/dev-harness-skills"
+    "file:///path/to/development-harness"
   ]
 }
 ```
+
+The plugin installation above loads agents and skills only; the harness tools
+require the project-scope `mcp.servers.dh` entry described in
+[MCP server (`dh`)](#mcp-server-dh). For a git-only checkout, run
+`npx -y github:andrescevp/development-harness install --project --mcp-only`.
 
 ## Quickstart
 
 1. Check that the plugin loaded successfully:
 
 ```sh
-opencode debug agents
-opencode debug skills
+opencode debug agents   # 5 dh-* agents (when the build surfaces plugin agents)
+opencode debug config   # plugin entry, and mcp.servers.dh once wired
+opencode mcp list       # expect: dh connected (server/status only)
 ```
 
-Confirm that the 7 `dh-` agents and 17 `dh-` skills appear and that zero commands are registered.
+The plugin also registers 24 skills (there is no skills debug subcommand on
+v2.0.18 — see `skills/index.md`) and zero tools; the harness tools come from
+the project-scope MCP server — see [MCP server (`dh`)](#mcp-server-dh).
 
 2. Audit your environment and initialize QA:
 
-Ask `@dh-software-architect` to run `dh-setup` to audit system tools and configure project QA hooks.
+Run `dh-setup` (or ask the agent selected for the architecture/design role to run it) to audit system tools and configure project QA hooks.
 
 3. Establish project coding conventions:
 
@@ -103,26 +134,82 @@ Plan execution inside the plugin runs the 5-step skills loop:
    - 2.1 `dh-execute-plan-task` — Implements the sub-task code using `dh-coding`.
    - 2.2 `dh-simplify` — Refactors and simplifies changed code for clarity and reuse.
    - 2.3 `dh-review` + `dh-code-review` — Verifies acceptance criteria and code correctness.
-   - 2.4 Hard blockers — If 3 consecutive validation failures occur or unresolved P0/P1 review findings arise, the loop stops and asks the user for guidance.
+   - 2.4 Hard blockers — If 3 consecutive validation failures occur or unresolved P0/P1 review findings arise, the loop stops and asks the user for guidance. Run `dh-pause-plan` before ending the session so the blocker and context are preserved in `handoff.md`.
 3. `dh-preflight` + `dh-artifact-check` — Runs static analysis, tests, and build artifact validation.
 4. `dh-final-review` — Reports per-phase completion and provides final plan-level sign-off.
-5. `dh-create-documentation` — Generates and updates project documentation.
+5. `dh-create-documentation` — Generates and updates project documentation, including the plan's evolution and observation notes.
 
 ### Phased plan model
 
 Plans are stored under `docs/plans/<slug>/plan.md` using a phased structure. Every phase and sub-task maintains a dual status marker (`Pending`, `In Progress`, or `Completed`). A phase cannot transition to `Completed` until all of its sub-tasks are marked `Completed`. When a hard blocker is reached, automation halts immediately so that blockers are never bypassed.
 
-### Bundled tools
+**Pause/resume (cross-cutting).** A plan can pause at any point without changing its statuses: `dh-pause-plan` writes `docs/plans/<slug>/handoff.md` with the active phase/sub-task, git/worktree state, decisions, blockers, validation, and next steps. `dh-resume-plan` validates the handoff, detects drift, rehydrates context, marks it `resumed`, and re-enters step 2. `dh-execute-plan` redirects when a paused handoff exists. The handoff is a sidecar, not a fourth status.
 
-The plugin registers custom V2 tools under the `dh` namespace:
+### MCP server (`dh`)
 
-- **Plan lifecycle**: `dh.plan_read` parses phased plans into structured JSON, `dh.plan_update_status` safely edits status markers, and `dh.plan_create` scaffolds new phased plans.
-- **Logged execution**: `dh.logged_command` runs commands locally while directing full output to a file in the system temporary directory, returning head and tail line windows.
-- **Tabular sheets**: `dh.read_sheet`, `dh.update_sheet`, and `dh.sheet_schema` provide DuckDB-backed querying, updating, and schema inspection for CSV and XLSX files.
+The plugin registers **no tools**. The 12 harness tools are served by a local
+stdio MCP server (`@modelcontextprotocol/server` v2), enabled **per project**
+in that project's `opencode.jsonc`:
+
+```jsonc
+{
+  "mcp": {
+    "servers": {
+      "dh": {
+        "type": "local",
+        // npm channel (after publication); use
+        // --package=github:andrescevp/development-harness for a Git-wired install.
+        "command": ["npx", "-y", "--package=dev-harness-skills", "dev-harness-mcp"],
+        "protocol": "2026-07-28",
+        // Cold first npx install can take ~20–25 s; prewarm makes later starts fast.
+        "timeout": { "startup": 300000 }
+      }
+    }
+  }
+}
+```
+
+| Tool | Purpose |
+|---|---|
+| `dh_plan_read` | Parse a phased plan (`docs/plans/<slug>/plan.md`) into structured JSON |
+| `dh_plan_update_status` | Edit phase/sub-task status markers (phase completion is gated) |
+| `dh_plan_create` | Scaffold a phased plan; optionally append the `index.md` row |
+| `dh_plan_fast_create` | Create `plan_fast.md` from `plan.md` and seed the skipped-check ledger |
+| `dh_plan_fast_read` | Parse `plan_fast.md`; report the source hash, stale flag, and ledger path |
+| `dh_plan_fast_update_status` | Update a phase/sub-task in **both** plans (fast mirror + source) |
+| `dh_plan_fast_sync` | Pre-execution dry-run/apply fast→plan reconciliation; plan-end is an equality gate (no writes) |
+| `dh_plan_fast_skip_check` | Append skipped-check rows to `plan_fast_skip_checks.md` (append-only) |
+| `dh_read_sheet` | Query tabular data with DuckDB — csv by default; xlsx via a `read_xlsx(...)` query when the extension loads |
+| `dh_update_sheet` | Apply UPDATE/INSERT/DELETE and write the CSV back |
+| `dh_sheet_schema` | Describe columns as `name:type` |
+| `dh_logged_command` | Run a command with its log in the OS temp dir (runs with the MCP server's OS permissions); return head/tail + log path |
+
+Full inputs/returns contract: [`docs/LOADING.md` → Tools](docs/LOADING.md#tools).
+
+Server key `dh` + tool `plan_read` → **`dh_plan_read`** (MCP host naming
+`<server>_<tool>`); under Code Mode call `tools.dh.<tool>`. The older
+`dh.<tool>` spelling belonged to the plugin's V2 tool namespace and is
+retired. Consumer permission actions match `dh_*`. Full wiring, verification
+(`opencode mcp list`), prewarm, and troubleshooting:
+[`docs/LOADING.md`](docs/LOADING.md#mcp-server-dh).
 
 ## Agents & skills
 
-The plugin defines 7 agents and 17 skills using `@opencode/plugin` (`Plugin.define`). Zero command transforms are registered.
+The plugin defines 5 agents and 24 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
+
+### Agent selection
+
+Skills are capability-driven: each names the role it delegates (architecture,
+implementation, testing/QA, review, final sign-off, documentation) and resolves
+it at runtime — runtime agent list first, then project config/agent
+directories, then global definitions. Ranking prefers project-specific agents
+whose instructions match the domain, then specialized project agents, then the
+bundled harness capability. `dh-planning` records the choices and their generic
+fallbacks in the plan's `## Agent Selection` table; execution re-validates
+availability before delegating and stops rather than substituting silently.
+Utility roles are skills, not personas: `dh-execute-cli` for command
+execution/validation and `dh-explore` for codebase exploration. Full protocol:
+[`skills/dh-planning/references/agent-selection.md`](skills/dh-planning/references/agent-selection.md).
 
 ### Agents
 
@@ -132,8 +219,6 @@ The plugin defines 7 agents and 17 skills using `@opencode/plugin` (`Plugin.defi
 | `dh-software-engineer` | Senior software engineer handling all sub-task implementation and TDD coding. |
 | `dh-reviewer` | Scoped code reviewer evaluating changes against sub-task criteria and code quality. |
 | `dh-final-reviewer` | Final reviewer conducting full diff review and plan-level sign-off. |
-| `dh-executor` | Execution agent running commands, tests, builds, and validation via logged command strategy. |
-| `dh-explorer` | Codebase exploration agent using fast glob, grep, and targeted reads. |
 | `dh-documentor` | Documentation agent responsible for creating, updating, and maintaining project documentation. |
 
 ### Skills
@@ -144,15 +229,22 @@ The plugin defines 7 agents and 17 skills using `@opencode/plugin` (`Plugin.defi
 | `dh-domain-check` | Validates domain boundaries and SOLID design during planning and execution. |
 | `dh-contingency` | Generates Plan A/B/C architectural alternatives with risk, complexity, and trade-off analysis. |
 | `dh-execute-plan` | Orchestrates the end-to-end execution and status tracking of phased plans. |
-| `dh-execute-plan-task` | Executes an individual sub-task by delegating to `@dh-software-engineer`. |
+| `dh-execute-plan-fast` | Fast alternative: executes from `plan_fast.md`, defers critical gates to plan end, records skipped checks. |
+| `dh-execute-plan-task` | Executes an individual sub-task by delegating to the plan's selected implementation agent. |
+| `dh-execute-plan-task-fast` | Fast alternative for one sub-task: dual-plan status, per-task ledger rows, no per-task gates. |
+| `dh-pause-plan` | Snapshots an active plan into `docs/plans/<slug>/handoff.md` without changing statuses or code. |
+| `dh-resume-plan` | Validates a handoff, detects drift, rehydrates context, and resumes via `dh-execute-plan-fast` when `plan_fast.md` exists, otherwise `dh-execute-plan`. |
 | `dh-coding` | Applies TDD best practices and enforces rules from `CODE_RULES.md`. |
+| `dh-execute-cli` | Executes commands, tests, builds, and validation through the logged-command strategy and reports compact results. |
+| `dh-explore` | Explores codebases with glob, grep, and targeted reads, returning compact evidence with exact file references. |
 | `dh-simplify` | Streamlines changed code to remove redundancy and reduce complexity. |
 | `dh-review` | Verifies sub-task implementations against specified acceptance criteria. |
 | `dh-code-review` | Inspects code changes for security, robustness, and style conformance. |
 | `dh-preflight` | Executes the full test, lint, and static analysis verification suite. |
 | `dh-artifact-check` | Validates build artifacts, distribution packages, and deployment scripts. |
 | `dh-final-review` | Performs final plan-level verification and delivers completion verdicts. |
-| `dh-create-documentation` | Generates and updates documentation in the project docs directory. |
+| `dh-create-documentation` | Generates and updates documentation in the project docs directory, including evolution and observation notes. |
+| `dh-mermaid` | Generates plan/documentation Mermaid diagrams: current state, desired state, critical changes, component graphs, flows, sequences, and data models. |
 | `dh-grill-sdd` | Conducts interactive requirement interviews to produce `sdd.md` specification documents. |
 | `dh-setup` | Audits system tools, user plugins, MCPs, and project quality configuration. |
 | `dh-code-ruler` | Interviews users and inspects code to generate project-level `CODE_RULES.md`. |
@@ -169,6 +261,9 @@ pnpm run audit
 pnpm typecheck
 pnpm build
 node scripts/smoke-load.mjs
+node scripts/smoke-mcp.mjs
+node scripts/smoke-install.mjs
+node scripts/smoke-pack.mjs
 pnpm qa:check
 pnpm qa:check:full
 pnpm format:biome
@@ -176,22 +271,39 @@ pnpm format:biome
 
 Use `pnpm run audit` to run the harness consistency audit (`pnpm audit` runs pnpm's package security audit).
 
+Docker test (opt-in; needs Docker and GitHub credentials for `--remote`):
+
+```sh
+scripts/docker-test.sh --local
+scripts/docker-test.sh --remote --ref <branch>
+```
+
+The runner derives from the pinned `ghcr.io/anomalyco/opencode:2.0.18` image,
+adds Node/npm/git/ssh/gcompat, mounts existing host Git credentials read-only,
+and keeps HOME/XDG/OpenCode/project paths isolated. It is not part of the
+offline `pnpm qa:check:full` gate.
+
 ## Repository layout
 
 ```text
 index.ts         Root plugin entry point for OpenCode plugin discovery (source mode)
-agents/          Markdown definitions and system prompts for the 7 bundled agents
-skills/          Instructions, templates, and references for the 17 bundled skills
-src/             TypeScript source code, asset loaders, type definitions, and tools
-scripts/         Audit, asset packaging, and smoke-testing scripts
+agents/          Markdown definitions and system prompts for the 5 bundled agents
+skills/          Instructions, templates, and references for the 24 bundled skills
+src/cli/         Installer CLI (args, scope, JSONC config, manifest, commands)
+src/mcp/         Local stdio MCP server and workspace resolver
+src/tools/       Plan/sheet/logged-command tool implementations
+src/lib/         Shared assets, records, atomic writes, package metadata, main guard
+scripts/         Audit, smoke tests (load/MCP/install/pack), Docker runner
+docker/test/     Derived OpenCode test image (pinned 2.0.18)
 test/            Vitest unit and registration tests
-docs/            Plugin documentation, loading guides, and phased implementation plans
+docs/            Plugin documentation, loading guides, release runbook, plans
 ```
 
 ## Documentation
 
 - [`AGENTS.md`](AGENTS.md) — Runtime contract: skills loop, phase lifecycle, tools, and delegation routing.
-- [`docs/LOADING.md`](docs/LOADING.md) — Plugin loading methods, verification checklists, and troubleshooting.
+- [`docs/LOADING.md`](docs/LOADING.md) — Install channels, verification checklists, and troubleshooting.
+- [`docs/RELEASING.md`](docs/RELEASING.md) — Manual npm publish runbook and post-publish verification.
 
 ## Contributing
 

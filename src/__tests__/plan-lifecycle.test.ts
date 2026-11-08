@@ -10,7 +10,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { buildPlanTemplate, parsePlan, resolvePlanPath, setStatus } from '../tools/plan-lifecycle.js';
+import { buildPlanTemplate, parsePlan, setStatus } from '../tools/plan-lifecycle.js';
+import { assertNoSymlinks, resolvePlanPath } from '../tools/plan-paths.js';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const FIXTURE = fs.readFileSync(
@@ -200,5 +201,14 @@ describe('resolvePlanPath', () => {
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }
+  });
+});
+
+describe('assertNoSymlinks', () => {
+  it('is fail-closed for targets outside the plans anchor', () => {
+    const root = path.join(os.tmpdir(), 'dhs-plan-path-test');
+    expect(() => assertNoSymlinks(root, path.join(root, 'outside.md'))).toThrow(/path escapes docs\/plans/);
+    expect(() => assertNoSymlinks(root, path.join(root, 'docs', 'plans'))).not.toThrow();
+    expect(() => assertNoSymlinks(root, path.join(root, 'docs', 'plans', 'x.md'))).not.toThrow();
   });
 });

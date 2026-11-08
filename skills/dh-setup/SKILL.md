@@ -1,7 +1,7 @@
 ---
 name: dh-setup
 description: >
-  Audit system software, configure user MCPs/plugins, scaffold project QA (hooks + per-stack tools), bootstrap docs/architecture via dh-software-architect, and write harness directives into AGENTS.md. Use to check requirements or setup the environment.
+  Audit system software, configure user MCPs/plugins, scaffold project QA (hooks + per-stack tools), bootstrap docs/architecture with the selected architecture agent, and write harness directives into AGENTS.md. Use to check requirements or setup the environment.
 license: MIT
 compatibility: opencode
 allowed-tools: read, write, edit, bash, websearch
@@ -17,7 +17,7 @@ Make sure the system, the user configuration, and the project are ready to run t
 ## Step 1: System Software Audit
 
 Check each required tool and guide installation when missing. Run the
-verification command via `@dh-executor`; if a tool is missing, provide the
+verification command via the `dh-execute-cli` skill; if a tool is missing, provide the
 install command for the detected OS (linux/macOS; note Windows equivalents
 where they differ) and re-verify.
 
@@ -34,7 +34,7 @@ where they differ) and re-verify.
 | graphify | yes | `graphify --version` | https://github.com/Graphify-Labs/graphify (v8 README) — `uv tool install graphifyy` (or `pipx install graphifyy`), then register the skill with `graphify install` |
 | obsidian | optional | `command -v obsidian` (app + best-effort CLI) | https://obsidian.md — recommended when the project vault flow (dh-create-documentation) should sync live |
 | notesmd-cli | optional | `notesmd --version` / `command -v notesmd` | https://github.com/Yakitrak/notesmd-cli — `yay -S notesmd-cli-bin` (Arch) / `brew install yakitrak/yakitrak/notesmd-cli` / release binary; used by dh-create-documentation for vault operations without Obsidian running |
-| duckdb (CLI, optional) | optional | `duckdb --version` | https://duckdb.org — native CLI alternative to the plugin's bundled sheet tools (dh.read_sheet/dh.update_sheet use the duckdb npm package) |
+| duckdb (CLI, optional) | optional | `duckdb --version` | https://duckdb.org — native CLI alternative to the `dh` MCP server's sheet tools (dh_read_sheet/dh_update_sheet use the duckdb npm package) |
 | phpenv | optional | `phpenv --version` / `phpenv versions` | https://github.com/phpenv/phpenv — skip with a note when absent |
 
 For anything missing, do NOT silently skip (except the optional items —
@@ -70,18 +70,9 @@ the configuration, but let the user decide whether to enable each.
 **MCP servers** (add to `opencode.jsonc` `mcp` section; local servers run via
 `npx`):
 
-- chrome-devtools-mcp — https://github.com/ChromeDevTools/chrome-devtools-mcp
-  ```jsonc
-  "chrome-devtools": { "type": "local", "enabled": true, "command": ["npx", "-y", "chrome-devtools-mcp@latest"] }
-  ```
-- Playwright MCP — https://playwright.dev/docs/getting-started-mcp
-  ```jsonc
-  "playwright": { "type": "local", "enabled": true, "command": ["npx", "-y", "@playwright/mcp@latest"] }
-  ```
-- mobile-mcp — https://github.com/mobile-next/mobile-mcp
-  ```jsonc
-  "mobile-mcp": { "type": "local", "enabled": true, "command": ["npx", "-y", "mobile-mcp@latest"] }
-  ```
+- chrome-devtools-mcp — https://github.com/ChromeDevTools/chrome-devtools-mcp — `"chrome-devtools": { "type": "local", "enabled": true, "command": ["npx", "-y", "chrome-devtools-mcp@latest"] }`
+- Playwright MCP — https://playwright.dev/docs/getting-started-mcp — `"playwright": { "type": "local", "enabled": true, "command": ["npx", "-y", "@playwright/mcp@latest"] }`
+- mobile-mcp — https://github.com/mobile-next/mobile-mcp — `"mobile-mcp": { "type": "local", "enabled": true, "command": ["npx", "-y", "mobile-mcp@latest"] }`
 
 **OpenCode plugin:** `opencode-rules` **latest v2 tag, beta versions for opencode v2** — https://github.com/frap129/opencode-rules
 ```jsonc
@@ -135,12 +126,28 @@ script + CI where a workflow exists):
 and confirm it exits 0; if pre-existing violations block the gate, report
 them instead of silently disabling rules.
 
+**4. Harness MCP server (`dh`)** — the harness tools are served by a
+project-scope local MCP server; wire it once (idempotent, consent first):
+- In the project `opencode.jsonc` (or `opencode.json`), ensure the entry
+  matches `"type": "local"`, `"command": ["npx", "-y", "--package=github:andrescevp/development-harness", "dev-harness-mcp"]`,
+  `"protocol": "2026-07-28"`, `"timeout": { "startup": 300000 }`. Accept nested `mcp.servers.dh` or legacy flat `mcp.dh` (both present → NESTED wins: show it and ask before consolidating).
+  Compare ONLY `type`/`command`/`protocol`/`timeout.startup`; other keys (`environment`, `disabled`, `codemode`) are preserved — not conflicts.
+  Create `mcp`/`servers` when absent; never overwrite other servers. Identical canonical fields → "already wired";
+  a difference → show a diff and ask (same consent as hooks). If neither config file exists, create `opencode.jsonc` with consent
+  (`$schema` + the block), preserving comments/format when editing in place (no parser round-trip).
+- Prewarm (best-effort; expect a fast exit via stdin EOF; on timeout note the
+  cold start): `npx -y --package=github:andrescevp/development-harness dev-harness-mcp < /dev/null`.
+- Verify: `opencode mcp list` → `dh` connected (restart long-lived sessions).
+- Cold first npx install (~20–25 s) is covered by the canonical
+  `"timeout": { "startup": 300000 }`; offline/local fallback: `["node", "<clone>/dist/mcp/stdio.js"]` (needs `pnpm build`).
+  Details: [docs/LOADING.md](https://github.com/andrescevp/development-harness/blob/main/docs/LOADING.md#mcp-server-dh).
+
 ## Step 4: Architecture Documentation
 
 Make sure the project has a **central architecture documentation directory**
 and that existing architecture artifacts are accounted for.
 
-**1. Explore first (via `@dh-executor`):** look for architecture files with
+**1. Explore first (via the `dh-execute-cli` skill):** look for architecture files with
 these probes and report what exists:
 
 ```bash
@@ -159,7 +166,7 @@ about each artifact (keep answers recorded in the report):
   consolidate, or must they stay where they are (e.g., linked from a
   README/CI)?
 - **Updatable?** — do they need **updating/rewriting** (delegate the refresh
-  to `@dh-software-architect`) or archiving (old/obsolete)?
+  to the selected architecture agent) or archiving (old/obsolete)?
 - **Tracked?** — are they **tracked in git**; if untracked, should they be
   committed, and is `docs/architecture/` itself tracked (else propose adding
   a `.gitkeep` + `.gitignore` line)? Should they be linked from the repo
@@ -175,14 +182,14 @@ the repo would leave it empty/untracked, add `.gitkeep` (or an `index.md`
 placeholder) and note the `.gitignore` choice.
 
 **4. Create the architecture documentation when it does NOT exist:**
-delegate to `@dh-software-architect` (architecture author) with a brief that
-requires: a system/module overview, bounded contexts or module boundaries,
-key decisions (ADR-style entries), and data/control flow — all under
-`{project_root}/docs/architecture`, following the `dh-create-documentation`
-conventions (vault = project root, docs under `{project_root}/docs`). Then
-ensure an **index** (`README.md` in the architecture dir) links every
-architecture document; the index and other generated docs are owned by
-`@dh-documentor`.
+delegate to the selected architecture agent (architecture author; bundled
+architecture capability as fallback) with a brief requiring: a system/module
+overview, bounded contexts or module boundaries, key decisions (ADR-style
+entries), and data/control flow — all under `{project_root}/docs/architecture`,
+following the `dh-create-documentation` conventions (vault = project root, docs
+under `{project_root}/docs`). Then ensure an **index** (`README.md`) links every
+architecture document; the index and other generated docs are owned by the
+selected documentation role (bundled documentation capability as fallback).
 
 ## Step 5: Harness Directives in AGENTS.md
 
@@ -203,37 +210,40 @@ This project is managed with the dev-harness plugin (dev-harness-skills):
 
 - **Plans:** phased plans live in `docs/plans/<slug>/plan.md` (phases →
   sub-tasks with `Pending | In Progress | Completed` markers); the format
-  contract is the phased-plan template. Use `dh.plan_read` /
-  `dh.plan_update_status` / `dh.plan_create` instead of manual edits when
-  available.
+  contract is the phased-plan template. Use `dh_plan_read` /
+  `dh_plan_update_status` / `dh_plan_create` instead of manual edits when
+  available. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 - **Loop:** plan with `dh-planning` (SDD first via `dh-grill-sdd` when
   absent), execute with `dh-execute-plan` → `dh-execute-plan-task`
-  (delegating implementation to `@dh-software-engineer`), simplify with
-  `dh-simplify`, review with `dh-review` + `dh-code-review`, gate with
-  `dh-preflight` + `dh-artifact-check`, sign off with `dh-final-review`,
-  document with `dh-create-documentation`.
-- **Delegation:** implementation → `@dh-software-engineer`; architecture →
-  `@dh-software-architect`; execution/validation → `@dh-executor`; review →
-  `@dh-reviewer` / `@dh-final-reviewer`; exploration → `@dh-explorer`;
-  generated docs (outside docs/plans) → `@dh-documentor`.
+  (delegating implementation to the plan's selected implementation agent),
+  simplify with `dh-simplify`, review with `dh-review` + `dh-code-review`,
+  gate with `dh-preflight` + `dh-artifact-check`, sign off with
+  `dh-final-review`, document with `dh-create-documentation`.
+- **Delegation (capability-based):** roles resolve via
+  `skills/dh-planning/references/agent-selection.md` and are recorded in the
+  plan's `## Agent Selection` — implementation → selected implementation
+  agent; architecture → selected architecture agent; validation →
+  `dh-execute-cli`; review → selected review agent; final sign-off → selected
+  final-review agent; exploration → `dh-explore`; generated docs (outside
+  docs/plans) → selected documentation agent (bundled capability as fallback).
 - **Blockers halt automation:** 3 consecutive validation failures or
   unresolved P0/P1 review findings stop the loop — report and ask for
   guidance; never mark a phase Completed around a blocker.
 - **Architecture docs:** maintained under `docs/architecture/` (see the
-  index there); refresh via `@dh-software-architect`.
+  index there); refresh via the selected architecture agent.
 ```
 
 ## Verification Checklist
 
 - [ ] Step 1: every required system tool present with version (phpenv optional)
 - [ ] Step 2: user-level MCPs/plugins verified and enabled per user decision
-- [ ] Step 3: hooks installed with documented rules; QA toolset wired and gate green
-- [ ] Step 4: architecture artifacts explored + interview answers recorded (if files exist); `docs/architecture/` created; docs created via `@dh-software-architect` when absent; index present
+- [ ] Step 3: hooks installed with documented rules; QA toolset wired and gate green; `dh` server wired/already wired **or explicitly skipped by the user**; prewarm **attempted** (cold start noted on timeout); `opencode mcp list` shows `dh` connected when wired
+- [ ] Step 4: architecture artifacts explored + interview answers recorded (if files exist); `docs/architecture/` created; docs created via the selected architecture agent when absent; index present
 - [ ] Step 5: project AGENTS.md has the harness directives section (updated, not duplicated)
 - [ ] Report produced: per-tool status table + any blockers with exact commands
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).
