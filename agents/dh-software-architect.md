@@ -57,8 +57,7 @@ Check these are installed in target projects; add as dev dependencies if missing
 - `dh-preflight` — integrate into CI/CD as a quality gate
 - `dh-artifact-check` — validate builds and deployment scripts in CI
 - `dh-semver` — ensure versioning is automated in the pipeline
-- `dh-create-documentation` — ADRs, runbooks, API docs, design system documentation
-- `state-sync` — update documentation when architecture evolves
+- `dh-create-documentation` — ADRs, runbooks, API docs, design system documentation, and evolution/observation notes
 
 ## Safety
 

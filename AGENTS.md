@@ -32,7 +32,12 @@ Completed). The loop:
    2.4 IF hard blockers → stop and ask guidance; otherwise keep `dh-execute-plan-task` loop
 3. `dh-preflight` + `dh-artifact-check`
 4. `dh-final-review` (reports per-phase completion)
-5. `dh-create-documentation`
+5. `dh-create-documentation` (also writes the evolution and observation notes under `docs/evolution/`)
+
+**Close-out documentation.** Step 5's `dh-create-documentation` also creates
+the plan's evolution note (`docs/evolution/<date>-<slug>.md`) and observation
+note (`docs/evolution/observations/<date>-<hhmm>-<slug>.md`), and updates
+`docs/evolution/index.md`. `docs/evolve/` is historical and stays untouched.
 
 **Phase lifecycle:** a phase becomes `In Progress` when its first sub-task
 starts and `Completed` only when ALL its sub-tasks are `Completed`. Resume

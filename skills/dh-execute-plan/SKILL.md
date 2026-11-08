@@ -31,8 +31,8 @@ Orchestrate the complete execution of a plan from start to finish. Iterate throu
 - After the final sub-task, run the `dh-final-review` skill for sign-off.
 - Update `./docs/plans/index.md` when the plan is fully complete.
 - **Project type awareness is delegated to `dh-execute-plan-task`.** The orchestrator does not re-detect project type — it relies on `dh-execute-plan-task` to handle agent selection based on whether the project is software or non-software. Do not hardcode agent choices (e.g., `@dh-software-engineer`) in the orchestration loop that would conflict with this.
-- **After plan completion (all projects):** invokes `evolve` and `state-sync` to capture what was learned and update documentation. This ensures knowledge persists beyond the active session.
-- **After plan completion (software projects only):** invokes `dh-create-documentation` for generating/updating project docs, and `dh-semver` for determining the next version bump.
+- **After plan completion (all projects):** invoke `dh-create-documentation` to update docs and create the plan's evolution + observation notes (see its Custom Directives). This ensures knowledge persists beyond the active session.
+- **After plan completion (software projects only):** invoke `dh-semver` for determining the next version bump.
 
 ## Workflow
 
@@ -73,29 +73,25 @@ After all sub-tasks are completed and verified:
 3. If the verdict is `Request changes`: report the findings — do not mark the plan complete.
 4. If the verdict is `Approve` or `Approve with comments`: proceed to Step 4.
 
-### Step 4: Capture learnings and close
+### Step 4: Document evolution and close
 
 After final sign-off passes and before marking the plan complete:
 
-1. **Capture learnings (all projects):** Invoke the `evolve` skill to capture session observations — what patterns emerged, what worked, what didn't, what decisions were made. This feeds into the agent learning pipeline.
+1. **Generate documentation (all projects):** Invoke the `dh-create-documentation` skill to update project docs and create `docs/evolution/<date>-<slug>.md` (evolution note) + `docs/evolution/observations/<date>-<hhmm>-<slug>.md` (observation note), following its Custom Directives.
 
-2. **Sync project state (all projects):** Invoke the `state-sync` skill to update knowledge management systems and relational documentation to reflect architecture changes, new modules, or configuration changes made during this plan.
+2. **Version bump (software projects only):** Invoke the `dh-semver` skill to determine the correct version bump from commit history, generate a changelog, and create a git tag. **Backfill:** after `dh-semver` determines the version/tag, update the evolution note's `version` and the index `Plan/Release` entry with the new version/tag.
 
-3. **Generate documentation (software projects only):** Invoke the `dh-create-documentation` skill to generate or update API references, architecture overviews, READMEs, or other technical docs based on the sub-task implementation.
-
-4. **Version bump (software projects only):** Invoke the `dh-semver` skill to determine the correct version bump from commit history, generate a changelog, and create a git tag.
-
-5. **Mark plan complete** in `./docs/plans/index.md`:
+3. **Mark plan complete** in `./docs/plans/index.md`:
    - Locate the row for `<plan-slug>` and update the Status to `Completed` and Updated timestamp columns. If the slug is not found, append a new row.
    - Set the plan status to `Completed`.
 
-6. Report the plan completion with a summary:
+4. Report the plan completion with a summary:
    - Total sub-tasks completed
    - Final review verdict
    - Any deferred P2/P3 findings
    - Documentation generated (yes/no — details)
    - Version bump (if applicable)
-   - Learnings captured (yes/no)
+   - Evolution & observation notes (paths)
    - Plan ready for merge
 
 ## Resume Mode
@@ -128,7 +124,7 @@ order — do not skip steps and never silently continue past a blocker:
    2.4 IF hard blockers → stop and ask guidance; otherwise keep the `dh-execute-plan-task` loop
 3. `dh-preflight` + `dh-artifact-check`
 4. `dh-final-review`
-5. `dh-create-documentation`
+5. `dh-create-documentation` (also writes the evolution and observation notes)
 
 **Step 2.4 halts automation.** When `dh-execute-plan-task` (or any loop step)
 hits a hard blocker — repeated validation failures (3 consecutive strikes),
@@ -146,7 +142,7 @@ blockers, and next steps in `handoff.md`; resume later with `dh-resume-plan`.
 - `dh-execute-plan-task` skill: executes a single sub-task.
 - `dh-review` skill: verifies a single sub-task result.
 - `dh-final-review` skill: produces plan-level sign-off.
-- `dh-create-documentation` skill: generates docs after plan completion (software projects only).
+- `dh-create-documentation` skill: updates docs and writes the evolution/observation notes after plan completion (all projects).
 
 ## Doc search
 
