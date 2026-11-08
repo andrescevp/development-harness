@@ -1,12 +1,12 @@
 # dev-harness-skills
 
-An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 7 agents and 22 skills.
+An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 5 agents and 24 skills.
 
 ## Features
 
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks with strict halt-on-blocker safeguards.
-- **7 agents and 22 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
+- **5 agents and 24 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
 - **`dh` MCP server (12 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents and skills only.
 - **Full QA gate**: Thorough verification suite integrating Biome, Knip, jscpd, dependency-cruiser, OSV-Scanner, Semgrep, Vitest, and TypeScript.
 - **Source-mode loading**: Automatic discovery by OpenCode via root `index.ts` with direct asset loading from the repository.
@@ -104,18 +104,18 @@ require the project-scope `mcp.servers.dh` entry described in
 1. Check that the plugin loaded successfully:
 
 ```sh
-opencode debug agents   # 7 dh-* agents (when the build surfaces plugin agents)
+opencode debug agents   # 5 dh-* agents (when the build surfaces plugin agents)
 opencode debug config   # plugin entry, and mcp.servers.dh once wired
 opencode mcp list       # expect: dh connected (server/status only)
 ```
 
-The plugin also registers 22 skills (there is no skills debug subcommand on
+The plugin also registers 24 skills (there is no skills debug subcommand on
 v2.0.18 — see `skills/index.md`) and zero tools; the harness tools come from
 the project-scope MCP server — see [MCP server (`dh`)](#mcp-server-dh).
 
 2. Audit your environment and initialize QA:
 
-Ask `@dh-software-architect` to run `dh-setup` to audit system tools and configure project QA hooks.
+Run `dh-setup` (or ask the agent selected for the architecture/design role to run it) to audit system tools and configure project QA hooks.
 
 3. Establish project coding conventions:
 
@@ -195,7 +195,21 @@ retired. Consumer permission actions match `dh_*`. Full wiring, verification
 
 ## Agents & skills
 
-The plugin defines 7 agents and 22 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
+The plugin defines 5 agents and 24 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
+
+### Agent selection
+
+Skills are capability-driven: each names the role it delegates (architecture,
+implementation, testing/QA, review, final sign-off, documentation) and resolves
+it at runtime — runtime agent list first, then project config/agent
+directories, then global definitions. Ranking prefers project-specific agents
+whose instructions match the domain, then specialized project agents, then the
+bundled harness capability. `dh-planning` records the choices and their generic
+fallbacks in the plan's `## Agent Selection` table; execution re-validates
+availability before delegating and stops rather than substituting silently.
+Utility roles are skills, not personas: `dh-execute-cli` for command
+execution/validation and `dh-explore` for codebase exploration. Full protocol:
+[`skills/dh-planning/references/agent-selection.md`](skills/dh-planning/references/agent-selection.md).
 
 ### Agents
 
@@ -205,8 +219,6 @@ The plugin defines 7 agents and 22 skills using the `@opencode/plugin` SDK. Zero
 | `dh-software-engineer` | Senior software engineer handling all sub-task implementation and TDD coding. |
 | `dh-reviewer` | Scoped code reviewer evaluating changes against sub-task criteria and code quality. |
 | `dh-final-reviewer` | Final reviewer conducting full diff review and plan-level sign-off. |
-| `dh-executor` | Execution agent running commands, tests, builds, and validation via logged command strategy. |
-| `dh-explorer` | Codebase exploration agent using fast glob, grep, and targeted reads. |
 | `dh-documentor` | Documentation agent responsible for creating, updating, and maintaining project documentation. |
 
 ### Skills
@@ -218,11 +230,13 @@ The plugin defines 7 agents and 22 skills using the `@opencode/plugin` SDK. Zero
 | `dh-contingency` | Generates Plan A/B/C architectural alternatives with risk, complexity, and trade-off analysis. |
 | `dh-execute-plan` | Orchestrates the end-to-end execution and status tracking of phased plans. |
 | `dh-execute-plan-fast` | Fast alternative: executes from `plan_fast.md`, defers critical gates to plan end, records skipped checks. |
-| `dh-execute-plan-task` | Executes an individual sub-task by delegating to `@dh-software-engineer`. |
+| `dh-execute-plan-task` | Executes an individual sub-task by delegating to the plan's selected implementation agent. |
 | `dh-execute-plan-task-fast` | Fast alternative for one sub-task: dual-plan status, per-task ledger rows, no per-task gates. |
 | `dh-pause-plan` | Snapshots an active plan into `docs/plans/<slug>/handoff.md` without changing statuses or code. |
 | `dh-resume-plan` | Validates a handoff, detects drift, rehydrates context, and resumes via `dh-execute-plan-fast` when `plan_fast.md` exists, otherwise `dh-execute-plan`. |
 | `dh-coding` | Applies TDD best practices and enforces rules from `CODE_RULES.md`. |
+| `dh-execute-cli` | Executes commands, tests, builds, and validation through the logged-command strategy and reports compact results. |
+| `dh-explore` | Explores codebases with glob, grep, and targeted reads, returning compact evidence with exact file references. |
 | `dh-simplify` | Streamlines changed code to remove redundancy and reduce complexity. |
 | `dh-review` | Verifies sub-task implementations against specified acceptance criteria. |
 | `dh-code-review` | Inspects code changes for security, robustness, and style conformance. |
@@ -273,8 +287,8 @@ offline `pnpm qa:check:full` gate.
 
 ```text
 index.ts         Root plugin entry point for OpenCode plugin discovery (source mode)
-agents/          Markdown definitions and system prompts for the 7 bundled agents
-skills/          Instructions, templates, and references for the 22 bundled skills
+agents/          Markdown definitions and system prompts for the 5 bundled agents
+skills/          Instructions, templates, and references for the 24 bundled skills
 src/cli/         Installer CLI (args, scope, JSONC config, manifest, commands)
 src/mcp/         Local stdio MCP server and workspace resolver
 src/tools/       Plan/sheet/logged-command tool implementations

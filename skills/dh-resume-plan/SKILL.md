@@ -32,6 +32,8 @@ plan truth.
 - **No destructive git.** Never run `reset`, `stash`, `checkout`, `clean`,
   `rebase`, `revert`, or switch/create branches; never discard uncommitted
   work. Every command in this skill is read-only except the handoff edit.
+- **Commands via the `dh-execute-cli` skill.** Run every git/verification
+  command through that skill; never run bash directly.
 - **Validate before acting.** An invalid, unparseable, or incompatible
   handoff stops the resume; never guess fields or versions.
 - **Handoff-only writes.** Do not change phase/sub-task statuses during
@@ -227,6 +229,6 @@ transitions.
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

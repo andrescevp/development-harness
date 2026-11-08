@@ -7,11 +7,12 @@ runtime delegation routing.
 ## Role summary
 
 The `dev-harness-skills` OpenCode V2 plugin bundles a self-contained dev harness for
-plan-driven development: **7 agents** — `dh-software-architect`,
-`dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-executor`, `dh-explorer`, `dh-documentor` —
-and **22 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
+plan-driven development: **5 agents** — `dh-software-architect`,
+`dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-documentor` —
+and **24 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
 `dh-execute-plan-fast`, `dh-execute-plan-task`, `dh-execute-plan-task-fast`,
-`dh-pause-plan`, `dh-resume-plan`, `dh-coding`, `dh-contingency`, `dh-simplify`,
+`dh-pause-plan`, `dh-resume-plan`, `dh-coding`, `dh-execute-cli`, `dh-explore`,
+`dh-contingency`, `dh-simplify`,
 `dh-review`, `dh-code-review`, `dh-preflight`, `dh-artifact-check`,
 `dh-final-review`, `dh-create-documentation`, `dh-mermaid`, `dh-grill-sdd`, `dh-setup`,
 `dh-code-ruler`, `dh-semver`. The plugin registers
@@ -81,11 +82,31 @@ verification: [`docs/LOADING.md`](docs/LOADING.md#mcp-server-dh).
 
 ## Runtime delegation
 
-**Single task executor:** ALL sub-task implementation in this harness is
-delegated to `@dh-software-engineer`. There is no complexity- or type-based
-builder split; `dh-execute-plan-task` and `dh-coding` route every task there.
-Architectural guidance comes from `@dh-software-architect`. These are the
-bundled agent names — no mapping is needed.
+**Capability-based selection.** Skills do not name fixed agents: they state the
+capability they need (architecture/design, implementation, testing/QA, review,
+final review, documentation, domain specialist) and resolve it against the
+environment. The authoritative protocol is
+[`skills/dh-planning/references/agent-selection.md`](skills/dh-planning/references/agent-selection.md):
+discover the runtime agent list first, then project config/agent directories,
+then global definitions; rank project-specific agents with domain instructions
+above specialized project agents, above the bundled harness capability
+fallback. `dh-planning` records the chosen agents, the evidence (`Why`), and the
+generic fallback in the plan's `## Agent Selection` table (before `## Phases`);
+execution re-validates the choices before delegating, updates the table when an
+agent disappears or is renamed, and stops rather than substituting silently.
+When no delegation is needed, the table says
+`None — no specialized agent required`.
+
+**Single task executor.** ALL sub-task implementation in this harness is
+delegated to the one implementation agent selected for the plan. There is no
+complexity- or type-based builder split; `dh-execute-plan-task` and `dh-coding`
+route every task there. Architectural guidance comes from the selected
+architecture agent. Bundled agents remain available as capability fallbacks but
+project-specific agents win whenever they match the role.
+
+**Utility roles are skills.** Command execution/validation and codebase
+exploration are instruction layers, not selectable personas: run them with the
+`dh-execute-cli` and `dh-explore` skills.
 
 ## Provenance
 
@@ -93,14 +114,14 @@ bundled agent names — no mapping is needed.
   owned by this repository — the repo is self-contained and independent
   (no external source, no extraction step).
 - OpenCode-only — no copilot/gemini variants.
-- Exactly **7 agents + 22 skills** are bundled. Commands, prompts, and all
+- Exactly **5 agents + 24 skills** are bundled. Commands, prompts, and all
   other non-bundled harness content are intentionally NOT bundled.
 - The `dh-` names are canonical in the repo files; bundled agents ship
   without the `permission` and `tools` frontmatter keys.
 
 ## Plugin registration and loading
 
-- The V2 plugin (`Plugin.define`) registers the 7 agents and 22 skills via
+- The V2 plugin (`Plugin.define`) registers the 5 agents and 24 skills via
   synchronous domain transforms (`ctx.agent.transform`, `ctx.skill.transform`)
   from frontmatter-parsed assets (repo `agents/` + `skills/` in source mode,
   `dist/assets/` in the bundle). Zero tool or command transforms (tools live
@@ -114,7 +135,7 @@ bundled agent names — no mapping is needed.
   `opencode.json(c)` pointing at the repo directory (`pnpm install` only; no
   build needed for source loading), or the installed package name. See
   [`docs/LOADING.md`](docs/LOADING.md).
-- **Verify:** launch opencode and confirm the 7 agents and 22 skills appear
+- **Verify:** launch opencode and confirm the 5 agents and 24 skills appear
   (including `dh-coding`) and no commands are registered; then confirm the
   project-scope `dh` MCP server is connected (`opencode mcp list`) so the
   harness tools are available.
@@ -123,8 +144,8 @@ bundled agent names — no mapping is needed.
 
 ```text
 index.ts          source-mode plugin entry (re-exports src/plugin.ts)
-agents/           bundled agent definitions (7)
-skills/           bundled skills (22)
+agents/           bundled agent definitions (5)
+skills/           bundled skills (24)
 src/cli/          installer CLI: args, scope, prompt/output, JSONC, config, manifest, commands
 src/mcp/          stdio MCP server + workspace resolver
 src/tools/        plan/sheet/logged-command tool implementations

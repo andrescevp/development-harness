@@ -38,7 +38,7 @@ Check these are installed in target projects; add as dev dependencies if missing
 
 ## Workflow
 
-> Delegate `@dh-software-engineer` for coding/development tasks, providing architectural guidance.
+> Delegate coding/development tasks to the plan's selected implementation agent (see [`skills/dh-planning/references/agent-selection.md`](../skills/dh-planning/references/agent-selection.md)), providing architectural guidance.
 
 1. Use `dh-contingency` skill to generate architectural alternatives (Plan A/B/C) with trade-off analysis
 2. Use `dh-domain-check` skill to map services to DDD bounded contexts and validate SOLID principles
@@ -76,6 +76,6 @@ Check these are installed in target projects; add as dev dependencies if missing
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

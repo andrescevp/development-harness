@@ -1,7 +1,7 @@
 /**
  * logged-command.ts — logged command execution strategy (dh_logged_command).
  *
- * Encodes the executor agent's mandatory strategy: run the command with its
+ * Encodes the dh-execute-cli skill's mandatory strategy: run the command with its
  * output written to a log file in the SYSTEM TEMP directory, then return a
  * head/tail window (first 20 / last 30 lines with a TRUNCATED marker) plus
  * the log path so the full log can be explored on demand.

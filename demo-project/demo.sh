@@ -5,7 +5,7 @@
 # Usage:
 #   ./demo.sh             launch the opencode TUI in this folder (the plugin
 #                         loads from the parent repo via opencode.jsonc on
-#                         hosts that support directory plugins; the 7 dh-*
+#                         hosts that support directory plugins; the 5 dh-*
 #                         agents are also registered natively via the config
 #                         agent map, so they are visible on every host)
 #   ./demo.sh validate    verify: opencode version + config resolution + agent
@@ -40,7 +40,7 @@ fresh_limited() {
   fi
 }
 
-AGENTS=(dh-software-architect dh-software-engineer dh-reviewer dh-final-reviewer dh-executor dh-explorer dh-documentor)
+AGENTS=(dh-software-architect dh-software-engineer dh-reviewer dh-final-reviewer dh-documentor)
 
 if [[ "${1:-}" == "validate" ]]; then
   command -v opencode >/dev/null || { echo "[demo] FAIL: opencode not found"; exit 1; }

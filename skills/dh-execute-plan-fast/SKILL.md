@@ -32,7 +32,7 @@ MCP tools on the project-scope `dh` server (Code Mode:
 - Create a feature branch per plan execution; if not on one, ask before any change. In monorepos with submodules, branch each submodule in alignment.
 - Read `plan.md` first with `dh_plan_read` (`{ slug }`). Fallback: manual read following the phased markers (`## Phases` → `### Phase N: <title>` → `#### Sub-Task N.M: <title>` with `- **Status:**` bullets). Missing → stop and suggest `dh-planning`.
 - **Paused handoff:** if `handoff.md` is `status: paused`, stop and redirect to `dh-resume-plan`. Resume defaults to standard; after it marks the handoff `resumed`, re-enter **fast mode** when `plan_fast.md` exists.
-- **Scope freeze + allowed differences:** never change `plan.md` scope, requirements, acceptance criteria, or done-when. The mirror may differ only by (a) omitted top-level sections — `## Objective`, `## Requirements Snapshot`, `## Scope`, `## Assumptions and Constraints`, `## Risks and Areas Requiring Care`, `## Core concepts`, `## Visual Context`, `## Open Questions`; (b) fast sections — `## Fast Execution Policy`, `## Alignment Contract`, `## Final Verification`; and (c) status progression. Use `plan.md` for every requirements/scope check.
+- **Scope freeze + allowed differences:** never change `plan.md` scope, requirements, acceptance criteria, or done-when. The mirror may differ only by (a) omitted top-level sections — `## Objective`, `## Requirements Snapshot`, `## Scope`, `## Assumptions and Constraints`, `## Risks and Areas Requiring Care`, `## Core concepts`, `## Visual Context`, `## Agent Selection`, `## Open Questions`; (b) fast sections — `## Fast Execution Policy`, `## Alignment Contract`, `## Final Verification`; and (c) status progression. Use `plan.md` for every requirements/scope check.
 - **Dual status is mandatory.** Every phase/sub-task change goes to **both plans** via `dh_plan_fast_update_status` (`{ slug, target, index, status }`; normalized `dh_plan_fast_update_status`, Code Mode `tools.dh.plan_fast_update_status`), which applies both writes and reverts on a failed mirror write. Fallback: manual dual edits with retry/revert. Never update only one plan.
 - **Skip-check ledger:** append every skipped, deferred, or not-applicable standard check to `plan_fast_skip_checks.md` via `dh_plan_fast_skip_check` (append-only, never delete). The task skill records per-task rows; this orchestrator records end-level rows.
 - **Integrity hash:** record `source_sha256` at creation — SHA-256 of the `plan.md` body (after the closing frontmatter) with every line whose trimmed form starts with `- **Status:**` deleted. Recompute at startup, resume, Step 4, and Step 6; validate `slug` and `source_plan: plan.md`. Mismatch → **stop and ask**; never auto-adopt. Only a pre-execution transcription fix (hash matches but structure/fields disagree, statuses excluded) may be done with confirmation; any realignment bumps `plan_version`.
@@ -41,7 +41,8 @@ MCP tools on the project-scope `dh` server (Code Mode:
 - **Critical gates:** pre-execution alignment in Step 4; all end gates once in Steps 6–7 — plan-end alignment, `dh-simplify` + `dh-code-review` (software), `dh-domain-check` (architectural software plans), `dh-preflight` + `dh-artifact-check`, `dh-final-review`, `dh-create-documentation`, `dh-semver` (software).
 - **Alignment:** `dh_plan_fast_sync` dry-run for structural/status differences plus `dh-review` Plan Alignment Mode — `phase: pre-execution` → `tasks/review-fast.md`, `phase: plan-end` → `tasks/review-fast-final.md`. Never write `tasks/review.md`.
 - **Selection:** phases in order; within the active phase, **In Progress first**, then the first `Pending`. Out-of-order statuses → ask, never silently resume the earlier task.
-- **Project type, once:** `package.json`, `pyproject.toml`, `Cargo.toml`, `composer.json`, `go.mod`, `CMakeLists.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `project.clj`, `deps.edn`, `mix.exs`, `pubspec.yaml`, `Build.scala`, `build.gradle`, `*.csproj`, `*.sln`. Record it once for end gates; it never changes who implements (`@dh-software-engineer`).
+- **Agent selection:** take the implementation, review, final-review, and documentation roles from `plan.md`'s `## Agent Selection` (the mirror intentionally omits the section). Absent, incomplete, or stale → run [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md) before executing; re-validate availability at startup and on resume; never substitute silently. One implementation agent per sub-task — no complexity- or type-based split.
+- **Project type, once:** `package.json`, `pyproject.toml`, `Cargo.toml`, `composer.json`, `go.mod`, `CMakeLists.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `project.clj`, `deps.edn`, `mix.exs`, `pubspec.yaml`, `Build.scala`, `build.gradle`, `*.csproj`, `*.sln`. Record it once for end gates; it never changes who implements (the selected implementation agent).
 - **Frontmatter lifecycle:** `status: In Progress` in both plans when the first sub-task starts; `Completed` in both at close; bump `plan_version` on realignment.
 - Update `./docs/plans/index.md` only when complete, then run `dh-create-documentation` (docs + evolution/observation notes).
 
@@ -94,7 +95,9 @@ and no P0/P1 finding. The mirror may be ahead of `plan.md` only in statuses;
 ### Step 5: Fast execution loop
 
 At loop start run `dh_plan_fast_sync`: dry-run, then apply **fast→plan only**;
-`plan.md` ahead → stop and ask, never rewind. Phase-close sweep, then read
+`plan.md` ahead → stop and ask, never rewind. Phase-close sweep, resolve the
+implementation/review/final-review roles from `plan.md`'s `## Agent Selection`
+(absent or stale → selection protocol), re-validate availability, then read
 `plan_fast.md` via `dh_plan_fast_read` and select:
 
 1. First `In Progress` phase → its first `In Progress` sub-task, else its first
@@ -206,6 +209,7 @@ mark sub-tasks/phases `Completed` around a blocker or skip a delayed gate.
 
 - [`references/plan-fast-skip-checks.md`](references/plan-fast-skip-checks.md): ledger contract and manual fallback.
 - [`references/plan-fast-template.md`](references/plan-fast-template.md): `plan_fast.md` contract.
+- [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): agent-selection protocol (implementation, review, final-review, documentation roles).
 - Fast tools: `dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_sync`, `dh_plan_fast_skip_check`.
 - `dh-execute-plan-task-fast`: executes one sub-task and records per-task ledger rows.
 - `dh-review`: Plan Alignment Mode (`phase: pre-execution | plan-end`).
@@ -214,6 +218,6 @@ mark sub-tasks/phases `Completed` around a blocker or skip a delayed gate.
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

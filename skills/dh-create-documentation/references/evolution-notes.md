@@ -115,7 +115,7 @@ title: "Auth token rotation — session learnings"
 kind: observation
 id: obs-20261108-1430-auth-token-rotation
 date: 2026-11-08
-agent: "dh-software-engineer"
+agent: "backend-engineer"
 project: "my-app"
 stack: "TypeScript / Node 24"
 plan: "auth-token-rotation"

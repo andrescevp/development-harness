@@ -4,7 +4,7 @@ slug: agent-selection-utility-skills
 description: Replace hardcoded dh-agent delegation with runtime agent selection and migrate dh-executor/dh-explorer to dh-execute-cli/dh-explore skills.
 created: 2026-11-08
 updated: 2026-11-08
-status: Pending
+status: Completed
 active: true
 tags: [plan]
 project: dev-harness-skills
@@ -74,11 +74,11 @@ their behavior is preserved.
 
 ### Phase 1: Agent-selection contract
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 1.1: Author the agent-selection protocol
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Define how skills discover, rank, select, record, and re-validate agents.
 - **Related Requirements:** R1, R2, R9
 - **Dependencies and Preconditions:** None.
@@ -93,7 +93,7 @@ their behavior is preserved.
 
 #### Sub-Task 1.2: Add `## Agent Selection` to the plan template
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Give plans a canonical place to record selected agents and fallbacks.
 - **Related Requirements:** R2, R7, R9
 - **Dependencies and Preconditions:** Sub-Task 1.1.
@@ -108,7 +108,7 @@ their behavior is preserved.
 
 #### Sub-Task 1.3: Update `dh-planning` to select and record agents
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Make planning inspect available agents and remove hardcoded agent delegation.
 - **Related Requirements:** R1, R2, R3, R9
 - **Dependencies and Preconditions:** Sub-Tasks 1.1 and 1.2.
@@ -123,11 +123,11 @@ their behavior is preserved.
 
 ### Phase 2: Utility agent-to-skill migration
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 2.1: Create the `dh-execute-cli` skill
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Preserve executor behavior as a skill instead of an agent.
 - **Related Requirements:** R4, R6
 - **Dependencies and Preconditions:** Sub-Task 1.1 (selection context).
@@ -142,7 +142,7 @@ their behavior is preserved.
 
 #### Sub-Task 2.2: Create the `dh-explore` skill
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Preserve explorer behavior as a skill instead of an agent.
 - **Related Requirements:** R4, R6
 - **Dependencies and Preconditions:** Sub-Task 1.1.
@@ -157,7 +157,7 @@ their behavior is preserved.
 
 #### Sub-Task 2.3: Replace executor/explorer references
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Point every old agent reference at the new skills.
 - **Related Requirements:** R5, R8
 - **Dependencies and Preconditions:** Sub-Tasks 2.1 and 2.2.
@@ -172,11 +172,11 @@ their behavior is preserved.
 
 ### Phase 3: Delegation cleanup
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 3.1: Execution and review delegation
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Remove hardcoded implementation/review/final-review agents from execution skills.
 - **Related Requirements:** R3, R6, R9
 - **Dependencies and Preconditions:** Phase 1 and Sub-Task 2.3.
@@ -191,7 +191,7 @@ their behavior is preserved.
 
 #### Sub-Task 3.2: Docs, setup, semver, preflight, artifact, and footers
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Remove hardcoded documentation and utility-agent delegation from the remaining skills.
 - **Related Requirements:** R3, R6, R8
 - **Dependencies and Preconditions:** Phase 1 and Sub-Task 2.3.
@@ -206,7 +206,7 @@ their behavior is preserved.
 
 #### Sub-Task 3.3: Update agent definitions and harness docs
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Align the remaining agents and top-level docs with selection and utility skills.
 - **Related Requirements:** R4, R8
 - **Dependencies and Preconditions:** Sub-Tasks 2.1–2.3 and 3.1–3.2.
@@ -221,11 +221,11 @@ their behavior is preserved.
 
 ### Phase 4: Inventory, tests, and docs
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 4.1: Update inventory counts and smoke checks
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Make the bundle contract 5 agents / 24 skills everywhere.
 - **Related Requirements:** R7, R10
 - **Dependencies and Preconditions:** Phases 1–3.
@@ -240,7 +240,7 @@ their behavior is preserved.
 
 #### Sub-Task 4.2: Add the agent-selection contract test
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Guard the new model against regressions.
 - **Related Requirements:** R1–R5, R10
 - **Dependencies and Preconditions:** Phases 1–3 and 4.1.
@@ -255,7 +255,7 @@ their behavior is preserved.
 
 #### Sub-Task 4.3: Update documentation counts and tables
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Remove stale 7-agent/22-skill claims and document the new skills.
 - **Related Requirements:** R8, R10
 - **Dependencies and Preconditions:** Sub-Tasks 3.3 and 4.1.
@@ -270,11 +270,11 @@ their behavior is preserved.
 
 ### Phase 5: Validation and release
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 5.1: Run the full validation gates
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Prove the rename/migration has no regressions.
 - **Related Requirements:** R10
 - **Dependencies and Preconditions:** Phases 1–4.
@@ -289,7 +289,7 @@ their behavior is preserved.
 
 #### Sub-Task 5.2: Final review and merge
 
-- **Status:** Pending
+- **Status:** Completed
 - **Objective:** Sign off and integrate the change.
 - **Related Requirements:** R10
 - **Dependencies and Preconditions:** Sub-Task 5.1.

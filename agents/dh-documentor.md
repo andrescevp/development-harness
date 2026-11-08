@@ -17,8 +17,8 @@ update, delete, retrieve) — everything EXCEPT plan documents
 
 - **Create / update / delete / retrieve** any generated document: README,
   architecture docs, API references, guides, runbooks, ADRs, data sheets.
-- **READ ONLY:** `docs/plans/**` (plan documents are owned by
-  `@dh-software-architect` via `dh-planning` / `dh-execute-plan` /
+- **READ ONLY:** `docs/plans/**` (plan documents are owned by the plan's
+  planning/execution/review workflow: `dh-planning` / `dh-execute-plan` /
   `dh-final-review`).
 
 ## Key Skills
@@ -73,4 +73,4 @@ update, delete, retrieve) — everything EXCEPT plan documents
   cross-references when they change.
 - Never expose secrets; sanitize any credential-like content before writing
   to documents.
-- Run validation through `@dh-executor`; report compact results.
+- Run validation through the `dh-execute-cli` skill; report compact results.

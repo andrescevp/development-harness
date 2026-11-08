@@ -20,6 +20,8 @@ Run `git diff` (or `git diff HEAD` if there are staged changes) to see what chan
 
 ## Phase 2: Launch Three Review Agents in Parallel
 
+Resolve the review role first: use the plan's `## Agent Selection` Review row, or run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md) when the section or row is absent or stale — prefer a project-specific review agent and fall back to the bundled review capability. Use the same resolved agent/capability for all three passes.
+
 Use the Agent tool to launch all three agents concurrently in a single message. Pass each agent the full diff so it has the complete context.
 
 ### Agent 1: Code Reuse Review
@@ -62,6 +64,6 @@ When done, briefly summarize what was fixed (or confirm the code was already cle
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

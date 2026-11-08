@@ -20,7 +20,7 @@ metadata:
 
 Harness-localized adaptation of the global `semver` skill. The versioning
 algorithm is identical; the harness adaptations are that every git command
-runs through the `@dh-executor` subagent, and this skill is invoked from the
+runs through the `dh-execute-cli` skill, and this skill is invoked from the
 bundled loop skills or a direct user request — the harness bundles no
 commands.
 
@@ -42,7 +42,7 @@ commands.
 - Create the tag locally:
   `git tag -a v<major>.<minor>.<patch> -m "Release v<major>.<minor>.<patch>"`.
 - Do NOT push the tag — the user confirms before pushing.
-- Run ALL git commands through the `@dh-executor` subagent — never run bash
+- Run ALL git commands through the `dh-execute-cli` skill — never run bash
   directly from the agent applying this skill.
 
 ## Edge Cases
@@ -105,7 +105,7 @@ import. This skill runs when:
 - Create the tag only after the version decision and changelog are reported;
   the tag stays local until the user confirms pushing.
 - Report the decision with its git evidence (last tag, commit counts, short
-  hashes) exactly as `@dh-executor` returns it — no guessing.
+  hashes) exactly as the `dh-execute-cli` skill reports it — no guessing.
 
 ## References
 
@@ -115,6 +115,6 @@ import. This skill runs when:
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

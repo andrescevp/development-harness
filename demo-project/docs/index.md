@@ -3,7 +3,7 @@ title: Demo Project Index
 tags: [documentation, demo]
 project: demo-project
 created: 2026-09-29
-updated: 2026-11-07
+updated: 2026-11-08
 stack: markdown, opencode
 feature: demo
 epic: plugin-demo
@@ -12,7 +12,7 @@ epic: plugin-demo
 # Demo Project
 
 Demo folder that links the `dev-harness-skills` plugin: run it isolated and
-exercise the bundled harness (7 agents, 22 skills, and the project-scope `dh`
+exercise the bundled harness (5 agents, 24 skills, and the project-scope `dh`
 MCP server tools).
 
 ## Quickstart
@@ -26,7 +26,7 @@ cd demo-project
 > Note: opencode v2.0.18 does not load directory/local plugins (documented
 > host limitation) — `validate` reports the load status transparently and
 > gates plugin behavior via the harness test suite (in-process
-> registration of the 7 agents / 22 skills; the tools come from the `dh` MCP
+> registration of the 5 agents / 24 skills; the tools come from the `dh` MCP
 > server wired in `opencode.jsonc`).
 
 ## How it is wired
@@ -45,6 +45,16 @@ cd demo-project
    markdown primary, csv/json/yaml/xml complementary, mermaid for workflows,
    ASCII wireframes for UI, obsidian frontmatter.
 
+## Agent selection (capability-based)
+
+Skills resolve delegation at runtime: `dh-planning` follows the
+[`agent-selection` protocol](../../skills/dh-planning/references/agent-selection.md)
+(runtime agent list → project config → global definitions), prefers
+project-specific agents over the bundled capabilities, and records the choice
+in the plan's `## Agent Selection`. Utility roles are skills, not agents:
+`dh-execute-cli` runs commands, tests, builds, and validation; `dh-explore`
+maps the codebase. The bundled surface stays 5 agents / 24 skills.
+
 ## Example workflow (plugin usage)
 
 ```mermaid
@@ -61,8 +71,8 @@ flowchart LR
 +--------------------------------------------------+
 | demo-project          [sdd] [plan] [review] [docs]|
 +--------------------------------------------------+
-|  Harness loaded: 7 agents / 22 skills / dh MCP   |
-|  Try:  ask dh-software-architect to plan a task   |
+|  Harness loaded: 5 agents / 24 skills / dh MCP   |
+|  Try:  dh-planning -> Agent Selection -> execute |
 +--------------------------------------------------+
 ```
 

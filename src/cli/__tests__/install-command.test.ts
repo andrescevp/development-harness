@@ -54,8 +54,8 @@ describe('runInstall', () => {
         target,
       });
       expect(manifest.files).toEqual(expect.arrayContaining(['index.ts', 'package.json', 'dist/plugin.js']));
-      expect(fs.readdirSync(path.join(target, 'dist', 'assets', 'agents'))).toHaveLength(7);
-      expect(fs.readdirSync(path.join(target, 'dist', 'assets', 'skills'))).toHaveLength(22);
+      expect(fs.readdirSync(path.join(target, 'dist', 'assets', 'agents'))).toHaveLength(5);
+      expect(fs.readdirSync(path.join(target, 'dist', 'assets', 'skills'))).toHaveLength(24);
       expect(manifest.config).toEqual({
         path: globalConfig(harness),
         key: 'mcp.servers.dh',

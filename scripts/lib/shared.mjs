@@ -24,10 +24,12 @@ export const LOOP = {
     'dh-contingency',
     'dh-create-documentation',
     'dh-domain-check',
+    'dh-execute-cli',
     'dh-execute-plan',
     'dh-execute-plan-fast',
     'dh-execute-plan-task',
     'dh-execute-plan-task-fast',
+    'dh-explore',
     'dh-final-review',
     'dh-grill-sdd',
     'dh-mermaid',
@@ -40,15 +42,7 @@ export const LOOP = {
     'dh-setup',
     'dh-simplify',
   ],
-  agents: [
-    'dh-documentor',
-    'dh-executor',
-    'dh-explorer',
-    'dh-final-reviewer',
-    'dh-reviewer',
-    'dh-software-architect',
-    'dh-software-engineer',
-  ],
+  agents: ['dh-documentor', 'dh-final-reviewer', 'dh-reviewer', 'dh-software-architect', 'dh-software-engineer'],
 };
 
 /** Junk classification rules: dependency dirs, secrets, backup/swap/OS junk. */

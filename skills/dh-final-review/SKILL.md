@@ -10,7 +10,7 @@ metadata:
   workflow: development
 ---
 
-Produce a comprehensive final sign-off review for a completed plan. Verify all sub-tasks are done, review the full diff against `sdd.md` requirements, delegate in-depth review to `@dh-final-reviewer`, and issue a binding verdict.
+Produce a comprehensive final sign-off review for a completed plan. Verify all sub-tasks are done, review the full diff against `sdd.md` requirements, delegate in-depth review to the plan's selected final-review agent, and issue a binding verdict.
 
 ## Core Rules
 
@@ -19,13 +19,15 @@ Produce a comprehensive final sign-off review for a completed plan. Verify all s
 - If any sub-task is not `Completed` (and therefore any phase is not `Completed`), stop and report which tasks remain — do not proceed to full review.
 - This skill is loop step 4 (`dh-final-review`); the full loop 1–5 lives in repo-root AGENTS.md (pointer only, no duplication).
 - Perform full-diff review against the entire scope, not just individual sub-tasks.
-- Delegate in-depth code review to `@dh-final-reviewer` agent (which uses `dh-code-review` skill).
+- **Resolve the final-review agent:** read `## Agent Selection` in `plan.md` and use its Final review row. If the section or row is absent or stale, run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md), record the row (fast mode: in `tasks/review.md`, per the fast-mode recording rule below), and continue. A selected agent that is unavailable and has no capability fallback stops sign-off — never substitute silently.
+- Delegate in-depth code review to the selected final-review agent (which uses the `dh-code-review` skill).
 - Write the final report to `./docs/plans/<plan-slug>/tasks/review.md`.
 - Use severity levels: P0 (blocking), P1 (high), P2 (medium), P3 (low).
 - Do not modify any implementation files — this skill is review-only.
 - If sdd.md does not exist, use plan.md's requirements snapshot as the fallback requirements source.
 - **For software projects:** run `dh-artifact-check` and `dh-preflight` for release readiness validation, and determine the recommended version bump with the `dh-semver` skill in the final report.
 - **Fast mode:** when invoked by `dh-execute-plan-fast`, reuse the pre-run preflight/artifact-check/semver results it already recorded instead of re-running them.
+- **Fast-mode recording:** when a `plan_fast.md` mirror exists (fast mode), never edit `plan.md` content to record findings or selection rows — any body edit changes `source_sha256` and invalidates the mirror. Write the verdict to `./docs/plans/<plan-slug>/tasks/review.md` and update statuses with `dh_plan_fast_update_status` (or the manual dual edit of the matching status lines in `plan.md` and `plan_fast.md`).
 
 ## Workflow
 
@@ -59,15 +61,15 @@ Generate the full diff (`git diff main...HEAD` or `git diff $(git merge-base mai
 
 ### Step 4: Delegate in-depth review
 
-Ask `@dh-final-reviewer` to perform the comprehensive final review using the `dh-code-review` skill — this is where requirements mapping, AC verification, and code-quality checks happen. Provide:
+Ask the plan's selected final-review agent to perform the comprehensive final review using the `dh-code-review` skill — this is where requirements mapping, AC verification, and code-quality checks happen. Provide:
 
 - The full requirements from sdd.md
 - The plan's acceptance criteria
 - The full diff context
 
-The `@dh-final-reviewer` agent writes its findings to `./docs/plans/<plan-slug>/tasks/review.md` and returns a verdict.
+The selected final-review agent writes its findings to `./docs/plans/<plan-slug>/tasks/review.md` and returns a verdict.
 
-After `@dh-final-reviewer` completes, read its findings from `./docs/plans/<plan-slug>/tasks/review.md`.
+After it completes, read its findings from `./docs/plans/<plan-slug>/tasks/review.md`.
 
 ### Step 4a: Release readiness check (software projects only)
 
@@ -81,7 +83,7 @@ After `@dh-final-reviewer` completes, read its findings from `./docs/plans/<plan
 
 ### Step 5: Produce final verdict
 
-Consolidate your own full-scope findings (Steps 1–3), the release readiness results (Step 4a), and the `@dh-final-reviewer`'s findings into a single final report:
+Consolidate your own full-scope findings (Steps 1–3), the release readiness results (Step 4a), and the selected final-review agent's findings into a single final report:
 
 ```markdown
 # Final Plan Review: [Plan title]
@@ -139,13 +141,13 @@ Return the sign-off verdict to the caller. If P0/P1 findings exist, recommend fi
 
 ## References
 
-- `dh-code-review` skill: the in-depth review methodology used by `@dh-final-reviewer`.
+- [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): final-review-role resolution and re-validation.
+- `dh-code-review` skill: the in-depth review methodology used by the selected final-review agent.
 - `dh-artifact-check` skill: build validation for release readiness (software projects only).
 - `dh-preflight` skill: full test/lint gate for release readiness (software projects only).
-- `@dh-final-reviewer` agent: the agent that performs deep code review with a premium model.
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

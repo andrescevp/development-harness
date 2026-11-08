@@ -241,8 +241,8 @@ const ctx = {
   skill: { transform: async (fn) => fn({ add: (skill) => skills.push(skill.name) }) },
 };
 await plugin.setup(ctx);
-if (agents.length !== 7 || skills.length !== 22) {
-  throw new Error(`setup registered ${agents.length} agents and ${skills.length} skills; expected 7/22`);
+if (agents.length !== 5 || skills.length !== 24) {
+  throw new Error(`setup registered ${agents.length} agents and ${skills.length} skills; expected 5/24`);
 }
 console.log(`[container] setup registered ${agents.length} agents and ${skills.length} skills from installed assets`);
 NODE
@@ -250,7 +250,7 @@ agents_out=/tmp/dh-test/agents.txt
 if timeout 30 opencode debug agents >"$agents_out" 2>/tmp/dh-test/agents.err; then
   count=$(grep -oE 'dh-[a-z0-9-]+' "$agents_out" | sort -u | wc -l | tr -d ' ')
   echo "[container] opencode debug agents surfaced $count dh-* agent(s)"
-  if [ "$count" -ne 7 ]; then
+  if [ "$count" -ne 5 ]; then
     echo "[container] note: this opencode CLI does not surface plugin agents via debug agents; setup-stub registration above is the assertion"
   fi
 else

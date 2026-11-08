@@ -1,7 +1,7 @@
 /**
  * dev-harness-skills — OpenCode V2 plugin.
  *
- * Registers ONLY the bundled dev harness (7 agents, 22 skills) via
+ * Registers ONLY the bundled dev harness (5 agents, 24 skills) via
  * synchronous domain transforms. The harness tools are NOT registered here —
  * they live in the `dh` MCP server (`src/mcp/server.ts`, served over stdio by
  * `src/mcp/stdio.ts`).

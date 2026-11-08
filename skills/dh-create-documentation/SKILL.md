@@ -16,10 +16,12 @@ Generate structured, cross-referenced documentation in any format, at any locati
 
 ## Documentation Contract (mandatory)
 
-- **Owner:** `@dh-documentor` is the main and only responsible agent for
-  create/update/delete/retrieve of generated documents (EXCLUDING
-  `docs/plans/`). All document work is delegated to it; this skill is the
-  tool it uses.
+- **Owner:** the best available documentation agent (bundled documentation
+  capability as fallback, resolved with
+  [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md))
+  is the main and only responsible role for create/update/delete/retrieve of
+  generated documents (EXCLUDING `docs/plans/`). All document work is delegated
+  to it; this skill is the tool it uses.
 - **Format:** Markdown is the PRIMARY format for every document.
   Complementary information and tables may use `csv`, `xml`, `yaml`, or
   `json`.
@@ -36,6 +38,8 @@ Generate structured, cross-referenced documentation in any format, at any locati
 - **Parsing extra formats:** use `jq` (json), `yq` (yaml), `xq` (xml), and
   DuckDB (`dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`) for
   tabular data. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
+- **Command execution:** run retrieval, search, and vault-push commands
+  through the `dh-execute-cli` skill; never run bash directly.
 
 ## Custom Directives: Evolution & Observation Notes
 
@@ -226,6 +230,6 @@ After generating documentation:
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

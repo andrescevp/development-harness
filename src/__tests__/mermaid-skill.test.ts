@@ -66,6 +66,7 @@ const CATEGORY_HEADINGS = ['## Current state', '## Desired state', '## Critical 
 
 const PLAN_TEMPLATE = path.join(REPO_ROOT, 'skills', 'dh-planning', 'references', 'phased-plan-template.md');
 const PLAN_SCAFFOLD = path.join(REPO_ROOT, 'src', 'tools', 'plan-template.ts');
+const FAST_RENDERER = path.join(REPO_ROOT, 'src', 'tools', 'plan-fast-template.ts');
 const FAST_ALIGNMENT_FILES = [
   path.join(REPO_ROOT, 'skills', 'dh-execute-plan-fast', 'SKILL.md'),
   path.join(REPO_ROOT, 'skills', 'dh-execute-plan-fast', 'references', 'plan-fast-template.md'),
@@ -149,6 +150,26 @@ describe('dh-mermaid integration', () => {
     }
   });
 
+  it('plan template, scaffold, and fixture expose the Agent Selection section', () => {
+    const fixture = path.join(REPO_ROOT, 'src', '__tests__', 'fixtures', 'plans', 'phased-plan.md');
+    for (const file of [PLAN_TEMPLATE, PLAN_SCAFFOLD, fixture]) {
+      const text = read(file);
+      expect(text, path.basename(file)).toContain('## Agent Selection');
+      expect(text.indexOf('## Agent Selection'), path.basename(file)).toBeLessThan(text.indexOf('\n## Phases\n'));
+    }
+    expect(read(PLAN_TEMPLATE), 'phased-plan-template.md').toContain('| Role | Selected agent | Why | Fallback |');
+    for (const file of [PLAN_SCAFFOLD, fixture]) {
+      expect(read(file), path.basename(file)).toContain('None — no specialized agent required');
+    }
+  });
+
+  it('fast alignment treats Agent Selection as an allowed omission', () => {
+    for (const file of FAST_ALIGNMENT_FILES) {
+      expect(read(file), path.basename(path.dirname(file))).toContain('## Agent Selection');
+    }
+    expect(read(FAST_RENDERER)).toContain("'Agent Selection'");
+  });
+
   it('fast generator lists Visual Context among the omitted sections', () => {
     const source = `---
 title: Demo
@@ -184,6 +205,7 @@ None — no structural change.
       timestamp: '2026-11-08T00:00:00.000Z',
     });
     expect(rendered.contents).toContain('`## Visual Context`');
+    expect(rendered.contents).toContain('`## Agent Selection`');
   });
 });
 

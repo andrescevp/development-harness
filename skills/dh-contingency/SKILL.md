@@ -10,7 +10,7 @@ metadata:
   workflow: development
 ---
 
-Evaluate architectural decision points and produce a small set of concrete alternatives with explicit risk, complexity, and trade-offs. Executed by `@dh-software-architect`; invoked by `dh-planning` when more than one plausible approach exists, and consumed by `dh-artifact-check` for planned deployment paths.
+Evaluate architectural decision points and produce a small set of concrete alternatives with explicit risk, complexity, and trade-offs. Executed by the plan's selected architecture agent (see [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md)); invoked by `dh-planning` when more than one plausible approach exists, and consumed by `dh-artifact-check` for planned deployment paths.
 
 **Output contract:** write the analysis to `./docs/plans/<plan-slug>/contingency.md` (create the plan directory when it does not exist yet).
 
@@ -28,7 +28,7 @@ Evaluate architectural decision points and produce a small set of concrete alter
 ## Method
 
 1. Read the request, plus `./docs/plans/<plan-slug>/sdd.md` and `./docs/plans/<plan-slug>/plan.md` when they exist — extract constraints, acceptance criteria, and out-of-scope items every alternative must respect.
-2. Survey existing project patterns, modules, and dependencies; delegate to `@dh-explorer` when the codebase is unfamiliar.
+2. Survey existing project patterns, modules, and dependencies; use the `dh-explore` skill when the codebase is unfamiliar.
 3. List the architectural decision areas where approaches diverge (data model and versioning, backend vs frontend responsibilities, integration boundaries, deployment topology, and similar).
 4. Define 2–3 coherent plans. Each plan states how it resolves every decision area; label the strongest candidate as recommended.
 5. Assess each plan: Risk (likelihood and impact), Complexity (size and rough effort), Trade-offs (what is gained, what is sacrificed).
@@ -98,6 +98,6 @@ Adopt Plan B only if [condition]; adopt Plan C only if [condition].
 
 ## Doc search
 
-**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to `@dh-documentor` — the main and only documentation owner (see dh-create-documentation).
+**Documentation management:** delegate create / update / delete / retrieve of generated documents (excluding docs/plans) to the best available documentation agent (bundled documentation capability as fallback) — the main and only documentation owner (see dh-create-documentation).
 
 Search generated documentation quickly: `notesmd-cli search-content "<term>" --vault "<project-name>"` or `obsidian search query="<term>"` (fallback: `rg --glob '*.md' "<term>" docs/`).

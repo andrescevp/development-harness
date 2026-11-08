@@ -1,22 +1,22 @@
 # Audit Report — dev-harness-skills plugin
 
-Generated 2026-11-08T12:07:25.897Z by `scripts/audit.mjs`.
+Generated 2026-11-08T16:03:12.201Z by `scripts/audit.mjs`.
 
 ## Verdict
 
-**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 233. Documented schema deviations: 0.
+**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 240. Documented schema deviations: 0.
 
 ## Summary verdict table
 
 | Dimension | Count | Status | Notes |
 |---|---|---|---|
-| Inventory & structure | 29 | PASS | 7 agents, 22 skill dirs + index.md; no commands/, no prompts/ |
+| Inventory & structure | 29 | PASS | 5 agents, 24 skill dirs + index.md; no commands/, no prompts/ |
 | Frontmatter parse | 30 | PASS | 30 files on audit surface |
 | Name regex | 29 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 2 | WARN | 645 resolved; 0 code-context; 0 allowlisted; 224 prose tokens (warn) |
-| Loop membership | 29 | PASS | 22/22 skills present; 7/7 agents present |
-| Secret scan | 40 | PASS | 40 low-signature prose hits (instructional), 0 high-signature |
+| Cross-references | 2 | WARN | 468 resolved; 0 code-context; 0 allowlisted; 233 prose tokens (warn) |
+| Loop membership | 29 | PASS | 24/24 skills present; 5/5 agents present |
+| Secret scan | 44 | PASS | 44 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
 
 ## Deviations (warn, per file)
@@ -24,8 +24,6 @@ Generated 2026-11-08T12:07:25.897Z by `scripts/audit.mjs`.
 | File | Dimension | Severity | Note |
 |---|---|---|---|
 | agents/dh-documentor.md | frontmatter | warn | agent missing 'model' (plugin registration impact) |
-| agents/dh-executor.md | frontmatter | warn | agent missing 'model' (plugin registration impact) |
-| agents/dh-explorer.md | frontmatter | warn | agent missing 'model' (plugin registration impact) |
 | agents/dh-final-reviewer.md | frontmatter | warn | agent missing 'model' (plugin registration impact) |
 | agents/dh-reviewer.md | frontmatter | warn | agent missing 'model' (plugin registration impact) |
 | agents/dh-software-architect.md | frontmatter | warn | agent missing 'model' (plugin registration impact) |
@@ -46,10 +44,12 @@ _None._
 | skill | dh-contingency | present |
 | skill | dh-create-documentation | present |
 | skill | dh-domain-check | present |
+| skill | dh-execute-cli | present |
 | skill | dh-execute-plan | present |
 | skill | dh-execute-plan-fast | present |
 | skill | dh-execute-plan-task | present |
 | skill | dh-execute-plan-task-fast | present |
+| skill | dh-explore | present |
 | skill | dh-final-review | present |
 | skill | dh-grill-sdd | present |
 | skill | dh-mermaid | present |
@@ -62,8 +62,6 @@ _None._
 | skill | dh-setup | present |
 | skill | dh-simplify | present |
 | agent | dh-documentor | present |
-| agent | dh-executor | present |
-| agent | dh-explorer | present |
 | agent | dh-final-reviewer | present |
 | agent | dh-reviewer | present |
 | agent | dh-software-architect | present |
@@ -78,8 +76,10 @@ _None._
 
 Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; full list in reports/audit.json):
 
+- `agent-selection` × 47
 - `project-name` × 28
 - `per-task` × 17
+- `final-review` × 13
 - `pre-execution` × 13
 - `project-scope` × 12
 - `plan-end` × 12
@@ -92,21 +92,19 @@ Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; f
 - `handoff-template` × 6
 - `domain-check` × 5
 - `status-based` × 5
+- `re-validation` × 5
 - `read-only` × 5
 - `phased-plan-template` × 5
 - `bounded-context` × 4
+- `type-based` × 4
 - `re-enter` × 4
 - `dry-run` × 4
 - `review-fast` × 4
 - `review-fast-final` × 4
-- `end-of-plan` × 4
-- `re-enters` × 4
-- `mobile-mcp` × 4
-- `cross-cutting` × 3
 
 ## Secret scan
 
-- Low-signature prose hits (instructional): **40** (env-var names, max_tokens, "never expose" rules).
+- Low-signature prose hits (instructional): **44** (env-var names, max_tokens, "never expose" rules).
 - High-signature matches: **0** _none_.
 
 ## Junk scan

@@ -6,8 +6,8 @@
  * Pipeline (offline, no registry, no publish):
  *   1. `npm pack --ignore-scripts --json` into a temp dir (build already on
  *      disk; `--ignore-scripts` keeps stdout pure JSON).
- *   2. Audit the pack list: entrypoints/declarations/assets, exactly 7 agents
- *      and 22 skills, no src/docs/tests/.env/plans/node_modules.
+ *   2. Audit the pack list: entrypoints/declarations/assets, exactly 5 agents
+ *      and 24 skills, no src/docs/tests/.env/plans/node_modules.
  *   3. `npm install <tarball> --offline` into a clean temp prefix. The prefix
  *      is seeded for offline resolution: real MCP deps (server/core/zod) are
  *      copied, and bundled/lazy direct deps get version stubs (see
@@ -15,7 +15,7 @@
  *      plugin does not need; `--offline` fails on any registry request.
  *   4. Import `dev-harness-skills` by name, assert `{ id, setup }`, run both
  *      CLIs, and perform a minimal MCP handshake listing the 12 tools.
- *   5. Assert the installed `dist/assets` inventory (7 agents / 22 skills).
+ *   5. Assert the installed `dist/assets` inventory (5 agents / 24 skills).
  *   6. Source mode: repo-root `index.ts` must remain and re-export
  *      `./src/plugin.js`. OpenCode directory discovery resolves `<dir>/index`
  *      (index.ts) and never reads package main/exports, so source/directory
@@ -59,13 +59,13 @@ function checkTarball(files, source) {
   );
   check(
     `exactly ${source.agents.length} agent files`,
-    source.agents.length === 7 && agentCount === 7 && missingAgents.length === 0,
-    `${missingAgents.length ? `missing: ${missingAgents.join(',')}` : ''}${agentCount !== 7 ? ` found ${agentCount}` : ''}`
+    source.agents.length === 5 && agentCount === 5 && missingAgents.length === 0,
+    `${missingAgents.length ? `missing: ${missingAgents.join(',')}` : ''}${agentCount !== 5 ? ` found ${agentCount}` : ''}`
   );
   check(
     `exactly ${source.skills.length} skill SKILL.md files`,
-    source.skills.length === 22 && skillCount === 22 && missingSkills.length === 0,
-    `${missingSkills.length ? `missing: ${missingSkills.join(',')}` : ''}${skillCount !== 22 ? ` found ${skillCount}` : ''}`
+    source.skills.length === 24 && skillCount === 24 && missingSkills.length === 0,
+    `${missingSkills.length ? `missing: ${missingSkills.join(',')}` : ''}${skillCount !== 24 ? ` found ${skillCount}` : ''}`
   );
   check('no src, docs, tests, .env, plans, node_modules, or .git', violations.length === 0, violations.join(','));
 }
