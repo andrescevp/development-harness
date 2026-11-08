@@ -9,9 +9,11 @@ runtime delegation routing.
 The `dev-harness-skills` OpenCode V2 plugin bundles a self-contained dev harness for
 plan-driven development: **7 agents** — `dh-software-architect`,
 `dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-executor`, `dh-explorer`, `dh-documentor` —
-and **17 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
-`dh-execute-plan-task`, `dh-coding`, `dh-contingency`, `dh-simplify`, `dh-review`, `dh-code-review`, `dh-preflight`,
-`dh-artifact-check`, `dh-final-review`, `dh-create-documentation`, `dh-grill-sdd`, `dh-setup`, `dh-code-ruler`, `dh-semver`. The plugin registers
+and **19 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
+`dh-execute-plan-task`, `dh-pause-plan`, `dh-resume-plan`, `dh-coding`,
+`dh-contingency`, `dh-simplify`, `dh-review`, `dh-code-review`, `dh-preflight`,
+`dh-artifact-check`, `dh-final-review`, `dh-create-documentation`, `dh-grill-sdd`,
+`dh-setup`, `dh-code-ruler`, `dh-semver`. The plugin registers
 agents and skills only; the harness tools are served by the shipped
 `dev-harness-mcp` MCP server (no tools, commands, or prompts are registered).
 All plan execution inside the plugin runs the skills loop below.
@@ -46,6 +48,14 @@ sub-tasks Complete around a blocker. The rule applies at phase boundaries too:
 a blocked sub-task blocks its phase — do not mark the phase `Completed` around
 a blocker.
 
+**Pause/resume (cross-cutting).** A plan can pause at any point without
+changing its statuses: `dh-pause-plan` writes `docs/plans/<slug>/handoff.md`
+with the active phase/sub-task, git/worktree state, decisions, blockers,
+validation state, and next steps. `dh-resume-plan` validates the handoff,
+detects drift, rehydrates context, marks it `resumed`, and re-enters step 2.
+`dh-execute-plan` redirects to `dh-resume-plan` when a paused handoff exists.
+`handoff.md` is a sidecar, not a fourth status.
+
 **Harness tools (MCP server `dh`):** the plugin registers no tools; the 7
 tools (`dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`,
 `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, `dh_logged_command`)
@@ -70,14 +80,14 @@ bundled agent names — no mapping is needed.
   owned by this repository — the repo is self-contained and independent
   (no external source, no extraction step).
 - OpenCode-only — no copilot/gemini variants.
-- Exactly **7 agents + 17 skills** are bundled. Commands, prompts, and all
+- Exactly **7 agents + 19 skills** are bundled. Commands, prompts, and all
   other non-bundled harness content are intentionally NOT bundled.
 - The `dh-` names are canonical in the repo files; bundled agents ship
   without the `permission` and `tools` frontmatter keys.
 
 ## Plugin registration and loading
 
-- The V2 plugin (`Plugin.define`) registers the 7 agents and 17 skills via
+- The V2 plugin (`Plugin.define`) registers the 7 agents and 19 skills via
   synchronous domain transforms (`ctx.agent.transform`, `ctx.skill.transform`)
   from frontmatter-parsed assets (repo `agents/` + `skills/` in source mode,
   `dist/assets/` in the bundle). Zero tool or command transforms (tools live
@@ -91,7 +101,7 @@ bundled agent names — no mapping is needed.
   `opencode.json(c)` pointing at the repo directory (`pnpm install` only; no
   build needed for source loading), or the installed package name. See
   [`docs/LOADING.md`](docs/LOADING.md).
-- **Verify:** launch opencode and confirm the 7 agents and 17 skills appear
+- **Verify:** launch opencode and confirm the 7 agents and 19 skills appear
   (including `dh-coding`) and no commands are registered; then confirm the
   project-scope `dh` MCP server is connected (`opencode mcp list`) so the
   harness tools are available.
@@ -101,7 +111,7 @@ bundled agent names — no mapping is needed.
 ```text
 index.ts          source-mode plugin entry (re-exports src/plugin.ts)
 agents/           bundled agent definitions (7)
-skills/           bundled skills (17)
+skills/           bundled skills (19)
 src/cli/          installer CLI: args, scope, prompt/output, JSONC, config, manifest, commands
 src/mcp/          stdio MCP server + workspace resolver
 src/tools/        plan/sheet/logged-command tool implementations

@@ -76,6 +76,8 @@ Ask `@dh-executor` to run the smallest relevant validation for the changed code:
 - Run linters and static analysis.
 - Fix any failures before proceeding. If validation fails 3 consecutive times, stop and report the failure with full error output — do not proceed to review.
 
+When stopping on a hard blocker, recommend `dh-pause-plan` so the phase/sub-task, git state, decisions, and next steps are preserved in `handoff.md` before the session ends.
+
 ### Step 3a: Simplify code (software projects only)
 
 **For software projects only** — after validation passes and before requesting review:
@@ -111,12 +113,13 @@ Read the review and address findings:
 - For P2/P3: use judgment — fix if meaningful, defer if low impact.
 - After fixes, ask `@dh-executor` to re-run the relevant validation.
 - Update `./docs/plans/<plan-slug>/tasks/review.md` marking each finding as `Addressed` or `Not Addressed` with a brief rationale.
-- If re-validation fails 2 additional times after initial fixes, stop and report the failure with full error output — do not proceed.
+- If re-validation fails 2 additional times after initial fixes, stop and report the failure with full error output — do not proceed; recommend `dh-pause-plan` to preserve state in `handoff.md` (resume with `dh-resume-plan`).
 
 ### Step 5a: Confirm review resolution
 
 - If the reviewer approved (no outstanding P0/P1 findings), proceed to Step 6.
 - If P0/P1 findings remain unaddressed, fix them and request a re-review from `@dh-reviewer` (loop back to Step 4).
+- If P0/P1 findings cannot be resolved in-session, recommend `dh-pause-plan` before stopping; do not mark the sub-task or phase `Completed`.
 - If only P2/P3 findings remain and you have addressed or explicitly deferred them with rationale, proceed to Step 6.
 
 ### Step 6: Update plan status
@@ -155,7 +158,9 @@ section. Executing a sub-task sits inside loop step 2:
   ask the user for guidance. Never silently continue, never skip the blocked
   step, and never mark sub-tasks `Completed` around a blocker. A blocked
   sub-task also blocks its phase — do not mark the phase `Completed` around a
-  blocker.
+  blocker. Before stopping for a hard blocker or ending the session, run
+  `dh-pause-plan` to preserve the phase/sub-task, git state, decisions,
+  blockers, and next steps in `handoff.md`; resume later with `dh-resume-plan`.
 
 ## References
 

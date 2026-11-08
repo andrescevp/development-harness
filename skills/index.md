@@ -1,7 +1,8 @@
 # Skills Index — dev-harness-skills plugin
 
-> The plugin bundles **17 skills** (incl. `dh-grill-sdd` SDD interviewer,
-> `dh-setup` harness setup, and `dh-contingency` planning support).
+> The plugin bundles **19 skills** (incl. `dh-grill-sdd` SDD interviewer,
+> `dh-setup` harness setup, `dh-contingency` planning support, and
+> `dh-pause-plan` / `dh-resume-plan` lifecycle support).
 > Loading a skill injects its instructions and resources into the current
 > conversation. Plans are **phased** (phases → sub-tasks, dual status
 > markers); plan lifecycle is managed via the `dh` MCP server tools
@@ -16,6 +17,8 @@ graph TB
     DC{{"domain-check"}}
     EP{{"② execute-plan"}}
     EPT{{"2.1 execute-plan-task"}}
+    PA{{"pause-plan"}}
+    RS{{"resume-plan"}}
     CD{{"coding ⭐ NEW"}}
     SM{{"2.2 simplify"}}
     RV{{"2.3 review + code-review"}}
@@ -26,6 +29,9 @@ graph TB
     PL -- "validate architecture" --> DC
     DC --> EP
     EP --> EPT
+    EP -- "pause / stop" --> PA
+    PA -- "handoff.md" --> RS
+    RS -- "rehydrate + drift check" --> EP
     EPT -- "implements code" --> CD
     CD -- "pass" --> SM
     SM --> RV
@@ -40,7 +46,7 @@ graph TB
   classDef pdd fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#0d47a1
   classDef new fill:#fff8e1,stroke:#f57f17,stroke-width:2px,color:#e65100
   classDef stop fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#b71c1c
-  class PL,EP,EPT,RV,PR,FR,DOC,DC,SM pdd
+  class PL,EP,EPT,PA,RS,RV,PR,FR,DOC,DC,SM pdd
   class CD new
   class STOP stop
 ```
@@ -67,12 +73,19 @@ it and ask the user for guidance — never silently continue or mark sub-tasks
 Complete around a blocker (see repo-root `AGENTS.md`). A blocked sub-task
 blocks its phase.
 
+**Pause/resume (cross-cutting).** Pause writes `docs/plans/<slug>/handoff.md`
+with the active phase/sub-task, git state, decisions, blockers, validation, and
+next steps without changing plan statuses. Resume validates the handoff,
+detects drift, rehydrates context, marks it `resumed`, and re-enters step 2.
+`dh-execute-plan` redirects when a paused handoff exists; it is not a fourth
+status.
+
 **Plan lifecycle tools:** use `dh_plan_read` to parse a phased plan,
 `dh_plan_update_status` to flip phase/sub-task status markers, and
 `dh_plan_create` to scaffold a new plan — fall back to direct plan.md
 edits only when the tools are unavailable. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 
-## The 17 bundled skills
+## The 19 bundled skills
 
 | Skill | Role in the loop |
 |---|---|
@@ -81,6 +94,8 @@ edits only when the tools are unavailable. These tools are exposed by the projec
 | [`dh-contingency`](dh-contingency/SKILL.md) | Planning support — generate Plan A/B/C alternatives with risk, complexity, and trade-off analysis (`docs/plans/<slug>/contingency.md`) |
 | [`dh-execute-plan`](dh-execute-plan/SKILL.md) | Step 2 — orchestrate full plan execution, review each sub-task, resume mode |
 | [`dh-execute-plan-task`](dh-execute-plan-task/SKILL.md) | Step 2.1 — execute one sub-task (project-type-aware delegation) |
+| [`dh-pause-plan`](dh-pause-plan/SKILL.md) | Cross-cutting — snapshot the active plan into `handoff.md`; read-only pause, no status changes |
+| [`dh-resume-plan`](dh-resume-plan/SKILL.md) | Cross-cutting — validate the handoff, detect drift, rehydrate context, and resume execution |
 | [`dh-coding`](dh-coding/SKILL.md) | **NEW** — TDD best practices; reads `CODE_RULES.md` at project root |
 | [`dh-simplify`](dh-simplify/SKILL.md) | Step 2.2 — reuse/quality/efficiency pass on changed code (software only) |
 | [`dh-review`](dh-review/SKILL.md) | Step 2.3 — verify a sub-task against acceptance criteria |
