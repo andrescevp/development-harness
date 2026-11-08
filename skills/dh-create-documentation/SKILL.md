@@ -1,7 +1,7 @@
 ---
 name: dh-create-documentation
 description: >
-  Create structured docs (Markdown/HTML/Mermaid): project docs, API refs, READMEs, guides; Obsidian vault = {project_root}, ALL docs under {project_root}/docs, frontmatter metadata. Use to document this, write a README, or generate documentation.
+  Create structured docs (Markdown/HTML/Mermaid): project docs, API refs, READMEs, guides, plus evolution and observation notes recording software evolution and session learnings; Obsidian vault = {project_root}, ALL docs under {project_root}/docs, frontmatter metadata. Use to document this, write a README, generate documentation, create evolution/observation notes, or capture learnings.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: bash, read, write, edit, glob
@@ -35,6 +35,31 @@ Generate structured, cross-referenced documentation in any format, at any locati
 - **Parsing extra formats:** use `jq` (json), `yq` (yaml), `xq` (xml), and
   DuckDB (`dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`) for
   tabular data. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
+
+## Custom Directives: Evolution & Observation Notes
+
+After plan completion, a release, an architecture change, or session learnings
+worth keeping, create BOTH notes and register them:
+
+- **Evolution note** — how the software evolved (what changed, why,
+  architecture/modules, validation/release, follow-ups):
+  `{project_root}/docs/evolution/<YYYY-MM-DD>-<slug>.md`
+- **Observation note** — session learnings (what worked, what didn't,
+  decisions, follow-ups):
+  `{project_root}/docs/evolution/observations/<YYYY-MM-DD>-<HHMM>-<slug>.md`
+- **Index** — prepend one row per note to
+  `{project_root}/docs/evolution/index.md` (newest first).
+
+Rules:
+
+- All paths stay under `{project_root}/docs`; never write notes under
+  `docs/plans/`.
+- `docs/evolve/` is historical: do not migrate, delete, or rewrite it — new
+  notes go to `docs/evolution/`.
+- These directives replace the external `evolve`/`state-sync` workflow for
+  plan close-out.
+- Templates, rules, workflow, and verification:
+  [`references/evolution-notes.md`](references/evolution-notes.md).
 
 ## Workflow
 
@@ -137,6 +162,7 @@ Use these detailed references only when the specific sub-task requires them:
 | Format guide | User requests HTML or Mermaid output, or detailed Markdown formatting examples | `references/format-guide.md` |
 | Obsidian push | Time to push documentation to Obsidian (Step 5 of the workflow) | `references/obsidian-push.md` |
 | Complete example | User wants to see a full end-to-end example | `references/complete-example.md` |
+| Evolution & observation notes | Plan completion, release, architecture change, or "capture learnings" | `references/evolution-notes.md` |
 
 ## Step 4: Content Standards
 

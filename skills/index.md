@@ -65,7 +65,7 @@ contract: `skills/dh-planning/references/phased-plan-template.md`.
    2.4 IF hard blockers → stop and ask guidance; otherwise keep `dh-execute-plan-task` loop
 3. `dh-preflight` + `dh-artifact-check`
 4. `dh-final-review` (reports per-phase completion)
-5. `dh-create-documentation`
+5. `dh-create-documentation` (also writes the evolution and observation notes)
 
 **Step 2.4 halts automation.** On a hard blocker (3 consecutive validation
 failures, unresolved P0/P1 review findings, or missing preconditions), report
@@ -103,7 +103,7 @@ edits only when the tools are unavailable. These tools are exposed by the projec
 | [`dh-preflight`](dh-preflight/SKILL.md) | Step 3 — run full test/lint/static-analysis gate |
 | [`dh-artifact-check`](dh-artifact-check/SKILL.md) | Step 3 — validate build artifacts + deploy scripts |
 | [`dh-final-review`](dh-final-review/SKILL.md) | Step 4 — plan-level sign-off verdict |
-| [`dh-create-documentation`](dh-create-documentation/SKILL.md) | Step 5 — generate/update project docs (vault = `{project_root}`, docs under `{project_root}/docs`) |
+| [`dh-create-documentation`](dh-create-documentation/SKILL.md) | Step 5 — generate/update project docs plus evolution + observation notes (vault = `{project_root}`, docs under `{project_root}/docs`) |
 | [`dh-grill-sdd`](dh-grill-sdd/SKILL.md) | Pre-planning — interviews the user and produces `./docs/plans/<slug>/sdd.md` (the requirements contract `dh-planning` consumes) |
 | [`dh-setup`](dh-setup/SKILL.md) | Environment — audits system software (chrome/uv/nvm/osv-scanner/docker/jq/xq/yq/graphify/phpenv), user MCPs + plugins, and scaffolds project QA (hooks + stack tools) |
 | [`dh-code-ruler`](dh-code-ruler/SKILL.md) | Rules — grills the user + analyzes code to generate `{project_root}/CODE_RULES.md` (style, patterns, security/perf constraints, stack best practices); run by dh-software-architect |

@@ -137,7 +137,7 @@ Plan execution inside the plugin runs the 5-step skills loop:
    - 2.4 Hard blockers — If 3 consecutive validation failures occur or unresolved P0/P1 review findings arise, the loop stops and asks the user for guidance. Run `dh-pause-plan` before ending the session so the blocker and context are preserved in `handoff.md`.
 3. `dh-preflight` + `dh-artifact-check` — Runs static analysis, tests, and build artifact validation.
 4. `dh-final-review` — Reports per-phase completion and provides final plan-level sign-off.
-5. `dh-create-documentation` — Generates and updates project documentation.
+5. `dh-create-documentation` — Generates and updates project documentation, including the plan's evolution and observation notes.
 
 ### Phased plan model
 
@@ -222,7 +222,7 @@ The plugin defines 7 agents and 19 skills using the `@opencode/plugin` SDK. Zero
 | `dh-preflight` | Executes the full test, lint, and static analysis verification suite. |
 | `dh-artifact-check` | Validates build artifacts, distribution packages, and deployment scripts. |
 | `dh-final-review` | Performs final plan-level verification and delivers completion verdicts. |
-| `dh-create-documentation` | Generates and updates documentation in the project docs directory. |
+| `dh-create-documentation` | Generates and updates documentation in the project docs directory, including evolution and observation notes. |
 | `dh-grill-sdd` | Conducts interactive requirement interviews to produce `sdd.md` specification documents. |
 | `dh-setup` | Audits system tools, user plugins, MCPs, and project quality configuration. |
 | `dh-code-ruler` | Interviews users and inspects code to generate project-level `CODE_RULES.md`. |
