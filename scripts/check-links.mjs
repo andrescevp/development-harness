@@ -18,6 +18,51 @@ import { fileURLToPath } from 'node:url';
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const EXCLUDE_DIRS = new Set(['node_modules', 'dist', '.git', 'coverage']);
 const ARCHIVE_PREFIXES = ['docs/evolve', 'docs/plans/dev-']; // historical records
+// Vendored third-party docs (exact upstream filenames only) keep their
+// upstream-relative links, which point into the Mermaid repository, not this
+// one. Provenance/license: skills/dh-mermaid/LICENSE. Any other file in that
+// folder — including plan-diagrams.md — is authored here and stays audited.
+const VENDORED_PREFIX = 'skills/dh-mermaid/references/';
+const VENDORED_REFERENCES = new Set([
+  'architecture.md',
+  'block.md',
+  'c4.md',
+  'classDiagram.md',
+  'config-configuration.md',
+  'config-directives.md',
+  'config-layouts.md',
+  'config-math.md',
+  'config-theming.md',
+  'config-tidy-tree.md',
+  'cynefin.md',
+  'entityRelationshipDiagram.md',
+  'eventmodeling.md',
+  'examples.md',
+  'flowchart.md',
+  'gantt.md',
+  'gitgraph.md',
+  'ishikawa.md',
+  'kanban.md',
+  'mindmap.md',
+  'packet.md',
+  'pie.md',
+  'quadrantChart.md',
+  'radar.md',
+  'railroad.md',
+  'requirementDiagram.md',
+  'sankey.md',
+  'sequenceDiagram.md',
+  'stateDiagram.md',
+  'swimlanes.md',
+  'timeline.md',
+  'treemap.md',
+  'treeView.md',
+  'userJourney.md',
+  'venn.md',
+  'wardley.md',
+  'xyChart.md',
+  'zenuml.md',
+]);
 const KNOWN_ROOTS = /^\/(?:skills|agents|src|scripts|docs|test)\//;
 
 function walk(dir, out = []) {
@@ -32,6 +77,11 @@ function walk(dir, out = []) {
 
 function isArchive(rel) {
   return ARCHIVE_PREFIXES.some((pre) => rel.startsWith(pre));
+}
+
+function isVendored(rel) {
+  if (!rel.startsWith(VENDORED_PREFIX)) return false;
+  return VENDORED_REFERENCES.has(rel.slice(VENDORED_PREFIX.length));
 }
 
 function markdownLinks(text) {
@@ -79,7 +129,7 @@ let checked = 0;
 
 for (const file of walk(REPO_ROOT)) {
   const rel = path.relative(REPO_ROOT, file);
-  if (isArchive(rel)) continue;
+  if (isArchive(rel) || isVendored(rel)) continue;
   const text = fs.readFileSync(file, 'utf8');
   const dir = path.dirname(file);
 

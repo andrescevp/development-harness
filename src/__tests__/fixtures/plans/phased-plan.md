@@ -44,6 +44,10 @@ Validate the phased plan format contract end-to-end.
 
 Phases group sub-tasks; status lines sit immediately after headers.
 
+## Visual Context
+
+None — no structural change.
+
 ## Phases
 
 ### Phase 1: Foundation

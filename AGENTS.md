@@ -9,11 +9,11 @@ runtime delegation routing.
 The `dev-harness-skills` OpenCode V2 plugin bundles a self-contained dev harness for
 plan-driven development: **7 agents** — `dh-software-architect`,
 `dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-executor`, `dh-explorer`, `dh-documentor` —
-and **21 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
+and **22 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
 `dh-execute-plan-fast`, `dh-execute-plan-task`, `dh-execute-plan-task-fast`,
 `dh-pause-plan`, `dh-resume-plan`, `dh-coding`, `dh-contingency`, `dh-simplify`,
 `dh-review`, `dh-code-review`, `dh-preflight`, `dh-artifact-check`,
-`dh-final-review`, `dh-create-documentation`, `dh-grill-sdd`, `dh-setup`,
+`dh-final-review`, `dh-create-documentation`, `dh-mermaid`, `dh-grill-sdd`, `dh-setup`,
 `dh-code-ruler`, `dh-semver`. The plugin registers
 agents and skills only; the harness tools are served by the shipped
 `dev-harness-mcp` MCP server (no tools, commands, or prompts are registered).
@@ -25,7 +25,7 @@ Plans are **phased**: a plan is an ordered set of phases, each containing
 sub-tasks, with status markers at BOTH levels (Pending | In Progress |
 Completed). The loop:
 
-1. `dh-planning` → use `dh-domain-check` while planning (creates phased plans)
+1. `dh-planning` → use `dh-domain-check` while planning and `dh-mermaid` for visual context (creates phased plans)
 2. `dh-execute-plan` (iterates phases in order → their sub-tasks)
    2.1 `dh-execute-plan-task` → use `dh-coding`
    2.2 `dh-simplify`
@@ -93,14 +93,14 @@ bundled agent names — no mapping is needed.
   owned by this repository — the repo is self-contained and independent
   (no external source, no extraction step).
 - OpenCode-only — no copilot/gemini variants.
-- Exactly **7 agents + 21 skills** are bundled. Commands, prompts, and all
+- Exactly **7 agents + 22 skills** are bundled. Commands, prompts, and all
   other non-bundled harness content are intentionally NOT bundled.
 - The `dh-` names are canonical in the repo files; bundled agents ship
   without the `permission` and `tools` frontmatter keys.
 
 ## Plugin registration and loading
 
-- The V2 plugin (`Plugin.define`) registers the 7 agents and 21 skills via
+- The V2 plugin (`Plugin.define`) registers the 7 agents and 22 skills via
   synchronous domain transforms (`ctx.agent.transform`, `ctx.skill.transform`)
   from frontmatter-parsed assets (repo `agents/` + `skills/` in source mode,
   `dist/assets/` in the bundle). Zero tool or command transforms (tools live
@@ -114,7 +114,7 @@ bundled agent names — no mapping is needed.
   `opencode.json(c)` pointing at the repo directory (`pnpm install` only; no
   build needed for source loading), or the installed package name. See
   [`docs/LOADING.md`](docs/LOADING.md).
-- **Verify:** launch opencode and confirm the 7 agents and 21 skills appear
+- **Verify:** launch opencode and confirm the 7 agents and 22 skills appear
   (including `dh-coding`) and no commands are registered; then confirm the
   project-scope `dh` MCP server is connected (`opencode mcp list`) so the
   harness tools are available.
@@ -124,7 +124,7 @@ bundled agent names — no mapping is needed.
 ```text
 index.ts          source-mode plugin entry (re-exports src/plugin.ts)
 agents/           bundled agent definitions (7)
-skills/           bundled skills (21)
+skills/           bundled skills (22)
 src/cli/          installer CLI: args, scope, prompt/output, JSONC, config, manifest, commands
 src/mcp/          stdio MCP server + workspace resolver
 src/tools/        plan/sheet/logged-command tool implementations

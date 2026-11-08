@@ -19,6 +19,7 @@ const FAST_OMITTED_SECTIONS = [
   'Assumptions and Constraints',
   'Risks and Areas Requiring Care',
   'Core concepts',
+  'Visual Context',
   'Open Questions',
 ] as const;
 

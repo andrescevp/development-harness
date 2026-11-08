@@ -68,6 +68,12 @@ project: <project>
 
 Explain core concepts with code level example if necessary.
 
+## Visual Context
+
+None — no structural change.
+
+> `dh-mermaid` replaces this line with links under `./diagrams/` when the plan has visual impact.
+
 ## Phases
 
 ### Phase 1: <Phase title>

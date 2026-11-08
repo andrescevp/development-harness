@@ -1,12 +1,12 @@
 # dev-harness-skills
 
-An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 7 agents and 21 skills.
+An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 7 agents and 22 skills.
 
 ## Features
 
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks with strict halt-on-blocker safeguards.
-- **7 agents and 21 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
+- **7 agents and 22 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
 - **`dh` MCP server (12 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents and skills only.
 - **Full QA gate**: Thorough verification suite integrating Biome, Knip, jscpd, dependency-cruiser, OSV-Scanner, Semgrep, Vitest, and TypeScript.
 - **Source-mode loading**: Automatic discovery by OpenCode via root `index.ts` with direct asset loading from the repository.
@@ -109,7 +109,7 @@ opencode debug config   # plugin entry, and mcp.servers.dh once wired
 opencode mcp list       # expect: dh connected (server/status only)
 ```
 
-The plugin also registers 21 skills (there is no skills debug subcommand on
+The plugin also registers 22 skills (there is no skills debug subcommand on
 v2.0.18 — see `skills/index.md`) and zero tools; the harness tools come from
 the project-scope MCP server — see [MCP server (`dh`)](#mcp-server-dh).
 
@@ -195,7 +195,7 @@ retired. Consumer permission actions match `dh_*`. Full wiring, verification
 
 ## Agents & skills
 
-The plugin defines 7 agents and 21 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
+The plugin defines 7 agents and 22 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
 
 ### Agents
 
@@ -230,6 +230,7 @@ The plugin defines 7 agents and 21 skills using the `@opencode/plugin` SDK. Zero
 | `dh-artifact-check` | Validates build artifacts, distribution packages, and deployment scripts. |
 | `dh-final-review` | Performs final plan-level verification and delivers completion verdicts. |
 | `dh-create-documentation` | Generates and updates documentation in the project docs directory, including evolution and observation notes. |
+| `dh-mermaid` | Generates plan/documentation Mermaid diagrams: current state, desired state, critical changes, component graphs, flows, sequences, and data models. |
 | `dh-grill-sdd` | Conducts interactive requirement interviews to produce `sdd.md` specification documents. |
 | `dh-setup` | Audits system tools, user plugins, MCPs, and project quality configuration. |
 | `dh-code-ruler` | Interviews users and inspects code to generate project-level `CODE_RULES.md`. |
@@ -273,7 +274,7 @@ offline `pnpm qa:check:full` gate.
 ```text
 index.ts         Root plugin entry point for OpenCode plugin discovery (source mode)
 agents/          Markdown definitions and system prompts for the 7 bundled agents
-skills/          Instructions, templates, and references for the 21 bundled skills
+skills/          Instructions, templates, and references for the 22 bundled skills
 src/cli/         Installer CLI (args, scope, JSONC config, manifest, commands)
 src/mcp/         Local stdio MCP server and workspace resolver
 src/tools/       Plan/sheet/logged-command tool implementations

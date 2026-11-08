@@ -1,22 +1,22 @@
 # Audit Report — dev-harness-skills plugin
 
-Generated 2026-11-08T01:55:21.881Z by `scripts/audit.mjs`.
+Generated 2026-11-08T12:07:25.897Z by `scripts/audit.mjs`.
 
 ## Verdict
 
-**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 216. Documented schema deviations: 0.
+**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 233. Documented schema deviations: 0.
 
 ## Summary verdict table
 
 | Dimension | Count | Status | Notes |
 |---|---|---|---|
-| Inventory & structure | 28 | PASS | 7 agents, 21 skill dirs + index.md; no commands/, no prompts/ |
-| Frontmatter parse | 29 | PASS | 29 files on audit surface |
-| Name regex | 28 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
+| Inventory & structure | 29 | PASS | 7 agents, 22 skill dirs + index.md; no commands/, no prompts/ |
+| Frontmatter parse | 30 | PASS | 30 files on audit surface |
+| Name regex | 29 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 2 | WARN | 632 resolved; 0 code-context; 0 allowlisted; 207 prose tokens (warn) |
-| Loop membership | 28 | PASS | 21/21 skills present; 7/7 agents present |
-| Secret scan | 38 | PASS | 38 low-signature prose hits (instructional), 0 high-signature |
+| Cross-references | 2 | WARN | 645 resolved; 0 code-context; 0 allowlisted; 224 prose tokens (warn) |
+| Loop membership | 29 | PASS | 22/22 skills present; 7/7 agents present |
+| Secret scan | 40 | PASS | 40 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
 
 ## Deviations (warn, per file)
@@ -52,6 +52,7 @@ _None._
 | skill | dh-execute-plan-task-fast | present |
 | skill | dh-final-review | present |
 | skill | dh-grill-sdd | present |
+| skill | dh-mermaid | present |
 | skill | dh-pause-plan | present |
 | skill | dh-planning | present |
 | skill | dh-preflight | present |
@@ -77,7 +78,7 @@ _None._
 
 Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; full list in reports/audit.json):
 
-- `project-name` × 27
+- `project-name` × 28
 - `per-task` × 17
 - `pre-execution` × 13
 - `project-scope` × 12
@@ -105,7 +106,7 @@ Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; f
 
 ## Secret scan
 
-- Low-signature prose hits (instructional): **38** (env-var names, max_tokens, "never expose" rules).
+- Low-signature prose hits (instructional): **40** (env-var names, max_tokens, "never expose" rules).
 - High-signature matches: **0** _none_.
 
 ## Junk scan

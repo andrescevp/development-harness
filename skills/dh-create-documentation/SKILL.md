@@ -24,7 +24,8 @@ Generate structured, cross-referenced documentation in any format, at any locati
   Complementary information and tables may use `csv`, `xml`, `yaml`, or
   `json`.
 - **Mermaid:** every complex workflow or design MUST include a mermaid
-  diagram (native in Obsidian — no conversion needed).
+  diagram (native in Obsidian — no conversion needed). For complex diagrams,
+  invoke the `dh-mermaid` skill.
 - **ASCII wireframes:** every UI representation MUST include an ASCII
   wireframe (code block).
 - **Obsidian frontmatter:** REQUIRED on every document (`title`, `tags`,
@@ -163,6 +164,7 @@ Use these detailed references only when the specific sub-task requires them:
 | Obsidian push | Time to push documentation to Obsidian (Step 5 of the workflow) | `references/obsidian-push.md` |
 | Complete example | User wants to see a full end-to-end example | `references/complete-example.md` |
 | Evolution & observation notes | Plan completion, release, architecture change, or "capture learnings" | `references/evolution-notes.md` |
+| Complex diagrams | Architecture, current/desired state, critical changes, or component graphs | [dh-mermaid](../dh-mermaid/SKILL.md) |
 
 ## Step 4: Content Standards
 
