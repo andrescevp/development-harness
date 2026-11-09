@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-11-09T12:34:49.873Z",
+    "generated": "2026-11-09T23:41:41.760Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -11,19 +11,19 @@
     "dimensions": [
       {
         "name": "Inventory & structure",
-        "count": 30,
+        "count": 31,
         "sev": "PASS",
-        "note": "5 agents, 25 skill dirs + index.md; no commands/, no prompts/"
+        "note": "5 agents, 26 skill dirs + index.md; no commands/, no prompts/"
       },
       {
         "name": "Frontmatter parse",
-        "count": 31,
+        "count": 32,
         "sev": "PASS",
-        "note": "31 files on audit surface"
+        "note": "32 files on audit surface"
       },
       {
         "name": "Name regex",
-        "count": 30,
+        "count": 31,
         "sev": "PASS",
         "note": "/^[a-z0-9]+(-[a-z0-9]+)*$/"
       },
@@ -37,19 +37,19 @@
         "name": "Cross-references",
         "count": 1,
         "sev": "WARN",
-        "note": "493 resolved; 0 code-context; 0 allowlisted; 258 prose tokens (warn)"
+        "note": "501 resolved; 0 code-context; 0 allowlisted; 261 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
-        "count": 30,
+        "count": 31,
         "sev": "PASS",
-        "note": "25/25 skills present; 5/5 agents present"
+        "note": "26/26 skills present; 5/5 agents present"
       },
       {
         "name": "Secret scan",
-        "count": 45,
+        "count": 47,
         "sev": "PASS",
-        "note": "45 low-signature prose hits (instructional), 0 high-signature"
+        "note": "47 low-signature prose hits (instructional), 0 high-signature"
       },
       {
         "name": "Junk scan",
@@ -642,6 +642,13 @@
       "count": 2,
       "files": [
         "skills/dh-create-documentation/SKILL.md"
+      ]
+    },
+    {
+      "token": "plan-to-worktree",
+      "count": 2,
+      "files": [
+        "skills/dh-create-worktree/SKILL.md"
       ]
     },
     {
@@ -1276,6 +1283,20 @@
       "count": 1,
       "files": [
         "skills/dh-create-documentation/SKILL.md"
+      ]
+    },
+    {
+      "token": "after-create",
+      "count": 1,
+      "files": [
+        "skills/dh-create-worktree/SKILL.md"
+      ]
+    },
+    {
+      "token": "auto-resolve",
+      "count": 1,
+      "files": [
+        "skills/dh-create-worktree/SKILL.md"
       ]
     },
     {
@@ -2000,7 +2021,7 @@
       ]
     }
   ],
-  "secretLow": 45,
+  "secretLow": 47,
   "secretHigh": [],
   "junkList": [],
   "symlinkCount": 0,
@@ -2032,6 +2053,10 @@
       },
       {
         "name": "dh-create-documentation",
+        "status": "present"
+      },
+      {
+        "name": "dh-create-worktree",
         "status": "present"
       },
       {
@@ -2363,6 +2388,24 @@
       "findings": []
     },
     {
+      "file": "skills/dh-create-worktree/SKILL.md",
+      "kind": "skill",
+      "lines": 128,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-create-worktree",
+          "description": "Create, reuse, merge, and remove project worktrees following the project-owned WORKTREE_LIFECYCLE.md (before/after create, merge, and remove). Use when the user asks for a worktree, to run a plan in one, or to merge/remove it. The lifecycle file is generated only by dh-setup.",
+          "license": "MIT",
+          "compatibility": "opencode",
+          "allowed-tools": "read, bash",
+          "metadata": "audience: developers workflow: worktree"
+        }
+      },
+      "findings": []
+    },
+    {
       "file": "skills/dh-domain-check/SKILL.md",
       "kind": "skill",
       "lines": 96,
@@ -2653,7 +2696,7 @@
     {
       "file": "skills/dh-setup/SKILL.md",
       "kind": "skill",
-      "lines": 244,
+      "lines": 249,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2689,7 +2732,7 @@
     {
       "file": "skills/index.md",
       "kind": "index",
-      "lines": 153,
+      "lines": 154,
       "frontmatter": {
         "status": "none-expected"
       },

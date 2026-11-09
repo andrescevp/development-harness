@@ -5,6 +5,15 @@ All notable changes to this project are documented here. The format follows
 Semantic Versioning. During the 0.x line, breaking changes bump the minor
 version.
 
+## [Unreleased]
+
+### Added
+
+- `dh-create-worktree` skill: create, reuse, merge, and remove worktrees from
+  the project-owned `WORKTREE_LIFECYCLE.md` (before/after create, merge, and
+  remove). A worktree may host different plans on the same branch at the user's
+  request; the lifecycle file is generated and maintained only by `dh-setup`.
+
 ## [0.6.0] — 2026-11-09
 
 ### Breaking Changes

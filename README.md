@@ -1,12 +1,12 @@
 # dev-harness-skills
 
-An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 5 agents and 25 skills.
+An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 5 agents and 26 skills.
 
 ## Features
 
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks, with every sub-task naming its responsible agent (`Delegated to agent`) and strict halt-on-blocker safeguards.
-- **5 agents and 25 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
+- **5 agents and 26 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
 - **`dh` MCP server (12 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents and skills only.
 - **Code graph queries**: `dh-setup` installs code-graph-rag (`cgr`) on the embedded SQLite backend and indexes the project; `dh-code-query` answers structural questions — definitions, callers/callees, importers, dead code, duplicates — without scanning every file.
 - **Full QA gate**: Thorough verification suite integrating Biome, Knip, jscpd, dependency-cruiser, OSV-Scanner, Semgrep, Vitest, and TypeScript.
@@ -113,7 +113,7 @@ opencode debug config   # plugin entry, and mcp.servers.dh once wired
 opencode mcp list       # expect: dh connected (server/status only)
 ```
 
-The plugin also registers 25 skills (there is no skills debug subcommand on
+The plugin also registers 26 skills (there is no skills debug subcommand on
 v2.0.18 — see `skills/index.md`) and zero tools; the harness tools come from
 the project-scope MCP server — see [MCP server (`dh`)](#mcp-server-dh).
 
@@ -199,7 +199,7 @@ retired. Consumer permission actions match `dh_*`. Full wiring, verification
 
 ## Agents & skills
 
-The plugin defines 5 agents and 25 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
+The plugin defines 5 agents and 26 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
 
 ### Agent selection
 
