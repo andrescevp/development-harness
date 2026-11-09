@@ -21,6 +21,21 @@ Produce high-signal, evidence-based reviews focused on real risk. Write the find
 - If no diff or scope is provided, ask instead of scanning broadly.
 - Do not modify any file other than `./docs/plans/<plan-slug>/tasks/review.md`.
 
+## Graph-Assisted Review
+
+When the project is indexed by `dh-setup`, use the `dh-code-query` skill to
+expand the review beyond the diff:
+
+- `cgr graph callers` / `callees` on changed symbols to find call sites the
+  diff does not show.
+- `cgr graph implementors` / `overrides` for contract changes.
+- `cgr graph importers` for API or module boundary changes.
+- `cgr graph tests-reaching` to check whether affected code is covered.
+
+Graph rows are candidates: confirm each one in the source or diff before
+raising a finding. If the graph is stale or the project is not indexed, fall
+back to `grep` / `read`.
+
 ## Review Order
 
 1. Correctness

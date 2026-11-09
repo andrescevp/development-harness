@@ -28,7 +28,7 @@ Evaluate architectural decision points and produce a small set of concrete alter
 ## Method
 
 1. Read the request, plus `./docs/plans/<plan-slug>/sdd.md` and `./docs/plans/<plan-slug>/plan.md` when they exist — extract constraints, acceptance criteria, and out-of-scope items every alternative must respect.
-2. Survey existing project patterns, modules, and dependencies; use the `dh-explore` skill when the codebase is unfamiliar.
+2. Survey existing project patterns, modules, and dependencies; use the `dh-explore` skill when the codebase is unfamiliar. When the project graph is indexed, use the `dh-code-query` skill (`importers`, `callers`, `implementors`) to map real dependencies and the blast radius each alternative would touch.
 3. List the architectural decision areas where approaches diverge (data model and versioning, backend vs frontend responsibilities, integration boundaries, deployment topology, and similar).
 4. Define 2–3 coherent plans. Each plan states how it resolves every decision area; label the strongest candidate as recommended.
 5. Assess each plan: Risk (likelihood and impact), Complexity (size and rough effort), Trade-offs (what is gained, what is sacrificed).

@@ -41,8 +41,8 @@ MCP tools on the project-scope `dh` server (Code Mode:
 - **Critical gates:** pre-execution alignment in Step 4; all end gates once in Steps 6–7 — plan-end alignment, `dh-simplify` + `dh-code-review` (software), `dh-domain-check` (architectural software plans), `dh-preflight` + `dh-artifact-check`, `dh-final-review`, `dh-create-documentation`, `dh-semver` (software).
 - **Alignment:** `dh_plan_fast_sync` dry-run for structural/status differences plus `dh-review` Plan Alignment Mode — `phase: pre-execution` → `tasks/review-fast.md`, `phase: plan-end` → `tasks/review-fast-final.md`. Never write `tasks/review.md`.
 - **Selection:** phases in order; within the active phase, **In Progress first**, then the first `Pending`. Out-of-order statuses → ask, never silently resume the earlier task.
-- **Agent selection:** take the implementation, review, final-review, and documentation roles from `plan.md`'s `## Agent Selection` (the mirror intentionally omits the section). Absent, incomplete, or stale → run [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md) before executing; re-validate availability at startup and on resume; never substitute silently. One implementation agent per sub-task — no complexity- or type-based split.
-- **Project type, once:** `package.json`, `pyproject.toml`, `Cargo.toml`, `composer.json`, `go.mod`, `CMakeLists.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `project.clj`, `deps.edn`, `mix.exs`, `pubspec.yaml`, `Build.scala`, `build.gradle`, `*.csproj`, `*.sln`. Record it once for end gates; it never changes who implements (the selected implementation agent).
+- **Agent selection:** the phases region copied into `plan_fast.md` carries each sub-task's `Delegated to agent`; confirm it against `plan.md`'s `## Agent Selection`. Missing/empty/unknown field or unavailable agent → **stop and ask**; never substitute silently. One responsible agent per sub-task — no complexity- or type-based split.
+- **Project type, once:** `package.json`, `pyproject.toml`, `Cargo.toml`, `composer.json`, `go.mod`, `CMakeLists.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `project.clj`, `deps.edn`, `mix.exs`, `pubspec.yaml`, `Build.scala`, `build.gradle`, `*.csproj`, `*.sln`. Record it once for end gates; it never changes the sub-task's delegated agent.
 - **Frontmatter lifecycle:** `status: In Progress` in both plans when the first sub-task starts; `Completed` in both at close; bump `plan_version` on realignment.
 - Update `./docs/plans/index.md` only when complete, then run `dh-create-documentation` (docs + evolution/observation notes).
 
@@ -95,10 +95,10 @@ and no P0/P1 finding. The mirror may be ahead of `plan.md` only in statuses;
 ### Step 5: Fast execution loop
 
 At loop start run `dh_plan_fast_sync`: dry-run, then apply **fast→plan only**;
-`plan.md` ahead → stop and ask, never rewind. Phase-close sweep, resolve the
-implementation/review/final-review roles from `plan.md`'s `## Agent Selection`
-(absent or stale → selection protocol), re-validate availability, then read
-`plan_fast.md` via `dh_plan_fast_read` and select:
+`plan.md` ahead → stop and ask, never rewind. Phase-close sweep, validate the
+`## Agent Selection` roster and the active sub-task's `Delegated to agent`
+against it (missing/empty/unknown → stop and ask), then read `plan_fast.md`
+via `dh_plan_fast_read` and select:
 
 1. First `In Progress` phase → its first `In Progress` sub-task, else its first
    `Pending` sub-task.
@@ -114,8 +114,9 @@ For each selected sub-task:
    sub-task also set the phase `In Progress` and the plan frontmatter
    `status: In Progress` in both files. Fallback: manual dual edit with
    retry/revert; never one plan.
-2. Invoke `dh-execute-plan-task-fast`; it implements the work, records the six
-   per-task ledger rows, and marks the sub-task `Completed` via the same tool.
+2. Invoke `dh-execute-plan-task-fast`; it delegates to the sub-task's
+   `Delegated to agent`, records the six per-task ledger rows, and marks the
+   sub-task `Completed` via the same tool.
 3. When ALL sub-tasks of the phase are `Completed`, close the phase in both
    files via `dh_plan_fast_update_status` (idempotent if the task skill already
    did).

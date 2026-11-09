@@ -241,8 +241,8 @@ const ctx = {
   skill: { transform: async (fn) => fn({ add: (skill) => skills.push(skill.name) }) },
 };
 await plugin.setup(ctx);
-if (agents.length !== 5 || skills.length !== 24) {
-  throw new Error(`setup registered ${agents.length} agents and ${skills.length} skills; expected 5/24`);
+if (agents.length !== 5 || skills.length !== 25) {
+  throw new Error(`setup registered ${agents.length} agents and ${skills.length} skills; expected 5/25`);
 }
 console.log(`[container] setup registered ${agents.length} agents and ${skills.length} skills from installed assets`);
 NODE

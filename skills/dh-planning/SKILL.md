@@ -28,10 +28,21 @@ Create a practical execution plan in `./docs/plans/<plan-slug>/plan.md`, not imp
 - Use stable requirement IDs such as `R1`, `R2`, and `R3` in the Requirements Snapshot so sub-tasks can refer to them unambiguously.
 - Make every sub-task self-contained enough that another agent can implement it directly from `plan.md` without a separate handoff file.
 - Initialize every newly created sub-task with status `Pending`.
+- **Delegated agent (mandatory):** every sub-task must include
+  `- **Delegated to agent:** <agent-id>` immediately after its status. The
+  value is the single agent responsible for executing that sub-task and MUST
+  match an agent recorded in `## Agent Selection`. Use the implementation agent
+  for code work, the documentation agent for docs, the testing/QA agent for
+  test-only work, and so on. Never leave it blank or generic.
 - If the work should be split across multiple PRs, keep each sub-task scoped tightly enough for one implementation pass.
 - Prefer concrete validation commands or checks when known; otherwise describe the exact verification approach.
 - **Agent selection:** resolve every delegated role with [`references/agent-selection.md`](references/agent-selection.md): inspect the runtime agent list, then project config/agent directories, then global definitions. Select the best available agent per capability and never hardcode bundled agent IDs.
 - **Project type awareness:** Before selecting architecture/engineering agents, determine whether the project is a software project (has `package.json`, `pyproject.toml`, `Cargo.toml`, `composer.json`, or similar language markers) or a non-software project (docs, config, design assets).
+  - **Code graph (when indexed):** if `dh-setup` has indexed the project, use
+    the `dh-code-query` skill to map current definitions, callers, importers,
+    and tests before decomposing the work. Record graph evidence in the
+    relevant sub-task instructions and add a re-index/verification step when
+    the change alters public symbols.
   - For **software projects**:
     - Run the `dh-domain-check` skill to validate the proposed scope against DDD bounded contexts and SOLID principles before writing the plan.
     - Run the `dh-contingency` skill when there are multiple plausible architectural approaches — generate Plan A/B/C with trade-off analysis to inform the plan structure.
@@ -79,14 +90,17 @@ Before leaving interview mode, confirm the collected answers provide enough info
    **sub-tasks** with clear outcomes. Group phases by logical workstream; keep
    each phase independently completable.
 7. For each sub-task, list the related requirements so downstream agents can trace the work back to the approved task.
-8. For each sub-task, include its objective, dependencies, in-scope work, explicit non-goals, key risks, implementation suggestions, and validation guidance.
+8. For each sub-task, assign the single responsible agent in
+   `- **Delegated to agent:**` (a value from `## Agent Selection`) and include
+   its objective, dependencies, in-scope work, explicit non-goals, key risks,
+   implementation suggestions, and validation guidance.
 9. **For software projects:** Include a documentation sub-task that references the `dh-create-documentation` skill for any new modules, APIs, or public interfaces introduced by the plan.
 10. **Create visual context:** invoke `dh-mermaid` for current state, desired state, critical changes, and component graph when applicable; write the diagrams under `./docs/plans/<plan-slug>/diagrams/` and link them from `## Visual Context`. Produce optional timeline/gantt diagrams only after phases are defined.
 11. Initialize each newly created sub-task as `Pending` and each phase as `Pending`, and use explicit status markers such as `Pending`, `In Progress`, and `Completed` so agents can reliably pick the next sub-task. Status lines go immediately after the phase/sub-task header (parser contract).
 12. Prefer concrete validation commands or checks when known.
 13. Explain core concepts with appropriate code example when necessary.
 14. Write a self-contained plan that can be executed without the conversation.
-15. **Tools:** create the plan scaffold with the `dh_plan_create` tool when available (then fill details), and read/verify with `dh_plan_read`; fall back to manual writes using `references/phased-plan-template.md` when the tools are not installed. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
+15. **Tools:** create the plan scaffold with the `dh_plan_create` tool when available (pass `delegatedTo` for every sub-task), then fill details, and read/verify with `dh_plan_read`; fall back to manual writes using `references/phased-plan-template.md` when the tools are not installed. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 16. Update `./docs/plans/index.md` to add the new plan or reflect the update, including title, slug, description, timestamps and status.
 17. Optionally use chrome mcp tools to validate the work via web if it is possible to do so, and include the results in the plan.
 
@@ -95,7 +109,8 @@ Before leaving interview mode, confirm the collected answers provide enough info
 The output template is the phased template in
 [`references/phased-plan-template.md`](references/phased-plan-template.md) —
 use it verbatim (`## Phases` → `### Phase N: <title>` + `- **Status:**` →
-`#### Sub-Task N.M: <title>` + full sub-task fields + `- **Status:**`). Do
+`#### Sub-Task N.M: <title>` + `- **Status:**` followed by
+`- **Delegated to agent:** <agent-id>` + the remaining fields). Do
 not emit a flat `## Sub-Tasks` section in new plans.
 
 Populate `## Agent Selection` (immediately before `## Phases`) whenever the
@@ -110,6 +125,8 @@ plan delegates work, following
 - `## Agent Selection` is populated when delegation is used (or states `None — no specialized agent required`), and every selected agent exists in the current runtime.
 - Explicit scope limits, acceptance criteria, and important edge cases from `./docs/plans/<plan-slug>/sdd.md` are preserved without inventing missing details.
 - Each sub-task is explicitly mapped to the relevant requirements.
+- Every sub-task carries a non-empty `- **Delegated to agent:**` whose value
+  matches an agent in `## Agent Selection`.
 - Each newly created sub-task starts as `Pending`.
 - Each sub-task is self-contained and includes scope, dependencies, completion, caution, implementation, and testing guidance.
 - Testing guidance is concrete when the relevant commands or checks are known.

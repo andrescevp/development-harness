@@ -140,7 +140,7 @@ describe('plan_create', () => {
       slug: 'new-plan',
       title: 'New Plan',
       objective: 'Demo roundtrip',
-      phases: [{ title: 'Phase One', subTasks: [{ title: 'First task' }] }],
+      phases: [{ title: 'Phase One', subTasks: [{ title: 'First task', delegatedTo: 'dh-software-engineer' }] }],
     });
     expect(created.ok).toBe(true);
     expect(created.path).toBe(plansFile(h.workspaceRoot, 'new-plan'));
@@ -148,8 +148,23 @@ describe('plan_create', () => {
     // Scaffolded statuses come from the single-sourced initial-status constant.
     expect(created.plan.phases[0]?.status).toBe(INITIAL_PHASE_STATUS);
     expect(created.plan.phases[0]?.subTasks[0]?.status).toBe(INITIAL_PHASE_STATUS);
+    expect(created.plan.phases[0]?.subTasks[0]?.delegatedTo).toBe('dh-software-engineer');
     const read = await h.callToolJson<PlanPayload>('plan_read', { slug: 'new-plan' });
     expect(read.plan).toEqual(created.plan);
+  });
+
+  it('rejects a sub-task without delegatedTo before writing anything', async () => {
+    const h = await connectPlanHarness();
+    const file = plansFile(h.workspaceRoot, 'missing-delegation');
+    const res = await h.callTool('plan_create', {
+      slug: 'missing-delegation',
+      title: 'Missing delegation',
+      objective: 'Must fail',
+      phases: [{ title: 'P', subTasks: [{ title: 'T' }] }],
+    });
+    expect(res.isError).toBe(true);
+    expect(textOf(res)).toMatch(/delegatedTo/);
+    expect(fs.existsSync(file)).toBe(false);
   });
 
   it('appends the index row byte-identically when updateIndex is true', async () => {
@@ -161,7 +176,7 @@ describe('plan_create', () => {
       slug: 'indexed',
       title: 'Indexed | Plan',
       objective: 'Index row',
-      phases: [{ title: 'P', subTasks: [{ title: 'T' }] }],
+      phases: [{ title: 'P', subTasks: [{ title: 'T', delegatedTo: 'dh-documentor' }] }],
       updateIndex: true,
     });
     expect(created.ok).toBe(true);
@@ -264,7 +279,7 @@ describe('input schema tightenings (accepted deviations)', () => {
     const { tools } = await h.listTools();
     const phases = schemaOf(tools, 'plan_create').properties?.phases;
     expect(phases?.items?.required).toEqual(['title', 'subTasks']);
-    expect(phases?.items?.properties?.subTasks?.items?.required).toEqual(['title']);
+    expect(phases?.items?.properties?.subTasks?.items?.required).toEqual(['title', 'delegatedTo']);
   });
 
   it('rejects an unknown status enum value before the handler (SDK deviation)', async () => {

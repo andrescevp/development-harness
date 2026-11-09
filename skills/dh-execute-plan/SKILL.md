@@ -30,8 +30,8 @@ Orchestrate the complete execution of a plan from start to finish. Iterate throu
 - If a review produces P0/P1 findings, stop and report — do not continue to the next sub-task (a blocked sub-task blocks its phase).
 - After the final sub-task, run the `dh-final-review` skill for sign-off.
 - Update `./docs/plans/index.md` when the plan is fully complete.
-- **Resolve agents once per plan:** before the first delegation, read `## Agent Selection` in `plan.md` and use its rows for the implementation, review, and final-review roles. If the section or a required row is absent or stale (a named agent no longer exists), run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): discover the runtime agent list, then project config/agent directories, then global definitions; record the choices and generic fallbacks in the plan before continuing.
-- **Single implementation agent per sub-task:** there is no complexity- or type-based builder split. If no available agent or bundled capability covers a required role, stop and report the gap — never name a fixed agent or substitute one silently.
+- **Resolve the roster once per plan:** before the first delegation, read `## Agent Selection` in `plan.md` and validate its rows for the delegated, review, and final-review roles. If the section or a required row is absent or stale (a named agent no longer exists), run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): discover the runtime agent list, then project config/agent directories, then global definitions; record the choices and generic fallbacks in the plan before continuing.
+- **One delegated agent per sub-task:** the active sub-task's `Delegated to agent` is the single executor. Implementation sub-tasks normally name the selected implementation agent; documentation/test-only sub-tasks name the matching selected role. There is no complexity- or type-based builder split. If the field is missing/empty/unknown or the named agent is unavailable, stop and report the gap — never substitute one silently.
 - **Project type awareness is delegated to `dh-execute-plan-task`.** The orchestrator does not re-detect project type — the task skill runs the software/non-software post-steps. Do not hardcode implementation, review, or final-review agent choices in the orchestration loop.
 - **After plan completion (all projects):** invoke `dh-create-documentation` to update docs and create the plan's evolution + observation notes (see its Custom Directives). This ensures knowledge persists beyond the active session.
 - **After plan completion (software projects only):** invoke `dh-semver` for determining the next version bump.
@@ -54,7 +54,7 @@ Iterate **phases in order** (skip phases already `Completed`); within each phase
 
 0. **Mark In Progress**: Ensure the active sub-task is marked `In Progress` via `dh_plan_update_status` (`target: "subtask"`). If it is already `In Progress` (resume), leave the state. Marking the first sub-task of a phase also moves that phase to `In Progress` (phase lifecycle). Fallback: manual plan.md edit per the marker rules. This ensures resume works if interrupted.
 
-0b. **Resolve agents**: confirm the plan's `## Agent Selection` names available agents for implementation, review, and (at the end) final review. Absent or stale → run the selection protocol ([`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md)), update the table, and tell the user before delegating. A selected agent missing with no capability fallback stops the run.
+0b. **Resolve agents**: confirm the plan's `## Agent Selection` names available agents for the delegated, review, and (at the end) final-review roles, and confirm the active sub-task carries a `Delegated to agent` that matches one of them. A missing/empty/unknown field is a hard blocker: stop and ask the planner/user to fix the plan before delegating. A selected agent missing with no capability fallback also stops the run.
 
 1. **Execute**: Follow the `dh-execute-plan-task` skill to implement this sub-task. Since this is called from the orchestrator, `dh-execute-plan-task` skips its internal review and completion steps (per its orchestration guard).
 
@@ -111,6 +111,7 @@ The execution loop automatically handles interruptions:
 
 - **Paused handoff present:** do not execute around it — redirect to `dh-resume-plan` or get explicit confirmation to bypass.
 - **Sub-task execution fails** (validation keeps failing): `dh-execute-plan-task` stops after 3 validation attempts and reports the failure. Do not proceed to the next sub-task — the blocked sub-task blocks its phase (loop rule 2.4: never mark the phase `Completed` around a blocker).
+- **Missing or invalid `Delegated to agent`:** stop before any delegation and report the sub-task; the plan must be fixed rather than executed under a guessed owner.
 - **Review produces blocking findings**: Stop the execution loop. Recommend fixing the findings (using the `address-review` pattern) and re-running `dh-execute-plan`.
 - **Final review fails**: Report the verdict — do not mark the plan complete until findings are addressed.
 

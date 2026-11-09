@@ -185,7 +185,15 @@ async function runChecks(root) {
             slug: 'smoke',
             title: 'Smoke Plan',
             objective: 'Prove the shipped MCP stdio path',
-            phases: [{ title: 'Phase One', subTasks: [{ title: 'First task' }, { title: 'Second task' }] }],
+            phases: [
+              {
+                title: 'Phase One',
+                subTasks: [
+                  { title: 'First task', delegatedTo: 'dh-software-engineer' },
+                  { title: 'Second task', delegatedTo: 'dh-software-engineer' },
+                ],
+              },
+            ],
             updateIndex: true,
           },
         },
@@ -220,6 +228,12 @@ async function runChecks(root) {
       'plan_read lists phase/sub-tasks',
       phase?.title === 'Phase One' && phase?.subTasks?.length === 2,
       JSON.stringify(phase?.subTasks?.length)
+    );
+    check(
+      'plan_read exposes each sub-task delegatedTo',
+      phase?.subTasks?.[0]?.delegatedTo === 'dh-software-engineer' &&
+        phase?.subTasks?.[1]?.delegatedTo === 'dh-software-engineer',
+      JSON.stringify(phase?.subTasks?.map((s) => s.delegatedTo))
     );
 
     const updated = payload(

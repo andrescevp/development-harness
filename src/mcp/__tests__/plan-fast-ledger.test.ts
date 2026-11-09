@@ -20,7 +20,7 @@ describe('plan_fast_skip_check', () => {
       slug: 'replace-ledger',
       title: 'Replace Ledger',
       objective: 'Keep the ledger',
-      phases: [{ title: 'P', subTasks: [{ title: 'T' }] }],
+      phases: [{ title: 'P', subTasks: [{ title: 'T', delegatedTo: 'dh-software-engineer' }] }],
     });
     const created = await createFast(h, 'replace-ledger');
     await h.callToolJson('plan_fast_skip_check', {
