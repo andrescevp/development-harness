@@ -74,7 +74,7 @@ plugin, `opencode plugin update`; remove it with `opencode plugin remove`.
 
 ### From source / development
 
-Clone the repository, install dependencies, build the bundle (tsup bundle + dist/assets), and configure OpenCode:
+Clone the repository, install dependencies, build the bundle (tsdown bundle + dist/assets), and configure OpenCode:
 
 ```sh
 git clone https://github.com/andrescevp/development-harness.git
@@ -82,6 +82,9 @@ cd development-harness
 pnpm install
 pnpm build
 ```
+
+The build toolchain (tsdown/Rolldown) requires Node `^22.18.0 || ^24.11.0 || >=26`;
+the published plugin itself still runs on Node `>=20.11`.
 
 Then load via `file:///path/to/development-harness` in your `opencode.json` or
 `opencode.jsonc` plugins array (or clone the repo into a `plugins/` folder):

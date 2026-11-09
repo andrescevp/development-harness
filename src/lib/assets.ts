@@ -4,7 +4,7 @@
  *
  * - Paths resolve from the module location (`import.meta.dirname`), NOT from
  *   `process.cwd()`, so the plugin finds its assets no matter where opencode
- *   launches it. In the tsup bundle the module lives at dist/plugin.js, so
+ *   launches it. In the bundled build the module lives at dist/plugin.js, so
  *   the default root is `<dist>/assets`.
  * - `loadHarnessAssets(root?)` accepts an explicit root for fixtures/tests.
  * - Per-file parse failures are collected, never thrown, so one bad asset

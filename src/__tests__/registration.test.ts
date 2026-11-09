@@ -6,7 +6,7 @@
  * the guards themselves are meta-tested below.
  *
  * The plugin entry imports the BUILT dist/plugin.js so the whole pipeline
- * (tsup bundle + dist/assets) is under test. Requires `pnpm build` first.
+ * (tsdown bundle + dist/assets) is under test. Requires `pnpm build` first.
  */
 
 import fs from 'node:fs';
