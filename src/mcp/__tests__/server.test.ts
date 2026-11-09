@@ -56,7 +56,7 @@ describe('MCP server tools/list contract', () => {
       slug: 'demo',
       title: 'Demo Plan',
       objective: 'Prove workspace anchoring',
-      phases: [{ title: 'Phase One', subTasks: [{ title: 'First task' }] }],
+      phases: [{ title: 'Phase One', subTasks: [{ title: 'First task', delegatedTo: 'dh-software-engineer' }] }],
     });
     expect(created.ok).toBe(true);
     expect(created.path).toBe(plansFile(harness!.workspaceRoot, 'demo'));

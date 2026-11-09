@@ -19,14 +19,18 @@ Agent choices follow [`agent-selection.md`](agent-selection.md).
 5. The **first** `- **Status:**` bullet in a sub-task section is the
    sub-task status; only blank lines may precede it, and it must appear
    before any other heading or field bullet.
-6. Valid statuses: `Pending`, `In Progress`, `Completed`.
-7. A sub-task's phase is derived from its `N` prefix (Sub-Task 2.1 belongs to
+6. Every sub-task carries `- **Delegated to agent:** <agent-id>` after the
+   status and before the other fields. It names the single agent responsible
+   for executing that sub-task and must match a role/agent recorded in
+   `## Agent Selection`.
+7. Valid statuses: `Pending`, `In Progress`, `Completed`.
+8. A sub-task's phase is derived from its `N` prefix (Sub-Task 2.1 belongs to
    Phase 2), so mis-numbered sub-tasks are format errors.
-8. The Requirements Snapshot with stable IDs (R1, R2, …) is preserved; each
+9. The Requirements Snapshot with stable IDs (R1, R2, …) is preserved; each
    sub-task maps to requirements via its `Related Requirements` field.
-9. The phases region runs from `## Phases` to the next top-level `##`
-   heading (e.g. `## Final Integration & Verification`) or EOF.
-10. `## Agent Selection` sits before `## Phases`; it is outside the phases
+10. The phases region runs from `## Phases` to the next top-level `##`
+    heading (e.g. `## Final Integration & Verification`) or EOF.
+11. `## Agent Selection` sits before `## Phases`; it is outside the phases
     region, so the parser ignores it for phase/sub-task extraction.
 
 ## Template
@@ -94,6 +98,7 @@ None — no structural change.
 #### Sub-Task 1.1: <Clear title>
 
 - **Status:** Pending
+- **Delegated to agent:** <agent-id from Agent Selection>
 - **Objective:** [What this sub-task should accomplish]
 - **Related Requirements:** [Requirement IDs]
 - **Dependencies and Preconditions:** [Prerequisites]
@@ -109,6 +114,7 @@ None — no structural change.
 #### Sub-Task 1.2: <Clear title>
 
 - **Status:** Pending
+- **Delegated to agent:** <agent-id from Agent Selection>
 - **Objective:** ...
 
 ### Phase 2: <Phase title>
@@ -118,6 +124,7 @@ None — no structural change.
 #### Sub-Task 2.1: <Clear title>
 
 - **Status:** Pending
+- **Delegated to agent:** <agent-id from Agent Selection>
 - **Objective:** ...
 
 ## Final Integration & Verification
@@ -129,6 +136,18 @@ None — no structural change.
 
 - [Only if important non-blocking uncertainty remains]
 ```
+
+## Delegated agent field
+
+Every new sub-task must name its responsible agent:
+
+- The value must match an agent recorded in `## Agent Selection` (role table).
+- `dh_plan_create` requires `delegatedTo` for every sub-task and renders it in
+  the scaffold.
+- `plan_read` exposes it as `delegatedTo`; legacy plans without the field parse
+  as `null` but are not executable under the delegation contract.
+- Execution uses the field as the single responsible agent. A missing,
+  malformed, or unavailable agent is a hard stop — do not substitute silently.
 
 ## Phase lifecycle (execution contract)
 

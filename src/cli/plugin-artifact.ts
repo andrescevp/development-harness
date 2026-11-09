@@ -31,7 +31,7 @@ export { scanBareSpecifiers } from './bundle-scan.js';
 
 /** Harness corpus guaranteed by the managed layout. */
 export const EXPECTED_AGENT_COUNT = 5;
-export const EXPECTED_SKILL_COUNT = 24;
+export const EXPECTED_SKILL_COUNT = 25;
 
 const BUNDLE_FILE = 'plugin.js';
 const ASSETS_DIR = 'assets';

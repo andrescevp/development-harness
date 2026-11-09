@@ -209,12 +209,14 @@ tags: [plan, fast]
 #### Sub-Task 1.1: Add the backoff calculator
 
 - **Status:** Completed
+- **Delegated to agent:** dh-software-engineer
 - **Related Requirements:** R1
 - **Done When:** Unit tests pass.
 
 #### Sub-Task 1.2: Wire retry into the client
 
 - **Status:** In Progress
+- **Delegated to agent:** dh-software-engineer
 - **Related Requirements:** R2
 - **Done When:** Integration test passes.
 

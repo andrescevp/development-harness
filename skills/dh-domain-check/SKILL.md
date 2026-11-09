@@ -30,6 +30,20 @@ For each planned change, check:
 - **I**nterface Segregation: Are we adding fat interfaces that force clients to depend on methods they don't use?
 - **D**ependency Inversion: Are new dependencies on abstractions, not concretions?
 
+## Graph-Assisted Boundary Discovery
+
+When `dh-setup` indexed the project, use the `dh-code-query` skill to ground
+the context map instead of relying only on directory names:
+
+- `cgr graph importers` / `callers` to expose cross-module dependencies and
+  actual usage edges.
+- `cgr graph implementors` / `overrides` to test LSP/ISP claims.
+- `cgr graph tests-reaching` to see which contexts have coverage at the
+  boundary.
+
+Verify every row in the source; fall back to the directory scan below when the
+project is not indexed or the graph is stale.
+
 ## Bounded Context Discovery
 
 To identify bounded contexts:

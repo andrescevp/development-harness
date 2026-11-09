@@ -91,6 +91,11 @@ Before writing, clarify with the user (or infer from context):
 
 Ask if critical info is missing. For simple requests ("document this function"), infer defaults and proceed.
 
+When the project graph is indexed, use the `dh-code-query` skill during
+discovery to inventory modules, public definitions, importers, and the tests
+that reach them. Use it to choose what to document; verify every symbol and
+signature in the source before writing.
+
 ## Step 2: Structure Design
 
 ### Single-file structure

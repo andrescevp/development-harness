@@ -99,6 +99,9 @@ before `## Phases`:
 Rules:
 
 - `Selected agent` is the exact runtime identifier discovered in step 1.
+- Name that identifier in every sub-task's `- **Delegated to agent:**` field;
+  the field is the single executor for that sub-task. A sub-task without it is
+  not executable.
 - `Fallback` names the capability, not a specific agent ID.
 - Keep the table in `plan.md`; the fast mirror intentionally omits it.
 - When no delegation is needed, write `None — no specialized agent required`
@@ -108,14 +111,18 @@ Rules:
 ## 7. Re-validation before execution
 
 Before execution starts — and again on resume — verify every agent named in
-`## Agent Selection` still exists in the current runtime:
+`## Agent Selection` and every sub-task's `Delegated to agent` still exists in
+the current runtime:
 
 - **Present:** proceed with the recorded choice.
 - **Missing, renamed, or disabled:** re-run discovery and ranking for that
-  role, update the row with the new agent and `Why`, and tell the user. If the
-  replacement changes what the plan assumed (scope, acceptance criteria,
-  permissions), ask before continuing.
+  role, update the row with the new agent and `Why`, update every sub-task that
+  named the old agent, and tell the user. If the replacement changes what the
+  plan assumed (scope, acceptance criteria, permissions), ask before continuing.
 - **Table absent or stale:** run the full protocol again before delegating.
+- **Sub-task field missing/empty/unknown:** stop; the plan is defective. Fix
+  the field from the table (or ask the planner/user) before executing that
+  sub-task — never guess an owner from the role name.
 
 Never silently substitute an agent and never keep executing against a missing
 one.
@@ -145,7 +152,8 @@ to "no delegation" when the plan requires a delegated result.
 4. Rank: project + domain > specialized project > bundled fallback.
 5. Tie → prefer specificity; still tied → ask the user and record it.
 6. No candidate → stop and report the missing capability (never invent one).
-7. Record the row in `## Agent Selection`.
+7. Record the row in `## Agent Selection` and the selected agent in every
+   sub-task's `Delegated to agent`.
 8. Re-validate presence before execution; update and ask on contract impact.
 
 ## Worked record

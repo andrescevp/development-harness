@@ -1,6 +1,6 @@
 # Skills Index — dev-harness-skills plugin
 
-> The plugin bundles **24 skills** (incl. `dh-grill-sdd` SDD interviewer,
+> The plugin bundles **25 skills** (incl. `dh-grill-sdd` SDD interviewer,
 > `dh-setup` harness setup, `dh-contingency` planning support, and
 > `dh-pause-plan` / `dh-resume-plan` lifecycle support).
 > Loading a skill injects its instructions and resources into the current
@@ -89,12 +89,13 @@ review, docs, semver) run once across plan end. `dh-execute-plan-task-fast`
 handles one sub-task; `dh_plan_fast_sync` + `dh-review` Plan Alignment Mode
 verify mirror alignment.
 
-**Plan lifecycle tools:** use `dh_plan_read` to parse a phased plan,
-`dh_plan_update_status` to flip phase/sub-task status markers, and
-`dh_plan_create` to scaffold a new plan — fall back to direct plan.md
-edits only when the tools are unavailable. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
+**Plan lifecycle tools:** use `dh_plan_read` to parse a phased plan
+(including each sub-task's `delegatedTo`), `dh_plan_update_status` to flip
+phase/sub-task status markers, and `dh_plan_create` to scaffold a new plan
+(passing `delegatedTo` for every sub-task) — fall back to direct plan.md edits
+only when the tools are unavailable. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 
-## The 24 bundled skills
+## The 25 bundled skills
 
 | Skill | Role in the loop |
 |---|---|
@@ -110,6 +111,7 @@ edits only when the tools are unavailable. These tools are exposed by the projec
 | [`dh-coding`](dh-coding/SKILL.md) | **NEW** — TDD best practices; reads `CODE_RULES.md` at project root |
 | [`dh-execute-cli`](dh-execute-cli/SKILL.md) | Utility — execute commands, tests, builds, linters, and validation via the logged-command strategy (`dh_logged_command` or temp-log head/tail); compact reports |
 | [`dh-explore`](dh-explore/SKILL.md) | Utility — codebase exploration with glob, grep, and targeted reads; compact evidence with exact file references |
+| [`dh-code-query`](dh-code-query/SKILL.md) | Utility — query the code knowledge graph with code-graph-rag (`cgr`): definitions, callers/callees/importers, tests, dead code, duplicates; setup/indexing live in `dh-setup` |
 | [`dh-simplify`](dh-simplify/SKILL.md) | Step 2.2 — reuse/quality/efficiency pass on changed code (software only) |
 | [`dh-review`](dh-review/SKILL.md) | Step 2.3 — verify a sub-task against acceptance criteria |
 | [`dh-code-review`](dh-code-review/SKILL.md) | Step 2.3 — code-level correctness/security/robustness review |
@@ -119,7 +121,7 @@ edits only when the tools are unavailable. These tools are exposed by the projec
 | [`dh-create-documentation`](dh-create-documentation/SKILL.md) | Step 5 — generate/update project docs plus evolution + observation notes (vault = `{project_root}`, docs under `{project_root}/docs`) |
 | [`dh-mermaid`](dh-mermaid/SKILL.md) | Planning + docs — Mermaid diagrams: current/desired state, critical changes, component graphs; plan output under `docs/plans/<slug>/diagrams/` |
 | [`dh-grill-sdd`](dh-grill-sdd/SKILL.md) | Pre-planning — interviews the user and produces `./docs/plans/<slug>/sdd.md` (the requirements contract `dh-planning` consumes) |
-| [`dh-setup`](dh-setup/SKILL.md) | Environment — audits system software (chrome/uv/nvm/osv-scanner/docker/jq/xq/yq/graphify/phpenv), user MCPs + plugins, and scaffolds project QA (hooks + stack tools) |
+| [`dh-setup`](dh-setup/SKILL.md) | Environment — audits system software (chrome/uv/nvm/osv-scanner/docker/jq/xq/yq/phpenv), user MCPs + plugins, and scaffolds project QA (hooks + stack tools) |
 | [`dh-code-ruler`](dh-code-ruler/SKILL.md) | Rules — grills the user + analyzes code to generate `{project_root}/CODE_RULES.md` (style, patterns, security/perf constraints, stack best practices); run by the selected architecture agent |
 | [`dh-semver`](dh-semver/SKILL.md) | Release — analyzes commits since the last tag, determines the version bump, generates a changelog, and creates a local tag (harness adaptation of the global `semver` skill) |
 

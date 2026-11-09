@@ -80,6 +80,19 @@ flowchart when unsupported):
 - [Configuration](references/config-configuration.md) — global settings
 - [Math](references/config-math.md) — LaTeX math support
 
+## Graph input (when indexed)
+
+When `dh-setup` indexed the project, use the `dh-code-query` skill before
+drafting component, architecture, sequence, or class diagrams:
+
+- `cgr graph importers` / `callers` for dependency and interaction edges.
+- `cgr graph implementors` / `overrides` for inheritance and contract edges.
+- `cgr stats` for a quick node/relationship inventory.
+
+Diagram only confirmed edges; verify them in the source and keep the graph's
+project name in the diagram notes when it matters. Fall back to code reading
+when the project is not indexed or the graph is stale.
+
 ## Plan diagrams
 
 Use this skill during planning (and in `dh-planning`) when the plan changes

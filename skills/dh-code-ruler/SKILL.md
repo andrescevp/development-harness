@@ -44,9 +44,12 @@ invoked by `dh-coding` when the file is missing).
    - Enforcement: which checks/linters must back each rule, and hard numbers
      (limits, thresholds).
 3. **Analyze the code** before writing: sample representative modules, tests,
-   configs, and docs. Extract de-facto conventions (naming, structure, import
-   style, error handling, test patterns) and existing constraints from
-   linter/formatter configs (biome/eslint, ruff, phpcs/phpstan...), `tsconfig`/
+   configs, and docs. When the project graph is indexed, use the
+   `dh-code-query` skill (`stats`, `graph importers`/`callers`, `duplicates`)
+   to inventory modules and spot repeated patterns before sampling files.
+   Extract de-facto conventions (naming, structure, import style, error
+   handling, test patterns) and existing constraints from linter/formatter
+   configs (biome/eslint, ruff, phpcs/phpstan...), `tsconfig`/
    `pyproject.toml`/`composer.json`, `AGENTS.md`, README, and `docs/`. Mark
    anything inferred as an assumption; never invent rules the codebase does
    not support.

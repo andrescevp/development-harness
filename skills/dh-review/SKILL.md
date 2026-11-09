@@ -22,6 +22,7 @@ Verify that a single sub-task implementation meets its plan-defined acceptance c
 - Write all findings to `./docs/plans/<plan-slug>/tasks/review.md`. **Exception:** Plan Alignment Mode writes to the caller-specified path — default `tasks/review-fast.md` (pre-execution) or `tasks/review-fast-final.md` (plan-end).
 - Use severity levels from the `dh-code-review` skill: P0 (blocking), P1 (high), P2 (medium), P3 (low).
 - If no sub-task is In Progress, review the most recently Completed sub-task and state that assumption.
+- **Graph-assisted impact (standard review only):** when the project graph is indexed, use the `dh-code-query` skill on changed symbols — `callers`/`callees` for untested call paths, `importers` for boundary impact, `implementors`/`overrides` for contract changes, and `tests-reaching` for coverage. Confirm each row in the diff or source; do not raise a finding from graph output alone. Plan Alignment Mode never uses this.
 
 ## Plan Alignment Mode (fast execution)
 

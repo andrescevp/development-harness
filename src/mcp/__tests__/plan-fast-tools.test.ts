@@ -111,7 +111,7 @@ describe('plan_fast_create / plan_fast_read', () => {
       slug: 'pending-fast',
       title: 'Pending Plan',
       objective: 'All pending',
-      phases: [{ title: 'P', subTasks: [{ title: 'T' }] }],
+      phases: [{ title: 'P', subTasks: [{ title: 'T', delegatedTo: 'dh-software-engineer' }] }],
     });
     await createFast(h, 'pending-fast');
     const replaced = await h.callToolJson<FastCreatePayload>('plan_fast_create', {

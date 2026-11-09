@@ -30,7 +30,12 @@ replaces the legacy `task.md` contract).
    (given by the caller or derived from the request). Target file:
    `./docs/plans/<plan-slug>/sdd.md`. If it already exists, STOP and report —
    `dh-planning` should reuse it (or `dh-review` should review it).
-2. **Interview** — ask ONLY the questions needed to fill the SDD template
+2. **Current-state evidence** — when the project graph is indexed, use the
+   `dh-code-query` skill to inventory the modules, entry points, callers, and
+   tests the request would touch. Use that evidence to sharpen the scope,
+   constraints, and risk questions; it informs the interview, never replaces
+   the user's answers.
+3. **Interview** — ask ONLY the questions needed to fill the SDD template
    (numbered, focused; skip what the user already provided):
    - **Goal:** What is the main outcome? What problem does it solve?
    - **Scope:** What functionality, systems, or changes are included?
@@ -41,13 +46,13 @@ replaces the legacy `task.md` contract).
    - **Risks:** Edge cases, failure modes, areas needing special care.
    - **Existing assets:** Prior art, current code, docs, integrations.
    Keep it minimal: if the request already answers a question, do not ask it.
-3. **Synthesize** — write `./docs/plans/<plan-slug>/sdd.md` (create the
+4. **Synthesize** — write `./docs/plans/<plan-slug>/sdd.md` (create the
    directory if needed) using the template below. Assign **stable IDs**
    (R1, R2, … / AC1, AC2, …) so `dh-planning`, `dh-execute-plan`, and
    `dh-final-review` can trace requirements unambiguously. Add obsidian-style
    frontmatter (title, slug, description, tags, project, stack, created,
    updated, status: proposed).
-4. **Report** — confirm the path, the requirement IDs created, and any open
+5. **Report** — confirm the path, the requirement IDs created, and any open
    questions left in the SDD.
 
 ## SDD Template

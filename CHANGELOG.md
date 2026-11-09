@@ -5,6 +5,36 @@ All notable changes to this project are documented here. The format follows
 Semantic Versioning. During the 0.x line, breaking changes bump the minor
 version.
 
+## [0.6.0] — 2026-11-09
+
+### Breaking Changes
+
+- Phased plans now require `- **Delegated to agent:** <agent-id>` on every
+  sub-task, and `dh_plan_create` requires `delegatedTo` for each sub-task.
+  Legacy plans still parse (`delegatedTo: null`) but are not executable under
+  the delegation contract until the field is added.
+
+### Added
+
+- `dh-code-query` skill: query the project code knowledge graph with
+  code-graph-rag (`cgr`) — deterministic definitions/callers/callees/importers,
+  dead-code and duplicate reports, graph export, and querying the optional
+  read-only MCP server. Setup, indexing, and configuration stay in `dh-setup`.
+- `dh-setup` installs `cgr` with `uv tool install` using the extras that cover
+  the project's languages (`treesitter-full`, `ast-grep`, optional `cpp` /
+  `semantic`), indexes the project with the embedded SQLite graph, and owns the
+  configuration reference (`skills/dh-setup/references/code-graph-rag.md`).
+- Phased plans now require `- **Delegated to agent:** <agent-id>` on every
+  sub-task; `dh_plan_create` requires `delegatedTo`, `plan_read` exposes it, and
+  standard/fast execution delegate to that specific agent (missing or
+  unavailable agents halt execution).
+- Code-graph guidance is wired into the skills that benefit from structural
+  evidence: `dh-coding`, `dh-code-review`, `dh-planning`, `dh-explore`,
+  `dh-domain-check`, `dh-contingency`, `dh-code-ruler`, `dh-simplify`,
+  `dh-create-documentation`, `dh-mermaid`, `dh-review`, `dh-final-review`,
+  `dh-preflight`, `dh-grill-sdd`, `dh-execute-plan-task`, and
+  `dh-execute-plan-task-fast`.
+
 ## [0.5.1] — 2026-11-09
 
 ### Changed
@@ -81,5 +111,6 @@ First release of the standalone OpenCode V2 harness.
 - Plan close-outs include the pause/resume, fast-plan, Mermaid, and
   agent-selection plans with evolution/observation notes.
 
+[0.6.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.6.0
 [0.5.1]: https://github.com/andrescevp/development-harness/releases/tag/v0.5.1
 [0.5.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.5.0

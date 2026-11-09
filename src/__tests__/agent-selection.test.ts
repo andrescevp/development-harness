@@ -4,7 +4,7 @@
  *   - no hardcoded `@dh-` agent references anywhere in the bundled corpus;
  *   - the utility agents are gone and their skills exist and parse;
  *   - the selection protocol, plan section, and fast omitted lists agree;
- *   - the inventory is 5 agents / 24 skills;
+ *   - the inventory is 5 agents / 25 skills;
  *   - the active docs list both utility skills.
  *
  * These are structural assertions over the real repo corpus — no prose
@@ -61,7 +61,7 @@ describe('agent references (hard cut)', () => {
   });
 
   it('the utility skills exist, parse, and carry the matching name', () => {
-    for (const name of ['dh-execute-cli', 'dh-explore']) {
+    for (const name of ['dh-execute-cli', 'dh-explore', 'dh-code-query']) {
       const file = `skills/${name}/SKILL.md`;
       expect(exists(file), file).toBe(true);
       const { data, body } = parseFrontmatter(read(file));
@@ -99,6 +99,15 @@ describe('agent-selection protocol', () => {
     for (const file of sources) expect(read(file), file).toContain('## Agent Selection');
   });
 
+  it('plan template, scaffold, and fixture require Delegated to agent per sub-task', () => {
+    const sources = [
+      'skills/dh-planning/references/phased-plan-template.md',
+      'src/tools/plan-template.ts',
+      'src/__tests__/fixtures/plans/phased-plan.md',
+    ];
+    for (const file of sources) expect(read(file), file).toContain('Delegated to agent');
+  });
+
   it('fast-plan omitted lists include the Agent Selection section', () => {
     const prose = [
       'skills/dh-execute-plan-fast/SKILL.md',
@@ -112,24 +121,25 @@ describe('agent-selection protocol', () => {
 });
 
 describe('bundle inventory', () => {
-  it('bundles 5 agents and 24 skills with a 29-name unique corpus', () => {
+  it('bundles 5 agents and 25 skills with a 30-name unique corpus', () => {
     const agents = walkFiles('agents').filter((file) => file.endsWith('.md'));
     const skills = skillNames();
     expect(agents).toHaveLength(5);
-    expect(skills).toHaveLength(24);
+    expect(skills).toHaveLength(25);
 
     const names = [
       ...agents.map((file) => parseFrontmatter(read(file)).data.name),
       ...skills.map((name) => parseFrontmatter(read(`skills/${name}/SKILL.md`)).data.name),
     ];
-    expect(new Set(names).size).toBe(29);
+    expect(new Set(names).size).toBe(30);
   });
 });
 
 describe('active documentation', () => {
-  it.each(['AGENTS.md', 'README.md', 'skills/index.md'])('%s lists both utility skills', (file) => {
+  it.each(['AGENTS.md', 'README.md', 'skills/index.md'])('%s lists the utility skills', (file) => {
     const text = read(file);
     expect(text).toContain('dh-execute-cli');
     expect(text).toContain('dh-explore');
+    expect(text).toContain('dh-code-query');
   });
 });

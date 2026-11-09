@@ -1,7 +1,7 @@
 ---
 name: dh-execute-plan-task
 description: >
-  Execute a single sub-task from plan.md: select the active one (In Progress phase first), implement (TDD), validate via dh-execute-cli, update status; project-type aware. Use for the next sub-task or continuing work — not orchestration.
+  Execute a single sub-task from plan.md: select the active one (In Progress phase first), resolve its `Delegated to agent`, implement (TDD), validate via dh-execute-cli, update status; project-type aware. Use for the next sub-task or continuing work — not orchestration.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: read, write, edit, bash
@@ -16,11 +16,12 @@ Execute one self-contained sub-task from `./docs/plans/<plan-slug>/plan.md`.
 
 - Read the plan with the `dh_plan_read` tool (`{ slug }` → structured JSON: meta, phases[].title/status, subTasks[].phase/title/status) to find the active sub-task. Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually, following the phased template markers (`## Phases` → `### Phase N: <title>` → `#### Sub-Task N.M: <title>` with `- **Status:**` bullets). If the plan does not exist, stop and report that no plan was found — suggest running the `dh-planning` skill first. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 - Treat the sub-task entry in plan.md as the full implementation brief.
-- **Resolve agents from `## Agent Selection`:** read the plan's selection table and use its implementation and review rows. If the section, or a required role row, is absent (including a `None — no specialized agent required` table) or stale, run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md), record the rows, and continue. A selected agent missing with no capability fallback stops the run — never substitute silently.
-- **ALL sub-task execution is delegated to the plan's selected implementation agent** (the single task executor). There is no complexity- or type-based builder split: simple, standard, complex, and non-software work ALL go to that one agent.
+- **Resolve the sub-task's delegated agent:** read `delegatedTo` from `dh_plan_read` for the active sub-task. It must name an agent recorded in `## Agent Selection`. If the field is missing, empty, or points to an unknown/unavailable agent, STOP and report the gap — never execute the sub-task or substitute an agent silently.
+- **One responsible agent per sub-task:** the `Delegated to agent` value is the single executor for that sub-task. Implementation work normally names the selected implementation agent; documentation or test-only sub-tasks may name the documentation or testing/QA agent. There is no complexity- or type-based builder split.
+- **Review stays separate:** resolve the review agent from `## Agent Selection`; the delegated agent does not review its own work.
 - **Detect project type** before the post-steps: it determines whether `dh-domain-check`, `dh-simplify`, and `dh-create-documentation` run (software projects only) — it does NOT change who implements.
 - For **software projects**: run `dh-domain-check` before complex implementation, `dh-simplify` after validation, and `dh-create-documentation` for new modules/APIs.
-- For **non-software projects**: skip the `dh-simplify`, `dh-domain-check`, and `dh-create-documentation` steps entirely; implementation still goes to the selected implementation agent.
+- For **non-software projects**: skip the `dh-simplify`, `dh-domain-check`, and `dh-create-documentation` steps entirely; implementation still goes to the sub-task's delegated agent.
 - Use the `dh-execute-cli` skill for tests, linters, and builds.
 - Delegate review to the plan's selected review agent for code quality and acceptance criteria checks.
 - Do not modify files outside the sub-task scope.
@@ -40,16 +41,16 @@ Check the project root for software marker files to determine project type. This
 3. If no marker files found → **non-software project** (skip `dh-domain-check`, `dh-simplify`, and `dh-create-documentation`).
 4. If uncertain (e.g., a `Makefile` with no other code), check for source code directories (`src/`, `lib/`, `app/`) as secondary indicators.
 
-Implementation delegation is IDENTICAL for both types: **every sub-task is
-implemented by the plan's selected implementation agent**.
+Delegation is IDENTICAL for both types: **every sub-task is executed by its
+`Delegated to agent`** (normally the selected implementation agent).
 
 > **Why this matters:** Non-software projects (docs repos, config repos, design assets) don't benefit from architecture/engineering agents or code-level simplification. Using the wrong agent type wastes context and produces irrelevant findings.
 
 ## Workflow
 
-### Step 0: Resolve the delegated agents
+### Step 0: Resolve the delegated agent
 
-Read `## Agent Selection` in `plan.md` and take the implementation and review roles from it. If the section — or a required role row — is absent or stale, run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md) (runtime agent list → project config/agent directories → global definitions), record the rows, and continue. If a selected agent is unavailable and no bundled capability covers the role, stop and report the gap.
+Read `## Agent Selection` in `plan.md` and confirm the sub-task's `Delegated to agent` names one of its agents. If the section or the field is absent, empty, or stale, STOP and ask the planner/user to fix the plan — do not run the selection protocol as a substitute for the missing field. If the named agent is unavailable and no bundled capability covers the role, stop and report the gap.
 
 ### Step 1: Select the active sub-task
 
@@ -62,12 +63,13 @@ Read the plan with the `dh_plan_read` tool (`{ slug }`) and find exactly one sub
 
 ### Step 2: Implement the sub-task
 
-Follow the sub-task's instructions, in-scope list, and implementation suggestions. **Every sub-task is delegated to the plan's selected implementation agent**:
+Follow the sub-task's instructions, in-scope list, and implementation suggestions. **The sub-task's `Delegated to agent` is the single responsible executor**:
 
-- Delegate the FULL sub-task brief to the selected implementation agent — for complex work (multi-file, architectural decisions, new modules), run the `dh-domain-check` skill first and include its findings in the delegation.
-- The implementation follows the `dh-coding` skill through the selected implementation agent (test-first TDD; `CODE_RULES.md` at project root when present).
-- **TDD**: the failing test is written first, then the minimal change to make it pass — performed inside the selected implementation agent's pass.
-- Do NOT implement sub-task work directly and do NOT seek another builder: the selected implementation agent is the single task executor for this plan.
+- Delegate the FULL sub-task brief to that agent — for complex work (multi-file, architectural decisions, new modules), run the `dh-domain-check` skill first and include its findings in the delegation. When the project graph is indexed, use `dh-code-query` on the affected symbols (`definition`, `callers`, `importers`, `tests-reaching`) to include impact and test evidence in the brief.
+- Route implementation work through the `dh-coding` skill inside that agent's pass (test-first TDD; `CODE_RULES.md` at project root when present).
+- Route documentation sub-tasks through `dh-create-documentation` and test-only work through the project's testing guidance, still under the named agent.
+- **TDD**: the failing test is written first, then the minimal change to make it pass — performed inside the delegated agent's pass.
+- Do NOT implement sub-task work directly and do NOT seek another builder: the `Delegated to agent` is the only executor for this sub-task.
 
 **General rules:**
 - Stay within the sub-task's in-scope boundaries. Do not widen scope.
@@ -136,15 +138,17 @@ Read the review and address findings:
 
 ## Execution Delegation Guide
 
-**Single executor policy:** every sub-task — software, non-software, simple,
-standard, complex — is implemented by the plan's selected implementation agent.
-There is no builder split.
+**Per-sub-task executor policy:** every sub-task is implemented by its
+`Delegated to agent`. Implementation sub-tasks normally name the plan's
+selected implementation agent; documentation, test-only, and similar
+sub-tasks name the matching selected role. There is no builder split beyond
+that explicit field.
 
 | Work | Delegate to | Post-steps |
 |---|---|---|
-| Software (complex, architectural) | selected implementation agent | `dh-domain-check` first, then `dh-simplify` + `dh-create-documentation` |
-| Software (other) | selected implementation agent | `dh-simplify` after validation |
-| Non-software | selected implementation agent | none (skip `dh-simplify`/`dh-domain-check`/`dh-create-documentation`) |
+| Software (complex, architectural) | sub-task's `Delegated to agent` | `dh-domain-check` first, then `dh-simplify` + `dh-create-documentation` |
+| Software (other) | sub-task's `Delegated to agent` | `dh-simplify` after validation |
+| Non-software | sub-task's `Delegated to agent` | none (skip `dh-simplify`/`dh-domain-check`/`dh-create-documentation`) |
 
 Validation always runs through the `dh-execute-cli` skill; review through the
 plan's selected review agent.

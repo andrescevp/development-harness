@@ -7,7 +7,8 @@
 /** Status every scaffolded phase/sub-task starts with (index rows reuse it). */
 export const INITIAL_PHASE_STATUS = 'Pending' as const;
 
-const SUB_TASK_SKELETON = `- **Status:** ${INITIAL_PHASE_STATUS}
+const SUB_TASK_SKELETON = (delegatedTo: string) => `- **Status:** ${INITIAL_PHASE_STATUS}
+- **Delegated to agent:** ${delegatedTo}
 - **Objective:** [What this sub-task should accomplish]
 - **Related Requirements:** [Requirement IDs]
 - **Dependencies and Preconditions:** [Prerequisites]
@@ -20,10 +21,10 @@ const SUB_TASK_SKELETON = `- **Status:** ${INITIAL_PHASE_STATUS}
 - **Testing Suggestions:** [Validation commands or checks]
 - **Done When:** [Observable completion conditions]`;
 
-function subTaskBlock(phaseNumber: number, subNumber: number, title: string): string {
+function subTaskBlock(phaseNumber: number, subNumber: number, title: string, delegatedTo: string): string {
   return `#### Sub-Task ${phaseNumber}.${subNumber}: ${title}
 
-${SUB_TASK_SKELETON}`;
+${SUB_TASK_SKELETON(delegatedTo)}`;
 }
 
 function phaseBlock(phaseNumber: number, title: string, subTaskBlocks: string[]): string {
@@ -39,7 +40,7 @@ export function planScaffold(input: {
   title: string;
   slug: string;
   objective: string;
-  phases: { title: string; subTasks: { title: string }[] }[];
+  phases: { title: string; subTasks: { title: string; delegatedTo: string }[] }[];
 }): string {
   const today = new Date().toISOString().slice(0, 10);
   const phaseBlocks = input.phases
@@ -47,7 +48,7 @@ export function planScaffold(input: {
       phaseBlock(
         i + 1,
         p.title,
-        p.subTasks.map((s, j) => subTaskBlock(i + 1, j + 1, s.title))
+        p.subTasks.map((s, j) => subTaskBlock(i + 1, j + 1, s.title, s.delegatedTo))
       )
     )
     .join('\n\n');
@@ -98,9 +99,11 @@ None — no structural change.
 
 ## Agent Selection
 
-None — no specialized agent required.
+| Role | Selected agent | Why | Fallback |
+|---|---|---|---|
+| [role] | [agent] | [reason] | [generic fallback] |
 
-> Replace this line with the selection protocol's table (\`| Role | Selected agent | Why | Fallback |\`) when the plan delegates work; keep the table before \`## Phases\`.
+> Every sub-task's \`Delegated to agent\` must match an agent in this table; keep the table before \`## Phases\`.
 
 ## Phases
 

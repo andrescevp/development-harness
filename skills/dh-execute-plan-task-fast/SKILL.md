@@ -1,7 +1,7 @@
 ---
 name: dh-execute-plan-task-fast
 description: >
-  Execute exactly one sub-task from docs/plans/<slug>/plan_fast.md in fast mode: read the fast mirror first, select the active sub-task (In Progress first), record the six per-task skipped-check rows, delegate implementation to the plan's selected implementation agent with TDD, run only a narrow sanity check, and update status in both plans via dh_plan_fast_update_status. Use for the next fast sub-task or continuing fast execution — no per-task review, simplify, code-review, preflight, artifact-check, or domain-check.
+  Execute exactly one sub-task from docs/plans/<slug>/plan_fast.md in fast mode: read the fast mirror first, select the active sub-task (In Progress first), record the six per-task skipped-check rows, delegate to the sub-task's `Delegated to agent` with TDD, run only a narrow sanity check, and update status in both plans via dh_plan_fast_update_status. Use for the next fast sub-task or continuing fast execution — no per-task review, simplify, code-review, preflight, artifact-check, or domain-check.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: read, write, edit, bash
@@ -32,16 +32,16 @@ and records status.
   as the full implementation brief (objective, requirements, in/out of scope,
   instructions, acceptance criteria, cautionary points, testing suggestions,
   done-when).
-- **Agent selection comes from `plan.md`.** The mirror intentionally omits
-  `## Agent Selection`; resolve the implementation role from the source plan's
-  table, or run
-  [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md)
-  when it is absent, incomplete, or stale. A selected agent that is unavailable
-  and has no bundled capability fallback stops the run.
-- **ALL implementation is delegated to the plan's selected implementation
-  agent** (the single task executor). There is no complexity- or type-based
-  builder split: simple, standard, complex, and non-software work all go to
-  that one agent.
+- **Agent selection comes from the sub-task's `Delegated to agent`.** The
+  mirror copies the phases region, so the active sub-task carries the field;
+  confirm it against the source plan's `## Agent Selection` table. If the field
+  is missing, empty, or names an unknown/unavailable agent, **stop** and report
+  the gap — do not run the selection protocol as a substitute and never
+  substitute an agent silently.
+- **One responsible agent per sub-task:** the `Delegated to agent` value is the
+  single executor. Implementation work normally names the selected
+  implementation agent; documentation or test-only sub-tasks may name the
+  matching selected role. There is no complexity- or type-based builder split.
 - **Detect project type once** from the full marker list used by
   `dh-execute-plan-task`: `package.json`, `pyproject.toml`, `Cargo.toml`,
   `composer.json`, `go.mod`, `CMakeLists.txt`, `setup.py`, `setup.cfg`,
@@ -51,8 +51,6 @@ and records status.
   implements and adds no gates here.
 - **No per-task gates.** Do not run `dh-review`, `dh-simplify`,
   `dh-code-review`, `dh-preflight`, `dh-artifact-check`, or `dh-domain-check`.
-  Keep the smallest relevant validation (tests/lint for the changed files)
-  through the `dh-execute-cli` skill; it is a sanity check, not a review gate.
 - **Skip-check ledger:** after selecting the sub-task, append its six per-task
   rows with `dh_plan_fast_skip_check` (one call, `checks: [...]`, scope
   `Sub-Task N.M`, reason `fast mode defers per-task verification`).
@@ -85,8 +83,9 @@ and records status.
 2. Confirm `./docs/plans/<plan-slug>/plan.md` exists. Missing → stop and
    suggest `dh-planning`; a mirror without its source plan is not executable.
 3. Read the matching sub-task in `plan.md` and confirm both plans parse and
-   agree on its ID, title, requirements, and scope. A mismatch is an alignment
-   blocker: stop and send the caller back to `dh-execute-plan-fast` Step 4.
+   agree on its ID, title, requirements, scope, and `Delegated to agent`. A
+   mismatch is an alignment blocker: stop and send the caller back to
+   `dh-execute-plan-fast` Step 4.
 
 ### Step 2: Select the active sub-task and record skipped checks
 
@@ -111,18 +110,21 @@ Use the phase-aware priority on `plan_fast.md`:
    dispositions from the Core Rule. Missing ledger → stop; the orchestrator
    recreates it before any work.
 
-### Step 3: Implement through the selected implementation agent
+### Step 3: Implement through the delegated agent
 
-- Delegate the full sub-task brief from `plan_fast.md` to the plan's selected
-  implementation agent (resolved from `plan.md`'s `## Agent Selection`, or via
-  the selection protocol); include the project type and `CODE_RULES.md`
-  guidance when present.
+- Take the active sub-task's `Delegated to agent` from `plan_fast.md` and
+  confirm the same agent in `plan.md`'s `## Agent Selection`. Delegate the full
+  sub-task brief to that agent; include the project type and `CODE_RULES.md`
+  guidance when present. When the project graph is indexed, use `dh-code-query`
+  (`definition`, `callers`, `importers`, `tests-reaching`) to add impact and
+  test evidence to the brief.
 - The implementation follows the `dh-coding` skill inside that pass (failing
-  test first, then the minimal change; TDD).
+  test first, then the minimal change; TDD). Route documentation sub-tasks
+  through `dh-create-documentation` under the named agent.
 - Stay within the sub-task's in-scope boundaries. Do not widen scope, add
   sub-tasks, or refactor unrelated code.
 - Do not implement the work yourself and do not seek another builder: the
-  selected implementation agent is the only executor for this plan.
+  sub-task's `Delegated to agent` is the only executor for that sub-task.
 - Use the `dh-execute-cli` skill to run only the smallest relevant validation for the
   changed files (targeted tests, linters, type checks). Do **not** run the full
   preflight or artifact checks.
@@ -157,13 +159,15 @@ confirmation. Then either:
 
 ## Execution Delegation Guide
 
-**Single executor policy:** every sub-task — software, non-software, simple,
-standard, complex — is implemented by the plan's selected implementation agent.
+**Per-sub-task executor policy:** every sub-task is implemented by its
+`Delegated to agent`; implementation sub-tasks normally name the selected
+implementation agent, while documentation/test-only sub-tasks name the matching
+selected role.
 
 | Work | Delegate to | Per-task post-steps |
 |---|---|---|
-| Software (any complexity) | selected implementation agent | Narrow validation via the `dh-execute-cli` skill only |
-| Non-software | selected implementation agent | Narrow validation via the `dh-execute-cli` skill only |
+| Software (any complexity) | sub-task's `Delegated to agent` | Narrow validation via the `dh-execute-cli` skill only |
+| Non-software | sub-task's `Delegated to agent` | Narrow validation via the `dh-execute-cli` skill only |
 
 No per-task `dh-domain-check`, `dh-simplify`, `dh-create-documentation`,
 `dh-review`, or `dh-code-review` runs here. `dh-domain-check` is deferred to
@@ -209,8 +213,8 @@ never skip a deferred gate.
 - [`../dh-execute-plan-fast/references/plan-fast-template.md`](../dh-execute-plan-fast/references/plan-fast-template.md): the `plan_fast.md` contract.
 - [`../dh-execute-plan-fast/references/plan-fast-skip-checks.md`](../dh-execute-plan-fast/references/plan-fast-skip-checks.md): the ledger contract and manual fallback.
 - Fast tools: `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_skip_check`.
-- [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): capability→agent resolution for the implementation role.
-- `dh-coding` skill: TDD and `CODE_RULES.md` enforcement used by the selected implementation agent.
+- [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): capability→agent resolution used to populate `## Agent Selection` and each sub-task's `Delegated to agent`.
+- `dh-coding` skill: TDD and `CODE_RULES.md` enforcement used by the sub-task's delegated agent.
 
 ## Doc search
 
