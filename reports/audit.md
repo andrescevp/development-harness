@@ -1,22 +1,22 @@
 # Audit Report — dev-harness-skills plugin
 
-Generated 2026-11-09T12:34:49.873Z by `scripts/audit.mjs`.
+Generated 2026-11-09T23:41:41.760Z by `scripts/audit.mjs`.
 
 ## Verdict
 
-**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 264. Documented schema deviations: 0.
+**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 267. Documented schema deviations: 0.
 
 ## Summary verdict table
 
 | Dimension | Count | Status | Notes |
 |---|---|---|---|
-| Inventory & structure | 30 | PASS | 5 agents, 25 skill dirs + index.md; no commands/, no prompts/ |
-| Frontmatter parse | 31 | PASS | 31 files on audit surface |
-| Name regex | 30 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
+| Inventory & structure | 31 | PASS | 5 agents, 26 skill dirs + index.md; no commands/, no prompts/ |
+| Frontmatter parse | 32 | PASS | 32 files on audit surface |
+| Name regex | 31 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 1 | WARN | 493 resolved; 0 code-context; 0 allowlisted; 258 prose tokens (warn) |
-| Loop membership | 30 | PASS | 25/25 skills present; 5/5 agents present |
-| Secret scan | 45 | PASS | 45 low-signature prose hits (instructional), 0 high-signature |
+| Cross-references | 1 | WARN | 501 resolved; 0 code-context; 0 allowlisted; 261 prose tokens (warn) |
+| Loop membership | 31 | PASS | 26/26 skills present; 5/5 agents present |
+| Secret scan | 47 | PASS | 47 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
 
 ## Deviations (warn, per file)
@@ -44,6 +44,7 @@ _None._
 | skill | dh-code-query | present |
 | skill | dh-contingency | present |
 | skill | dh-create-documentation | present |
+| skill | dh-create-worktree | present |
 | skill | dh-domain-check | present |
 | skill | dh-execute-cli | present |
 | skill | dh-execute-plan | present |
@@ -104,7 +105,7 @@ Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; f
 
 ## Secret scan
 
-- Low-signature prose hits (instructional): **45** (env-var names, max_tokens, "never expose" rules).
+- Low-signature prose hits (instructional): **47** (env-var names, max_tokens, "never expose" rules).
 - High-signature matches: **0** _none_.
 
 ## Junk scan

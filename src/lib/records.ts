@@ -97,14 +97,14 @@ export function buildAgentRecord(parsed: ParsedDocument, file = '<agent>'): Agen
   const { data, body } = parsed;
   const name = requireString(data, 'name', file);
   const description = requireString(data, 'description', file);
-  const modeRaw = data['mode'];
+  const modeRaw = data.mode;
   const mode: AgentMode = modeRaw === undefined ? 'subagent' : (modeRaw as AgentMode);
   if (!MODES.includes(mode)) throw new Error(`${file}: invalid mode '${String(modeRaw)}'`);
 
-  const variant = typeof data['variant'] === 'string' ? (data['variant'] as string) : undefined;
+  const variant = typeof data.variant === 'string' ? (data.variant as string) : undefined;
   let providerId: string | undefined;
   let modelId: string | undefined;
-  const model = data['model'];
+  const model = data.model;
   if (model !== undefined) {
     if (typeof model !== 'string') throw new Error(`${file}: 'model' must be a string`);
     const slash = model.lastIndexOf('/');
@@ -115,8 +115,8 @@ export function buildAgentRecord(parsed: ParsedDocument, file = '<agent>'): Agen
     }
   }
 
-  const tools = isRecord(data['tools']) ? (data['tools'] as Record<string, boolean>) : undefined;
-  const permission = isRecord(data['permission']) ? data['permission'] : undefined;
+  const tools = isRecord(data.tools) ? (data.tools as Record<string, boolean>) : undefined;
+  const permission = isRecord(data.permission) ? data.permission : undefined;
 
   return {
     name,

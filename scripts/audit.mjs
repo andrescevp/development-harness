@@ -102,7 +102,7 @@ function auditFile(rel) {
           if (fields[f] === undefined)
             add(rec, 'frontmatter', 'warn', `agent missing '${f}' (plugin registration impact)`);
       // M3 mandate: bundled agents must NOT carry the `permission` frontmatter key.
-      if (kind === 'agent' && fields['permission'] !== undefined)
+      if (kind === 'agent' && fields.permission !== undefined)
         add(rec, 'frontmatter', 'fail', 'permission key present (M3: strip from bundled agents)');
     }
     if ((kind === 'skill' || kind === 'agent') && fields.name !== undefined) {

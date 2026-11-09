@@ -130,6 +130,11 @@ project-scope local MCP server; wire it once (idempotent, consent first):
   Details: [docs/LOADING.md](https://github.com/andrescevp/development-harness/blob/main/docs/LOADING.md#mcp-server-dh).
 **5. Code knowledge graph (`code-graph-rag` / `cgr`)** — install at user level and index the project; **SQLite backend only**. Follow [references/code-graph-rag.md](references/code-graph-rag.md) for language extras, install/upgrade, verification, indexing, exclusions, destructive operations, LLM configuration, and the optional read-only MCP server. Query the graph through the `dh-code-query` skill.
 
+**6. Worktree lifecycle (`WORKTREE_LIFECYCLE.md`)** — with consent, create or update
+`{project_root}/WORKTREE_LIFECYCLE.md` for `dh-create-worktree`; this skill is its only
+generator (never overwrite without review). Interview, template, and validation:
+[references/worktree-lifecycle.md](references/worktree-lifecycle.md).
+
 ## Step 4: Architecture Documentation
 
 Make sure the project has a **central architecture documentation directory**

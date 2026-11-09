@@ -37,9 +37,9 @@ const AGENT_FILES = listMd('agents');
 const SKILL_FILES = listSkillMd();
 
 describe('corpus parsing (real bundled set)', () => {
-  it('finds the harness corpus on disk (5 agents + 25 skills)', () => {
+  it('finds the harness corpus on disk (5 agents + 26 skills)', () => {
     expect(AGENT_FILES).toHaveLength(5);
-    expect(SKILL_FILES).toHaveLength(25);
+    expect(SKILL_FILES).toHaveLength(26);
   });
 
   it.each([...AGENT_FILES.map((f) => ['agent', f] as const), ...SKILL_FILES.map((f) => ['skill', f] as const)])(
@@ -59,7 +59,7 @@ describe('corpus parsing (real bundled set)', () => {
     for (const file of AGENT_FILES) names.push(parseFrontmatter(fs.readFileSync(file, 'utf8')).data.name as string);
     for (const file of SKILL_FILES) names.push(parseFrontmatter(fs.readFileSync(file, 'utf8')).data.name as string);
     for (const n of names) expect(n).toMatch(NAME_REGEX);
-    expect(new Set(names)).toHaveLength(30); // corpus: 5 agents, 25 skills, no duplicates
+    expect(new Set(names)).toHaveLength(31); // corpus: 5 agents, 26 skills, no duplicates
   });
 
   it('the coding skill is present and parses', () => {
@@ -76,8 +76,8 @@ describe('corpus parsing (real bundled set)', () => {
     // frontmatter keys — they register with no static tool rules.
     for (const file of AGENT_FILES) {
       const { data } = parseFrontmatter(fs.readFileSync(file, 'utf8'));
-      expect(data['permission'], file).toBeUndefined();
-      expect(data['tools'], file).toBeUndefined();
+      expect(data.permission, file).toBeUndefined();
+      expect(data.tools, file).toBeUndefined();
     }
   });
 });

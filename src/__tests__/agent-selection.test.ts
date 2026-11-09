@@ -4,7 +4,7 @@
  *   - no hardcoded `@dh-` agent references anywhere in the bundled corpus;
  *   - the utility agents are gone and their skills exist and parse;
  *   - the selection protocol, plan section, and fast omitted lists agree;
- *   - the inventory is 5 agents / 25 skills;
+ *   - the inventory is 5 agents / 26 skills;
  *   - the active docs list both utility skills.
  *
  * These are structural assertions over the real repo corpus — no prose
@@ -121,17 +121,17 @@ describe('agent-selection protocol', () => {
 });
 
 describe('bundle inventory', () => {
-  it('bundles 5 agents and 25 skills with a 30-name unique corpus', () => {
+  it('bundles 5 agents and 26 skills with a 31-name unique corpus', () => {
     const agents = walkFiles('agents').filter((file) => file.endsWith('.md'));
     const skills = skillNames();
     expect(agents).toHaveLength(5);
-    expect(skills).toHaveLength(25);
+    expect(skills).toHaveLength(26);
 
     const names = [
       ...agents.map((file) => parseFrontmatter(read(file)).data.name),
       ...skills.map((name) => parseFrontmatter(read(`skills/${name}/SKILL.md`)).data.name),
     ];
-    expect(new Set(names).size).toBe(30);
+    expect(new Set(names).size).toBe(31);
   });
 });
 

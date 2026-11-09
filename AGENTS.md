@@ -9,12 +9,12 @@ runtime delegation routing.
 The `dev-harness-skills` OpenCode V2 plugin bundles a self-contained dev harness for
 plan-driven development: **5 agents** — `dh-software-architect`,
 `dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-documentor` —
-and **25 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
+and **26 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
 `dh-execute-plan-fast`, `dh-execute-plan-task`, `dh-execute-plan-task-fast`,
 `dh-pause-plan`, `dh-resume-plan`, `dh-coding`, `dh-execute-cli`, `dh-explore`,
 `dh-code-query`, `dh-contingency`, `dh-simplify`,
 `dh-review`, `dh-code-review`, `dh-preflight`, `dh-artifact-check`,
-`dh-final-review`, `dh-create-documentation`, `dh-mermaid`, `dh-grill-sdd`, `dh-setup`,
+`dh-final-review`, `dh-create-documentation`, `dh-create-worktree`, `dh-mermaid`, `dh-grill-sdd`, `dh-setup`,
 `dh-code-ruler`, `dh-semver`. The plugin registers
 agents and skills only; the harness tools are served by the shipped
 `dev-harness-mcp` MCP server (no tools, commands, or prompts are registered).
@@ -121,14 +121,14 @@ skills.
   owned by this repository — the repo is self-contained and independent
   (no external source, no extraction step).
 - OpenCode-only — no copilot/gemini variants.
-- Exactly **5 agents + 25 skills** are bundled. Commands, prompts, and all
+- Exactly **5 agents + 26 skills** are bundled. Commands, prompts, and all
   other non-bundled harness content are intentionally NOT bundled.
 - The `dh-` names are canonical in the repo files; bundled agents ship
   without the `permission` and `tools` frontmatter keys.
 
 ## Plugin registration and loading
 
-- The V2 plugin (`Plugin.define`) registers the 5 agents and 25 skills via
+- The V2 plugin (`Plugin.define`) registers the 5 agents and 26 skills via
   synchronous domain transforms (`ctx.agent.transform`, `ctx.skill.transform`)
   from frontmatter-parsed assets (repo `agents/` + `skills/` in source mode,
   `dist/assets/` in the bundle). Zero tool or command transforms (tools live
@@ -142,7 +142,7 @@ skills.
   `opencode.json(c)` pointing at the repo directory (`pnpm install` only; no
   build needed for source loading), or the installed package name. See
   [`docs/LOADING.md`](docs/LOADING.md).
-- **Verify:** launch opencode and confirm the 5 agents and 25 skills appear
+- **Verify:** launch opencode and confirm the 5 agents and 26 skills appear
   (including `dh-coding`) and no commands are registered; then confirm the
   project-scope `dh` MCP server is connected (`opencode mcp list`) so the
   harness tools are available.
@@ -152,7 +152,7 @@ skills.
 ```text
 index.ts          source-mode plugin entry (re-exports src/plugin.ts)
 agents/           bundled agent definitions (5)
-skills/           bundled skills (25)
+skills/           bundled skills (26)
 src/cli/          installer CLI: args, scope, prompt/output, JSONC, config, manifest, commands
 src/mcp/          stdio MCP server + workspace resolver
 src/tools/        plan/sheet/logged-command tool implementations
