@@ -5,7 +5,7 @@
  * installs that already built skip (keeping `pnpm install` fast).
  *
  * Completion is the `dist/.build-ok` sentinel written as the FINAL step of
- * copy-assets (last step of both build variants) — a partial build (tsup
+ * copy-assets (last step of both build variants) — a partial build (tsdown
  * emitted, tsc/copy-assets failed) or a zero-byte artifact never counts.
  * `npm` is used deliberately: the install context may lack pnpm.
  *
@@ -13,7 +13,7 @@
  * machine-parseable.
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -38,24 +38,26 @@ if (isComplete()) {
   process.exit(0);
 }
 
-// Production installs (`--omit=dev`) carry no tsup; packaged consumers get
+// Production installs (`--omit=dev`) carry no tsdown; packaged consumers get
 // dist from the tarball, so a missing toolchain is a skip, not a failure.
 const require = createRequire(import.meta.url);
-let tsupManifest;
+let tsdownManifest;
 try {
-  tsupManifest = require.resolve('tsup/package.json');
+  tsdownManifest = require.resolve('tsdown/package.json');
 } catch {
   console.error('[prepare] build tooling not installed (dev dependencies omitted) — skipping build');
   process.exit(0);
 }
 
-// Run tsup/copy-assets directly instead of `npm run`: OpenCode's bundled npm
+// Run tsdown/copy-assets directly instead of `npm run`: OpenCode's bundled npm
 // invokes prepare with a restricted PATH, and shelling out to `npm` there fails
 // even though plain npm/git installs work. Direct node execution is portable.
-const tsupBin = join(dirname(tsupManifest), JSON.parse(readFileSync(tsupManifest, 'utf8')).bin.tsup);
-console.error('[prepare] dist missing — running tsup + copy-assets');
+const tsdownBin = join(dirname(tsdownManifest), JSON.parse(readFileSync(tsdownManifest, 'utf8')).bin.tsdown);
+console.error('[prepare] dist missing — running tsdown + copy-assets');
+// tsdown configs disable in-build cleaning (concurrent single-entry builds).
+rmSync(join(root, 'dist'), { recursive: true, force: true });
 try {
-  execFileSync(process.execPath, [tsupBin], { cwd: root, stdio: ['ignore', 2, 2] });
+  execFileSync(process.execPath, [tsdownBin], { cwd: root, stdio: ['ignore', 2, 2] });
   execFileSync(process.execPath, [join(root, 'scripts', 'copy-assets.mjs')], {
     cwd: root,
     stdio: ['ignore', 2, 2],

@@ -1,6 +1,7 @@
 # pnpm 11 workspace/settings file — build-script approval for deps that need
-# a postinstall step (esbuild platform binary check via tsup; msgpackr-extract
-# optional native accelerator used by vitest; duckdb native binding).
+# a postinstall step (esbuild platform binary check via vite/vitest;
+# msgpackr-extract optional native accelerator used by vitest; duckdb native
+# binding).
 onlyBuiltDependencies:
   - esbuild
   - msgpackr-extract
@@ -15,3 +16,9 @@ overrides:
   "tar@<7": "^7.5.22"
   "http-cache-semantics@<4.3.0": "^4.3.0"
   "source-map-js@<1.2.2": "^1.2.2"
+  "zod@<4.6.6": "^4.6.6"
+  "undici@>=6.0.0 <6.29.1": "^6.29.1"
+  "undici@>=8.0.0 <8.12.2": "^8.12.2"
+  "glob@>=10.0.0 <14.0.2": "^14.0.2"
+  "minimatch@>=9.0.0 <11.0.1": "^11.0.1"
+  "ip-address@<10.7.4": "^10.7.4"

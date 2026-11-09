@@ -140,13 +140,16 @@ Manage with `opencode plugin list` / `opencode plugin update` / `opencode plugin
   (re-exporting `src/plugin.ts`) keeps loading from source with no build.
   Keep it when cloning the repo into a `plugins/` folder.
 - **Pack lifecycle** — `npm pack`/`npm publish` runs `prepack`
-  (`npm run build 1>&2`: tsup bundle + `dist/plugin.d.ts` declarations +
+  (`npm run build 1>&2`: tsdown bundle + `dist/plugin.d.ts` declarations +
   assets; build output goes to stderr so `npm pack --json` stays parseable)
   and then `prepare` (`scripts/prepare.mjs`), which detects the
   `dist/.build-ok` sentinel and skips — one build per pack. Git installs run
   only `prepare`, which builds the runtime bundle (`build:runtime`) when
   `dist` is absent. No Docker or network QA gate runs in either hook; run
   `pnpm qa:check:full` manually before publishing.
+  **Build-time Node:** the tsdown toolchain requires Node
+  `^22.18.0 || ^24.11.0 || >=26`; the published tarball still runs on Node
+  `>=20.11`.
 
 ## Alternative: explicit config entry
 

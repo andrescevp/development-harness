@@ -4,7 +4,7 @@
  * from the ~/.config/opencode/plugins directory (documented limitation),
  * so the bundle must not evaluate any bare specifier during module load.
  *
- * Strategy: @opencode/plugin and yaml are bundled in by tsup; duckdb is a
+ * Strategy: @opencode/plugin and yaml are bundled in by tsdown; duckdb is a
  * lazy require() inside sheet-tools (only evaluated when a sheet tool runs).
  * This test loads dist/plugin.js from an isolated directory with NO
  * node_modules and asserts the module evaluates (builtins + relative paths
