@@ -5,6 +5,24 @@ All notable changes to this project are documented here. The format follows
 Semantic Versioning. During the 0.x line, breaking changes bump the minor
 version.
 
+## [0.5.1] — 2026-11-09
+
+### Changed
+
+- Build tooling migrated from tsup to tsdown (Rolldown): the three ESM
+  artifacts keep the same names and self-containment (bundled
+  `@opencode/plugin`, `yaml`, `jsonc-parser`; external `duckdb` and MCP SDK),
+  declarations stay on `tsc --emitDeclarationOnly`, and each entry is built as
+  a single self-contained file. Source/Git builds now require Node
+  `^22.18.0 || ^24.11.0 || >=26`.
+
+### Security
+
+- Refresh OSV-flagged dependencies with pnpm overrides: `undici` ≥ 6.29.1 /
+  8.12.2, `zod` ≥ 4.6.6 (now also the direct dependency floor), `glob` ≥
+  14.0.2, `minimatch` ≥ 11.0.1, and `ip-address` ≥ 10.7.4. `scan:deps` is
+  green again.
+
 ## [0.5.0] — 2026-11-08
 
 First release of the standalone OpenCode V2 harness.
@@ -63,4 +81,5 @@ First release of the standalone OpenCode V2 harness.
 - Plan close-outs include the pause/resume, fast-plan, Mermaid, and
   agent-selection plans with evolution/observation notes.
 
+[0.5.1]: https://github.com/andrescevp/development-harness/releases/tag/v0.5.1
 [0.5.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.5.0

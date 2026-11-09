@@ -24,3 +24,6 @@ report/
 
 # Atomic-write crash residue (temp files beside plan files)
 docs/plans/**/*.tmp
+
+# Managed OpenCode plugin installs (dev-harness installer)
+.opencode/plugins/dev-harness-skills/

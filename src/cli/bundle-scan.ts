@@ -8,8 +8,8 @@
  */
 import { builtinModules } from 'node:module';
 
-// tsup emits bare builtin specifiers (`import fs from "fs"`), which Node always
-// resolves as builtins and never from a package; accept those alongside node:.
+// Bundlers may emit bare builtin specifiers (`import fs from "fs"`), which Node
+// always resolves as builtins and never from a package; accept those too.
 const NODE_BUILTINS = new Set(builtinModules);
 
 interface ScanToken {

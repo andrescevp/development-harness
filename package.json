@@ -1,6 +1,6 @@
 {
   "name": "dev-harness-skills",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "type": "module",
   "description": "OpenCode V2 plugin with an opinionated development harness based in plan execution loop architecture",
   "main": "./dist/plugin.js",
@@ -26,8 +26,9 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsup && tsc --emitDeclarationOnly && npm run copy-assets",
-    "build:runtime": "tsup && npm run copy-assets",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "npm run clean && tsdown && tsc --emitDeclarationOnly && npm run copy-assets",
+    "build:runtime": "npm run clean && tsdown && npm run copy-assets",
     "copy-assets": "node scripts/copy-assets.mjs",
     "prepack": "npm run build 1>&2",
     "prepare": "node scripts/prepare.mjs",
@@ -61,7 +62,7 @@
     "duckdb": "^1.4.4",
     "jsonc-parser": "^3.3.1",
     "yaml": "^2.9.1",
-    "zod": "^4.6.5"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.14",
@@ -70,7 +71,7 @@
     "dependency-cruiser": "^18.4.0",
     "jscpd": "^5.3.2",
     "knip": "^6.38.0",
-    "tsup": "^8.5.1",
+    "tsdown": "^0.23.7",
     "typescript": "^6.0.3",
     "vite": "8.3.3",
     "vitest": "^5.0.3"
