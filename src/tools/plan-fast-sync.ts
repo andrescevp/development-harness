@@ -48,7 +48,12 @@ function sameStructure(fast: PlanDocument, plan: PlanDocument): boolean {
     if (fastPhase.subTasks.length !== planPhase.subTasks.length) return false;
     return planPhase.subTasks.every((planSub, j) => {
       const fastSub = fastPhase.subTasks[j];
-      return Boolean(fastSub && fastSub.index === planSub.index && fastSub.title === planSub.title);
+      return Boolean(
+        fastSub &&
+          fastSub.index === planSub.index &&
+          fastSub.title === planSub.title &&
+          fastSub.delegatedTo === planSub.delegatedTo
+      );
     });
   });
 }

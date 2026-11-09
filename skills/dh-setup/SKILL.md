@@ -31,6 +31,7 @@ where they differ) and re-verify.
 | jq | yes | `jq --version` | https://jqlang.org/ — distro package or `brew install jq` |
 | xq | yes | `xq --version` | https://github.com/sibprogrammer/xq — `go install github.com/sibprogrammer/xq/cmd/xq@latest` or `brew install sibprogrammer/xq` |
 | yq | yes | `yq --version` | https://github.com/mikefarah/yq — `brew install yq` or download binary |
+| code-graph-rag (`cgr`) | yes | `cgr --version` | `uv tool install --compile-bytecode "code-graph-rag[treesitter-full]"` — extras per detected languages, SQLite backend only; see [references/code-graph-rag.md](references/code-graph-rag.md) |
 | obsidian | optional | `command -v obsidian` (app + best-effort CLI) | https://obsidian.md — recommended when the project vault flow (dh-create-documentation) should sync live |
 | notesmd-cli | optional | `notesmd --version` / `command -v notesmd` | https://github.com/Yakitrak/notesmd-cli — `yay -S notesmd-cli-bin` (Arch) / `brew install yakitrak/yakitrak/notesmd-cli` / release binary; used by dh-create-documentation for vault operations without Obsidian running |
 | duckdb (CLI, optional) | optional | `duckdb --version` | https://duckdb.org — native CLI alternative to the `dh` MCP server's sheet tools (dh_read_sheet/dh_update_sheet use the duckdb npm package) |
@@ -127,6 +128,7 @@ project-scope local MCP server; wire it once (idempotent, consent first):
 - Cold first npx install (~20–25 s) is covered by the canonical
   `"timeout": { "startup": 300000 }`; offline/local fallback: `["node", "<clone>/dist/mcp/stdio.js"]` (needs `pnpm build`).
   Details: [docs/LOADING.md](https://github.com/andrescevp/development-harness/blob/main/docs/LOADING.md#mcp-server-dh).
+**5. Code knowledge graph (`code-graph-rag` / `cgr`)** — install at user level and index the project; **SQLite backend only**. Follow [references/code-graph-rag.md](references/code-graph-rag.md) for language extras, install/upgrade, verification, indexing, exclusions, destructive operations, LLM configuration, and the optional read-only MCP server. Query the graph through the `dh-code-query` skill.
 
 ## Step 4: Architecture Documentation
 
@@ -201,20 +203,25 @@ This project is managed with the dev-harness plugin (dev-harness-skills):
   available. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 - **Loop:** plan with `dh-planning` (SDD first via `dh-grill-sdd` when
   absent), execute with `dh-execute-plan` → `dh-execute-plan-task`
-  (delegating implementation to the plan's selected implementation agent),
+  (delegating each sub-task to its `Delegated to agent`),
   simplify with `dh-simplify`, review with `dh-review` + `dh-code-review`,
   gate with `dh-preflight` + `dh-artifact-check`, sign off with
   `dh-final-review`, document with `dh-create-documentation`.
 - **Delegation (capability-based):** roles resolve via
   `skills/dh-planning/references/agent-selection.md` and are recorded in the
-  plan's `## Agent Selection` — implementation → selected implementation
-  agent; architecture → selected architecture agent; validation →
-  `dh-execute-cli`; review → selected review agent; final sign-off → selected
-  final-review agent; exploration → `dh-explore`; generated docs (outside
-  docs/plans) → selected documentation agent (bundled capability as fallback).
+  plan's `## Agent Selection`; every sub-task records its responsible agent in
+  `Delegated to agent` — implementation → selected implementation agent;
+  architecture → selected architecture agent; validation → `dh-execute-cli`;
+  review → selected review agent; final sign-off → selected final-review agent;
+  exploration → `dh-explore`; code graph → `dh-code-query`; generated docs
+  (outside docs/plans) → selected documentation agent (bundled capability as
+  fallback).
 - **Blockers halt automation:** 3 consecutive validation failures or
   unresolved P0/P1 review findings stop the loop — report and ask for
   guidance; never mark a phase Completed around a blocker.
+- **Code graph:** `dh-setup` installs and indexes code-graph-rag with SQLite;
+  query it with `dh-code-query`, sync before trusting structural answers, and
+  verify candidates in the source.
 - **Architecture docs:** maintained under `docs/architecture/` (see the
   index there); refresh via the selected architecture agent.
 ```
@@ -224,6 +231,7 @@ This project is managed with the dev-harness plugin (dev-harness-skills):
 - [ ] Step 1: every required system tool present with version (phpenv optional)
 - [ ] Step 2: user-level MCPs/plugins verified and enabled per user decision
 - [ ] Step 3: hooks installed with documented rules; QA toolset wired and gate green; `dh` server wired/already wired **or explicitly skipped by the user**; prewarm **attempted** (cold start noted on timeout); `opencode mcp list` shows `dh` connected when wired
+- [ ] Step 3.5: code graph installed and indexed with SQLite (`cgr status`, `cgr stats`) **or explicitly skipped by the user**
 - [ ] Step 4: architecture artifacts explored + interview answers recorded (if files exist); `docs/architecture/` created; docs created via the selected architecture agent when absent; index present
 - [ ] Step 5: project AGENTS.md has the harness directives section (updated, not duplicated)
 - [ ] Report produced: per-tool status table + any blockers with exact commands

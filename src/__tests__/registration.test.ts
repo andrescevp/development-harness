@@ -1,7 +1,7 @@
 /**
  * registration.test.ts — integration-style check: run the REAL plugin setup
  * against a stub ctx and assert the hard cut (Sub-Task 3.1): the plugin
- * registers 5 agents and 24 skills ONLY. Tools live in the `dh` MCP server,
+ * registers 5 agents and 25 skills ONLY. Tools live in the `dh` MCP server,
  * so ANY tool-domain access throws (same guard style as the command domain);
  * the guards themselves are meta-tested below.
  *
@@ -68,7 +68,7 @@ describe('plugin setup registration (built bundle)', () => {
     expect(fs.existsSync(DIST_PLUGIN)).toBe(true);
   });
 
-  it('registers the 5 bundled agents and 24 skills only (hard cut)', async () => {
+  it('registers the 5 bundled agents and 25 skills only (hard cut)', async () => {
     const { default: plugin } = (await import(DIST_PLUGIN)) as {
       default: { id: string; setup: (ctx: ReturnType<typeof createStubContext>['ctx']) => Promise<void> };
     };
@@ -88,7 +88,7 @@ describe('plugin setup registration (built bundle)', () => {
       .sort();
 
     expect(agents).toHaveLength(5);
-    expect(skills).toHaveLength(24);
+    expect(skills).toHaveLength(25);
     expect(toolTouches()).toBe(0);
   });
 });

@@ -191,7 +191,7 @@ function checkAssets(prefix, source, check) {
     .map((entry) => entry.name)
     .sort();
   check('installed dist/assets has 5 agents', agents.length === 5, String(agents.length));
-  check('installed dist/assets has 24 skills', skills.length === 24, String(skills.length));
+  check('installed dist/assets has 25 skills', skills.length === 25, String(skills.length));
   check('installed dist/assets has skills/index.md', fs.existsSync(path.join(assets, 'skills', 'index.md')));
   check(
     'installed agent/skill inventory matches source',

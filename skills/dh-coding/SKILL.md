@@ -16,7 +16,8 @@ Apply test-first TDD and clean code best practices when implementing or fixing c
 
 - **Test-first, always:** write a failing test before any implementation; then implement the minimal change that makes it pass; then refactor. Repeat the red → green → refactor loop until the change is complete.
 - **Rules precedence:** code rules are always project-level — `CODE_RULES.md` at the project root is the only rule source; when absent, analyze the code and CREATE it before implementing (see Resolution Order); kept updated via `dh-create-documentation`. No dependency on global guideline files.
-- **Project type aware:** detect software vs non-software before choosing how to implement and which builder agent to delegate to.
+- **Project type aware:** detect software vs non-software before choosing how to implement and which responsible agent to delegate to.
+- **Code graph context (when indexed):** use the `dh-code-query` skill before editing to resolve the target symbol, its callers/callees, importers, implementors, and the tests that reach it. Use the graph to bound the change and pick tests; verify every candidate in the source before acting. Skip it when the project is not indexed or the graph is stale.
 - **Validation through `dh-execute-cli`:** never run bash, tests, or builds directly — use the `dh-execute-cli` skill and act on its summarized output.
 - **Tight scope:** change only what the active sub-task requires; do not add extra features, abstractions, or refactors beyond the task.
 - **Stop on repeated failure:** if validation fails 3 consecutive times, stop and report the failure with full error output — do not loop indefinitely or proceed to review.
@@ -63,8 +64,8 @@ Detect the project type before delegating or implementing. Check the project roo
 
 - **Software project markers** (any present at the project root): `package.json`, `pyproject.toml`, `Cargo.toml`, `composer.json`, `go.mod`, `CMakeLists.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `pubspec.yaml`, `build.gradle`, `*.csproj`, `*.sln`, and similar language build files.
 - **Language/toolkit detection:** infer the stack and its tooling from the marker — for example `package.json` → npm/pnpm/bun, `pyproject.toml` → uv/poetry/pip, `Cargo.toml` → cargo, `composer.json` → composer. Use the project's own tooling and lockfiles; do not introduce a different package manager or toolchain.
-- **Software projects:** delegate ALL implementation to the plan's selected implementation agent (the single task executor, resolved via `## Agent Selection` or [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md)); run validation through the `dh-execute-cli` skill. When invoked from the skills loop, `dh-domain-check` runs before complex implementation and `dh-simplify` runs after validation.
-- **Non-software projects** (docs, config, design assets — no marker files): delegate implementation to the selected implementation agent as well; skip the `dh-simplify`, `dh-domain-check`, and `dh-create-documentation` steps.
+- **Software projects:** delegate implementation to the active sub-task's `Delegated to agent` (normally the plan's selected implementation agent, resolved via `## Agent Selection` or [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md)); run validation through the `dh-execute-cli` skill. When invoked from the skills loop, `dh-domain-check` runs before complex implementation and `dh-simplify` runs after validation.
+- **Non-software projects** (docs, config, design assets — no marker files): delegate to the sub-task's delegated agent as well; skip the `dh-simplify`, `dh-domain-check`, and `dh-create-documentation` steps.
 
 ## Coding Best Practices
 
@@ -130,6 +131,7 @@ Apply where the change touches these areas:
 ## References
 
 - `dh-execute-plan-task` skill: the loop entry point that delegates implementation work to this skill (loop 2.1).
+- `dh-code-query` skill: graph-backed definitions, callers/callees, importers, and tests before editing (when the project graph is indexed).
 - Loop steps after implementation: `dh-simplify` after validation, then `dh-review` + `dh-code-review` (software projects).
 - `CODE_RULES.md` maintenance: created from code analysis when absent and kept updated via `dh-create-documentation` — see Resolution Order above.
 

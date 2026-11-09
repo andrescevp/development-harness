@@ -1,6 +1,6 @@
 # Skills Index — dev-harness-skills plugin
 
-> The plugin bundles **24 skills** (incl. `dh-grill-sdd` SDD interviewer,
+> The plugin bundles **25 skills** (incl. `dh-grill-sdd` SDD interviewer,
 > `dh-setup` harness setup, `dh-contingency` planning support, and
 > `dh-pause-plan` / `dh-resume-plan` lifecycle support).
 > Loading a skill injects its instructions and resources into the current
@@ -89,12 +89,13 @@ review, docs, semver) run once across plan end. `dh-execute-plan-task-fast`
 handles one sub-task; `dh_plan_fast_sync` + `dh-review` Plan Alignment Mode
 verify mirror alignment.
 
-**Plan lifecycle tools:** use `dh_plan_read` to parse a phased plan,
-`dh_plan_update_status` to flip phase/sub-task status markers, and
-`dh_plan_create` to scaffold a new plan — fall back to direct plan.md
-edits only when the tools are unavailable. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
+**Plan lifecycle tools:** use `dh_plan_read` to parse a phased plan
+(including each sub-task's `delegatedTo`), `dh_plan_update_status` to flip
+phase/sub-task status markers, and `dh_plan_create` to scaffold a new plan
+(passing `delegatedTo` for every sub-task) — fall back to direct plan.md edits
+only when the tools are unavailable. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 
-## The 24 bundled skills
+## The 25 bundled skills
 
 | Skill | Role in the loop |
 |---|---|
@@ -110,6 +111,7 @@ edits only when the tools are unavailable. These tools are exposed by the projec
 | [`dh-coding`](dh-coding/SKILL.md) | **NEW** — TDD best practices; reads `CODE_RULES.md` at project root |
 | [`dh-execute-cli`](dh-execute-cli/SKILL.md) | Utility — execute commands, tests, builds, linters, and validation via the logged-command strategy (`dh_logged_command` or temp-log head/tail); compact reports |
 | [`dh-explore`](dh-explore/SKILL.md) | Utility — codebase exploration with glob, grep, and targeted reads; compact evidence with exact file references |
+| [`dh-code-query`](dh-code-query/SKILL.md) | Utility — query the code knowledge graph with code-graph-rag (`cgr`): definitions, callers/callees/importers, tests, dead code, duplicates; setup/indexing live in `dh-setup` |
 | [`dh-simplify`](dh-simplify/SKILL.md) | Step 2.2 — reuse/quality/efficiency pass on changed code (software only) |
 | [`dh-review`](dh-review/SKILL.md) | Step 2.3 — verify a sub-task against acceptance criteria |
 | [`dh-code-review`](dh-code-review/SKILL.md) | Step 2.3 — code-level correctness/security/robustness review |

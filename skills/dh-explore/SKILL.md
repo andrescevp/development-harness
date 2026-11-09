@@ -27,6 +27,20 @@ unnecessary file access.
   about them.
 - Stop exploring once the answer is supported by concrete evidence.
 
+## Code Graph First
+
+When `dh-setup` indexed the project, use the `dh-code-query` skill before
+broad scans:
+
+- `cgr graph definition` / `resolve` for exact symbols and locations.
+- `cgr graph callers` / `callees` / `importers` / `implementors` for
+  relationships.
+- `cgr graph tests-reaching` for the tests that exercise a symbol.
+
+Treat graph rows as candidates and confirm them in the source. Fall back to
+`glob` / `grep` when the project is not indexed, the graph is stale, or the
+question is textual rather than structural.
+
 ## Search Order
 
 1. **Locate** — use `glob` to find candidate files by name or extension.

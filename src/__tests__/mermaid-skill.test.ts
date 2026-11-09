@@ -158,8 +158,8 @@ describe('dh-mermaid integration', () => {
       expect(text.indexOf('## Agent Selection'), path.basename(file)).toBeLessThan(text.indexOf('\n## Phases\n'));
     }
     expect(read(PLAN_TEMPLATE), 'phased-plan-template.md').toContain('| Role | Selected agent | Why | Fallback |');
-    for (const file of [PLAN_SCAFFOLD, fixture]) {
-      expect(read(file), path.basename(file)).toContain('None — no specialized agent required');
+    for (const file of [PLAN_TEMPLATE, PLAN_SCAFFOLD, fixture]) {
+      expect(read(file), path.basename(file)).toContain('| Role | Selected agent | Why | Fallback |');
     }
   });
 

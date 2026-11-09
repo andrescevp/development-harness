@@ -36,6 +36,7 @@ Produce a comprehensive final sign-off review for a completed plan. Verify all s
 Read the plan (via `dh_plan_read` when available; fallback: manual read) and check every sub-task AND phase status:
 
 - All sub-tasks must be `Completed` and every phase must be `Completed` (a phase is `Completed` only when all its sub-tasks are). If any sub-task is `Pending` or `In Progress`, list them, note their phase, and stop — do not proceed.
+- Every sub-task must carry a non-empty `Delegated to agent` that matches an agent in `## Agent Selection`. List missing/unknown values and stop; do not sign off a plan that skipped its delegation contract.
 - If the plan has no sub-tasks at all, report that the plan is empty and stop.
 
 ### Step 2: Read the requirements
@@ -57,6 +58,7 @@ Generate the full diff (`git diff main...HEAD` or `git diff $(git merge-base mai
 - Are there any missing deliverables (empty files, stubs where real implementation was expected)?
 - Are there cross-sub-task integration gaps (e.g., Sub-Task 2 expects a file Sub-Task 3 was supposed to create)?
 - **Per-phase completion:** list each `Phase N` with its status and confirm no phase was marked `Completed` with open sub-tasks (blocker rule 2.4: never mark a phase around a blocker).
+- **Graph-assisted integration scan:** when the project graph is indexed, use the `dh-code-query` skill on the changed symbols — `callers`/`importers` for missed integration points, `tests-reaching` for untested call sites, `implementors`/`overrides` for contract breaks. Confirm each candidate in the diff or source before reporting it.
 - Are there obvious scope violations (out-of-scope items implemented)?
 
 ### Step 4: Delegate in-depth review
@@ -95,9 +97,9 @@ Consolidate your own full-scope findings (Steps 1–3), the release readiness re
 
 ## Plan Completion Status
 
-| Phase | Sub-task | Status | Notes |
-|---|---|---|---|
-| [Phase 1] | [Sub-task 1.1] | Completed | [Brief note] |
+| Phase | Sub-task | Delegated agent | Status | Notes |
+|---|---|---|---|---|
+| [Phase 1] | [Sub-task 1.1] | [agent-id] | Completed | [Brief note] |
 
 Per-phase completion: [Phase 1: Completed — N/N sub-tasks; Phase 2: Completed — M/M sub-tasks; …]
 

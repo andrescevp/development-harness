@@ -18,6 +18,22 @@ Review all changed files for reuse, quality, and efficiency. Fix any issues foun
 
 Run `git diff` (or `git diff HEAD` if there are staged changes) to see what changed. If there are no git changes, review the most recently modified files that the user mentioned or that you edited earlier in this conversation.
 
+## Phase 1a: Graph-Assisted Reuse (when indexed)
+
+When `dh-setup` indexed the project, use the `dh-code-query` skill before the
+three agents run:
+
+- `cgr duplicates` on the changed area to find existing clones, including
+  renamed or lightly edited copies.
+- `cgr graph callers` / `importers` on changed symbols to judge reuse and
+  blast radius.
+- `cgr graph tests-reaching` to see which existing tests already cover the
+  behavior.
+
+Graph results are candidates: confirm each one in the source before treating
+it as a duplicate or dependency. Skip this phase when the project is not
+indexed or the graph is stale.
+
 ## Phase 2: Launch Three Review Agents in Parallel
 
 Resolve the review role first: use the plan's `## Agent Selection` Review row, or run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md) when the section or row is absent or stale — prefer a project-specific review agent and fall back to the bundled review capability. Use the same resolved agent/capability for all three passes.

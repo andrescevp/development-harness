@@ -50,7 +50,10 @@ None — no structural change.
 
 ## Agent Selection
 
-None — no specialized agent required.
+| Role | Selected agent | Why | Fallback |
+|---|---|---|---|
+| Implementation | dh-software-engineer | Implements the contract fixture and parser | bundled engineering capability |
+| Review | dh-reviewer | Reviews parser correctness and acceptance criteria | bundled review capability |
 
 ## Phases
 
@@ -61,6 +64,7 @@ None — no specialized agent required.
 #### Sub-Task 1.1: Define the contract
 
 - **Status:** Completed
+- **Delegated to agent:** dh-software-engineer
 - **Objective:** Define the format contract.
 - **Related Requirements:** R1
 - **Dependencies and Preconditions:** None.
@@ -76,6 +80,7 @@ None — no specialized agent required.
 #### Sub-Task 1.2: Ship the fixture
 
 - **Status:** In Progress
+- **Delegated to agent:** dh-software-engineer
 - **Objective:** Provide the parser ground truth.
 - **Related Requirements:** R1, R2
 - **Dependencies and Preconditions:** Sub-Task 1.1.
@@ -95,6 +100,7 @@ None — no specialized agent required.
 #### Sub-Task 2.1: Implement the parser
 
 - **Status:** Pending
+- **Delegated to agent:** dh-software-engineer
 - **Objective:** Implement parsePlan.
 - **Related Requirements:** R1, R2
 - **Dependencies and Preconditions:** Phase 1.

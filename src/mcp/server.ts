@@ -42,7 +42,7 @@ export function buildServer({ workspaceRoot, version, instructions }: BuildServe
     'plan_read',
     {
       description:
-        'Parse a phased plan (docs/plans/<slug>/plan.md) into structured JSON: meta, phases[] with status, subTasks[] with phase/status/relatedRequirements. Input: slug (or path relative to docs/plans). Errors clearly when missing or unparseable.',
+        'Parse a phased plan (docs/plans/<slug>/plan.md) into structured JSON: meta, phases[] with status, subTasks[] with phase/status/relatedRequirements/delegatedTo. Input: slug (or path relative to docs/plans). Errors clearly when missing or unparseable.',
       inputSchema: z.object({
         slug: z.string().describe('Plan slug (docs/plans/<slug>/plan.md)').optional(),
         path: z.string().describe('Explicit path relative to docs/plans (overrides slug)').optional(),
@@ -84,7 +84,7 @@ export function buildServer({ workspaceRoot, version, instructions }: BuildServe
     'plan_create',
     {
       description:
-        'Scaffold a new phased plan (docs/plans/<slug>/plan.md) from a title, objective, and phases with sub-task titles; all statuses start Pending. Optionally append the index.md row.',
+        'Scaffold a new phased plan (docs/plans/<slug>/plan.md) from a title, objective, and phases with sub-task titles + the responsible agent per sub-task; all statuses start Pending. Optionally append the index.md row.',
       inputSchema: z.object({
         slug: z.string(),
         title: z.string(),
@@ -92,7 +92,15 @@ export function buildServer({ workspaceRoot, version, instructions }: BuildServe
         phases: z.array(
           z.object({
             title: z.string(),
-            subTasks: z.array(z.object({ title: z.string() })),
+            subTasks: z.array(
+              z.object({
+                title: z.string(),
+                delegatedTo: z
+                  .string()
+                  .min(1)
+                  .describe('Agent ID responsible for executing this sub-task (must exist in ## Agent Selection)'),
+              })
+            ),
           })
         ),
         updateIndex: z.boolean().describe('Append a row to docs/plans/index.md').optional(),

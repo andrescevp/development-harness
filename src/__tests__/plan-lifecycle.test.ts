@@ -31,12 +31,18 @@ describe('parsePlan', () => {
     expect(all).toHaveLength(3);
     expect(all.map((s) => s.index)).toEqual(['1.1', '1.2', '2.1']);
     expect(all.map((s) => s.status)).toEqual(['Completed', 'In Progress', 'Pending']);
+    expect(all.map((s) => s.delegatedTo)).toEqual([
+      'dh-software-engineer',
+      'dh-software-engineer',
+      'dh-software-engineer',
+    ]);
   });
 
-  it('captures Related Requirements on sub-tasks', () => {
+  it('captures Related Requirements and Delegated to agent on sub-tasks', () => {
     const plan = parsePlan(FIXTURE);
     const t11 = plan.phases[0]!.subTasks.find((s) => s.index === '1.1')!;
     expect(t11.relatedRequirements).toContain('R1');
+    expect(t11.delegatedTo).toBe('dh-software-engineer');
   });
 
   it('does not cross sibling sections when collecting related requirements', () => {
@@ -64,7 +70,23 @@ slug: t
 `;
     const plan = parsePlan(doc);
     expect(plan.phases[0]!.subTasks[0]!.relatedRequirements).toEqual([]);
+    expect(plan.phases[0]!.subTasks[0]!.delegatedTo).toBeNull();
     expect(plan.phases[0]!.subTasks[1]!.relatedRequirements).toEqual(['R2']);
+  });
+
+  it('rejects an empty Delegated to agent marker', () => {
+    const doc = `## Phases
+
+### Phase 1: P
+
+- **Status:** Pending
+
+#### Sub-Task 1.1: T
+
+- **Status:** Pending
+- **Delegated to agent:**
+`;
+    expect(() => parsePlan(doc)).toThrow(/empty Delegated to agent/);
   });
 
   it('round-trips the scaffold template output (everything Pending)', () => {
@@ -73,8 +95,14 @@ slug: t
       title: 'Demo Plan',
       objective: 'Demo objective.',
       phases: [
-        { title: 'Alpha', subTasks: [{ title: 'A1' }, { title: 'A2' }] },
-        { title: 'Beta', subTasks: [{ title: 'B1' }] },
+        {
+          title: 'Alpha',
+          subTasks: [
+            { title: 'A1', delegatedTo: 'dh-software-engineer' },
+            { title: 'A2', delegatedTo: 'dh-software-engineer' },
+          ],
+        },
+        { title: 'Beta', subTasks: [{ title: 'B1', delegatedTo: 'dh-documentor' }] },
       ],
     });
     expect(doc.startsWith('---')).toBe(true);
@@ -82,7 +110,9 @@ slug: t
     expect(plan.phases).toHaveLength(2);
     expect(plan.phases[0]!.status).toBe('Pending');
     expect(plan.phases[0]!.subTasks.map((s) => s.index)).toEqual(['1.1', '1.2']);
+    expect(plan.phases[0]!.subTasks[0]!.delegatedTo).toBe('dh-software-engineer');
     expect(plan.phases[1]!.subTasks[0]!.status).toBe('Pending');
+    expect(plan.phases[1]!.subTasks[0]!.delegatedTo).toBe('dh-documentor');
   });
 
   it('tolerates a missing frontmatter header (meta {})', () => {

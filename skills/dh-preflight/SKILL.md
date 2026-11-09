@@ -21,6 +21,7 @@ metadata:
   - **Shell:** `shellcheck` on scripts
 - If a tool is not installed or configured, skip it — do not install globally
 - Check `git status --porcelain` for uncommitted changes
+- **Impact triage (read-only, when indexed):** use the `dh-code-query` skill (`tests-reaching`, `callers`, `importers`) on the changed symbols to understand what the gate exercises and what it might miss. This prioritizes attention; it does not replace running the full configured gate.
 - Report each tool result independently; aggregate into a single pass/fail
 - If any tool fails: report exact file, line, and error message
 - Do not fix failures — report them and let the user decide

@@ -31,6 +31,8 @@ interface PlanSubTask {
   title: string;
   status: PhaseStatus;
   relatedRequirements: string[];
+  /** Agent named by `- **Delegated to agent:**`; null on legacy plans. */
+  delegatedTo: string | null;
 }
 
 interface PlanPhase {
@@ -65,6 +67,8 @@ const HEADINGS = {
 /** Matches status/related bullets with an optional trailing CR. */
 const STATUS_RE = /^-\s+\*\*Status:\*\*\s+(.+?)\r?$/;
 const RELATED_RE = /^-\s+\*\*Related Requirements:\*\*\s+(.+?)\r?$/;
+const DELEGATED_RE = /^-\s+\*\*Delegated to agent:\*\*\s+(.+?)\r?$/;
+const DELEGATED_EMPTY_RE = /^-\s+\*\*Delegated to agent:\*\*\s*\r?$/;
 
 /** Return (value, hadCr) for a status line; throws on unknown statuses. */
 function readStatusRaw(contents: string, line: number): { raw: string; cr: boolean } {
@@ -165,16 +169,31 @@ export function parsePlan(contents: string, file = '<plan>'): PlanDocument {
     const title = m[3]!.trim();
     const status = statusOf(contents, sec.statusLine ?? sec.headerLine, file);
     const related: string[] = [];
+    let delegatedTo: string | null = null;
+    let relatedFound = false;
     for (let i = sec.headerLine + 1; i <= sec.endLine; i++) {
-      const r = lines[i]?.match(RELATED_RE);
-      if (r) {
-        related.push(
-          ...r[1]!
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean)
-        );
-        break;
+      const line = lines[i] ?? '';
+      if (delegatedTo === null) {
+        const d = line.match(DELEGATED_RE);
+        if (d) {
+          delegatedTo = d[1]!.trim();
+          continue;
+        }
+        if (DELEGATED_EMPTY_RE.test(line)) {
+          throw new Error(`${file}: sub-task ${phaseIdx}.${subNumber} has an empty Delegated to agent marker`);
+        }
+      }
+      if (!relatedFound) {
+        const r = line.match(RELATED_RE);
+        if (r) {
+          related.push(
+            ...r[1]!
+              .split(',')
+              .map((s) => s.trim())
+              .filter(Boolean)
+          );
+          relatedFound = true;
+        }
       }
     }
     const phase = phases.find((p) => p.index === phaseIdx);
@@ -186,6 +205,7 @@ export function parsePlan(contents: string, file = '<plan>'): PlanDocument {
       title,
       status,
       relatedRequirements: related,
+      delegatedTo,
     });
   }
 
@@ -251,7 +271,7 @@ export interface PlanScaffold {
   slug: string;
   title: string;
   objective: string;
-  phases: { title: string; subTasks: { title: string }[] }[];
+  phases: { title: string; subTasks: { title: string; delegatedTo: string }[] }[];
 }
 
 /** Build the phased plan markdown from a scaffold (all statuses Pending). */
