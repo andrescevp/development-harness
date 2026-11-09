@@ -1,6 +1,11 @@
 {
   "plugins": [
-    "opencode-rules@2.0.0"
+		{
+			"package": "opencode-rules@2.0.0",
+			"options": {
+				"additionalRuleDirectories": ["code-rules"]
+			}
+		}
   ],
   "mcp": {
     "servers": {
