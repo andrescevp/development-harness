@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-11-09T11:16:38.117Z",
+    "generated": "2026-11-09T11:34:26.152Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -35,9 +35,9 @@
       },
       {
         "name": "Cross-references",
-        "count": 2,
+        "count": 1,
         "sev": "WARN",
-        "note": "468 resolved; 0 code-context; 0 allowlisted; 233 prose tokens (warn)"
+        "note": "468 resolved; 0 code-context; 0 allowlisted; 232 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
@@ -91,15 +91,8 @@
   "atMentions": [
     {
       "file": "skills/dh-setup/SKILL.md",
-      "line": 64,
+      "line": 63,
       "mention": "@playwright",
-      "severity": "warn",
-      "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
-    },
-    {
-      "file": "skills/dh-setup/SKILL.md",
-      "line": 81,
-      "mention": "@graphify",
       "severity": "warn",
       "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
     }
@@ -1629,13 +1622,6 @@
       ]
     },
     {
-      "token": "graphify-out",
-      "count": 1,
-      "files": [
-        "skills/dh-setup/SKILL.md"
-      ]
-    },
-    {
       "token": "project-appropriate",
       "count": 1,
       "files": [
@@ -2449,7 +2435,7 @@
     {
       "file": "skills/dh-setup/SKILL.md",
       "kind": "skill",
-      "lines": 250,
+      "lines": 236,
       "frontmatter": {
         "status": "ok",
         "errors": [],

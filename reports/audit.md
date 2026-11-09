@@ -1,10 +1,10 @@
 # Audit Report — dev-harness-skills plugin
 
-Generated 2026-11-09T11:16:38.117Z by `scripts/audit.mjs`.
+Generated 2026-11-09T11:34:26.152Z by `scripts/audit.mjs`.
 
 ## Verdict
 
-**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 240. Documented schema deviations: 0.
+**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 238. Documented schema deviations: 0.
 
 ## Summary verdict table
 
@@ -14,7 +14,7 @@ Generated 2026-11-09T11:16:38.117Z by `scripts/audit.mjs`.
 | Frontmatter parse | 30 | PASS | 30 files on audit surface |
 | Name regex | 29 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 2 | WARN | 468 resolved; 0 code-context; 0 allowlisted; 233 prose tokens (warn) |
+| Cross-references | 1 | WARN | 468 resolved; 0 code-context; 0 allowlisted; 232 prose tokens (warn) |
 | Loop membership | 29 | PASS | 24/24 skills present; 5/5 agents present |
 | Secret scan | 44 | PASS | 44 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
@@ -71,8 +71,7 @@ _None._
 
 | File | Line | Mention | Note |
 |---|---|---|---|
-| skills/dh-setup/SKILL.md | 64 | @playwright | unresolved @mention (external role/product or prose) — warn-only per plan |
-| skills/dh-setup/SKILL.md | 81 | @graphify | unresolved @mention (external role/product or prose) — warn-only per plan |
+| skills/dh-setup/SKILL.md | 63 | @playwright | unresolved @mention (external role/product or prose) — warn-only per plan |
 
 Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; full list in reports/audit.json):
 
