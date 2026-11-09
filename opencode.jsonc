@@ -1,0 +1,20 @@
+{
+  "plugins": [
+    "opencode-rules@2.0.0"
+  ],
+  "mcp": {
+    "servers": {
+      "dh": {
+        "type": "local",
+        "command": [
+          "/usr/bin/node",
+          "/home/andres/workspace/dev-harness-skills/dist/mcp/stdio.js"
+        ],
+        "protocol": "2026-07-28",
+        "timeout": {
+          "startup": 300000
+        }
+      }
+    }
+  }
+}
