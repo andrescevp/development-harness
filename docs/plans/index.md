@@ -9,3 +9,11 @@
 | npx Install Entrypoint | npx-install-entrypoint | Add an npx-runnable dev-harness CLI (install/status/uninstall) that materializes the plugin into global or project OpenCode scope and wires mcp.servers.dh with JSONC-preserving, idempotent, ownership-safe operations; publishable npm package installable via npm and opencode plugin add (npm + Git specs), plus a Docker test env derived from ghcr.io/anomalyco/opencode with read-only host Git credential mounts | 2026-10-21 | 2026-10-21 | Pending | Yes |
 | Pause and Resume Plan Skills | pause-resume-plan-skills | Add dh-pause-plan and dh-resume-plan with a versioned handoff.md sidecar, drift-safe resume, an execute-plan guard, a handoff contract test, and a 19-skill inventory/docs update | 2026-11-07 | 2026-11-07 | Completed | No |
 | Agent Selection and Utility Skills | agent-selection-utility-skills | Replace hardcoded dh-agent delegation with runtime agent selection and migrate dh-executor/dh-explorer to dh-execute-cli/dh-explore skills | 2026-11-08 | 2026-11-08 | Completed | No |
+| Harness Monorepo Awareness | harness-monorepo-awareness | Make the bundled skills and agents workspace-aware for standalone and nested monorepo projects: workspace/anchor contract, setup detection and workspace map, per-package gates/reviews, docs/graph/version/worktree handling, agent guidance and fixtures | 2026-11-10 | 2026-11-10 | Pending | Yes |
+
+## Execution Records
+
+Rows are added when a plan is executed. The workspace-root plan remains the only plan root; the record points to the real repository/path, the mirrored plan path when applicable, the summary and the architectural changes.
+
+| Slug | Executed in (repo/path) | Plan path | Summary | Architectural changes | Date |
+|---|---|---|---|---|---|
