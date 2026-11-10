@@ -8,10 +8,14 @@ register them in the evolution index. This replaces the external `evolve` and
 
 ## Location and naming
 
-All notes live under `{project_root}/docs` — never under `docs/plans/`:
+All notes live under `{workspace_root}/docs` — never under `docs/plans/`:
+
+Evolution and observation notes always live at the workspace root, even when the
+plan touches a package; package-scoped docs follow
+[`workspace-docs.md`](workspace-docs.md).
 
 ```
-{project_root}/docs/evolution/
+{workspace_root}/docs/evolution/
   index.md
   <YYYY-MM-DD>-<slug>.md                    # evolution notes
   observations/
@@ -30,7 +34,7 @@ All notes live under `{project_root}/docs` — never under `docs/plans/`:
 Records **how the software evolved**: what changed, why, the architecture and
 modules touched, how it was validated/released, and what remains.
 
-Template (`{project_root}/docs/evolution/<YYYY-MM-DD>-<slug>.md`):
+Template (`{workspace_root}/docs/evolution/<YYYY-MM-DD>-<slug>.md`):
 
 ```markdown
 ---
@@ -107,7 +111,7 @@ Records **session learnings**: what worked, what didn't, decisions, and
 follow-ups — not a transcript dump.
 
 Template
-(`{project_root}/docs/evolution/observations/<YYYY-MM-DD>-<HHMM>-<slug>.md`):
+(`{workspace_root}/docs/evolution/observations/<YYYY-MM-DD>-<HHMM>-<slug>.md`):
 
 ```markdown
 ---
@@ -171,7 +175,7 @@ Rules:
 
 ## Evolution index
 
-`{project_root}/docs/evolution/index.md` lists every note, newest first:
+`{workspace_root}/docs/evolution/index.md` lists every note, newest first:
 
 ```markdown
 ---
@@ -211,14 +215,14 @@ Newest-first register of evolution and observation notes for this project.
    artifact-check or rehearsal results, and `git log`/tags for the plan. Use
    only what was observed.
 2. **Write the evolution note** —
-   `{project_root}/docs/evolution/<YYYY-MM-DD>-<slug>.md` from the template
+   `{workspace_root}/docs/evolution/<YYYY-MM-DD>-<slug>.md` from the template
    (create the directory if missing); fill every section, writing `None` only
    where a section genuinely has no content.
 3. **Write the observation note** —
-   `{project_root}/docs/evolution/observations/<YYYY-MM-DD>-<HHMM>-<slug>.md`
+   `{workspace_root}/docs/evolution/observations/<YYYY-MM-DD>-<HHMM>-<slug>.md`
    from the template; capture learnings, not a transcript.
 4. **Update the index** — prepend one row per note to
-   `{project_root}/docs/evolution/index.md` (newest first).
+   `{workspace_root}/docs/evolution/index.md` (newest first).
 5. **Cross-link** — plan ↔ evolution note ↔ observation note; add the release
    tag/URL when one exists; refresh `updated`.
 6. **Verify** — run the checklist below before reporting completion.
@@ -226,11 +230,11 @@ Newest-first register of evolution and observation notes for this project.
 ## Verification checklist
 
 - [ ] Evolution note exists at
-      `{project_root}/docs/evolution/<YYYY-MM-DD>-<slug>.md` with
+      `{workspace_root}/docs/evolution/<YYYY-MM-DD>-<slug>.md` with
       `kind: evolution`, the standard frontmatter, an `# Evolution: <title>`
       H1, and an `## Overview` section.
 - [ ] Observation note exists at
-      `{project_root}/docs/evolution/observations/<YYYY-MM-DD>-<HHMM>-<slug>.md`
+      `{workspace_root}/docs/evolution/observations/<YYYY-MM-DD>-<HHMM>-<slug>.md`
       with `kind: observation`, the standard frontmatter, the observation
       fields, an `# Observation: <title>` H1, and an `## Overview` section;
       optional `confidence` stays within 0.3–0.9.

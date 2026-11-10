@@ -14,7 +14,9 @@ metadata:
 
 - Read `./docs/plans/<plan-slug>/plan.md` (or current task scope) to understand what will change
 - Read the project's `AGENTS.md` for architectural conventions if it exists
-- Scan the project directory structure to identify bounded contexts by module/domain boundaries
+- In a workspace, read `WORKSPACE.md` (else `docs/WORKSPACE.md`) and map contexts
+  from the package graph before any top-level directory heuristic
+- Otherwise scan the project directory structure to identify bounded contexts by module/domain boundaries
 - If the project has no explicit DDD structure, note it and skip bounded-context mapping — do not force-fit
 - Check each SOLID principle; only flag violations with a plausible failure path
 - Do not block progress on minor style preferences or naming disagreements
@@ -46,11 +48,22 @@ project is not indexed or the graph is stale.
 
 ## Bounded Context Discovery
 
-To identify bounded contexts:
-1. Look for top-level directories that represent distinct domains (e.g., `auth/`, `billing/`, `catalog/`)
-2. Identify shared kernel modules used across contexts (e.g., `common/`, `shared/`, `lib/`)
-3. Check for anti-corruption layers (translation between contexts)
-4. Flag any sub-task that reads/writes across context boundaries without an explicit integration pattern
+In a workspace the **package graph** is the first source of bounded contexts;
+use top-level directories only when no map exists:
+
+1. Read `WORKSPACE.md` (else `docs/WORKSPACE.md`) → `## Packages` (paths,
+   stacks, dependencies) and the root `AGENTS.md`.
+2. Map each context to its package path(s); a package boundary is a context
+   boundary unless the map or an ADR says otherwise.
+3. Read the plan's `## Workspace Impact`; a change that reaches a package outside
+   the affected list is a cross-context concern to flag.
+4. Confirm cross-package dependencies with the code graph
+   (`importers`/`callers`) before claiming a boundary violation.
+5. Standalone (no map) or unindexed project — fall back to directory heuristics:
+   - Look for top-level directories that represent distinct domains (e.g., `auth/`, `billing/`, `catalog/`)
+   - Identify shared kernel modules used across contexts (e.g., `common/`, `shared/`, `lib/`)
+   - Check for anti-corruption layers (translation between contexts)
+   - Flag any sub-task that reads/writes across context boundaries without an explicit integration pattern
 
 ## Output Template
 

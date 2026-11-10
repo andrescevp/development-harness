@@ -1,0 +1,5 @@
+{
+  "name": "npm-workspace-fixture",
+  "private": true,
+  "workspaces": ["apps/*", "libs/*"]
+}

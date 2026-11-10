@@ -16,11 +16,13 @@ const FAST_OMITTED_SECTIONS = [
   'Objective',
   'Requirements Snapshot',
   'Scope',
+  'Workspace Impact',
   'Assumptions and Constraints',
   'Risks and Areas Requiring Care',
   'Core concepts',
   'Visual Context',
   'Agent Selection',
+  'Execution Record',
   'Open Questions',
 ] as const;
 

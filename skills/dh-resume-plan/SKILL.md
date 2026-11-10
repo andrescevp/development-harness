@@ -116,6 +116,11 @@ Collect evidence and classify it as **clean**, **explainable**, or **material**:
   confirmation before continuing.
 - **Conflicts:** `git diff --name-only --diff-filter=U` reporting paths is
   material.
+- **Package scope:** when the handoff carries `## Package Scope`, recompute the
+  affected/shared fingerprints first — a change there is material; a change in
+  an out-of-scope package is explainable and reported separately (never drift).
+  A handoff without the section keeps the repo-wide comparison
+  ([package-scope](../dh-pause-plan/references/package-scope.md)).
 - **Unverifiable:** no git, `branch`/`base_commit` null, missing commits, or
   unavailable tooling → mark the check unverifiable, say so in the summary,
   and require confirmation before proceeding; never treat unverifiable as
@@ -149,6 +154,7 @@ Print a concise summary (do not dump the whole handoff):
 - goal and current phase/sub-task;
 - `progress`, completed, and in-flight work;
 - uncommitted paths and unverified git checks;
+- package scope and out-of-scope dirty packages (when recorded);
 - decisions, blockers, and risks;
 - ambiguities from Step 3;
 - validation to re-run and the ordered next steps.
@@ -221,6 +227,7 @@ transitions.
 ## References
 
 - [`../dh-pause-plan/references/handoff-template.md`](../dh-pause-plan/references/handoff-template.md): the `handoff.md` contract this skill validates.
+- [`../dh-pause-plan/references/package-scope.md`](../dh-pause-plan/references/package-scope.md): affected-package fingerprints and the out-of-scope rule.
 - `dh-pause-plan`: writes and refreshes the handoff, including re-pause.
 - `dh-execute-plan`: standard execution loop resume mode (no `plan_fast.md`).
 - `dh-execute-plan-fast`: fast execution/end-gate loop used when `plan_fast.md` exists.

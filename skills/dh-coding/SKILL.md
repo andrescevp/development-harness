@@ -10,12 +10,12 @@ metadata:
   workflow: development
 ---
 
-Apply test-first TDD and clean code best practices when implementing or fixing code. Code rules are always project-level: enforce `CODE_RULES.md` at the project root when present; analyze the code and CREATE it when absent (then keep it updated via `dh-create-documentation`).
+Apply test-first TDD and clean code best practices when implementing or fixing code. Code rules are always project-level: the root `CODE_RULES.md` holds the defaults and a package's own `CODE_RULES.md` overrides them for files inside that package. Analyze the code and CREATE the missing file(s) when absent (then keep them updated via `dh-create-documentation`).
 
 ## Core Rules
 
 - **Test-first, always:** write a failing test before any implementation; then implement the minimal change that makes it pass; then refactor. Repeat the red → green → refactor loop until the change is complete.
-- **Rules precedence:** code rules are always project-level — `CODE_RULES.md` at the project root is the only rule source; when absent, analyze the code and CREATE it before implementing (see Resolution Order); kept updated via `dh-create-documentation`. No dependency on global guideline files.
+- **Rules precedence:** code rules are always project-level — the resolved `CODE_RULES.md` is the only rule source. A package file wins for files inside that package; the root file covers shared/root files and packages without their own. The two are never merged silently (see Resolution Order). No dependency on global guideline files.
 - **Project type aware:** detect software vs non-software before choosing how to implement and which responsible agent to delegate to.
 - **Code graph context (when indexed):** use the `dh-code-query` skill before editing to resolve the target symbol, its callers/callees, importers, implementors, and the tests that reach it. Use the graph to bound the change and pick tests; verify every candidate in the source before acting. Skip it when the project is not indexed or the graph is stale.
 - **Validation through `dh-execute-cli`:** never run bash, tests, or builds directly — use the `dh-execute-cli` skill and act on its summarized output.
@@ -25,25 +25,36 @@ Apply test-first TDD and clean code best practices when implementing or fixing c
 
 ## CODE_RULES.md Resolution Order
 
-Code rules are ALWAYS at project level — the only rule source is
-`CODE_RULES.md` at the project root. Never delegate to global guideline
-files.
+Code rules are ALWAYS project-level and resolved per file — never from global
+guideline files, never merged. Precedence table, package-root discovery, worked
+example and validation:
+[`references/code-rules-resolution.md`](references/code-rules-resolution.md).
 
-1. **If `CODE_RULES.md` exists at the project root:** read it before touching
-   any code and treat it as the primary rule set for this project — it
-   overrides generic defaults for naming, structure, and style. Enforce it
-   for every file you create or modify.
-2. **If `CODE_RULES.md` is absent:** invoke the `dh-code-ruler` skill — it
-   interviews the user, analyzes the code, and researches stack best
-   practices (websearch when possible) to generate strict rules at
-   `{project_root}/CODE_RULES.md` (style guide, design patterns, security and
-   performance constraints with checks, stack best practices). Then implement
-   with the created file as the rule set.
-3. **Maintenance:** keep `CODE_RULES.md` always updated via
+1. **Resolve the file's package** from `WORKSPACE.md` (`## Packages` paths,
+   longest prefix wins), never from the cwd or a directory name. Standalone
+   projects have no package layer: the project root is the only root.
+2. **Package rules first:** when `{package}/CODE_RULES.md` exists, read it
+   before touching any file inside that package and treat it as the primary
+   rule set; the root file still supplies what the package file does not state.
+3. **Root rules otherwise:** the root `CODE_RULES.md` governs shared and
+   root-owned files (`docs/`, `AGENTS.md`, workspace config, root scripts) and
+   every package without its own file.
+4. **Report the resolved file** in the implementation report — the package path
+   and/or the root path that governed the change.
+5. **Conflicts are reported, never merged:** when a package and the root
+   disagree, the package rule wins for package files and the divergence is
+   reported once per rule pair.
+6. **If no rules file exists:** invoke the `dh-code-ruler` skill — it
+   interviews the user, analyzes the code, and researches stack best practices
+   (websearch when possible) to generate strict rules at
+   `{project_root}/CODE_RULES.md` (or the package file when the workspace map
+   declares package overrides). Then implement with the created file as the
+   rule set.
+7. **Maintenance:** keep every `CODE_RULES.md` updated via
    `dh-create-documentation` — whenever the codebase conventions evolve, a
    significant change lands, or the documentation pass runs, refresh the file
    (and have it reviewed) so it never drifts from reality.
-4. **Regardless of which rules apply:** always work test-first. Project rules
+8. **Regardless of which rules apply:** always work test-first. Project rules
    refine *how* you code, never *whether* you test.
 
 ## Test-First TDD Workflow
@@ -134,6 +145,7 @@ Apply where the change touches these areas:
 - `dh-code-query` skill: graph-backed definitions, callers/callees, importers, and tests before editing (when the project graph is indexed).
 - Loop steps after implementation: `dh-simplify` after validation, then `dh-review` + `dh-code-review` (software projects).
 - `CODE_RULES.md` maintenance: created from code analysis when absent and kept updated via `dh-create-documentation` — see Resolution Order above.
+- [`references/code-rules-resolution.md`](references/code-rules-resolution.md): package-vs-root precedence, package-root discovery, conflict reporting and the worked example.
 
 ## Doc search
 

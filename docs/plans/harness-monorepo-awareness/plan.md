@@ -22,8 +22,9 @@ pause/resume and agent prompts workspace-aware — while keeping standalone
 behavior unchanged.
 
 The evidence base is the audit at
-[`docs/audits/2026-11-10-skills-agents-standalone-monorepo.md`](../../audits/2026-11-10-skills-agents-standalone-monorepo.md)
-and the contract in [`sdd.md`](sdd.md).
+[`docs/audits/2026-11-10-skills-agents-standalone-monorepo.md`](../../audits/2026-11-10-skills-agents-standalone-monorepo.md),
+the contract in [`sdd.md`](sdd.md), and the normative
+[`workspace-contract.md`](workspace-contract.md).
 
 ## Requirements Snapshot
 
@@ -142,11 +143,11 @@ the bundled harness capabilities present in this runtime.
 
 ### Phase 1: Workspace Contract and Detection
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 1.1: Define the workspace contract and anchor rules
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-architect
 - **Objective:** Produce the authoritative workspace contract used by every
   later sub-task: terminology, anchor rules, failure behavior and the
@@ -177,7 +178,7 @@ the bundled harness capabilities present in this runtime.
 
 #### Sub-Task 1.2: Detect monorepo layouts and generate the workspace map
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Extend `dh-setup` to detect monorepo layouts and generate a
   user-approved workspace map with packages, stacks, commands and scopes.
@@ -210,7 +211,7 @@ the bundled harness capabilities present in this runtime.
 
 #### Sub-Task 1.3: Verify the plan/docs anchor and add anchor tests
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Add a verification step and regression tests that prove the
   MCP workspace and skill `docs/plans` paths align (or fail loudly).
@@ -238,11 +239,11 @@ the bundled harness capabilities present in this runtime.
 
 ### Phase 2: Workspace-Aware Planning and Gates
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 2.1: Add workspace impact to SDD and plan templates and planning skills
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Add a `## Workspace Impact` contract to SDDs/plans and make
   planning capture affected packages, per-package commands and docs/version
@@ -273,7 +274,7 @@ the bundled harness capabilities present in this runtime.
 
 #### Sub-Task 2.2: Make preflight and artifact-check package-aware
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Make the release gates validate affected packages (or the
   workspace aggregate) and report per-package results.
@@ -303,7 +304,7 @@ the bundled harness capabilities present in this runtime.
 
 #### Sub-Task 2.3: Scope review, simplify and final-review diffs to affected packages
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Scope diffs and findings to the affected packages so unrelated
   workspace changes do not contaminate reviews.
@@ -333,7 +334,7 @@ the bundled harness capabilities present in this runtime.
 
 #### Sub-Task 2.4: Add root and package CODE_RULES inheritance
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Support root `CODE_RULES.md` defaults plus per-package
   overrides, and make `dh-coding`/`dh-code-ruler` resolve them.
@@ -361,7 +362,7 @@ the bundled harness capabilities present in this runtime.
 
 #### Sub-Task 2.5: Record execution provenance and architectural changes in plan and index
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Define and implement the execution-record contract: the
   workspace root is the only plan root; every executed plan records its
@@ -399,11 +400,11 @@ the bundled harness capabilities present in this runtime.
 
 ### Phase 3: Workspace-Aware Docs, Graph, Versions and Worktrees
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 3.1: Distinguish workspace, package and vault roots in documentation
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Make documentation choose the correct root and allow
   package-scoped docs without breaking the single-vault model.
@@ -432,7 +433,7 @@ the bundled harness capabilities present in this runtime.
 
 #### Sub-Task 3.2: Route code-graph queries by workspace or package
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Make `dh-code-query` and the setup reference route queries to
   the workspace or package index instead of assuming `$PWD`.
@@ -458,7 +459,7 @@ the bundled harness capabilities present in this runtime.
 
 #### Sub-Task 3.3: Define the monorepo versioning policy in dh-semver
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Support fixed and independent monorepo versioning without
   breaking single-package releases.
@@ -484,7 +485,7 @@ the bundled harness capabilities present in this runtime.
 
 #### Sub-Task 3.4: Discover worktree lifecycles and align submodule branches
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Make `dh-create-worktree` discover lifecycle files at the
   workspace and submodule roots and align submodule branches.
@@ -513,7 +514,7 @@ the bundled harness capabilities present in this runtime.
 
 #### Sub-Task 3.5: Add package-aware pause/resume and workspace domain mapping
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Reduce false drift in pause/resume and map bounded contexts
   from the workspace package graph.
@@ -541,11 +542,11 @@ the bundled harness capabilities present in this runtime.
 
 ### Phase 4: Agents, Fixtures and Release
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 4.1: Add workspace-first guidance to the bundled agents
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Make every bundled agent consult the workspace map and state
   the affected package scope before acting.
@@ -572,7 +573,7 @@ the bundled harness capabilities present in this runtime.
 
 #### Sub-Task 4.2: Add monorepo fixtures and tests and run the full QA gate
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Prove the workspace behavior with fixtures and the full gate.
 - **Related Requirements:** R1-R8
@@ -599,7 +600,7 @@ the bundled harness capabilities present in this runtime.
 
 #### Sub-Task 4.3: Update user-facing docs, plan index and CHANGELOG
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-documentor
 - **Objective:** Document the workspace contract and the new behavior for users
   and future agents.
@@ -631,17 +632,44 @@ the bundled harness capabilities present in this runtime.
   docs root decision, graph routing (documented), version policy, worktree
   discovery and pause/resume fallback; assert the standalone path still works.
 - **Completion Checklist:**
-  - [ ] All sub-tasks and phases `Completed`.
-  - [ ] `pnpm qa:check:full` green.
-  - [ ] Every audit P0/P1 finding is addressed or explicitly deferred with a
+  - [x] All sub-tasks and phases `Completed`.
+  - [x] `pnpm qa:check:full` green.
+  - [x] Every audit P0/P1 finding is addressed or explicitly deferred with a
         recorded reason.
-  - [ ] No legacy plan/parser regression.
-  - [ ] Docs, plan index, CHANGELOG and the audit cross-link are updated.
+  - [x] No legacy plan/parser regression.
+  - [x] Docs, plan index, CHANGELOG and the audit cross-link are updated.
   - [ ] The plan's `## Execution Record` and the index execution row contain
         the real repo/path, mirrored plan path, summary and architectural
         changes.
-  - [ ] Standalone repositories with no workspace markers behave exactly as
+  - [x] Standalone repositories with no workspace markers behave exactly as
         before.
+
+## Execution Record
+
+- **Execution status:** In progress
+- **Executed at:** 2026-11-11
+- **Workspace root:** `/home/andres/workspace/dev-harness-skills`
+- **Repository kind:** workspace
+- **Repository path:** `.`
+- **Branch / worktree:** `feature/harness-monorepo-awareness` (main checkout)
+- **Commit range:** `7e2eb14..uncommitted` (finalized at T3)
+- **Plan path:** `docs/plans/harness-monorepo-awareness/plan.md`
+- **Mirrored plan path:** `none`
+- **Summary:**
+  - Added the workspace contract, workspace map detection and anchor verification.
+  - Added Workspace Impact and Execution Record contracts, per-package gates and
+    scoped reviews, and root/package CODE_RULES inheritance.
+  - Added workspace-aware docs roots, code-graph routing, semver policy,
+    worktree/submodule discovery, and package-scope pause/resume/domain mapping.
+  - Added workspace-first agent guidance, monorepo fixtures/tests, and user docs.
+- **Architectural changes:** workspace/package/plan/vault root model;
+  `DH_WORKSPACE_ROOT` + start-at-root anchor; workspace map and per-package
+  command matrix; package-scoped gates/reviews; root/package CODE_RULES
+  precedence; docs-root decision; code-graph index routing; fixed/independent
+  semver policy; root/submodule worktree lifecycle; package-scope pause/resume;
+  execution provenance in plan + index.
+- **References:** [audit](../../audits/2026-11-10-skills-agents-standalone-monorepo.md),
+  [contract](workspace-contract.md), [reviews](tasks/).
 
 ## Open Questions
 

@@ -11,6 +11,23 @@ mode: subagent
 
 You are a final in-depth reviewer. Perform a comprehensive review of the full diff against the entire task requirements and plan. This is the last quality gate before completion.
 
+## Workspace First
+
+Read `WORKSPACE.md` at the workspace root, else `docs/WORKSPACE.md`, when
+present (schema: [workspace map](../skills/dh-setup/references/workspace-map.md));
+the map gives each package's path, commands and docs root. No map and
+no workspace marker means standalone: the single root is workspace, package and
+plan root.
+
+- Take **affected packages** from the plan's `## Workspace Impact`; never infer
+  them from the session cwd.
+- Verify every affected package was validated in that package's scope; report
+  untouched packages as unaffected and block sign-off when a package has no
+  evidence.
+- Review integration at the workspace root; standalone keeps the full
+  single-root diff and record. `docs/plans` stays workspace-root only (no
+  package-local plan directory).
+
 ## Instructions
 
 1. Use the `dh-code-review` skill

@@ -16,20 +16,30 @@ metadata:
 # Code Ruler
 
 Produce the project's strict rules contract at `{project_root}/CODE_RULES.md`
-by grilling the user and analyzing the codebase. `dh-coding` enforces this
-file; `dh-code-ruler` is executed by the selected architecture agent (or
-invoked by `dh-coding` when the file is missing).
+(or, in a workspace, root defaults plus per-package `{package}/CODE_RULES.md`
+overrides) by grilling the user and analyzing the codebase. `dh-coding` enforces
+these files; `dh-code-ruler` is executed by the selected architecture agent (or
+invoked by `dh-coding` when a file is missing).
 
 ## When to use
 
-- `{project_root}/CODE_RULES.md` does not exist → create it (dh-coding step 2).
+- No `CODE_RULES.md` exists at the resolved root (project root or package root)
+  → create it (dh-coding step 6).
 - The rules have drifted from the code or the stack changed → refresh it.
+- A workspace package needs a rule the root file cannot express → create
+  `{package}/CODE_RULES.md` as a package override of the root defaults.
 - The architect needs a precise rule contract before planning/implementation.
 
 ## Workflow
 
-1. **Locate** `{project_root}/CODE_RULES.md`. If it exists and is fresh, offer
-   a refresh instead of a rewrite; if it is missing, create mode.
+1. **Locate and resolve** the rule files (precedence:
+   [`../dh-coding/references/code-rules-resolution.md`](../dh-coding/references/code-rules-resolution.md)):
+   - root `CODE_RULES.md` — defaults for every file, and the only file for
+     standalone projects;
+   - `{package}/CODE_RULES.md` per workspace package that needs an override,
+     resolved from the `WORKSPACE.md` `## Packages` paths (longest prefix wins).
+   If a file exists and is fresh, offer a refresh instead of a rewrite; if it is
+   missing, create mode.
 2. **Grill (interview)** — ask ONLY what is missing, numbered and focused:
    - Stack & tooling: languages, frameworks, package manager, build/lint/test
      setup.
@@ -57,9 +67,10 @@ invoked by `dh-coding` when the file is missing).
    official/community guides for the detected stack (e.g. JS/TS: biome +
    TypeScript conventions; Python: PEP 8/ruff; PHP: PSR-12/phpstan; Go:
    gofmt/effective go) and fold the relevant recommendations into the rules.
-5. **Generate** `{project_root}/CODE_RULES.md` with the MANDATORY sections
-   below. Keep it concise and enforceable (aim ≤ 200 lines; rules are backed
-   by concrete checks or commands).
+5. **Generate** the resolved file(s) — `{project_root}/CODE_RULES.md` for root
+   defaults, `{package}/CODE_RULES.md` for a package override — with the
+   MANDATORY sections below. Keep it concise and enforceable (aim ≤ 200 lines;
+   rules are backed by concrete checks or commands).
 6. **Verify**: the file parses, each rule maps to a check where possible, and
    the configured QA gate (qa:check / lint / tests) still reflects the rules.
 
@@ -70,6 +81,7 @@ invoked by `dh-coding` when the file is missing).
 
 > Source of truth for this project's coding rules (dh-code-ruler).
 > `dh-coding` enforces this file; keep it updated via `dh-create-documentation`.
+> Package override? State the scope: overrides the root CODE_RULES.md for `<package>/**` only.
 
 ## Code Style Guide
 - <naming, formatting, file layout, imports, comments, line limits (<300 code-only)>
@@ -91,6 +103,10 @@ invoked by `dh-coding` when the file is missing).
 
 - Never copy whole guideline documents: distill strict, project-specific
   rules backed by the interview, the code analysis, or the researched guide.
+- **Root defaults, package overrides:** the root file states the shared rules;
+  a package file overrides only the files of its own package and must not
+  restate root rules it keeps. Never merge the two into one document — `dh-coding`
+  resolves them by precedence and reports conflicts per rule pair.
 - Preserve user statements verbatim where they define constraints or scope.
 - Every rule should be actionable: either a check/command exists to enforce
   it, or the rule names the review gate that validates it.
@@ -100,10 +116,15 @@ invoked by `dh-coding` when the file is missing).
 ## Verification Checklist
 
 - [ ] `{project_root}/CODE_RULES.md` exists with all 5 mandatory sections
+- [ ] Workspace packages that need an override have their own
+      `{package}/CODE_RULES.md`, scoped to that package (no restated root rules)
+- [ ] The resolved file for a given path is unambiguous (longest package prefix
+      from `WORKSPACE.md`)
 - [ ] Rules traceable to interview answers, code analysis, or researched sources
 - [ ] Enforcement mapped (commands/gates) per rule where possible
 - [ ] No invented rules; assumptions marked
 - [ ] Mirrors the project's actual configs (linters, toolchain, docs)
+- [ ] Standalone projects still produce exactly one project-root file
 
 ## Doc search
 

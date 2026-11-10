@@ -197,6 +197,52 @@ retired. Consumer permission actions match `dh_*`. Full wiring, verification
 (`opencode mcp list`), prewarm, and troubleshooting:
 [`docs/LOADING.md`](docs/LOADING.md#mcp-server-dh).
 
+## Monorepo workspaces
+
+The harness resolves four roots and keeps standalone projects unchanged:
+
+| Root | Meaning |
+|---|---|
+| Workspace root (`W`) | Repository containing the nested projects; owns `docs/plans`, `AGENTS.md`, the `dh` MCP entry and the root `WORKTREE_LIFECYCLE.md`. |
+| Package root | Nested project (workspace package, submodule, nested repo, worktree); owns its stack, commands, optional `CODE_RULES.md`, docs and lifecycle. |
+| Plan root | Always `W/docs/plans`; package-local plan directories are never created. |
+| Vault root | `W` by default; `OBSIDIAN_VAULT` moves docs only, never plans. |
+
+- **Start at `W`.** Monorepo sessions start opencode at the workspace root;
+  `DH_WORKSPACE_ROOT` is unset or the absolute path of `W` in the `dh` MCP entry
+  (`"environment": { "DH_WORKSPACE_ROOT": "/abs/workspace" }`). A package-scoped
+  session is an anchor mismatch — stop and restart at `W`; the harness never
+  creates a package-local `docs/plans`.
+- **Workspace map.** `dh-setup` detects pnpm/npm/yarn workspaces, Nx/Turbo/
+  Lerna, Cargo workspaces, Go workspaces, Gradle/.NET solutions and
+  `.gitmodules`, then writes a user-approved `WORKSPACE.md` at `W` (fallback
+  `docs/WORKSPACE.md`). The map records the workspace root (layout, markers,
+  plan root); packages (path, stack, test, build, docs root, rules); aggregate
+  and affected-only commands; docs roots; code-graph scope; worktree scope; and
+  the fixed/independent version policy.
+- **Per-package gates and reviews.** `## Workspace Impact` in the plan names the
+  affected packages and their commands. `dh-preflight` and `dh-artifact-check`
+  report each package independently — a green aggregate never hides an
+  unvalidated package — and `dh-review`, `dh-code-review`, `dh-simplify` and
+  `dh-final-review` diff only the declared package/shared paths.
+- **Rules, docs, graph, versions, worktrees.** A package `CODE_RULES.md`
+  overrides the root file for its files; docs live under `W/docs` or
+  `{package}/docs` with `package` frontmatter, and evolution notes stay at `W`;
+  `dh-code-query` routes to the workspace or package index; `dh-semver` honors a
+  `fixed` or `independent` policy; `dh-create-worktree` discovers root/submodule
+  lifecycles and aligns submodule branches.
+- **Execution provenance.** Executed plans fill `## Execution Record` in
+  `docs/plans/<slug>/plan.md` and one row in the plans index
+  `## Execution Records`: real repository/path, mirrored plan path, summary and
+  architectural changes (T1 write, T2 final-review check, T3 finalize).
+- **Standalone unchanged.** No markers and no map: one root, one toolchain, full
+  diff; `DH_WORKSPACE_ROOT` may stay unset.
+
+Normative contract:
+[`docs/plans/harness-monorepo-awareness/workspace-contract.md`](docs/plans/harness-monorepo-awareness/workspace-contract.md).
+Evidence and gaps:
+[`docs/audits/2026-11-10-skills-agents-standalone-monorepo.md`](docs/audits/2026-11-10-skills-agents-standalone-monorepo.md).
+
 ## Agents & skills
 
 The plugin defines 5 agents and 26 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
@@ -292,7 +338,7 @@ offline `pnpm qa:check:full` gate.
 ```text
 index.ts         Root plugin entry point for OpenCode plugin discovery (source mode)
 agents/          Markdown definitions and system prompts for the 5 bundled agents
-skills/          Instructions, templates, and references for the 25 bundled skills
+skills/          Instructions, templates, and references for the 26 bundled skills
 src/cli/         Installer CLI (args, scope, JSONC config, manifest, commands)
 src/mcp/         Local stdio MCP server and workspace resolver
 src/tools/       Plan/sheet/logged-command tool implementations

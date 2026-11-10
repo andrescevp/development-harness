@@ -29,6 +29,13 @@ Orchestrate the complete execution of a plan from start to finish. Iterate throu
 - After each sub-task execution, run the `dh-review` skill before proceeding to the next.
 - If a review produces P0/P1 findings, stop and report — do not continue to the next sub-task (a blocked sub-task blocks its phase).
 - After the final sub-task, run the `dh-final-review` skill for sign-off.
+- **Execution record (T1/T3):** when the last sub-task completes and before
+  `dh-final-review`, write `## Execution Record` in `plan.md` with every field
+  (`Execution status: In progress`). After an `Approve` / `Approve with comments`
+  verdict and before marking the plan `Completed`, finalize the record and add
+  the `docs/plans/index.md` `## Execution Records` row. Field contract and
+  timing: [`../dh-planning/references/execution-record.md`](../dh-planning/references/execution-record.md).
+  Never record secrets, tokens, or full diffs.
 - Update `./docs/plans/index.md` when the plan is fully complete.
 - **Resolve the roster once per plan:** before the first delegation, read `## Agent Selection` in `plan.md` and validate its rows for the delegated, review, and final-review roles. If the section or a required row is absent or stale (a named agent no longer exists), run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): discover the runtime agent list, then project config/agent directories, then global definitions; record the choices and generic fallbacks in the plan before continuing.
 - **One delegated agent per sub-task:** the active sub-task's `Delegated to agent` is the single executor. Implementation sub-tasks normally name the selected implementation agent; documentation/test-only sub-tasks name the matching selected role. There is no complexity- or type-based builder split. If the field is missing/empty/unknown or the named agent is unavailable, stop and report the gap — never substitute one silently.
@@ -72,24 +79,39 @@ Iterate **phases in order** (skip phases already `Completed`); within each phase
 
 After all sub-tasks are completed and verified:
 
-1. Run the `dh-final-review` skill for the comprehensive final plan review.
-2. Read the final review verdict from `./docs/plans/<plan-slug>/tasks/review.md`.
-3. If the verdict is `Request changes`: report the findings — do not mark the plan complete.
-4. If the verdict is `Approve` or `Approve with comments`: proceed to Step 4.
+1. **Write the execution record (T1):** fill `## Execution Record` in `plan.md`
+   after `## Final Integration & Verification` with the workspace root,
+   repository kind/path, branch/worktree, provisional commit range, plan and
+   mirrored plan paths, summary, architectural changes and references;
+   `Execution status: In progress`
+   ([`../dh-planning/references/execution-record.md`](../dh-planning/references/execution-record.md)).
+2. Run the `dh-final-review` skill for the comprehensive final plan review.
+3. Read the final review verdict from `./docs/plans/<plan-slug>/tasks/review.md`.
+4. If the verdict is `Request changes`: report the findings — do not mark the plan complete.
+5. If the verdict is `Approve` or `Approve with comments`: finalize the record
+   (T3 — status `Completed` / `Completed with deferrals`, final `Executed at` and
+   commit range) and add or update its `docs/plans/index.md`
+   `## Execution Records` row; then proceed to Step 4.
 
 ### Step 4: Document evolution and close
 
 After final sign-off passes and before marking the plan complete:
 
-1. **Generate documentation (all projects):** Invoke the `dh-create-documentation` skill to update project docs and create `docs/evolution/<date>-<slug>.md` (evolution note) + `docs/evolution/observations/<date>-<hhmm>-<slug>.md` (observation note), following its Custom Directives.
+1. **Finalize the execution record (T3):** set `Execution status` to
+   `Completed` or `Completed with deferrals`, finalize `Commit range` and
+   `Executed at`, and add/update the `docs/plans/index.md` `## Execution
+   Records` row per
+   [`../dh-planning/references/execution-record.md`](../dh-planning/references/execution-record.md).
 
-2. **Version bump (software projects only):** Invoke the `dh-semver` skill to determine the correct version bump from commit history, generate a changelog, and create a git tag. **Backfill:** after `dh-semver` determines the version/tag, update the evolution note's `version` and the index `Plan/Release` entry with the new version/tag.
+2. **Generate documentation (all projects):** Invoke the `dh-create-documentation` skill to update project docs and create `docs/evolution/<date>-<slug>.md` (evolution note) + `docs/evolution/observations/<date>-<hhmm>-<slug>.md` (observation note), following its Custom Directives. Link the finalized execution record (T4).
 
-3. **Mark plan complete** in `./docs/plans/index.md`:
+3. **Version bump (software projects only):** Invoke the `dh-semver` skill to determine the correct version bump from commit history, generate a changelog, and create a git tag. **Backfill:** after `dh-semver` determines the version/tag, update the evolution note's `version` and the index `Plan/Release` entry with the new version/tag.
+
+4. **Mark plan complete** in `./docs/plans/index.md`:
    - Locate the row for `<plan-slug>` and update the Status to `Completed` and Updated timestamp columns. If the slug is not found, append a new row.
    - Set the plan status to `Completed`.
 
-4. Report the plan completion with a summary:
+5. Report the plan completion with a summary:
    - Total sub-tasks completed
    - Final review verdict
    - Any deferred P2/P3 findings

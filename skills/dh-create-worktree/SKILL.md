@@ -15,18 +15,19 @@ metadata:
 
 # Worktree Lifecycle
 
-Create, reuse, merge, and remove git worktrees according to `{project_root}/WORKTREE_LIFECYCLE.md`.
-That file is generated and maintained **only** by `dh-setup`; this skill reads it and
-executes its steps. Format, interview questions, and template:
-[`dh-setup/references/worktree-lifecycle.md`](../dh-setup/references/worktree-lifecycle.md).
+Create, reuse, merge, and remove git worktrees according to the project's
+`WORKTREE_LIFECYCLE.md`: the workspace root file plus each independent package's
+own file. Those files are generated and maintained **only** by `dh-setup`; this
+skill reads them and executes their steps. Format, interview questions, and
+template: [`dh-setup/references/worktree-lifecycle.md`](../dh-setup/references/worktree-lifecycle.md).
 
 ## Hard rules
 
 - **User request only.** Never create, merge, reuse, or remove a worktree because a plan
   starts, finishes, or pauses. The user must ask in this session.
-- **Read before acting.** Load `WORKTREE_LIFECYCLE.md` first. If it is missing, empty,
-  or lacks a required section, STOP and ask the user to run `dh-setup`. Never create,
-  guess, or overwrite the file from this skill.
+- **Read before acting.** Load the root `WORKTREE_LIFECYCLE.md` first. If it is missing,
+  empty, or lacks a required section, STOP and ask the user to run `dh-setup`. Never
+  create, guess, or overwrite the file from this skill.
 - **Plans do not own worktrees.** A worktree may host different plans over time, and a
   plan may move to another worktree. A worktree may be reused on the **same branch**
   for a different plan, always at the user's request. Never create a new worktree per
@@ -37,6 +38,25 @@ executes its steps. Format, interview questions, and template:
   lines; reference environment variables or local files instead.
 - **No destructive shortcuts.** Never `--force`, reset, delete a branch, or push unless
   the user or the lifecycle file explicitly asks.
+
+## Discovery And Alignment
+
+Discover every lifecycle file before touching git: the workspace root
+`WORKTREE_LIFECYCLE.md` first, then each package that is an independent
+repository (submodule or nested checkout) from the map (`WORKSPACE.md`, else
+`docs/WORKSPACE.md`). Order, branch alignment and failure behavior:
+[`references/worktree-discovery.md`](references/worktree-discovery.md).
+
+- Root phases always run; package phases run for the packages the operation
+  touches. Create runs root then packages; merge runs packages then the root so
+  the submodule pointer is committed; remove runs packages then the root.
+- Align branches: `feature/x` in the root means `feature/x` in every
+  participating package. A submodule in detached HEAD must be checked out on
+  the aligned branch before any commit.
+- A missing package lifecycle file is not an error (report it); a missing or
+  incomplete root file stops the operation.
+- The same-branch reuse rule still applies: one branch, one worktree, at the
+  user's request.
 
 ## Modes
 
@@ -60,12 +80,12 @@ relevant.
 
 | Section | Default cwd |
 |---|---|
-| `## Before create` | project root |
+| `## Before create` | workspace root |
 | `## After create` | new worktree |
 | `## Before merge` | worktree being merged |
-| `## After merge` | target worktree / project root |
+| `## After merge` | target worktree / workspace root |
 | `## Before remove` | worktree being removed |
-| `## After remove` | project root |
+| `## After remove` | workspace root |
 
 Each section is an ordered list of commands or manual instructions. Commands may use
 `{project_root}`, `{worktree}`, `{branch}`, `{base}`, `{target}`, and `{plan}`.
@@ -74,7 +94,7 @@ and reported as such.
 
 ## Create
 
-1. Run `Before create` from the project root.
+1. Run `Before create` from the workspace root.
 2. Ask which branch mode the user wants:
    - **new** — create `<branch>` from `<base>` (`git worktree add -b`).
    - **existing** — attach an existing branch; first verify with
@@ -112,7 +132,7 @@ and reported as such.
    removal without confirmation.
 3. Remove with `worktree_remove` (or `git worktree remove`), then `git worktree prune`
    when the lifecycle file asks for it.
-4. Run `After remove` from the project root. Do not delete branches unless the user
+4. Run `After remove` from the workspace root. Do not delete branches unless the user
    asks.
 
 ## Status
@@ -122,6 +142,6 @@ each worktree when known.
 
 ## Report
 
-Return: mode, worktree path, branch/base, lifecycle sections executed (pass/fail),
-failed commands, dirty state, and next steps. Record the plan-to-worktree association
-when a plan runs there.
+Return: mode, worktree path, branch/base, lifecycle sections executed (pass/fail)
+for the root and each package, failed commands, dirty state, and next steps. Record
+the plan-to-worktree association when a plan runs there.

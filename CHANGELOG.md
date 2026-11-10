@@ -9,10 +9,39 @@ version.
 
 ### Added
 
+- Workspace awareness across the harness (R1–R9): a normative workspace
+  contract (workspace, package, plan and vault roots; start-at-workspace-root
+  anchoring; `DH_WORKSPACE_ROOT`), `dh-setup` monorepo detection for
+  pnpm/npm/yarn workspaces, Nx/Turbo/Lerna, Cargo workspaces, Go workspaces,
+  Gradle/.NET solutions and `.gitmodules`, and a user-approved workspace map
+  (`WORKSPACE.md`, fallback `docs/WORKSPACE.md`).
+- Per-package preflight/artifact gates and package-scoped review/simplify diffs;
+  root + package `CODE_RULES.md` inheritance; workspace/package docs roots;
+  code-graph index routing; fixed/independent monorepo versioning;
+  root/submodule worktree lifecycle discovery; package-aware pause/resume;
+  workspace-first guidance in all 5 agents; monorepo fixtures plus anchor,
+  parser and contract tests.
+- Execution provenance: plans gain `## Execution Record` and the plans index a
+  `## Execution Records` table, recording the real repository/path, mirrored
+  plan path, summary and architectural changes (T1 write, T2 final-review
+  check, T3 finalize).
 - `dh-create-worktree` skill: create, reuse, merge, and remove worktrees from
   the project-owned `WORKTREE_LIFECYCLE.md` (before/after create, merge, and
   remove). A worktree may host different plans on the same branch at the user's
   request; the lifecycle file is generated and maintained only by `dh-setup`.
+
+### Changed
+
+- All 26 skills and 5 agents resolve the workspace map before acting, declare
+  affected packages in `## Workspace Impact`, and report per-package results;
+  `AGENTS.md`, `README.md`, `docs/LOADING.md` and `skills/index.md` document the
+  workspace contract and link its references.
+- `dh-planning`/`dh-grill-sdd` capture `## Workspace Impact`; the plan template
+  adds `## Workspace Impact` and `## Execution Record` while legacy plans and
+  the existing parser keep working.
+
+Standalone repositories with no workspace markers keep the current single-root
+behavior; there are no breaking changes.
 
 ## [0.6.0] — 2026-11-09
 

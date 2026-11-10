@@ -1,8 +1,8 @@
 # AGENTS.md — dev-harness V2 plugin (harness runtime contract)
 
 Role summary, provenance, plugin registration, the 5-step skills loop that
-every agent executing plans inside this plugin must follow, and the
-runtime delegation routing.
+every agent executing plans inside this plugin must follow, the workspace
+contract for monorepos, and the runtime delegation routing.
 
 ## Role summary
 
@@ -79,6 +79,52 @@ agents prefer these tools over manual plan.md edits (fall back to manual edits
 only when the server is unavailable). Format contract:
 `skills/dh-planning/references/phased-plan-template.md`. Wiring and
 verification: [`docs/LOADING.md`](docs/LOADING.md#mcp-server-dh).
+
+## Workspace contract (monorepo awareness)
+
+| Root | Meaning |
+|---|---|
+| **Workspace root** (`W`) | Repository containing every nested project; owns `docs/plans`, the root `AGENTS.md`, the `dh` MCP entry and the root `WORKTREE_LIFECYCLE.md`. |
+| **Package root** | Nested project (workspace package, submodule, nested repo or worktree); owns its stack, commands, optional `CODE_RULES.md`, docs and lifecycle. |
+| **Plan root** | Always `W/docs/plans`; a package-local `docs/plans` is never created. |
+| **Vault root** | `W` by default; `OBSIDIAN_VAULT` moves the vault copy only, never plans. |
+
+- **Start at `W`.** A monorepo session starts OpenCode at the workspace root;
+  `DH_WORKSPACE_ROOT` is unset or the absolute path of `W`. A package-scoped
+  session is an anchor mismatch: stop before the first write and restart at `W`
+  (read-only inspection only with explicit consent).
+- **Workspace map.** `dh-setup` detects the layout (pnpm/npm/yarn,
+  Nx/Turbo/Lerna, Cargo, Go, Gradle/.NET, `.gitmodules`) and writes a
+  user-approved `WORKSPACE.md` at `W` (fallback `docs/WORKSPACE.md`) with
+  packages, stacks, commands, docs roots, code-graph scope, worktree scope and
+  version policy. Skills read it before acting.
+- **Per-package work.** `## Workspace Impact` declares the affected packages;
+  `dh-preflight`/`dh-artifact-check` report each package independently (never
+  green for an unvalidated package), reviews diff only the declared
+  package/shared paths, and `CODE_RULES.md` resolves package-over-root for files
+  in that package (root covers shared files).
+- **Docs and versions.** Workspace docs live under `W/docs`; package docs under
+  `{package}/docs` with `package` frontmatter; evolution/observation notes stay
+  at `W/docs/evolution`. `dh-semver` follows the map's `fixed` (one `vX.Y.Z`)
+  or `independent` (`<package>@X.Y.Z`) policy; `dh-create-worktree` discovers
+  lifecycles at `W` and each independent package and aligns submodule branches.
+- **Execution record.** An executed plan fills `## Execution Record` in
+  `docs/plans/<slug>/plan.md` (real repo/path, mirrored plan path, summary,
+  architectural changes) at T1, `dh-final-review` verifies it at T2, and
+  execution finalizes it plus the `docs/plans/index.md` `## Execution Records`
+  row at T3.
+- **Standalone unchanged.** No markers and no map: `cwd = W = package root =
+  plan root = vault root`, one toolchain, full diff; no map or
+  `DH_WORKSPACE_ROOT` required.
+
+Normative contract:
+[`docs/plans/harness-monorepo-awareness/workspace-contract.md`](docs/plans/harness-monorepo-awareness/workspace-contract.md).
+References: [workspace map](skills/dh-setup/references/workspace-map.md) ·
+[gates](skills/dh-preflight/references/workspace-gates.md) ·
+[diff scope](skills/dh-review/references/workspace-diff-scope.md) ·
+[CODE_RULES](skills/dh-coding/references/code-rules-resolution.md) ·
+[docs roots](skills/dh-create-documentation/references/workspace-docs.md) ·
+[execution record](skills/dh-planning/references/execution-record.md).
 
 ## Runtime delegation
 
@@ -211,8 +257,9 @@ prefixes above.
 
 ## Generated documentation search
 
-Search generated documentation (vault = project root; docs under
-`{project_root}/docs`) quickly with the Obsidian CLI or notesmd-cli:
+Search generated documentation (vault = workspace root, which is the project
+root in a standalone repo; docs under `{workspace_root}/docs`) quickly with the
+Obsidian CLI or notesmd-cli:
 
 ```bash
 # notesmd-cli (works without Obsidian running; vault = project folder name)
@@ -224,5 +271,5 @@ rg --glob '*.md' "search term" docs/
 ```
 
 Use the first available tool (notesmd-cli preferred, then obsidian, then
-`rg`). The project root is an Obsidian vault when it contains `.obsidian/`;
+`rg`). The workspace root is an Obsidian vault when it contains `.obsidian/`;
 `dh-setup` checks and initializes it.

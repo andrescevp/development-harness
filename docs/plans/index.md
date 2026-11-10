@@ -1,5 +1,14 @@
 # Plans Index
 
+## Execution Records
+
+Rows are added when a plan is executed. The workspace-root plan remains the only plan root; the record points to the real repository/path, the mirrored plan path when applicable, the summary and the architectural changes.
+
+| Slug | Executed in (repo/path) | Plan path | Mirrored plan path | Summary | Architectural changes | Date |
+|---|---|---|---|---|---|---|
+
+## Plans
+
 | Title | Slug | Description | Created | Updated | Status | Active |
 |---|---|---|---|---|---|---|
 | Dev Harness V2 Plugin | dev-harness-v2-plugin | Build a standalone OpenCode V2 plugin in dev-harness-skills — 7 agents + 15 skills wired into a planning → execution → review → release loop, packaged via @opencode/plugin (Plugin.define, agent+skill transforms) | 2026-09-27 | 2026-09-28 | Completed | No |
@@ -10,10 +19,3 @@
 | Pause and Resume Plan Skills | pause-resume-plan-skills | Add dh-pause-plan and dh-resume-plan with a versioned handoff.md sidecar, drift-safe resume, an execute-plan guard, a handoff contract test, and a 19-skill inventory/docs update | 2026-11-07 | 2026-11-07 | Completed | No |
 | Agent Selection and Utility Skills | agent-selection-utility-skills | Replace hardcoded dh-agent delegation with runtime agent selection and migrate dh-executor/dh-explorer to dh-execute-cli/dh-explore skills | 2026-11-08 | 2026-11-08 | Completed | No |
 | Harness Monorepo Awareness | harness-monorepo-awareness | Make the bundled skills and agents workspace-aware for standalone and nested monorepo projects: workspace/anchor contract, setup detection and workspace map, per-package gates/reviews, docs/graph/version/worktree handling, agent guidance and fixtures | 2026-11-10 | 2026-11-10 | Pending | Yes |
-
-## Execution Records
-
-Rows are added when a plan is executed. The workspace-root plan remains the only plan root; the record points to the real repository/path, the mirrored plan path when applicable, the summary and the architectural changes.
-
-| Slug | Executed in (repo/path) | Plan path | Summary | Architectural changes | Date |
-|---|---|---|---|---|---|

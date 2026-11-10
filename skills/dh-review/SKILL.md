@@ -17,6 +17,7 @@ Verify that a single sub-task implementation meets its plan-defined acceptance c
 - Read the plan to find the active sub-task and its criteria — via `dh_plan_read` (`{ slug }`) when available, else manual read of `./docs/plans/<plan-slug>/plan.md` following the phased marker rules. If the plan does not exist, stop and report that no plan was found. The plan tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 - This skill is loop step 2.3 (`dh-review` + `dh-code-review`); the full loop 1–5 lives in repo-root AGENTS.md (pointer only, no duplication).
 - Do not review code outside the sub-task scope.
+- **Workspace diff scope (standard review only):** when `## Workspace Impact` lists affected packages, derive the path list and review `git diff <base>...HEAD -- <paths>` plus `git diff HEAD -- <paths>` / `git status --porcelain -- <paths>` for uncommitted work; label every finding with its package; include declared root/shared files explicitly; report untouched packages as **unaffected** (not reviewed, not "clean"). Standalone plans keep the full diff. Rules and commands: [`references/workspace-diff-scope.md`](references/workspace-diff-scope.md). Plan Alignment Mode never uses this.
 - **Resolve the review agent (standard review only):** read `## Agent Selection` in `plan.md` and use its Review row. If the section or row is absent or stale, run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md), record the row, and continue. A selected reviewer that is unavailable and has no capability fallback stops the run — never substitute silently.
 - Delegate code quality checks to the selected review agent — do not duplicate the `dh-code-review` skill.
 - Write all findings to `./docs/plans/<plan-slug>/tasks/review.md`. **Exception:** Plan Alignment Mode writes to the caller-specified path — default `tasks/review-fast.md` (pre-execution) or `tasks/review-fast-final.md` (plan-end).
@@ -48,9 +49,9 @@ Read `./docs/plans/<plan-slug>/plan.md` and
 **Allowed differences** (never findings):
 
 - `plan_fast.md` intentionally omits `## Objective`, `## Requirements Snapshot`,
-  `## Scope`, `## Assumptions and Constraints`,
+  `## Scope`, `## Workspace Impact`, `## Assumptions and Constraints`,
   `## Risks and Areas Requiring Care`, `## Core concepts`, `## Visual Context`,
-  `## Agent Selection`, and `## Open Questions`. Compare the `## Phases` region
+  `## Agent Selection`, `## Execution Record`, and `## Open Questions`. Compare the `## Phases` region
   and sub-task fields against `plan.md`, and use `plan.md` for
   requirements/scope checks. Do **not** flag those omitted top-level sections
   as missing.
@@ -123,7 +124,14 @@ Read the plan (via `dh_plan_read` when available; fallback: manual read of `./do
 
 ### Step 2: Review diff against criteria
 
-Examine the implementation changes (via `git diff` against base branch) and evaluate against the first four review dimensions (acceptance criteria, scope, validation, regression).
+Examine the implementation changes and evaluate against the first four review
+dimensions (acceptance criteria, scope, validation, regression). In a workspace,
+use the scoped diff — `git diff <base>...HEAD -- <affected package paths>` plus
+`git diff HEAD -- <paths>` / `git status --porcelain -- <paths>` for uncommitted
+work — plus the root/shared files the plan declares — never the unqualified full
+diff; a missing `## Workspace Impact` on a workspace plan stops the review
+instead of widening it
+([`references/workspace-diff-scope.md`](references/workspace-diff-scope.md)).
 
 ### Step 3: Delegate architecture validation (software projects only)
 
@@ -145,6 +153,7 @@ Write findings to `./docs/plans/<plan-slug>/tasks/review.md` using this format:
 # Sub-Task Review: [Sub-task title]
 
 **Reviewed against:** Sub-task from plan.md  
+**Packages:** [affected package paths, or `None — standalone`]  
 **Overall risk:** High / Medium / Low  
 **Verdict:** Approve / Approve with comments / Request changes
 
@@ -176,6 +185,8 @@ Write findings to `./docs/plans/<plan-slug>/tasks/review.md` using this format:
 
 - In scope: [verified]
 - Out of scope detected: [none / list]
+- Packages reviewed: [paths, or `None — standalone`]
+- Packages unaffected: [paths the plan marks unaffected — not reviewed]
 
 ## Suggested Next Steps
 
@@ -188,6 +199,7 @@ Return the review verdict to the caller. If P0/P1 findings exist, recommend fixe
 
 ## References
 
+- [`references/workspace-diff-scope.md`](references/workspace-diff-scope.md): path derivation, `git diff -- <paths>`, root/shared files and package labels.
 - [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): review-role resolution and re-validation.
 - `dh-code-review` skill: the detailed code review methodology delegated to the selected review agent.
 - `dh-domain-check` skill: architecture validation for cross-module changes (software projects only).

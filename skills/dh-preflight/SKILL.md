@@ -26,6 +26,26 @@ metadata:
 - If any tool fails: report exact file, line, and error message
 - Do not fix failures — report them and let the user decide
 
+## Workspace-Aware Gates
+
+- Read `## Workspace Impact` from the active plan (`dh_plan_read`) and the
+  workspace map (`WORKSPACE.md`) at the workspace root; the plan declares the
+  affected packages, the map supplies their exact commands. Command matrix,
+  selection rules and checklist:
+  [`references/workspace-gates.md`](references/workspace-gates.md).
+- Run each affected package's command (affected mode) or the workspace
+  aggregate when the plan is workspace-wide; report every affected package on
+  its own row as pass / fail / skipped.
+- Never report green for an unvalidated package: a skipped package needs its
+  recorded reason, and a green aggregate never covers a package whose own
+  command did not run.
+- A package listed in `## Workspace Impact` with no map row, no command, or a
+  path that does not exist is `unknown package` → **FAIL**, never skipped.
+- Run commands from the workspace root; confirm the session base is the
+  workspace root before starting (a package-level cwd is a hard stop).
+- **Standalone** (no map, no affected packages): keep the single-root behavior
+  and single-table report below unchanged.
+
 ## Output Template
 
 ```markdown
@@ -39,6 +59,11 @@ metadata:
 | Static analysis | ✅ Pass / ❌ Fail | [file:line: message] |
 | Format check | ✅ Pass / ❌ Fail | [files with issues] |
 | Clean state | ✅ Pass / ⚠️ Dirty | [uncommitted files] |
+
+## Package Gates (workspace only)
+| Package | Command | Result | Details |
+|---|---|---|---|
+| `apps/web` | `pnpm --filter web test` | ✅ Pass / ❌ Fail / ⏭️ Skipped | [reason when skipped] |
 
 **Verdict:** ✅ READY / ❌ BLOCKED — [N] failure(s)
 
