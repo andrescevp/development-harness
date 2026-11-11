@@ -3,9 +3,9 @@ title: Harness Monorepo Awareness
 slug: harness-monorepo-awareness
 description: Make the bundled skills and agents workspace-aware so they behave predictably in standalone projects and in monorepos with nested standalone projects.
 created: 2026-11-10
-updated: 2026-11-10
-status: Pending
-active: true
+updated: 2026-11-11
+status: Completed
+active: false
 tags: [plan]
 project: dev-harness-skills
 ---
@@ -638,7 +638,7 @@ the bundled harness capabilities present in this runtime.
         recorded reason.
   - [x] No legacy plan/parser regression.
   - [x] Docs, plan index, CHANGELOG and the audit cross-link are updated.
-  - [ ] The plan's `## Execution Record` and the index execution row contain
+  - [x] The plan's `## Execution Record` and the index execution row contain
         the real repo/path, mirrored plan path, summary and architectural
         changes.
   - [x] Standalone repositories with no workspace markers behave exactly as
@@ -646,13 +646,13 @@ the bundled harness capabilities present in this runtime.
 
 ## Execution Record
 
-- **Execution status:** In progress
+- **Execution status:** Completed
 - **Executed at:** 2026-11-11
 - **Workspace root:** `/home/andres/workspace/dev-harness-skills`
 - **Repository kind:** workspace
 - **Repository path:** `.`
 - **Branch / worktree:** `feature/harness-monorepo-awareness` (main checkout)
-- **Commit range:** `7e2eb14..uncommitted` (finalized at T3)
+- **Commit range:** `7e2eb14..425cc77` (implementation; close-out commit follows)
 - **Plan path:** `docs/plans/harness-monorepo-awareness/plan.md`
 - **Mirrored plan path:** `none`
 - **Summary:**
@@ -669,7 +669,10 @@ the bundled harness capabilities present in this runtime.
   semver policy; root/submodule worktree lifecycle; package-scope pause/resume;
   execution provenance in plan + index.
 - **References:** [audit](../../audits/2026-11-10-skills-agents-standalone-monorepo.md),
-  [contract](workspace-contract.md), [reviews](tasks/).
+  [contract](workspace-contract.md), [reviews](tasks/),
+  [final review](tasks/review.md),
+  [evolution note](../../evolution/2026-11-11-harness-monorepo-awareness.md),
+  [observation note](../../evolution/observations/2026-11-11-0116-harness-monorepo-awareness.md).
 
 ## Open Questions
 
