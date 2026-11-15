@@ -200,9 +200,31 @@ function checkAssets(prefix, source, check) {
   );
 }
 
+/**
+ * The tarball must ship the TUI part and publish `exports["./tui"]`: the
+ * opencode host resolves `<name>/tui` for every loaded package. The artifact is
+ * host-linked (opencode injects `@opencode/plugin/tui`, `solid-js` and
+ * `@opentui/*`), so this checks presence and the export map, never an import.
+ */
+function checkTui(prefix, check) {
+  const root = path.join(prefix, 'node_modules', PACKAGE_NAME);
+  const installed = readJson(path.join(root, 'package.json'));
+  const exported = installed.exports?.['./tui'];
+  const target = typeof exported === 'string' ? exported : (exported?.import ?? exported?.default);
+  check('installed package exports ./tui to dist/tui.js', target === './dist/tui.js', JSON.stringify(exported));
+
+  const bundle = path.join(root, 'dist', 'tui.js');
+  const stats = fs.statSync(bundle, { throwIfNoEntry: false });
+  const present = stats?.isFile() === true && stats.size > 0;
+  check('installed dist/tui.js exists and is non-empty', present, String(stats?.size));
+  const source = present ? fs.readFileSync(bundle, 'utf8') : '';
+  check('installed dist/tui.js links the host TUI runtime', source.includes('@opencode/plugin/tui'));
+}
+
 export async function checkInstalled(prefix, manifest, source, env, check) {
   checkImport(prefix, env, check);
   checkBins(prefix, manifest, env, check);
   await checkMcp(prefix, env, check);
   checkAssets(prefix, source, check);
+  checkTui(prefix, check);
 }

@@ -8,6 +8,13 @@
       "comment": "Plugin code runs inside the opencode host (node), but accidental node builtin imports in shared libs should stay explicit.",
       "from": {},
       "to": { "path": "^node:" }
+    },
+    {
+      "name": "tui-read-only",
+      "severity": "error",
+      "comment": "src/tui is a read-only reader (progress-contract §2, §10): writer modules are forbidden. plan-io is allowed for readPlanFile (O_NOFOLLOW) and plan-fast-template for computeSourceSha256, as the contract requires.",
+      "from": { "path": "^src/tui" },
+      "to": { "path": "^src/(lib/atomic-write|tools/(plan-fast|plan-fast-sync|plan-template|sheet-tools|logged-command))\\.ts$" }
     }
   ],
   "options": {

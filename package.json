@@ -1,6 +1,6 @@
 {
   "name": "dev-harness-skills",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "type": "module",
   "description": "OpenCode V2 plugin with an opinionated development harness based in plan execution loop architecture",
   "main": "./dist/plugin.js",
@@ -10,6 +10,11 @@
       "types": "./dist/plugin.d.ts",
       "import": "./dist/plugin.js",
       "default": "./dist/plugin.js"
+    },
+    "./tui": {
+      "types": "./dist/tui/index.d.ts",
+      "import": "./dist/tui.js",
+      "default": "./dist/tui.js"
     },
     "./package.json": "./package.json"
   },
@@ -58,19 +63,39 @@
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.3.1",
-    "@opencode/plugin": "^2.0.20",
+    "@opencode/plugin": "2.2.7",
     "duckdb": "^1.4.4",
     "jsonc-parser": "^3.3.1",
     "yaml": "^2.9.1",
     "zod": "^4.6.6"
   },
+  "peerDependencies": {
+    "@opentui/core": ">=0.8.1",
+    "@opentui/solid": ">=0.8.1",
+    "solid-js": ">=1.9.12"
+  },
+  "peerDependenciesMeta": {
+    "@opentui/core": {
+      "optional": true
+    },
+    "@opentui/solid": {
+      "optional": true
+    },
+    "solid-js": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@biomejs/biome": "^2.5.14",
     "@modelcontextprotocol/client": "^2.3.1",
+    "@opencode/theme": "2.2.7",
+    "@opentui/core": "^0.9.0",
+    "@opentui/solid": "^0.9.0",
     "@types/node": "^26.6.3",
     "dependency-cruiser": "^18.4.0",
     "jscpd": "^5.3.2",
     "knip": "^6.38.0",
+    "solid-js": "^1.9.19",
     "tsdown": "^0.23.7",
     "typescript": "^6.0.3",
     "vite": "8.3.3",
@@ -79,7 +104,8 @@
   "knip": {
     "$schema": "https://unpkg.com/knip@6/schema.json",
     "project": [
-      "src/**/*.ts"
+      "src/**/*.ts",
+      "src/**/*.tsx"
     ],
     "ignoreDependencies": [],
     "ignore": []

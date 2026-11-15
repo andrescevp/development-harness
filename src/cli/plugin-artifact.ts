@@ -2,11 +2,13 @@
  * plugin-artifact.ts — materialize the self-contained managed plugin layout.
  *
  * `buildStagedPlugin` resolves the running package root, verifies the built
- * `dist/plugin.js` + `dist/assets`, copies only what the plugin needs into a
- * staging sibling of the final target, and writes the `index.ts` / package.json
- * shims plus the install manifest. The staged bundle is imported before it is
- * accepted, so a broken artifact can never be swapped into place. Any failure
- * removes the staging directory; committing the swap belongs to the caller.
+ * server + TUI bundles and `dist/assets` (see plugin-layout.ts), copies only
+ * what the plugin needs into a staging sibling of the final target, and writes
+ * the `index.ts` / package.json shims plus the install manifest. The staged
+ * server bundle is imported before it is accepted, so a broken artifact can
+ * never be swapped into place; the host-linked TUI bundle is only size-checked.
+ * Any failure removes the staging directory; committing the swap belongs to the
+ * caller.
  */
 import crypto from 'node:crypto';
 import type { Dirent } from 'node:fs';
@@ -25,6 +27,7 @@ import {
   manifestPathFor,
   renderManifest,
 } from './manifest.js';
+import { ASSETS_DIR, BUNDLE_FILE, isNonEmptyFile, requireBuiltLayout, TUI_BUNDLE_FILE } from './plugin-layout.js';
 import type { Scope } from './scope.js';
 
 export { scanBareSpecifiers } from './bundle-scan.js';
@@ -33,8 +36,6 @@ export { scanBareSpecifiers } from './bundle-scan.js';
 export const EXPECTED_AGENT_COUNT = 5;
 export const EXPECTED_SKILL_COUNT = 26;
 
-const BUNDLE_FILE = 'plugin.js';
-const ASSETS_DIR = 'assets';
 const INDEX_FILE = 'index.ts';
 const PACKAGE_FILE = 'package.json';
 const INDEX_SHIM =
@@ -76,14 +77,6 @@ function isFile(candidate: string): boolean {
   }
 }
 
-function isDirectory(candidate: string): boolean {
-  try {
-    return fs.statSync(candidate).isDirectory();
-  } catch {
-    return false;
-  }
-}
-
 function describeError(error: unknown): string {
   return error instanceof Error && error.message !== '' ? error.message : String(error);
 }
@@ -96,23 +89,6 @@ function requireAbsoluteTarget(targetDir: string): string {
     throw new OperationalError(`cannot materialize the plugin: target directory must be absolute: ${targetDir}`);
   }
   return path.resolve(targetDir);
-}
-
-/** Fail early when running from a source checkout without a build. */
-function requireBuiltLayout(packageRoot: string): { bundle: string; assets: string } {
-  const bundle = path.join(packageRoot, 'dist', BUNDLE_FILE);
-  const assets = path.join(packageRoot, 'dist', ASSETS_DIR);
-  if (!isFile(bundle)) {
-    throw new OperationalError(
-      `cannot materialize the plugin: ${bundle} is missing; build the package first (pnpm build) or install from the published package`
-    );
-  }
-  if (!isDirectory(assets)) {
-    throw new OperationalError(
-      `cannot materialize the plugin: ${assets} is missing; build the package assets first (pnpm build)`
-    );
-  }
-  return { bundle, assets };
 }
 
 function readEntries(directory: string): Dirent[] {
@@ -214,7 +190,9 @@ function renderPackageJson(version: string): string {
     private: true,
     type: 'module',
     main: `./dist/${BUNDLE_FILE}`,
-    exports: { '.': `./dist/${BUNDLE_FILE}` },
+    // The opencode host resolves the TUI part through the package export
+    // (`<name>/tui`), so the managed copy must publish it beside the server.
+    exports: { '.': `./dist/${BUNDLE_FILE}`, './tui': `./dist/${TUI_BUNDLE_FILE}` },
   };
   return `${JSON.stringify(metadata, null, 2)}\n`;
 }
@@ -230,32 +208,43 @@ async function cleanupStaging(stagingDir: string): Promise<void> {
 /**
  * Build and verify a staged managed plugin directory. The final `targetDir` is
  * never created or modified; the caller owns the atomic swap after review.
- * Throws `OperationalError` for a missing/partial build, bad asset counts, a
- * non-self-contained or unimportable bundle, or an invalid manifest; staging
- * is removed on every failure.
+ * Throws `OperationalError` for a missing/partial build (including a missing or
+ * zero-byte TUI bundle), bad asset counts, a non-self-contained or unimportable
+ * server bundle, or an invalid manifest; staging is removed on every failure.
  */
 export async function buildStagedPlugin(input: BuildStagedPluginInput): Promise<StagedPlugin> {
   const targetDir = requireAbsoluteTarget(input.targetDir);
   const packageRoot =
     input.packageRoot === undefined ? findPackageRoot(import.meta.url) : path.resolve(input.packageRoot);
-  const { bundle, assets } = requireBuiltLayout(packageRoot);
+  const { bundle, tuiBundle, assets } = requireBuiltLayout(packageRoot);
 
   const sourceCounts = assertAssetCounts(assets);
+  // Only the server bundle must be self-contained; dist/tui.js links the
+  // modules opencode injects.
   await assertSelfContained(bundle);
 
   let stagingDir: string | undefined;
   try {
     stagingDir = await stageDirectory(targetDir);
     const stagedBundle = path.join(stagingDir, 'dist', BUNDLE_FILE);
+    const stagedTuiBundle = path.join(stagingDir, 'dist', TUI_BUNDLE_FILE);
     const stagedAssets = path.join(stagingDir, 'dist', ASSETS_DIR);
 
     await copyTree(bundle, stagedBundle);
+    await copyTree(tuiBundle, stagedTuiBundle);
     await copyTree(assets, stagedAssets);
     writeFileAtomic(path.join(stagingDir, INDEX_FILE), INDEX_SHIM);
     writeFileAtomic(path.join(stagingDir, PACKAGE_FILE), renderPackageJson(input.version));
 
     assertAssetCounts(stagedAssets, sourceCounts);
     await importStagedBundle(stagedBundle);
+    // The TUI bundle is host-linked (bare imports the host injects), so it is
+    // not imported here; a zero-byte copy is still a broken installation.
+    if (!isNonEmptyFile(stagedTuiBundle)) {
+      throw new OperationalError(
+        `the staged TUI bundle ${stagedTuiBundle} is empty; the build artifact ${tuiBundle} could not be copied`
+      );
+    }
 
     const files = (await listManagedFiles(stagingDir)).sort();
     const manifest = createManifest({

@@ -149,6 +149,31 @@ Plans are stored under `docs/plans/<slug>/plan.md` using a phased structure. Eve
 
 **Pause/resume (cross-cutting).** A plan can pause at any point without changing its statuses: `dh-pause-plan` writes `docs/plans/<slug>/handoff.md` with the active phase/sub-task, git/worktree state, decisions, blockers, validation, and next steps. `dh-resume-plan` validates the handoff, detects drift, rehydrates context, marks it `resumed`, and re-enters step 2. `dh-execute-plan` redirects when a paused handoff exists. The handoff is a sidecar, not a fourth status.
 
+### TUI plan progress
+
+The package also ships a **TUI part** (`exports["./tui"]`) that loads
+automatically beside the server part — no second entry — so plan execution can
+be followed without leaving OpenCode. It is read-only and reads the **local**
+workspace only.
+
+- **Sidebar card** (`sidebar.content`): active plan, `Phase N · N.M` position,
+  completed/total sub-tasks with a text progress bar, the current sub-task's
+  delegated agent, plan status and a one-line activity (`Running edit`,
+  `2 active plans — choose one`).
+- **`/plan-progress` panel** (palette entry "Plan progress"): every phase and
+  sub-task with status and delegated agent, checklists, review verdict,
+  fast-mode skipped-check ledger and last update. `↑`/`↓` and `PgUp`/`PgDn`
+  scroll, `f` toggles fullscreen, `r` refreshes, `Esc` closes, and `1`…`9` pin a
+  plan when several are active.
+- **Build:** `pnpm build` emits `dist/tui.js` (required for source/`file://`
+  loading); managed and package installs ship it. `@opentui/core`,
+  `@opentui/solid` and `solid-js` are optional peers provided by the host.
+- **Limit (v1):** plans come from the `docs/plans` of the local workspace root;
+  a remote-server or package-scoped session shows the empty state.
+
+Loading modes, the `cli.json` rule, verification and the manual session check:
+[`docs/LOADING.md` → TUI plan progress](docs/LOADING.md#tui-plan-progress).
+
 ### MCP server (`dh`)
 
 The plugin registers **no tools**. The 12 harness tools are served by a local

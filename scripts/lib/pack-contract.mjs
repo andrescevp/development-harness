@@ -13,6 +13,8 @@ export const REQUIRED_ARTIFACTS = [
   'README.md',
   'dist/plugin.js',
   'dist/plugin.d.ts',
+  'dist/tui.js',
+  'dist/tui/index.d.ts',
   'dist/cli.js',
   'dist/mcp/stdio.js',
   'dist/assets/skills/index.md',
