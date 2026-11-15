@@ -4,7 +4,7 @@ slug: tui-plan-progress
 description: Add an OpenCode TUI part to dev-harness-skills that shows live plan-execution progress in the sidebar and a full session panel (phases, sub-tasks, checklists, current agent/activity).
 created: 2026-11-15
 updated: 2026-11-15
-status: Pending
+status: In Progress
 active: true
 tags: [plan]
 project: dev-harness-skills
@@ -131,11 +131,11 @@ harness capabilities available in this runtime.
 
 ### Phase 1: API and Build Contract
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 1.1: Validate TUI APIs and session activity typings
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Pin the exact TUI APIs, slot/panel/command shapes, session
   status/events and storage semantics used by the implementation.
@@ -167,7 +167,7 @@ harness capabilities available in this runtime.
 
 #### Sub-Task 1.2: Define the progress and activity contracts
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-architect
 - **Objective:** Specify the `PlanProgress` model, active-plan selection,
   checklist/review/gate derivation and activity fallback behavior.
@@ -192,7 +192,7 @@ harness capabilities available in this runtime.
 
 #### Sub-Task 1.3: Spike the Solid/OpenTUI build and package loading
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Prove the TUI part can be built with the repo toolchain and
   loaded beside the server part, and decide peer-vs-bundle resolution.
@@ -220,11 +220,11 @@ harness capabilities available in this runtime.
 
 ### Phase 2: Progress Data Layer
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 2.1: Implement the plan progress parser
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Implement the pure progress model over `docs/plans`.
 - **Related Requirements:** R2, R3, R4
@@ -247,7 +247,7 @@ harness capabilities available in this runtime.
 
 #### Sub-Task 2.2: Implement plan watch and refresh
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Keep the progress model fresh with a debounced watcher/poll and
   clean disposal.
@@ -270,7 +270,7 @@ harness capabilities available in this runtime.
 
 #### Sub-Task 2.3: Map session status and events to current activity
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Produce the one-line "what is happening" model without leaking
   message content.
@@ -292,7 +292,7 @@ harness capabilities available in this runtime.
 
 #### Sub-Task 2.4: Add data-layer tests and fixtures
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Cover the parser, watcher and activity mapper with deterministic
   tests and fixtures.
@@ -314,11 +314,11 @@ harness capabilities available in this runtime.
 
 ### Phase 3: TUI Components and Commands
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 3.1: Implement the sidebar progress card
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Render the compact always-visible plan card in
   `sidebar.content`.
@@ -341,7 +341,7 @@ harness capabilities available in this runtime.
 
 #### Sub-Task 3.2: Implement the full plan progress panel
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Render the detailed `session.panel` for `/plan-progress`.
 - **Related Requirements:** R3
@@ -362,7 +362,7 @@ harness capabilities available in this runtime.
 
 #### Sub-Task 3.3: Wire the TUI plugin, commands and cleanup
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Assemble the TUI plugin: store, watcher, slots, command and
   activity subscription with cleanup.
@@ -386,11 +386,11 @@ harness capabilities available in this runtime.
 
 ### Phase 4: Packaging, Installer, Docs and QA
 
-- **Status:** Pending
+- **Status:** In Progress
 
 #### Sub-Task 4.1: Wire the TUI build, package exports and peers
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Ship `dist/tui.js` with correct exports, peers and JSX build.
 - **Related Requirements:** R1, R7
@@ -411,7 +411,7 @@ harness capabilities available in this runtime.
 
 #### Sub-Task 4.2: Teach the managed installer to ship the TUI artifact
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Include the TUI artifact and package export in managed installs
   without breaking server self-containment.
@@ -434,7 +434,7 @@ harness capabilities available in this runtime.
 
 #### Sub-Task 4.3: Document TUI usage and limitations
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-documentor
 - **Objective:** Document loading, sidebar, `/plan-progress`, build requirement
   and local-only v1 limits.
@@ -458,7 +458,7 @@ harness capabilities available in this runtime.
 
 #### Sub-Task 4.4: Run the full QA gate and close the plan
 
-- **Status:** Pending
+- **Status:** In Progress
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Validate the full feature end-to-end and close the plan.
 - **Related Requirements:** R1–R8
@@ -489,26 +489,40 @@ harness capabilities available in this runtime.
 - **Completion Checklist:**
   - [ ] All 4 phases and 14 sub-tasks `Completed`.
   - [ ] TUI card and panel render with real plan data and refresh.
-  - [ ] Data-layer tests and TUI smoke pass.
-  - [ ] `pnpm qa:check:full` green.
+  - [x] Data-layer tests and TUI smoke pass.
+  - [x] `pnpm qa:check:full` green.
   - [ ] Docs/CHANGELOG and execution record/index updated.
-  - [ ] No new skills/agents; counts stay 5 agents + 26 skills.
-  - [ ] Standalone and workspace plan resolution respected.
+  - [x] No new skills/agents; counts stay 5 agents + 26 skills.
+  - [x] Standalone and workspace plan resolution respected.
 
 ## Execution Record
 
-- **Execution status:** Not executed
-- **Executed at:** —
-- **Workspace root:** —
-- **Repository kind:** —
-- **Repository path:** —
-- **Branch / worktree:** —
-- **Commit range:** —
+- **Execution status:** In progress
+- **Executed at:** 2026-11-15
+- **Workspace root:** `/home/andres/workspace/dev-harness-skills`
+- **Repository kind:** workspace
+- **Repository path:** `.`
+- **Branch / worktree:** `feature/tui-plan-progress` (main checkout)
+- **Commit range:** `814a8b7..uncommitted` (finalized at T3)
 - **Plan path:** `docs/plans/tui-plan-progress/plan.md`
-- **Mirrored plan path:** `none`
-- **Summary:** —
-- **Architectural changes:** —
-- **References:** —
+- **Mirrored plan path:** `docs/plans/tui-plan-progress/plan_fast.md`
+- **Summary:**
+  - Added the `./tui` part with a `sidebar.content` progress card and a
+    `/plan-progress` session panel; read-only, local-first.
+  - Added the plan progress data layer: parser/selection/checklists/review/
+    ledger, watcher, and session activity mapping.
+  - Wired tsdown/package exports/peers, the managed installer TUI artifact and
+    the `@opencode/plugin` 2.2.7 alignment; added unit, bundle, install and pack
+    coverage plus docs/CHANGELOG.
+  - Full `pnpm qa:check:full` green; live TUI pixel verification is blocked by
+    the lack of a TTY/session in this environment (host evaluates the bundle).
+- **Architectural changes:** TUI part (`exports["./tui"]`) beside the server
+  part; plan-progress read-only data pipeline; sidebar/panel slot architecture;
+  host-singleton peer model with bundled `yaml`; managed-install layout ships
+  `dist/tui.js` and the `./tui` export; `@opencode/plugin` pinned to 2.2.7.
+- **References:** [SDD](sdd.md), [progress contract](progress-contract.md),
+  [API notes](tui-api-notes.md), [alignment](tasks/review-fast-final.md),
+  [code review](tasks/review-code.md).
 
 ## Open Questions
 

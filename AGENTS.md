@@ -192,6 +192,10 @@ skills.
   (including `dh-coding`) and no commands are registered; then confirm the
   project-scope `dh` MCP server is connected (`opencode mcp list`) so the
   harness tools are available.
+- **TUI part:** `exports["./tui"]` loads automatically beside the server part and
+  renders read-only plan progress (sidebar card + `/plan-progress`) from the
+  local `docs/plans` — see
+  [`docs/LOADING.md`](docs/LOADING.md#tui-plan-progress).
 
 ## Repository layout
 

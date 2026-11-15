@@ -41,10 +41,11 @@ function isDhEntry(entry) {
   );
 }
 
-/** Require the built CLI, bundle, and the 5-agent/26-skill corpus. */
+/** Require the built CLI, both bundles, and the 5-agent/26-skill corpus. */
 export function preflight(repoRoot, check) {
   const cli = path.join(repoRoot, 'dist', 'cli.js');
   const plugin = path.join(repoRoot, 'dist', 'plugin.js');
+  const tui = path.join(repoRoot, 'dist', 'tui.js');
   const assets = path.join(repoRoot, 'dist', 'assets');
   const skills = path.join(assets, 'skills');
   const agents = readEntries(path.join(assets, 'agents')).filter(
@@ -56,12 +57,14 @@ export function preflight(repoRoot, check) {
 
   check('dist/cli.js exists and is non-empty', isFileWithContent(cli), 'run pnpm build');
   check('dist/plugin.js exists and is non-empty', isFileWithContent(plugin), 'run pnpm build');
+  check('dist/tui.js exists and is non-empty', isFileWithContent(tui), 'run pnpm build');
   check('dist/assets exists', isDirectory(assets), 'run pnpm build');
   check('dist/assets has exactly 5 agent files', agents.length === 5, `found ${agents.length}`);
   check('dist/assets has exactly 26 skill directories', skillDirs.length === 26, `found ${skillDirs.length}`);
   return (
     isFileWithContent(cli) &&
     isFileWithContent(plugin) &&
+    isFileWithContent(tui) &&
     isDirectory(assets) &&
     agents.length === 5 &&
     skillDirs.length === 26
@@ -89,7 +92,7 @@ export function inspectManifest(target, configPath, version, check) {
     'project: manifest records the managed config and files',
     manifest.config?.path === configPath &&
       manifest.config?.key === 'mcp.servers.dh' &&
-      ['index.ts', 'package.json', 'dist/plugin.js'].every((entry) => manifest.files?.includes(entry))
+      ['index.ts', 'package.json', 'dist/plugin.js', 'dist/tui.js'].every((entry) => manifest.files?.includes(entry))
   );
 }
 
@@ -134,4 +137,39 @@ export async function inspectInstalledPlugin(target, check) {
   } catch (error) {
     check('project: installed dist/plugin.js imports with id and setup', false, describe(error));
   }
+}
+
+/**
+ * The managed copy must ship the TUI part and publish it as a package export:
+ * the opencode host resolves `<name>/tui`, and the 1.3 spike proved that path
+ * loads from a directory with no node_modules. The artifact is host-linked
+ * (bare `@opencode/plugin/tui`, `solid-js`, `@opentui/*` imports the host
+ * injects), so it is validated by presence and export only — never imported
+ * here.
+ */
+export function inspectInstalledTui(target, check) {
+  const bundle = path.join(target, 'dist', 'tui.js');
+  const present = isFileWithContent(bundle);
+  check('project: installed dist/tui.js exists and is non-empty', present, 'run pnpm build');
+
+  let source = '';
+  try {
+    source = present ? fs.readFileSync(bundle, 'utf8') : '';
+  } catch {
+    // reported by the presence check above
+  }
+  check(
+    'project: managed dist/tui.js links the host TUI runtime',
+    source.includes('@opencode/plugin/tui'),
+    'artifact is missing the host TUI import'
+  );
+
+  let exported;
+  try {
+    exported = readJson(path.join(target, 'package.json')).exports?.['./tui'];
+  } catch (error) {
+    check('project: managed package.json exports ./tui', false, describe(error));
+    return;
+  }
+  check('project: managed package.json exports ./tui', exported === './dist/tui.js', String(exported));
 }

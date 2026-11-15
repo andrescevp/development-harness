@@ -57,8 +57,45 @@ const base = {
   outputOptions: { codeSplitting: false },
 } satisfies UserConfig;
 
+/**
+ * TUI part (`dist/tui.js`) — runs inside the opencode host, not in a Node
+ * process we control.
+ *
+ * - Host singletons stay EXTERNAL: `@opencode/plugin/tui`, `solid-js` and the
+ *   `@opentui/*` runtime modules are injected by the host through its
+ *   `opentui:runtime-module:*` rewrite. Bundling a second `solid-js` would
+ *   split reactivity/context; bundling `@opentui/core` would build renderables
+ *   outside the host renderer.
+ * - JSX compiles to the automatic runtime `@opentui/solid/jsx-runtime` (also a
+ *   host-provided runtime module) through rolldown's oxc transform.
+ * - No shebang banner: this artifact is imported, never executed.
+ */
+const tui = {
+  ...base,
+  entry: { tui: 'src/tui/index.tsx' },
+  banner: undefined,
+  deps: {
+    neverBundle: ['@opencode/plugin', /^@opencode\/plugin\//, 'solid-js', /^solid-js\//, /^@opentui\//],
+    // `plan-lifecycle` parses plan frontmatter; the managed install has no
+    // node_modules, so `yaml` must ship inside the single-file artifact
+    // (progress-contract §2 bundling note).
+    alwaysBundle: ['yaml'],
+    onlyBundle: false,
+  },
+  // The server aliases exist only for the bundled `yaml`/`jsonc-parser` copies.
+  // The TUI bundles `yaml` too (managed installs have no node_modules), and the
+  // browser ESM build avoids the CJS `createRequire` interop the node build
+  // needs; `jsonc-parser` is never imported by the TUI.
+  alias: {
+    yaml: path.resolve('node_modules/yaml/browser/dist/index.js'),
+  },
+  outputOptions: { codeSplitting: false },
+} satisfies UserConfig;
+
 export default defineConfig([
   { ...base, entry: { plugin: 'src/plugin.ts' } },
   { ...base, entry: { 'mcp/stdio': 'src/mcp/stdio.ts' } },
   { ...base, entry: { cli: 'src/cli/main.ts' } },
+  tui,
 ]);
+

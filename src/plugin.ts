@@ -10,7 +10,8 @@
  * external data must be pre-loaded), resolved from the bundle location
  * (`import.meta.dirname` → dist/assets), NOT from the process CWD.
  *
- * Semantics verified against @opencode/plugin@2.0.18 typings + host source:
+ * Semantics verified against @opencode/plugin@2.0.18 typings + host source and
+ * re-verified against the host-aligned 2.2.7 typings (identical surface):
  *   - `ctx.agent.transform(editor)`: `editor.update(id, (agent) => void)`
  *     UPSERTS — the host creates plugin-scope agents that do not exist yet
  *     (the built-in agent plugin registers `plan`/`explore`/... the same way)

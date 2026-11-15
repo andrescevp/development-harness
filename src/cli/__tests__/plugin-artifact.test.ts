@@ -2,9 +2,14 @@
  * plugin-artifact.test.ts — managed plugin materialization and integrity (2.3).
  *
  * Every case builds a fixture package root in a temp directory (package.json,
- * dist/plugin.js, dist/assets), runs the materializer, and removes the temp
- * tree in `finally`. The staged bundle is imported exactly like OpenCode would
- * import the managed layout; no real home, network, or repo artifact is used.
+ * dist/plugin.js, dist/tui.js, dist/assets), runs the materializer, and removes
+ * the temp tree in `finally`. The staged server bundle is imported exactly like
+ * OpenCode would import the managed layout; no real home, network, or repo
+ * artifact is used.
+ *
+ * The TUI bundle is copied + size-checked but never imported or bare-import
+ * scanned: it depends on host-injected `@opencode/plugin/tui`, `solid-js` and
+ * `@opentui/*` modules that only exist inside the opencode process.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -23,13 +28,18 @@ import {
 } from '../plugin-artifact.js';
 
 const VALID_BUNDLE = "export default { id: 'fixture-plugin', setup() {} };\n";
+/** Host-provided bare imports: valid for the TUI artifact, invalid for the server bundle. */
+const VALID_TUI_BUNDLE =
+  "import { Plugin } from '@opencode/plugin/tui';\nexport default Plugin.define({ id: 'fixture-tui', setup() {} });\n";
 
 interface FixtureOptions {
   readonly withBundle?: boolean;
   readonly withAssets?: boolean;
+  readonly withTui?: boolean;
   readonly agents?: number;
   readonly skills?: number;
   readonly pluginSource?: string;
+  readonly tuiSource?: string;
 }
 
 function writeFile(file: string, contents: string): void {
@@ -37,7 +47,7 @@ function writeFile(file: string, contents: string): void {
   fs.writeFileSync(file, contents, 'utf8');
 }
 
-/** Build a fixture package root with `dist/plugin.js` and `dist/assets`. */
+/** Build a fixture package root with `dist/plugin.js`, `dist/tui.js`, and `dist/assets`. */
 function createFixture(root: string, options: FixtureOptions = {}): string {
   const packageRoot = path.join(root, 'package');
   writeFile(path.join(packageRoot, 'package.json'), JSON.stringify({ name: 'dev-harness-skills', version: '0.4.0' }));
@@ -45,6 +55,9 @@ function createFixture(root: string, options: FixtureOptions = {}): string {
   const dist = path.join(packageRoot, 'dist');
   if (options.withBundle !== false) {
     writeFile(path.join(dist, 'plugin.js'), options.pluginSource ?? VALID_BUNDLE);
+  }
+  if (options.withTui !== false) {
+    writeFile(path.join(dist, 'tui.js'), options.tuiSource ?? VALID_TUI_BUNDLE);
   }
   if (options.withAssets !== false) {
     const agentCount = options.agents ?? EXPECTED_AGENT_COUNT;
@@ -125,10 +138,11 @@ describe('buildStagedPlugin', () => {
         private: true,
         type: 'module',
         main: './dist/plugin.js',
-        exports: { '.': './dist/plugin.js' },
+        exports: { '.': './dist/plugin.js', './tui': './dist/tui.js' },
       });
 
       expect(fs.readFileSync(path.join(staged.stagingDir, 'dist', 'plugin.js'), 'utf8')).toBe(VALID_BUNDLE);
+      expect(fs.readFileSync(path.join(staged.stagingDir, 'dist', 'tui.js'), 'utf8')).toBe(VALID_TUI_BUNDLE);
       expect(await entries(path.join(staged.stagingDir, 'dist', 'assets', 'agents'))).toHaveLength(
         EXPECTED_AGENT_COUNT
       );
@@ -171,6 +185,7 @@ describe('buildStagedPlugin', () => {
           'index.ts',
           'package.json',
           'dist/plugin.js',
+          'dist/tui.js',
           'dist/assets/agents/agent-0.md',
           'dist/assets/skills/skill-0/SKILL.md',
         ])
@@ -183,6 +198,8 @@ describe('buildStagedPlugin', () => {
 
   const LAYOUT_CASES: ReadonlyArray<{ name: string; options: FixtureOptions; pattern: RegExp }> = [
     { name: 'a missing bundle', options: { withBundle: false }, pattern: /dist\/plugin\.js is missing.*pnpm build/ },
+    { name: 'a missing TUI bundle', options: { withTui: false }, pattern: /dist\/tui\.js is missing/ },
+    { name: 'an empty TUI bundle', options: { tuiSource: '' }, pattern: /dist\/tui\.js is missing or empty/ },
     { name: 'missing assets', options: { withAssets: false }, pattern: /dist\/assets is missing/ },
     { name: 'too few agents', options: { agents: 4 }, pattern: /expected 5 agent files.*found 4 agents and 26 skills/ },
     {
@@ -205,6 +222,20 @@ describe('buildStagedPlugin', () => {
 
       expect(error.message).toMatch(/not self-contained/);
       expect(error.message).toContain('lodash');
+    });
+  });
+
+  it('does not apply the server self-containment scan to the TUI bundle', async () => {
+    await withTempDir(async (dir) => {
+      // Same bare specifier: fatal in dist/plugin.js, expected in dist/tui.js
+      // because the opencode host injects that module at runtime.
+      const source =
+        "import { Plugin } from '@opencode/plugin/tui';\nexport default Plugin.define({ id: 't', setup() {} });\n";
+      const packageRoot = createFixture(dir, { tuiSource: source });
+      const staged = await buildStagedPlugin(buildInput(dir, packageRoot));
+
+      expect(fs.readFileSync(path.join(staged.stagingDir, 'dist', 'tui.js'), 'utf8')).toBe(source);
+      expect(staged.files).toContain('dist/tui.js');
     });
   });
 
