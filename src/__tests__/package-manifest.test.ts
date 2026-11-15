@@ -41,8 +41,46 @@ describe('npm package entrypoints', () => {
         import: './dist/plugin.js',
         default: './dist/plugin.js',
       },
+      './tui': {
+        types: './dist/tui/index.d.ts',
+        import: './dist/tui.js',
+        default: './dist/tui.js',
+      },
       './package.json': './package.json',
     });
+  });
+
+  it('declares the host-provided TUI peers as optional', () => {
+    // The OpenCode host injects solid-js/@opentui at runtime; the declarations
+    // exist so package managers and editors resolve the types, not to bundle
+    // copies.
+    expect(manifest.peerDependencies).toEqual({
+      '@opentui/core': '>=0.8.1',
+      '@opentui/solid': '>=0.8.1',
+      'solid-js': '>=1.9.12',
+    });
+    expect(manifest.peerDependenciesMeta).toEqual({
+      '@opentui/core': { optional: true },
+      '@opentui/solid': { optional: true },
+      'solid-js': { optional: true },
+    });
+  });
+
+  it('pins @opencode/plugin to the host line with @opencode/theme in lockstep', () => {
+    // The server plugin is BUNDLED into dist/plugin.js and runs inside the
+    // opencode host (2.2.7 today). A range would resolve a newer line and
+    // bundle APIs the running host does not provide; the theme typings must
+    // match the plugin typings (context.d.ts imports ResolvedTheme from the
+    // same version).
+    const dependencies = isRecord(manifest.dependencies) ? manifest.dependencies : {};
+    const devDependencies = isRecord(manifest.devDependencies) ? manifest.devDependencies : {};
+    const pinned = dependencies['@opencode/plugin'];
+    expect(pinned).toMatch(/^\d+\.\d+\.\d+$/);
+    expect(devDependencies['@opencode/theme']).toBe(pinned);
+    const installed: unknown = JSON.parse(
+      fs.readFileSync(path.join(REPO_ROOT, 'node_modules', '@opencode', 'plugin', 'package.json'), 'utf8')
+    );
+    expect(isRecord(installed) ? installed.version : undefined).toBe(pinned);
   });
 
   it('ships only the built artifacts and README in the tarball', () => {

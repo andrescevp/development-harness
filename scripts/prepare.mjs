@@ -19,7 +19,8 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const artifacts = ['dist/plugin.js', 'dist/mcp/stdio.js', 'dist/cli.js'];
+// Server plugin, MCP bin, installer CLI, and the TUI part (`exports["./tui"]`).
+const artifacts = ['dist/plugin.js', 'dist/tui.js', 'dist/mcp/stdio.js', 'dist/cli.js'];
 const sentinel = join(root, 'dist', '.build-ok');
 
 function isComplete() {

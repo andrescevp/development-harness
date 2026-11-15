@@ -53,7 +53,13 @@ describe('runInstall', () => {
         scope: 'global',
         target,
       });
-      expect(manifest.files).toEqual(expect.arrayContaining(['index.ts', 'package.json', 'dist/plugin.js']));
+      expect(manifest.files).toEqual(
+        expect.arrayContaining(['index.ts', 'package.json', 'dist/plugin.js', 'dist/tui.js'])
+      );
+      expect(readJson(path.join(target, 'package.json')).exports).toEqual({
+        '.': './dist/plugin.js',
+        './tui': './dist/tui.js',
+      });
       expect(fs.readdirSync(path.join(target, 'dist', 'assets', 'agents'))).toHaveLength(5);
       expect(fs.readdirSync(path.join(target, 'dist', 'assets', 'skills'))).toHaveLength(26);
       expect(manifest.config).toEqual({

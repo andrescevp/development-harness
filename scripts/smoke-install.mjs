@@ -29,6 +29,7 @@ import {
 import {
   inspectConfig,
   inspectInstalledPlugin,
+  inspectInstalledTui,
   inspectManifest,
   isDirectory,
   preflight,
@@ -84,6 +85,7 @@ async function runProjectLifecycle(root, env) {
   inspectManifest(target, config, PACKAGE_VERSION, check);
   inspectConfig('project install', config, { dh: true, other: true }, check);
   await inspectInstalledPlugin(target, check);
+  inspectInstalledTui(target, check);
 
   const mtime = fs.statSync(target).mtimeMs;
   const rerun = jsonCommand(

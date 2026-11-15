@@ -6,6 +6,7 @@ Rows are added when a plan is executed. The workspace-root plan remains the only
 
 | Slug | Executed in (repo/path) | Plan path | Mirrored plan path | Summary | Architectural changes | Date |
 |---|---|---|---|---|---|---|
+| tui-plan-progress | workspace: . | docs/plans/tui-plan-progress/plan.md | docs/plans/tui-plan-progress/plan_fast.md | TUI sidebar card + /plan-progress panel, plan progress data layer/activity, packaging/installer and tests | TUI part (`./tui`), host-peer model, read-only progress pipeline, managed TUI artifact, `@opencode/plugin` 2.2.7 pin | 2026-11-15 |
 | harness-monorepo-awareness | workspace: . | docs/plans/harness-monorepo-awareness/plan.md | none | Workspace contract/map, per-package gates/reviews, docs/graph/semver/worktrees, agent guidance, fixtures | Workspace roots/anchor; Workspace Impact + Execution Record; package-scoped gates/reviews; CODE_RULES precedence; docs roots; graph routing; semver policy; worktree/submodule lifecycle; package-scope pause/resume | 2026-11-11 |
 
 ## Plans
@@ -20,3 +21,4 @@ Rows are added when a plan is executed. The workspace-root plan remains the only
 | Pause and Resume Plan Skills | pause-resume-plan-skills | Add dh-pause-plan and dh-resume-plan with a versioned handoff.md sidecar, drift-safe resume, an execute-plan guard, a handoff contract test, and a 19-skill inventory/docs update | 2026-11-07 | 2026-11-07 | Completed | No |
 | Agent Selection and Utility Skills | agent-selection-utility-skills | Replace hardcoded dh-agent delegation with runtime agent selection and migrate dh-executor/dh-explorer to dh-execute-cli/dh-explore skills | 2026-11-08 | 2026-11-08 | Completed | No |
 | Harness Monorepo Awareness | harness-monorepo-awareness | Make the bundled skills and agents workspace-aware for standalone and nested monorepo projects: workspace/anchor contract, setup detection and workspace map, per-package gates/reviews, docs/graph/version/worktree handling, agent guidance and fixtures | 2026-11-10 | 2026-11-11 | Completed | No |
+| TUI Plan Progress | tui-plan-progress | Add a `./tui` part with a sidebar progress card and a `/plan-progress` session panel for the active plan: parser, watcher, activity line, Solid/OpenTUI components, build/installer packaging, tests and docs | 2026-11-15 | 2026-11-15 | Completed | No |

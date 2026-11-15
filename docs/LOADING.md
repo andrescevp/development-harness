@@ -5,7 +5,7 @@ description: Enable the dev-harness-skills plugin in OpenCode V2, wire the dh MC
 tags: [loading, install, plugin, mcp, workspace]
 project: dev-harness-skills
 created: 2026-09-28
-updated: 2026-11-11
+updated: 2026-11-15
 status: active
 ---
 
@@ -96,9 +96,12 @@ config-wide:
 ```
 
 Because the repo root ships `index.ts` (re-exporting `src/plugin.ts`), cloning
-the repo into such a folder is a complete install — **no config entry, no
-build step** (assets load from the repo's `agents/` + `skills/` in source
-mode; `@opencode/plugin` resolves from the clone's own node_modules):
+the repo into such a folder is a complete install for the server part — **no
+config entry, no build step** (assets load from the repo's `agents/` + `skills/`
+in source mode; `@opencode/plugin` resolves from the clone's own
+node_modules). The **TUI part** is different: it resolves the built
+`dist/tui.js`, so run `pnpm build` in the clone to get the sidebar card and
+`/plan-progress` (see [TUI plan progress](#tui-plan-progress)):
 
 ```sh
 # global install (all projects):
@@ -120,8 +123,8 @@ Private-repo note: cloning uses your existing git credentials (same as any
 > `Cannot find package '@opencode/plugin'` right after cloning, run
 > `pnpm install` in the folder (or `pnpm install` again after a `git pull`
 > that bumped dependencies) and restart opencode. The repo pins
-> `@opencode/plugin@^2.0.20` — earlier 2.0.18 builds fail bare-import
-> resolution in the global plugins directory.
+> `@opencode/plugin@2.2.7` (aligned with the OpenCode 2.2.7 host) — earlier
+> 2.0.18 builds fail bare-import resolution in the global plugins directory.
 
 ## Alternative: `opencode plugin add` (managed install)
 
@@ -141,15 +144,19 @@ Manage with `opencode plugin list` / `opencode plugin update` / `opencode plugin
 ### Package entrypoints (npm tarball vs source checkout)
 
 - **npm tarball** — `package.json` resolves the plugin via `exports["."]`:
-  `types`/`import`/`default` → `dist/plugin.d.ts` / `dist/plugin.js`; `main`
-  and `types` point at the same files. `files` ships `dist` (bundle, MCP bin,
-  installer CLI, declarations, assets) plus `README.md`, so a registry install
-  loads without any build. `publishConfig.access` is `public`.
-- **Source checkout** — unchanged: OpenCode's plugin-directory discovery
-  resolves `<dir>/server` then `<dir>/index` with `Bun.resolveSync` and never
-  consults package `main`/`exports`, so the repo-root `index.ts`
-  (re-exporting `src/plugin.ts`) keeps loading from source with no build.
-  Keep it when cloning the repo into a `plugins/` folder.
+  `types`/`import`/`default` → `dist/plugin.d.ts` / `dist/plugin.js`, and
+  `exports["./tui"]` → `dist/tui.js` for the TUI part; `main` and `types` point
+  at the same server files. `files` ships `dist` (server bundle, TUI bundle, MCP
+  bin, installer CLI, declarations, assets) plus `README.md`, so a registry
+  install loads without any build. `publishConfig.access` is `public`.
+- **Source checkout** — a plugin directory whose `package.json` has `name` and
+  `exports` resolves through them, like the published package: `"."` →
+  `dist/plugin.js` (server part) and `"./tui"` → `dist/tui.js` (TUI part).
+  Without them, discovery falls back to the root file names `<dir>/server` then
+  `<dir>/index` (`Bun.resolveSync`), so the repo-root `index.ts`
+  (re-exporting `src/plugin.ts`) keeps the **server part** loading from source
+  with no build. Keep it when cloning the repo into a `plugins/` folder; run
+  `pnpm build` for the TUI part.
 - **Pack lifecycle** — `npm pack`/`npm publish` runs `prepack`
   (`npm run build 1>&2`: tsdown bundle + `dist/plugin.d.ts` declarations +
   assets; build output goes to stderr so `npm pack --json` stays parseable)
@@ -175,6 +182,64 @@ Add ONE of the following entries to `"plugins"` in `opencode.json(c)`:
 The source `index.ts` entry also works when pointed at directly, e.g.
 `"plugins": ["/abs/path/dev-harness-skills/index.ts"]` (opencode loads direct
 `.ts` files too).
+
+## TUI plan progress
+
+The package ships a **TUI part** beside the server part — `exports["./tui"]` →
+`dist/tui.js`, plugin id `dev-harness-skills.tui` — that renders live,
+**read-only** plan progress inside a session: an always-visible sidebar card and
+the `/plan-progress` panel.
+
+### Loading
+
+- **Automatic beside the server part.** One entry loads every part: whatever
+  loads the server part (project `opencode.jsonc` `"plugins"`, the global
+  config, a `plugins/` folder clone, or `opencode plugin add`) also loads
+  `./tui`, resolved through the package's `exports["./tui"]` (`dist/tui.js`).
+- **No `cli.json` needed** for this package. A `cli.json` entry is only for a
+  **TUI-only** package (no server part) or a TUI attached to a **remote**
+  server; `dev-harness-skills` always has a server part.
+- **Source mode needs a build.** Directory/`file://` loading resolves the built
+  artifact, so run `pnpm build` in the clone (it emits `dist/tui.js` and
+  `dist/tui/index.d.ts`). `pnpm install` alone loads the server part but no TUI
+  card.
+- **Managed and package installs** already ship `dist/tui.js` and the `./tui`
+  export (`npx … install`, `opencode plugin add`, npm tarball) — no extra step.
+  Restart opencode after installing or changing the plugin.
+- **Peers are optional.** `@opentui/core`, `@opentui/solid` and `solid-js` are
+  declared as optional peer dependencies: the host injects its own instances at
+  runtime (OpenTUI/Solid runtime-module rewrite), so `dist/tui.js` does not
+  bundle them and server-only users do not install them. Add them only for your
+  own type/build tooling.
+
+### Usage
+
+| Surface | What it shows |
+|---|---|
+| `sidebar.content` card | Active plan title/slug, `Phase N · N.M` position, completed/total sub-tasks with a text progress bar, the current sub-task's delegated agent, plan status and a one-line activity (`Running edit`, `1.1 … — dh-software-engineer`, `2 active plans — choose one`). |
+| `/plan-progress` panel (`dev-harness-skills.plan`) | Every phase and sub-task with status and delegated agent, checklists (`plan.md` checkboxes, `Done When`/`Acceptance Criteria`, final verification), review verdict, fast-mode skipped-check ledger and last update. Keys: `↑`/`↓` and `PgUp`/`PgDn` scroll, `f` fullscreen, `r` refresh, `Esc` close; `1`…`9` pin a plan when several are active. |
+
+- **Read-only.** The TUI never edits plan status, checklists, reviews or the
+  index; it keeps state in `storage.memory` and writes nothing under
+  `docs/plans`.
+- **Selection.** One `active: true` plan is selected automatically; several
+  active plans (frontmatter or index `Active = Yes`) show a selector with the
+  newest suggested; none/malformed plans show an empty/error state. The card
+  refreshes with a short debounce after a plan file changes.
+- **Limit (v1): local workspace only.** Plans are read from the `docs/plans` of
+  the TUI's local location directory, so the session must start at the workspace
+  root. A remote-server session, or a session started inside a workspace
+  package, has no local plan tree and shows the empty state (`No docs/plans
+  here — start opencode at the workspace root`). Remote plan files are a
+  follow-up.
+
+**Verification note (manual):** the card and panel cannot be rendered headlessly
+(OpenTUI's native FFI is only available inside the host), so the visual check is
+manual: open a session at the workspace root with an active plan, confirm the
+sidebar card, run `/plan-progress` (or the "Plan progress" palette entry), and
+change a sub-task status to watch the refresh. Unit tests cover the parser,
+watcher and activity mapping, and `test/tui-bundle.test.ts` locks the artifact
+contract; neither proves pixels.
 
 ## Verification checklist
 
@@ -385,8 +450,9 @@ the 12 tools, and round-trips plan create/read/update + fast create/read/update/
   started before the plugin was installed. If agents do not appear, restart
   opencode first, then confirm the load form and rebuild `dist/assets` if
   using the built package form.
-- **Version skew** — the plugin targets `@opencode/plugin@^2.0.20`; keep the
-  host opencode ≥ that version and pin the package if the host is older.
+- **Version skew** — the plugin is built against `@opencode/plugin@2.2.7`
+  (aligned with the OpenCode 2.2.7 host); keep the host opencode ≥ that version
+  and pin the package if the host is older.
 - **Audit fails after editing harness content** — run
   `node scripts/audit.mjs`; new skills/agents must pass the audit rules
   (name regex, loop membership, <250/<300 line limits, no secrets/junk).

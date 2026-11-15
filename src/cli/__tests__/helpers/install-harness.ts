@@ -1,9 +1,10 @@
 /**
  * install-harness.ts — isolated fixture for install-command tests (4.1).
  *
- * Builds a temp root with a fixture package (`dist/plugin.js`, 5 agents, 26
- * skills), an isolated HOME/XDG/OPENCODE config dir, and a project directory.
- * Every path is under the temp root and removed by `withTempDir` in `finally`.
+ * Builds a temp root with a fixture package (`dist/plugin.js`, `dist/tui.js`,
+ * 5 agents, 26 skills), an isolated HOME/XDG/OPENCODE config dir, and a project
+ * directory. Every path is under the temp root and removed by `withTempDir` in
+ * `finally`.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -14,6 +15,9 @@ import { parseJsonc } from '../../jsonc.js';
 
 export const FIXTURE_VERSION = '1.2.3';
 const FIXTURE_BUNDLE = "export default { id: 'dev-harness-skills', setup() {} };\n";
+/** Host-provided import: the TUI artifact is never bare-scan/import checked. */
+const FIXTURE_TUI_BUNDLE =
+  "import { Plugin } from '@opencode/plugin/tui';\nexport default Plugin.define({ id: 'dev-harness-skills.tui', setup() {} });\n";
 const EXPECTED_AGENTS = 5;
 const EXPECTED_SKILLS = 26;
 
@@ -74,6 +78,7 @@ export function readJsonc(file: string): unknown {
 function createPackageRoot(root: string): string {
   writeFile(path.join(root, 'package.json'), JSON.stringify({ name: 'dev-harness-skills', version: FIXTURE_VERSION }));
   writeFile(path.join(root, 'dist', 'plugin.js'), FIXTURE_BUNDLE);
+  writeFile(path.join(root, 'dist', 'tui.js'), FIXTURE_TUI_BUNDLE);
   for (let index = 0; index < EXPECTED_AGENTS; index += 1) {
     writeFile(path.join(root, 'dist', 'assets', 'agents', `agent-${index}.md`), `# agent ${index}\n`);
   }

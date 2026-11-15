@@ -5,6 +5,39 @@ All notable changes to this project are documented here. The format follows
 Semantic Versioning. During the 0.x line, breaking changes bump the minor
 version.
 
+## [Unreleased]
+
+### Added
+
+- **TUI plan progress** (`exports["./tui"]`, plugin
+  `dev-harness-skills.tui`): a read-only TUI part loaded automatically beside
+  the server part. A `sidebar.content` card shows the active plan, the
+  `Phase N · N.M` position, completed/total sub-tasks with a text progress bar,
+  the current sub-task's delegated agent, plan status and a one-line session
+  activity; `/plan-progress` (palette entry "Plan progress") opens the
+  `dev-harness-skills.plan` session panel with every phase/sub-task status and
+  delegated agent, checklists, review verdict, fast-mode skipped-check ledger
+  and last update (`f` fullscreen, `r` refresh, `Esc` close, `1`…`9` pin).
+- TUI data layer and activity: a pure parser over the workspace `docs/plans`
+  (active-plan selection, counts/current position, checklist/review/ledger
+  derivation), a debounced watcher with a poll fallback, and an allowlisted
+  session-activity mapper that never renders message bodies, tool I/O, provider
+  errors or secrets. Read-only and local-first: nothing is written under
+  `docs/plans`, and remote-server workspaces show the empty state.
+- TUI packaging and installer support: `pnpm build` emits `dist/tui.js`
+  (`@opentui/core`, `@opentui/solid` and `solid-js` are optional,
+  host-provided peers), `package.json` exposes `exports["./tui"]`, and managed
+  installs copy the TUI bundle and its export next to the unchanged server
+  bundle.
+
+### Changed
+
+- `@opencode/plugin` aligned with the OpenCode host (`2.2.7`, was `2.0.20`);
+  `@opencode/theme` follows the same version. The TUI surface used is identical;
+  the server bundle and its smoke gates are unchanged.
+
+Read-only and local-first; no breaking changes.
+
 ## [0.7.0] — 2026-11-15
 
 ### Added
@@ -149,6 +182,7 @@ First release of the standalone OpenCode V2 harness.
 - Plan close-outs include the pause/resume, fast-plan, Mermaid, and
   agent-selection plans with evolution/observation notes.
 
+[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.7.0...HEAD
 [0.7.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.7.0
 [0.6.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.6.0
 [0.5.1]: https://github.com/andrescevp/development-harness/releases/tag/v0.5.1
