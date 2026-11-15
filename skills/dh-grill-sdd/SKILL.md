@@ -45,6 +45,10 @@ replaces the legacy `task.md` contract).
    - **Out of scope:** What must explicitly NOT be included?
    - **Risks:** Edge cases, failure modes, areas needing special care.
    - **Existing assets:** Prior art, current code, docs, integrations.
+   - **Workspace impact (when `WORKSPACE.md` exists):** which packages does this
+     change (affected packages), and per package: test command, build command,
+     docs root and version policy (`fixed` or `independent`)? Standalone
+     repositories answer `None — standalone repository`.
    Keep it minimal: if the request already answers a question, do not ask it.
 4. **Synthesize** — write `./docs/plans/<plan-slug>/sdd.md` (create the
    directory if needed) using the template below. Assign **stable IDs**
@@ -92,6 +96,16 @@ status: proposed
 - **In scope:** <what is included>
 - **Out of scope:** <what is NOT included>
 
+## Workspace Impact
+
+- **Workspace root:** <absolute path, or `None — standalone repository`>
+- **Affected packages:** <package paths, or `None — standalone`>
+- **Shared paths:** <root/shared files touched, or `None`>
+
+| Package | Stack | Test | Build | Docs | Version policy |
+|---|---|---|---|---|---|
+| <package> | <stack> | <test command> | <build command> | <docs root> | fixed \| independent |
+
 ## Constraints
 
 - <dependencies, platforms, technical constraints>
@@ -127,6 +141,8 @@ status: proposed
 - [ ] `./docs/plans/<plan-slug>/sdd.md` exists with valid frontmatter
 - [ ] Requirements R1…Rn with stable IDs
 - [ ] Scope in/out, constraints, risks, acceptance criteria present
+- [ ] `## Workspace Impact` present when `WORKSPACE.md` exists (standalone:
+      `None — standalone repository`)
 - [ ] No implementation details smuggled into requirements
 
 ## Doc search

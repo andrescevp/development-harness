@@ -79,6 +79,16 @@ ${input.objective}
 
 - [In-scope work]
 
+## Workspace Impact
+
+- **Workspace root:** [absolute workspace root, or None — standalone repository]
+- **Affected packages:** [package paths, or None — standalone]
+- **Shared paths:** [root/shared files touched, e.g. docs/, AGENTS.md, pnpm-workspace.yaml; or None]
+
+| Package | Stack | Test | Build | Docs | Version policy |
+|---|---|---|---|---|---|
+| [package] | [stack] | [test command] | [build command] | [docs root] | [fixed \\| independent] |
+
 ## Assumptions and Constraints
 
 - [Known assumptions, dependencies, constraints]
@@ -113,6 +123,22 @@ ${phaseBlocks}
 
 - **System-Wide Test:** [End-to-end verification]
 - **Completion Checklist:** [Final checks]
+
+## Execution Record
+
+- **Execution status:** [In progress | Completed | Completed with deferrals | Not executed]
+- **Executed at:** [YYYY-MM-DD]
+- **Workspace root:** [absolute workspace root]
+- **Repository kind:** [workspace | nested project | submodule | worktree]
+- **Repository path:** [workspace-relative path; \`.\` for the workspace root]
+- **Branch / worktree:** [branch; worktree path when not the main checkout]
+- **Commit range:** [base..head]
+- **Plan path:** docs/plans/<plan-slug>/plan.md
+- **Mirrored plan path:** [none, or the non-authoritative copy path]
+- **Summary:**
+  - [What shipped]
+- **Architectural changes:** [ADRs/contracts/interfaces created or changed, or None]
+- **References:** [review, handoff, evolution note and ADR links]
 
 ## Open Questions
 

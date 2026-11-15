@@ -1,3 +1,14 @@
+---
+title: Loading the dev-harness-skills plugin
+slug: loading
+description: Enable the dev-harness-skills plugin in OpenCode V2, wire the dh MCP server, verify registration, and troubleshoot missing agents or skills in standalone and monorepo projects.
+tags: [loading, install, plugin, mcp, workspace]
+project: dev-harness-skills
+created: 2026-09-28
+updated: 2026-11-11
+status: active
+---
+
 # Loading the dev-harness-skills plugin
 
 How to enable the plugin in OpenCode V2, verify it registered the
@@ -24,7 +35,7 @@ npx -y github:andrescevp/development-harness install --project --path .
 | `--project` | `<project>/.opencode/plugins/dev-harness-skills` | `<project>/opencode.jsonc` (or existing `opencode.json`) |
 
 The managed layout is self-contained: `index.ts`, package metadata,
-`dist/plugin.js`, `dist/assets` (5 agents, 25 skills), and
+`dist/plugin.js`, `dist/assets` (5 agents, 26 skills), and
 `.dev-harness-install.json`; no `pnpm install` is needed in the target.
 
 Common flags:
@@ -176,7 +187,7 @@ opencode debug config   → the plugin entry, and mcp.servers.dh once wired
 opencode mcp list       → `dh` connected (server/status only)
 ```
 
-The plugin also registers 25 skills (there is no skills debug subcommand on
+The plugin also registers 26 skills (there is no skills debug subcommand on
 v2.0.18 — the bundled list lives in `skills/index.md`). Zero tools are
 registered by the plugin: the 12 tools come from the MCP server below.
 
@@ -227,9 +238,30 @@ project's `opencode.jsonc` (additive to the plugin loading above):
   prewarmed/already-connected starts are fast.
 - `protocol: "2026-07-28"` pins the native MCP revision; the same server
   factory also serves legacy (`initialize`) clients, so 2025-era hosts work.
-- **Workspace anchoring:** the server resolves the workspace from the process
-  cwd (the project directory opencode starts it in). Override with
-  `"environment": { "DH_WORKSPACE_ROOT": "/absolute/workspace" }`.
+- **Workspace anchoring:**
+  - Start opencode at the **workspace root** (`W`) — the directory that holds
+    `docs/plans`, the workspace map and the root `AGENTS.md`. The server
+    resolves its workspace from the process cwd, which is that project
+    directory.
+  - `DH_WORKSPACE_ROOT` is unset or the **absolute** path of `W`; set it in the
+    `dh` entry's `environment` block. Relative values are rejected by the anchor
+    check, and a package-scoped session is an anchor mismatch, not a second plan
+    root.
+  - `dh-setup` detects monorepo layouts and writes a user-approved workspace map
+    at `W/WORKSPACE.md` (fallback `W/docs/WORKSPACE.md`): packages, stacks,
+    commands, docs roots, code-graph scope, worktree scope and version policy.
+  - Plans are anchored at `<W>/docs/plans` only; package-local `docs/plans` are
+    never created. Executed plans record the real repo/path, mirrored plan path,
+    summary and architectural changes in `## Execution Record`, plus one row in
+    the `docs/plans/index.md` `## Execution Records` table (T1 write, T2
+    final-review check, T3 finalize).
+  - A mismatch stops writes: restart at `W` with the override unset or equal to
+    it; read-only inspection is the only operation a user may explicitly
+    authorize. No markers and no map → standalone, today's behavior unchanged.
+  - Contract:
+    [`plans/harness-monorepo-awareness/workspace-contract.md`](plans/harness-monorepo-awareness/workspace-contract.md);
+    map schema:
+    [`../skills/dh-setup/references/workspace-map.md`](../skills/dh-setup/references/workspace-map.md).
 - **No-npx fallback** (no cache, offline, or pinned local build): build a
   clone (`pnpm build`) and point the entry at the binary:
   `"command": ["node", "<clone>/dist/mcp/stdio.js"]`.
@@ -276,7 +308,7 @@ opencode mcp list   # expect the `dh` server, connected
 
 MCP servers connect at session start — restart opencode after adding or
 changing the project entry. The in-repo gates are
-`src/__tests__/registration.test.ts` (exactly 5 agents + 25 skills, zero tool
+`src/__tests__/registration.test.ts` (exactly 5 agents + 26 skills, zero tool
 transforms) and `node scripts/smoke-mcp.mjs` (spawns the built binary, lists
 the 12 tools, and round-trips plan create/read/update + fast create/read/update/skip).
 
@@ -326,7 +358,7 @@ the 12 tools, and round-trips plan create/read/update + fast create/read/update/
   was started **before** the plugin was installed: plugins load at server
   startup, and a long-lived opencode session keeps its original registry.
   Restart opencode (or reload the config) and both the 5 `dh-*` agents and
-  25 `dh-*` skills appear — the plugin registers agents via `agent.transform`
+  26 `dh-*` skills appear — the plugin registers agents via `agent.transform`
   exactly like skills, no `agent` map in config is needed.
 - **`pnpm audit` vs `pnpm run audit`** — `pnpm audit` is pnpm's **dependency
   security audit** (currently reports 1 low dev-only esbuild advisory and

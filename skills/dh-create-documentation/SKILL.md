@@ -1,7 +1,7 @@
 ---
 name: dh-create-documentation
 description: >
-  Create structured docs (Markdown/HTML/Mermaid): project docs, API refs, READMEs, guides, plus evolution and observation notes recording software evolution and session learnings; Obsidian vault = {project_root}, ALL docs under {project_root}/docs, frontmatter metadata. Use to document this, write a README, generate documentation, create evolution/observation notes, or capture learnings.
+  Create structured docs (Markdown/HTML/Mermaid): project docs, API refs, READMEs, guides, plus evolution and observation notes recording software evolution and session learnings; Obsidian vault = workspace root, docs under {workspace_root}/docs or {package}/docs with `package` frontmatter, metadata. Use to document this, write a README, generate documentation, create evolution/observation notes, or capture learnings.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: bash, read, write, edit, glob
@@ -32,6 +32,10 @@ Generate structured, cross-referenced documentation in any format, at any locati
   wireframe (code block).
 - **Obsidian frontmatter:** REQUIRED on every document (`title`, `tags`,
   `project`, `created`, `updated`, `stack`, `feature`, `epic`).
+- **Roots:** the docs root comes from the workspace map — `{workspace_root}/docs`
+  for workspace docs, `{package}/docs` with `package` frontmatter for package
+  docs, `OBSIDIAN_VAULT` for the vault copy; evolution notes stay workspace-root
+  ([workspace-docs.md](references/workspace-docs.md)).
 - **Retrieval:** use `notesmd-cli search-content "<term>" --vault
   "<project>"` (preferred) or `obsidian search query="<term>"` to retrieve
   information from documents; `rg` as fallback.
@@ -48,21 +52,23 @@ worth keeping, create BOTH notes and register them:
 
 - **Evolution note** — how the software evolved (what changed, why,
   architecture/modules, validation/release, follow-ups):
-  `{project_root}/docs/evolution/<YYYY-MM-DD>-<slug>.md`
+  `{workspace_root}/docs/evolution/<YYYY-MM-DD>-<slug>.md`
 - **Observation note** — session learnings (what worked, what didn't,
   decisions, follow-ups):
-  `{project_root}/docs/evolution/observations/<YYYY-MM-DD>-<HHMM>-<slug>.md`
+  `{workspace_root}/docs/evolution/observations/<YYYY-MM-DD>-<HHMM>-<slug>.md`
 - **Index** — prepend one row per note to
-  `{project_root}/docs/evolution/index.md` (newest first).
+  `{workspace_root}/docs/evolution/index.md` (newest first).
 
 Rules:
 
-- All paths stay under `{project_root}/docs`; never write notes under
-  `docs/plans/`.
+- All paths stay under the docs root; never write notes under `docs/plans/`.
 - `docs/evolve/` is historical: do not migrate, delete, or rewrite it — new
   notes go to `docs/evolution/`.
 - These directives replace the external `evolve`/`state-sync` workflow for
   plan close-out.
+- **T4 — execution record:** link the evolution note and the mirrored plan path
+  from the plan's `## Execution Record`
+  ([`../dh-planning/references/execution-record.md`](../dh-planning/references/execution-record.md)).
 - Templates, rules, workflow, and verification:
   [`references/evolution-notes.md`](references/evolution-notes.md).
 
@@ -84,10 +90,10 @@ Before writing, clarify with the user (or infer from context):
 |---------------------------------------|-------------------------------------------------------------------|
 | What are we documenting?              | Current project, recent changes, or user-specified topic          |
 | Output format?                        | `markdown` (also supports `html`, `mermaid`)                     |
-| Output location?                      | `{project_root}/docs` (ALL documentation lives here)            |
+| Output location?                      | Workspace map docs root: `{workspace_root}/docs`, or `{package}/docs` for a package doc (see [workspace-docs.md](references/workspace-docs.md)) |
 | Single file or multi-file?            | Multi-file for >3 sections, single otherwise                      |
-| Obsidian vault path?                  | The vault IS the project root — `git rev-parse --show-toplevel`; docs are a folder inside it (`{project_root}/docs`) |
-| Existing docs to extend?              | Check `{project_root}/docs/` first, extend if found               |
+| Obsidian vault path?                  | The vault IS the workspace root — `git rev-parse --show-toplevel` when it agrees with the map; docs live in its `docs/` folder ([workspace-docs.md](references/workspace-docs.md)) |
+| Existing docs to extend?              | Check the map's docs root first (`{workspace_root}/docs/` or `{package}/docs/`), extend if found |
 
 Ask if critical info is missing. For simple requests ("document this function"), infer defaults and proceed.
 
@@ -126,11 +132,11 @@ Content.
 
 ### Multi-file structure
 
-For broad topics (full API, architecture, project handbook). Always create an index. All documentation lives under `{project_root}/docs` (a folder of the Obsidian vault):
+For broad topics (full API, architecture, project handbook). Always create an index. Workspace documentation lives under `{workspace_root}/docs`; package documentation under `{package}/docs`:
 
 ```
-{project_root}/                ← Obsidian vault (the project root)
-  docs/                        ← ALL documentation goes here
+{workspace_root}/              ← Obsidian vault (the workspace root)
+  docs/                        ← workspace docs; package docs live in {package}/docs
     index.md              ← Entry point with links to all sections
     getting-started.md    ← Quickstart guide
     architecture.md       ← System design
@@ -173,6 +179,7 @@ Use these detailed references only when the specific sub-task requires them:
 | Obsidian push | Time to push documentation to Obsidian (Step 5 of the workflow) | `references/obsidian-push.md` |
 | Complete example | User wants to see a full end-to-end example | `references/complete-example.md` |
 | Evolution & observation notes | Plan completion, release, architecture change, or "capture learnings" | `references/evolution-notes.md` |
+| Docs and vault roots | Choosing between workspace, package and vault docs roots | `references/workspace-docs.md` |
 | Complex diagrams | Architecture, current/desired state, critical changes, or component graphs | [dh-mermaid](../dh-mermaid/SKILL.md) |
 
 ## Step 4: Content Standards
@@ -217,7 +224,7 @@ For Obsidian compatibility, also include `[[wikilinks]]` as comments:
 - **Nested directories**: Create parent directories first (`mkdir -p`) before writing files.
 - **Frontmatter conflicts**: If source Markdown already has frontmatter, merge the Obsidian metadata into the existing block — don't create two `---` blocks.
 - **Obsidian not running**: The Obsidian push is best-effort. If `obsidian` CLI fails, write files directly to the vault path and tell the user to open Obsidian to see them.
-- **Vault path**: The Obsidian vault IS the project root (`{project_root}`, auto-detected via `git rev-parse --show-toplevel`). **ALL documentation must be written under `{project_root}/docs`** — Obsidian sees it as a `docs/` folder inside the vault; there is no `{vault}/{project}/` nesting. Override the vault with the `OBSIDIAN_VAULT` environment variable (e.g., for a dedicated notes vault) — docs still land in `{vault}/docs`.
+- **Vault path**: The Obsidian vault IS the workspace root (`{workspace_root}`, `git rev-parse --show-toplevel` when it agrees with the map). Documentation goes under the docs root the workspace map names — `{workspace_root}/docs` for workspace docs, `{package}/docs` for package docs — never a `{vault}/{project}/` nesting. Override the vault with the `OBSIDIAN_VAULT` environment variable (e.g., for a dedicated notes vault); it moves the vault copy only, never `docs/plans` or a package root (see [workspace-docs.md](references/workspace-docs.md)).
 - **Large docs**: For 20+ files, batch the push and report progress per batch.
 - **HTML docs in Obsidian**: Obsidian primarily renders Markdown. If HTML is requested, still push a `.md` version with an embedded `<iframe>` or link to the HTML version.
 - **Mermaid in Obsidian**: Obsidian renders Mermaid natively inside code blocks. No conversion needed — Mermaid syntax works directly in `.md` files.
@@ -226,10 +233,10 @@ For Obsidian compatibility, also include `[[wikilinks]]` as comments:
 
 After generating documentation:
 
-- [ ] All files exist in `{project_root}/docs/` (the documentation folder of the vault)
+- [ ] All files exist under the chosen docs root (`{workspace_root}/docs/` or `{package}/docs/`), the documentation folder of the vault
 - [ ] Index file (`index.md`) links to every document
 - [ ] Cross-references between documents resolve correctly
-- [ ] Every document inside `{project_root}/docs/` has complete frontmatter (tags, project, created, stack, updated)
+- [ ] Every document under the docs root has complete frontmatter (tags, project, created, stack, updated; `package` for package docs)
 - [ ] Mermaid diagrams render correctly (check syntax)
 - [ ] HTML files have proper structure with embedded styles
 

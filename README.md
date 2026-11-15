@@ -1,12 +1,12 @@
 # dev-harness-skills
 
-An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 5 agents and 25 skills.
+An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 5 agents and 26 skills.
 
 ## Features
 
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks, with every sub-task naming its responsible agent (`Delegated to agent`) and strict halt-on-blocker safeguards.
-- **5 agents and 25 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
+- **5 agents and 26 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
 - **`dh` MCP server (12 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents and skills only.
 - **Code graph queries**: `dh-setup` installs code-graph-rag (`cgr`) on the embedded SQLite backend and indexes the project; `dh-code-query` answers structural questions — definitions, callers/callees, importers, dead code, duplicates — without scanning every file.
 - **Full QA gate**: Thorough verification suite integrating Biome, Knip, jscpd, dependency-cruiser, OSV-Scanner, Semgrep, Vitest, and TypeScript.
@@ -113,7 +113,7 @@ opencode debug config   # plugin entry, and mcp.servers.dh once wired
 opencode mcp list       # expect: dh connected (server/status only)
 ```
 
-The plugin also registers 25 skills (there is no skills debug subcommand on
+The plugin also registers 26 skills (there is no skills debug subcommand on
 v2.0.18 — see `skills/index.md`) and zero tools; the harness tools come from
 the project-scope MCP server — see [MCP server (`dh`)](#mcp-server-dh).
 
@@ -197,9 +197,55 @@ retired. Consumer permission actions match `dh_*`. Full wiring, verification
 (`opencode mcp list`), prewarm, and troubleshooting:
 [`docs/LOADING.md`](docs/LOADING.md#mcp-server-dh).
 
+## Monorepo workspaces
+
+The harness resolves four roots and keeps standalone projects unchanged:
+
+| Root | Meaning |
+|---|---|
+| Workspace root (`W`) | Repository containing the nested projects; owns `docs/plans`, `AGENTS.md`, the `dh` MCP entry and the root `WORKTREE_LIFECYCLE.md`. |
+| Package root | Nested project (workspace package, submodule, nested repo, worktree); owns its stack, commands, optional `CODE_RULES.md`, docs and lifecycle. |
+| Plan root | Always `W/docs/plans`; package-local plan directories are never created. |
+| Vault root | `W` by default; `OBSIDIAN_VAULT` moves docs only, never plans. |
+
+- **Start at `W`.** Monorepo sessions start opencode at the workspace root;
+  `DH_WORKSPACE_ROOT` is unset or the absolute path of `W` in the `dh` MCP entry
+  (`"environment": { "DH_WORKSPACE_ROOT": "/abs/workspace" }`). A package-scoped
+  session is an anchor mismatch — stop and restart at `W`; the harness never
+  creates a package-local `docs/plans`.
+- **Workspace map.** `dh-setup` detects pnpm/npm/yarn workspaces, Nx/Turbo/
+  Lerna, Cargo workspaces, Go workspaces, Gradle/.NET solutions and
+  `.gitmodules`, then writes a user-approved `WORKSPACE.md` at `W` (fallback
+  `docs/WORKSPACE.md`). The map records the workspace root (layout, markers,
+  plan root); packages (path, stack, test, build, docs root, rules); aggregate
+  and affected-only commands; docs roots; code-graph scope; worktree scope; and
+  the fixed/independent version policy.
+- **Per-package gates and reviews.** `## Workspace Impact` in the plan names the
+  affected packages and their commands. `dh-preflight` and `dh-artifact-check`
+  report each package independently — a green aggregate never hides an
+  unvalidated package — and `dh-review`, `dh-code-review`, `dh-simplify` and
+  `dh-final-review` diff only the declared package/shared paths.
+- **Rules, docs, graph, versions, worktrees.** A package `CODE_RULES.md`
+  overrides the root file for its files; docs live under `W/docs` or
+  `{package}/docs` with `package` frontmatter, and evolution notes stay at `W`;
+  `dh-code-query` routes to the workspace or package index; `dh-semver` honors a
+  `fixed` or `independent` policy; `dh-create-worktree` discovers root/submodule
+  lifecycles and aligns submodule branches.
+- **Execution provenance.** Executed plans fill `## Execution Record` in
+  `docs/plans/<slug>/plan.md` and one row in the plans index
+  `## Execution Records`: real repository/path, mirrored plan path, summary and
+  architectural changes (T1 write, T2 final-review check, T3 finalize).
+- **Standalone unchanged.** No markers and no map: one root, one toolchain, full
+  diff; `DH_WORKSPACE_ROOT` may stay unset.
+
+Normative contract:
+[`docs/plans/harness-monorepo-awareness/workspace-contract.md`](docs/plans/harness-monorepo-awareness/workspace-contract.md).
+Evidence and gaps:
+[`docs/audits/2026-11-10-skills-agents-standalone-monorepo.md`](docs/audits/2026-11-10-skills-agents-standalone-monorepo.md).
+
 ## Agents & skills
 
-The plugin defines 5 agents and 25 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
+The plugin defines 5 agents and 26 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
 
 ### Agent selection
 
@@ -292,7 +338,7 @@ offline `pnpm qa:check:full` gate.
 ```text
 index.ts         Root plugin entry point for OpenCode plugin discovery (source mode)
 agents/          Markdown definitions and system prompts for the 5 bundled agents
-skills/          Instructions, templates, and references for the 25 bundled skills
+skills/          Instructions, templates, and references for the 26 bundled skills
 src/cli/         Installer CLI (args, scope, JSONC config, manifest, commands)
 src/mcp/         Local stdio MCP server and workspace resolver
 src/tools/       Plan/sheet/logged-command tool implementations

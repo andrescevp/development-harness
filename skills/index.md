@@ -1,6 +1,6 @@
 # Skills Index — dev-harness-skills plugin
 
-> The plugin bundles **25 skills** (incl. `dh-grill-sdd` SDD interviewer,
+> The plugin bundles **26 skills** (incl. `dh-grill-sdd` SDD interviewer,
 > `dh-setup` harness setup, `dh-contingency` planning support, and
 > `dh-pause-plan` / `dh-resume-plan` lifecycle support).
 > Loading a skill injects its instructions and resources into the current
@@ -95,7 +95,28 @@ phase/sub-task status markers, and `dh_plan_create` to scaffold a new plan
 (passing `delegatedTo` for every sub-task) — fall back to direct plan.md edits
 only when the tools are unavailable. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 
-## The 25 bundled skills
+## Workspace behavior
+
+All 26 skills stay workspace-aware — no new skill is added. The workspace root
+owns `docs/plans`; `dh-setup` writes the workspace map (`WORKSPACE.md`, root
+first, else `docs/WORKSPACE.md`) with packages and per-package commands; plans
+declare affected packages in `## Workspace Impact`. Standalone repositories keep
+the single-root behavior unchanged.
+
+| Area | Reference |
+|---|---|
+| Roots, anchoring, execution record | [`../docs/plans/harness-monorepo-awareness/workspace-contract.md`](../docs/plans/harness-monorepo-awareness/workspace-contract.md) · [`dh-planning/references/execution-record.md`](dh-planning/references/execution-record.md) |
+| Detection and workspace map | [`dh-setup/references/workspace-map.md`](dh-setup/references/workspace-map.md) |
+| Per-package gates | [`dh-preflight/references/workspace-gates.md`](dh-preflight/references/workspace-gates.md) |
+| Package-scoped diff/review | [`dh-review/references/workspace-diff-scope.md`](dh-review/references/workspace-diff-scope.md) |
+| Root → package `CODE_RULES.md` | [`dh-coding/references/code-rules-resolution.md`](dh-coding/references/code-rules-resolution.md) |
+| Workspace/package docs + vault | [`dh-create-documentation/references/workspace-docs.md`](dh-create-documentation/references/workspace-docs.md) |
+| Code-graph index routing | [`dh-code-query/references/workspace-index.md`](dh-code-query/references/workspace-index.md) |
+| Fixed/independent versioning | [`dh-semver/references/monorepo-versioning.md`](dh-semver/references/monorepo-versioning.md) |
+| Worktree/submodule discovery | [`dh-create-worktree/references/worktree-discovery.md`](dh-create-worktree/references/worktree-discovery.md) |
+| Package-aware pause/resume | [`dh-pause-plan/references/package-scope.md`](dh-pause-plan/references/package-scope.md) |
+
+## The 26 bundled skills
 
 | Skill | Role in the loop |
 |---|---|
@@ -119,6 +140,7 @@ only when the tools are unavailable. These tools are exposed by the project-scop
 | [`dh-artifact-check`](dh-artifact-check/SKILL.md) | Step 3 — validate build artifacts + deploy scripts |
 | [`dh-final-review`](dh-final-review/SKILL.md) | Step 4 — plan-level sign-off verdict |
 | [`dh-create-documentation`](dh-create-documentation/SKILL.md) | Step 5 — generate/update project docs plus evolution + observation notes (vault = `{project_root}`, docs under `{project_root}/docs`) |
+| [`dh-create-worktree`](dh-create-worktree/SKILL.md) | Cross-cutting — create/reuse/merge/remove worktrees following the project's `WORKTREE_LIFECYCLE.md`; generation delegated to `dh-setup` |
 | [`dh-mermaid`](dh-mermaid/SKILL.md) | Planning + docs — Mermaid diagrams: current/desired state, critical changes, component graphs; plan output under `docs/plans/<slug>/diagrams/` |
 | [`dh-grill-sdd`](dh-grill-sdd/SKILL.md) | Pre-planning — interviews the user and produces `./docs/plans/<slug>/sdd.md` (the requirements contract `dh-planning` consumes) |
 | [`dh-setup`](dh-setup/SKILL.md) | Environment — audits system software (chrome/uv/nvm/osv-scanner/docker/jq/xq/yq/phpenv), user MCPs + plugins, and scaffolds project QA (hooks + stack tools) |

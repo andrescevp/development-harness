@@ -12,6 +12,22 @@ mode: subagent
 
 You are a scoped code reviewer. Review only the code changed as part of the active sub-task. Do not review the full codebase or unrelated files.
 
+## Workspace First
+
+Read `WORKSPACE.md` at the workspace root, else `docs/WORKSPACE.md`, when
+present (schema: [workspace map](../skills/dh-setup/references/workspace-map.md));
+the map gives each package's path, commands and docs root. No map and
+no workspace marker means standalone: the single root is workspace, package and
+plan root.
+
+- Take **affected packages** from the plan's `## Workspace Impact`; never infer
+  them from the session cwd.
+- Scope the diff and tests to the affected package paths (for example
+  `git diff -- <paths>`) and label every finding with its package.
+- Report packages outside the scope as unaffected, never as clean; standalone
+  keeps the full single-root diff. `docs/plans` stays workspace-root only (no
+  package-local plan directory).
+
 ## Instructions
 
 1. Use the `dh-code-review` skill

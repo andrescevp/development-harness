@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-11-09T12:34:49.873Z",
+    "generated": "2026-11-15T19:50:42.384Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -11,19 +11,19 @@
     "dimensions": [
       {
         "name": "Inventory & structure",
-        "count": 30,
+        "count": 31,
         "sev": "PASS",
-        "note": "5 agents, 25 skill dirs + index.md; no commands/, no prompts/"
+        "note": "5 agents, 26 skill dirs + index.md; no commands/, no prompts/"
       },
       {
         "name": "Frontmatter parse",
-        "count": 31,
+        "count": 32,
         "sev": "PASS",
-        "note": "31 files on audit surface"
+        "note": "32 files on audit surface"
       },
       {
         "name": "Name regex",
-        "count": 30,
+        "count": 31,
         "sev": "PASS",
         "note": "/^[a-z0-9]+(-[a-z0-9]+)*$/"
       },
@@ -37,19 +37,19 @@
         "name": "Cross-references",
         "count": 1,
         "sev": "WARN",
-        "note": "493 resolved; 0 code-context; 0 allowlisted; 258 prose tokens (warn)"
+        "note": "539 resolved; 0 code-context; 0 allowlisted; 290 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
-        "count": 30,
+        "count": 31,
         "sev": "PASS",
-        "note": "25/25 skills present; 5/5 agents present"
+        "note": "26/26 skills present; 5/5 agents present"
       },
       {
         "name": "Secret scan",
-        "count": 45,
+        "count": 49,
         "sev": "PASS",
-        "note": "45 low-signature prose hits (instructional), 0 high-signature"
+        "note": "49 low-signature prose hits (instructional), 0 high-signature"
       },
       {
         "name": "Junk scan",
@@ -91,7 +91,7 @@
   "atMentions": [
     {
       "file": "skills/dh-setup/SKILL.md",
-      "line": 64,
+      "line": 55,
       "mention": "@playwright",
       "severity": "warn",
       "note": "unresolved @mention (external role/product or prose) — warn-only per plan"
@@ -133,6 +133,37 @@
       ]
     },
     {
+      "token": "execution-record",
+      "count": 16,
+      "files": [
+        "skills/dh-create-documentation/SKILL.md",
+        "skills/dh-execute-plan/SKILL.md",
+        "skills/dh-execute-plan-fast/SKILL.md",
+        "skills/dh-final-review/SKILL.md",
+        "skills/dh-planning/SKILL.md"
+      ]
+    },
+    {
+      "token": "workspace-diff-scope",
+      "count": 14,
+      "files": [
+        "skills/dh-code-review/SKILL.md",
+        "skills/dh-final-review/SKILL.md",
+        "skills/dh-review/SKILL.md",
+        "skills/dh-simplify/SKILL.md"
+      ]
+    },
+    {
+      "token": "final-review",
+      "count": 13,
+      "files": [
+        "skills/dh-execute-plan/SKILL.md",
+        "skills/dh-execute-plan-fast/SKILL.md",
+        "skills/dh-final-review/SKILL.md",
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
       "token": "pre-execution",
       "count": 13,
       "files": [
@@ -141,15 +172,12 @@
       ]
     },
     {
-      "token": "project-scope",
-      "count": 12,
+      "token": "plan-end",
+      "count": 13,
       "files": [
-        "agents/dh-documentor.md",
-        "skills/dh-create-documentation/SKILL.md",
-        "skills/dh-execute-cli/SKILL.md",
-        "skills/dh-execute-plan/SKILL.md",
         "skills/dh-execute-plan-fast/SKILL.md",
-        "skills/dh-execute-plan-task/SKILL.md"
+        "skills/dh-execute-plan-task-fast/SKILL.md",
+        "skills/dh-review/SKILL.md"
       ]
     },
     {
@@ -165,29 +193,54 @@
       ]
     },
     {
-      "token": "final-review",
-      "count": 12,
+      "token": "workspace-docs",
+      "count": 11,
       "files": [
-        "skills/dh-execute-plan/SKILL.md",
-        "skills/dh-execute-plan-fast/SKILL.md",
-        "skills/dh-final-review/SKILL.md",
-        "skills/dh-setup/SKILL.md"
+        "agents/dh-documentor.md",
+        "skills/dh-create-documentation/SKILL.md"
       ]
     },
     {
-      "token": "plan-end",
-      "count": 12,
+      "token": "project-scope",
+      "count": 11,
       "files": [
+        "agents/dh-documentor.md",
+        "skills/dh-create-documentation/SKILL.md",
+        "skills/dh-execute-cli/SKILL.md",
+        "skills/dh-execute-plan/SKILL.md",
         "skills/dh-execute-plan-fast/SKILL.md",
-        "skills/dh-execute-plan-task-fast/SKILL.md",
-        "skills/dh-review/SKILL.md"
+        "skills/dh-execute-plan-task/SKILL.md"
       ]
     },
     {
       "token": "repo-path",
-      "count": 10,
+      "count": 11,
       "files": [
         "skills/dh-code-query/SKILL.md"
+      ]
+    },
+    {
+      "token": "read-only",
+      "count": 10,
+      "files": [
+        "agents/dh-documentor.md",
+        "skills/dh-code-query/SKILL.md",
+        "skills/dh-execute-plan-task-fast/SKILL.md",
+        "skills/dh-pause-plan/SKILL.md",
+        "skills/dh-preflight/SKILL.md",
+        "skills/dh-resume-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "workspace-map",
+      "count": 9,
+      "files": [
+        "agents/dh-documentor.md",
+        "agents/dh-final-reviewer.md",
+        "agents/dh-reviewer.md",
+        "agents/dh-software-architect.md",
+        "agents/dh-software-engineer.md",
+        "skills/dh-planning/SKILL.md"
       ]
     },
     {
@@ -198,23 +251,19 @@
       ]
     },
     {
-      "token": "read-only",
-      "count": 9,
-      "files": [
-        "skills/dh-code-query/SKILL.md",
-        "skills/dh-execute-plan-task-fast/SKILL.md",
-        "skills/dh-pause-plan/SKILL.md",
-        "skills/dh-preflight/SKILL.md",
-        "skills/dh-resume-plan/SKILL.md",
-        "skills/dh-setup/SKILL.md"
-      ]
-    },
-    {
       "token": "plan-fast-skip-checks",
       "count": 8,
       "files": [
         "skills/dh-execute-plan-fast/SKILL.md",
         "skills/dh-execute-plan-task-fast/SKILL.md"
+      ]
+    },
+    {
+      "token": "package-scope",
+      "count": 8,
+      "files": [
+        "skills/dh-pause-plan/SKILL.md",
+        "skills/dh-resume-plan/SKILL.md"
       ]
     },
     {
@@ -233,6 +282,26 @@
         "skills/dh-execute-plan-task/SKILL.md",
         "skills/dh-execute-plan-task-fast/SKILL.md",
         "skills/dh-planning/SKILL.md"
+      ]
+    },
+    {
+      "token": "package-local",
+      "count": 6,
+      "files": [
+        "agents/dh-documentor.md",
+        "agents/dh-final-reviewer.md",
+        "agents/dh-reviewer.md",
+        "agents/dh-software-architect.md",
+        "agents/dh-software-engineer.md",
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "code-rules-resolution",
+      "count": 6,
+      "files": [
+        "skills/dh-code-ruler/SKILL.md",
+        "skills/dh-coding/SKILL.md"
       ]
     },
     {
@@ -277,6 +346,23 @@
       ]
     },
     {
+      "token": "per-package",
+      "count": 5,
+      "files": [
+        "skills/dh-code-ruler/SKILL.md",
+        "skills/dh-semver/SKILL.md"
+      ]
+    },
+    {
+      "token": "top-level",
+      "count": 5,
+      "files": [
+        "skills/dh-domain-check/SKILL.md",
+        "skills/dh-execute-plan-fast/SKILL.md",
+        "skills/dh-review/SKILL.md"
+      ]
+    },
+    {
       "token": "domain-check",
       "count": 5,
       "files": [
@@ -311,12 +397,47 @@
       ]
     },
     {
+      "token": "workspace-root",
+      "count": 4,
+      "files": [
+        "agents/dh-documentor.md",
+        "agents/dh-final-reviewer.md",
+        "agents/dh-reviewer.md",
+        "skills/dh-create-documentation/SKILL.md"
+      ]
+    },
+    {
+      "token": "single-root",
+      "count": 4,
+      "files": [
+        "agents/dh-final-reviewer.md",
+        "agents/dh-reviewer.md",
+        "skills/dh-artifact-check/SKILL.md",
+        "skills/dh-preflight/SKILL.md"
+      ]
+    },
+    {
       "token": "bounded-context",
       "count": 4,
       "files": [
         "agents/dh-software-architect.md",
         "skills/dh-code-ruler/SKILL.md",
         "skills/dh-domain-check/SKILL.md"
+      ]
+    },
+    {
+      "token": "workspace-gates",
+      "count": 4,
+      "files": [
+        "skills/dh-artifact-check/SKILL.md",
+        "skills/dh-preflight/SKILL.md"
+      ]
+    },
+    {
+      "token": "dead-code",
+      "count": 4,
+      "files": [
+        "skills/dh-code-query/SKILL.md"
       ]
     },
     {
@@ -387,6 +508,13 @@
       ]
     },
     {
+      "token": "monorepo-versioning",
+      "count": 4,
+      "files": [
+        "skills/dh-semver/SKILL.md"
+      ]
+    },
+    {
       "token": "mobile-mcp",
       "count": 4,
       "files": [
@@ -400,13 +528,6 @@
         "agents/dh-software-architect.md",
         "skills/dh-pause-plan/SKILL.md",
         "skills/dh-resume-plan/SKILL.md"
-      ]
-    },
-    {
-      "token": "dead-code",
-      "count": 3,
-      "files": [
-        "skills/dh-code-query/SKILL.md"
       ]
     },
     {
@@ -426,6 +547,13 @@
       ]
     },
     {
+      "token": "project-level",
+      "count": 3,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
       "token": "evolution-notes",
       "count": 3,
       "files": [
@@ -438,15 +566,6 @@
       "files": [
         "skills/dh-create-documentation/SKILL.md",
         "skills/dh-setup/SKILL.md"
-      ]
-    },
-    {
-      "token": "top-level",
-      "count": 3,
-      "files": [
-        "skills/dh-domain-check/SKILL.md",
-        "skills/dh-execute-plan-fast/SKILL.md",
-        "skills/dh-review/SKILL.md"
       ]
     },
     {
@@ -480,6 +599,15 @@
       "files": [
         "skills/dh-final-review/SKILL.md",
         "skills/dh-planning/SKILL.md"
+      ]
+    },
+    {
+      "token": "affected-package",
+      "count": 3,
+      "files": [
+        "skills/dh-final-review/SKILL.md",
+        "skills/dh-pause-plan/SKILL.md",
+        "skills/dh-resume-plan/SKILL.md"
       ]
     },
     {
@@ -564,6 +692,22 @@
       ]
     },
     {
+      "token": "cross-package",
+      "count": 2,
+      "files": [
+        "agents/dh-software-architect.md",
+        "skills/dh-domain-check/SKILL.md"
+      ]
+    },
+    {
+      "token": "package-scoped",
+      "count": 2,
+      "files": [
+        "agents/dh-software-architect.md",
+        "agents/dh-software-engineer.md"
+      ]
+    },
+    {
       "token": "dependency-cruiser",
       "count": 2,
       "files": [
@@ -580,6 +724,29 @@
       ]
     },
     {
+      "token": "non-zero",
+      "count": 2,
+      "files": [
+        "skills/dh-artifact-check/SKILL.md"
+      ]
+    },
+    {
+      "token": "workspace-wide",
+      "count": 2,
+      "files": [
+        "skills/dh-artifact-check/SKILL.md",
+        "skills/dh-preflight/SKILL.md"
+      ]
+    },
+    {
+      "token": "single-table",
+      "count": 2,
+      "files": [
+        "skills/dh-artifact-check/SKILL.md",
+        "skills/dh-preflight/SKILL.md"
+      ]
+    },
+    {
       "token": "system-wide",
       "count": 2,
       "files": [
@@ -588,10 +755,25 @@
       ]
     },
     {
+      "token": "workspace-index",
+      "count": 2,
+      "files": [
+        "skills/dh-code-query/SKILL.md"
+      ]
+    },
+    {
       "token": "min-size",
       "count": 2,
       "files": [
         "skills/dh-code-query/SKILL.md"
+      ]
+    },
+    {
+      "token": "code-graph",
+      "count": 2,
+      "files": [
+        "skills/dh-code-query/SKILL.md",
+        "skills/dh-setup/SKILL.md"
       ]
     },
     {
@@ -609,7 +791,15 @@
       ]
     },
     {
-      "token": "project-level",
+      "token": "project-root",
+      "count": 2,
+      "files": [
+        "skills/dh-code-ruler/SKILL.md",
+        "skills/dh-execute-plan-task/SKILL.md"
+      ]
+    },
+    {
+      "token": "package-root",
       "count": 2,
       "files": [
         "skills/dh-coding/SKILL.md"
@@ -642,6 +832,20 @@
       "count": 2,
       "files": [
         "skills/dh-create-documentation/SKILL.md"
+      ]
+    },
+    {
+      "token": "worktree-discovery",
+      "count": 2,
+      "files": [
+        "skills/dh-create-worktree/SKILL.md"
+      ]
+    },
+    {
+      "token": "plan-to-worktree",
+      "count": 2,
+      "files": [
+        "skills/dh-create-worktree/SKILL.md"
       ]
     },
     {
@@ -716,14 +920,6 @@
       "count": 2,
       "files": [
         "skills/dh-explore/SKILL.md"
-      ]
-    },
-    {
-      "token": "merge-base",
-      "count": 2,
-      "files": [
-        "skills/dh-final-review/SKILL.md",
-        "skills/dh-resume-plan/SKILL.md"
       ]
     },
     {
@@ -908,21 +1104,7 @@
       ]
     },
     {
-      "token": "non-zero",
-      "count": 1,
-      "files": [
-        "skills/dh-artifact-check/SKILL.md"
-      ]
-    },
-    {
       "token": "name-or-path",
-      "count": 1,
-      "files": [
-        "skills/dh-code-query/SKILL.md"
-      ]
-    },
-    {
-      "token": "code-graph",
       "count": 1,
       "files": [
         "skills/dh-code-query/SKILL.md"
@@ -1059,6 +1241,13 @@
       "count": 1,
       "files": [
         "skills/dh-code-ruler/SKILL.md"
+      ]
+    },
+    {
+      "token": "root-owned",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
       ]
     },
     {
@@ -1202,6 +1391,13 @@
       ]
     },
     {
+      "token": "package-vs-root",
+      "count": 1,
+      "files": [
+        "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
       "token": "cross-referenced",
       "count": 1,
       "files": [
@@ -1279,7 +1475,35 @@
       ]
     },
     {
+      "token": "same-branch",
+      "count": 1,
+      "files": [
+        "skills/dh-create-worktree/SKILL.md"
+      ]
+    },
+    {
+      "token": "after-create",
+      "count": 1,
+      "files": [
+        "skills/dh-create-worktree/SKILL.md"
+      ]
+    },
+    {
+      "token": "auto-resolve",
+      "count": 1,
+      "files": [
+        "skills/dh-create-worktree/SKILL.md"
+      ]
+    },
+    {
       "token": "force-fit",
+      "count": 1,
+      "files": [
+        "skills/dh-domain-check/SKILL.md"
+      ]
+    },
+    {
+      "token": "cross-context",
       "count": 1,
       "files": [
         "skills/dh-domain-check/SKILL.md"
@@ -1308,6 +1532,13 @@
     },
     {
       "token": "of-order",
+      "count": 1,
+      "files": [
+        "skills/dh-execute-plan-fast/SKILL.md"
+      ]
+    },
+    {
+      "token": "hash-mismatch",
       "count": 1,
       "files": [
         "skills/dh-execute-plan-fast/SKILL.md"
@@ -1353,13 +1584,6 @@
       "count": 1,
       "files": [
         "skills/dh-execute-plan-fast/SKILL.md"
-      ]
-    },
-    {
-      "token": "project-root",
-      "count": 1,
-      "files": [
-        "skills/dh-execute-plan-task/SKILL.md"
       ]
     },
     {
@@ -1434,6 +1658,13 @@
     },
     {
       "token": "pre-run",
+      "count": 1,
+      "files": [
+        "skills/dh-final-review/SKILL.md"
+      ]
+    },
+    {
+      "token": "plan-scoped",
       "count": 1,
       "files": [
         "skills/dh-final-review/SKILL.md"
@@ -1664,6 +1895,20 @@
       ]
     },
     {
+      "token": "package-level",
+      "count": 1,
+      "files": [
+        "skills/dh-preflight/SKILL.md"
+      ]
+    },
+    {
+      "token": "merge-base",
+      "count": 1,
+      "files": [
+        "skills/dh-resume-plan/SKILL.md"
+      ]
+    },
+    {
       "token": "is-ancestor",
       "count": 1,
       "files": [
@@ -1679,6 +1924,13 @@
     },
     {
       "token": "diff-filter",
+      "count": 1,
+      "files": [
+        "skills/dh-resume-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "repo-wide",
       "count": 1,
       "files": [
         "skills/dh-resume-plan/SKILL.md"
@@ -1812,6 +2064,13 @@
     },
     {
       "token": "mobile-next",
+      "count": 1,
+      "files": [
+        "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "pnpm-workspace",
       "count": 1,
       "files": [
         "skills/dh-setup/SKILL.md"
@@ -2000,7 +2259,7 @@
       ]
     }
   ],
-  "secretLow": 45,
+  "secretLow": 49,
   "secretHigh": [],
   "junkList": [],
   "symlinkCount": 0,
@@ -2032,6 +2291,10 @@
       },
       {
         "name": "dh-create-documentation",
+        "status": "present"
+      },
+      {
+        "name": "dh-create-worktree",
         "status": "present"
       },
       {
@@ -2134,7 +2397,7 @@
     {
       "file": "agents/dh-documentor.md",
       "kind": "agent",
-      "lines": 76,
+      "lines": 98,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2155,7 +2418,7 @@
     {
       "file": "agents/dh-final-reviewer.md",
       "kind": "agent",
-      "lines": 36,
+      "lines": 53,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2176,7 +2439,7 @@
     {
       "file": "agents/dh-reviewer.md",
       "kind": "agent",
-      "lines": 34,
+      "lines": 50,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2197,7 +2460,7 @@
     {
       "file": "agents/dh-software-architect.md",
       "kind": "agent",
-      "lines": 82,
+      "lines": 97,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2218,7 +2481,7 @@
     {
       "file": "agents/dh-software-engineer.md",
       "kind": "agent",
-      "lines": 102,
+      "lines": 117,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2239,7 +2502,7 @@
     {
       "file": "skills/dh-artifact-check/SKILL.md",
       "kind": "skill",
-      "lines": 71,
+      "lines": 91,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2257,7 +2520,7 @@
     {
       "file": "skills/dh-code-query/SKILL.md",
       "kind": "skill",
-      "lines": 172,
+      "lines": 191,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2275,7 +2538,7 @@
     {
       "file": "skills/dh-code-review/SKILL.md",
       "kind": "skill",
-      "lines": 110,
+      "lines": 113,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2293,7 +2556,7 @@
     {
       "file": "skills/dh-code-ruler/SKILL.md",
       "kind": "skill",
-      "lines": 112,
+      "lines": 133,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2311,7 +2574,7 @@
     {
       "file": "skills/dh-coding/SKILL.md",
       "kind": "skill",
-      "lines": 143,
+      "lines": 155,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2347,13 +2610,13 @@
     {
       "file": "skills/dh-create-documentation/SKILL.md",
       "kind": "skill",
-      "lines": 241,
+      "lines": 248,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-create-documentation",
-          "description": "Create structured docs (Markdown/HTML/Mermaid): project docs, API refs, READMEs, guides, plus evolution and observation notes recording software evolution and session learnings; Obsidian vault = {project_root}, ALL docs under {project_root}/docs, frontmatter metadata. Use to document this, write a README, generate documentation, create evolution/observation notes, or capture learnings.",
+          "description": "Create structured docs (Markdown/HTML/Mermaid): project docs, API refs, READMEs, guides, plus evolution and observation notes recording software evolution and session learnings; Obsidian vault = workspace root, docs under {workspace_root}/docs or {package}/docs with `package` frontmatter, metadata. Use to document this, write a README, generate documentation, create evolution/observation notes, or capture learnings.",
           "license": "MIT",
           "compatibility": "opencode, copilot, antigravity",
           "allowed-tools": "bash, read, write, edit, glob",
@@ -2363,9 +2626,27 @@
       "findings": []
     },
     {
+      "file": "skills/dh-create-worktree/SKILL.md",
+      "kind": "skill",
+      "lines": 148,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-create-worktree",
+          "description": "Create, reuse, merge, and remove project worktrees following the project-owned WORKTREE_LIFECYCLE.md (before/after create, merge, and remove). Use when the user asks for a worktree, to run a plan in one, or to merge/remove it. The lifecycle file is generated only by dh-setup.",
+          "license": "MIT",
+          "compatibility": "opencode",
+          "allowed-tools": "read, bash",
+          "metadata": "audience: developers workflow: worktree"
+        }
+      },
+      "findings": []
+    },
+    {
       "file": "skills/dh-domain-check/SKILL.md",
       "kind": "skill",
-      "lines": 96,
+      "lines": 109,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2401,7 +2682,7 @@
     {
       "file": "skills/dh-execute-plan/SKILL.md",
       "kind": "skill",
-      "lines": 159,
+      "lines": 181,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2419,7 +2700,7 @@
     {
       "file": "skills/dh-execute-plan-fast/SKILL.md",
       "kind": "skill",
-      "lines": 225,
+      "lines": 243,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2491,7 +2772,7 @@
     {
       "file": "skills/dh-final-review/SKILL.md",
       "kind": "skill",
-      "lines": 156,
+      "lines": 174,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2509,7 +2790,7 @@
     {
       "file": "skills/dh-grill-sdd/SKILL.md",
       "kind": "skill",
-      "lines": 137,
+      "lines": 153,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2545,7 +2826,7 @@
     {
       "file": "skills/dh-pause-plan/SKILL.md",
       "kind": "skill",
-      "lines": 247,
+      "lines": 249,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2563,7 +2844,7 @@
     {
       "file": "skills/dh-planning/SKILL.md",
       "kind": "skill",
-      "lines": 141,
+      "lines": 159,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2581,7 +2862,7 @@
     {
       "file": "skills/dh-preflight/SKILL.md",
       "kind": "skill",
-      "lines": 61,
+      "lines": 86,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2599,7 +2880,7 @@
     {
       "file": "skills/dh-resume-plan/SKILL.md",
       "kind": "skill",
-      "lines": 235,
+      "lines": 242,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2617,7 +2898,7 @@
     {
       "file": "skills/dh-review/SKILL.md",
       "kind": "skill",
-      "lines": 200,
+      "lines": 212,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2635,7 +2916,7 @@
     {
       "file": "skills/dh-semver/SKILL.md",
       "kind": "skill",
-      "lines": 121,
+      "lines": 145,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2653,7 +2934,7 @@
     {
       "file": "skills/dh-setup/SKILL.md",
       "kind": "skill",
-      "lines": 244,
+      "lines": 249,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2671,7 +2952,7 @@
     {
       "file": "skills/dh-simplify/SKILL.md",
       "kind": "skill",
-      "lines": 86,
+      "lines": 88,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2689,7 +2970,7 @@
     {
       "file": "skills/index.md",
       "kind": "index",
-      "lines": 153,
+      "lines": 175,
       "frontmatter": {
         "status": "none-expected"
       },

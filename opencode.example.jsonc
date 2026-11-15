@@ -3,7 +3,7 @@
   // NOTE (verified against opencode v2.0.18): `plugins` entries that are
   // `file://` URLs must point to a DIRECTORY, not a plugin.js file — the
   // file form is rejected with "configured plugin path must be a directory".
-  // Bundled surface: 5 agents + 25 skills (the `dh` MCP server adds 12 tools).
+  // Bundled surface: 5 agents + 26 skills (the `dh` MCP server adds 12 tools).
   // Delegation is capability-based: skills resolve each role through
   // skills/dh-planning/references/agent-selection.md (discover the runtime
   // agents, prefer project-specific matches, fall back to the bundled
@@ -43,7 +43,7 @@
   //   opencode debug agents → the 5 dh-* agents: dh-software-architect,
   //                           dh-software-engineer, dh-reviewer,
   //                           dh-final-reviewer, dh-documentor
-  //   (25 skills: no debug subcommand on v2.0.18 — see skills/index.md)
+  //   (26 skills: no debug subcommand on v2.0.18 — see skills/index.md)
   //   opencode debug config → the plugin entry + mcp.servers.dh
   //   opencode mcp list     → `dh` connected (server/status only)
   //   expected tools        → dh_plan_read, dh_plan_update_status,

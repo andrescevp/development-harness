@@ -7,8 +7,8 @@ Canonical format for `handoff.md` (written by `dh-pause-plan`, consumed by
 
 - **Sidecar, not a second plan.** `plan.md` stays the source of truth for task status; the handoff never overrides it.
 - **Session continuity.** Records where execution stopped, why, what is in flight, what was decided, what was validated, and how to continue.
-- **One handoff per plan.** Re-pausing refreshes the snapshot and appends
-  history; earlier rows are never discarded.
+- **One handoff per plan.** Re-pausing refreshes the snapshot and appends history; earlier rows are never discarded.
+- **Optional package scope.** A `## Package Scope` section (affected-package fingerprints) is additive — no version bump; old handoffs stay valid ([`package-scope.md`](package-scope.md)).
 - **Git is optional.** Unknown values are `null`; resume degrades to `plan_sha256` plus file evidence.
 
 ## Versioning
@@ -142,6 +142,15 @@ was available at pause; no drift check since.
 - 2.3 started: hard-blocker bullet in `skills/dh-execute-plan-task/SKILL.md`
   now recommends `dh-pause-plan`; stopped there.
 - Remaining: apply the same wording to the failure path, then lint + contract test.
+
+## Package Scope
+
+- Scope source: `docs/plans/<slug>/plan.md` → `## Workspace Impact`
+- Workspace map: `WORKSPACE.md` (present) / `None — standalone`
+- Affected: `<package>` (fingerprint `<hex>`); shared `<path>` (fingerprint `<hex>`)
+- Out of scope (dirty, not drift): `<package>` (fingerprint `<hex>`)
+- Unattributed dirty paths: `none`
+- Fallback: package scope available / repo-wide (standalone or legacy handoff)
 
 ## Uncommitted Changes
 

@@ -2,7 +2,7 @@
 
 ## Step 5: Obsidian Push
 
-The Obsidian vault IS the project root: `{project_root}` (auto-detected via `git rev-parse --show-toplevel` or the current directory). **ALL documentation is written under `{project_root}/docs`** — Obsidian sees it as a `docs/` folder inside the vault, and there is no `{vault}/{project}/` nesting. This step enriches every written document with complete frontmatter so it is discoverable in Obsidian.
+Root selection follows [`workspace-docs.md`](workspace-docs.md): the default vault is the workspace root (`{workspace_root}`), package docs go to `{package}/docs` with `package` frontmatter, and evolution/observation notes always stay at the workspace root. `OBSIDIAN_VAULT` moves the vault copy only; it never moves `docs/plans`. **Workspace-level documentation is written under `{workspace_root}/docs`** — Obsidian sees it as a `docs/` folder inside the vault, and there is no `{vault}/{project}/` nesting. This step enriches every written document with complete frontmatter so it is discoverable in Obsidian.
 
 ### 5a. Determine vault path
 
@@ -31,6 +31,7 @@ For every document, add YAML frontmatter before pushing:
 ---
 tags: [documentation]
 project: <project-name>
+package: <package-name>     # required for package docs; omit for workspace docs
 created: <YYYY-MM-DD>
 updated: <YYYY-MM-DD>
 stack: <tech-stack>        # e.g. "python,fastapi", "typescript,react"

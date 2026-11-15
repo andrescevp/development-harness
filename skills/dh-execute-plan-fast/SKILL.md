@@ -32,7 +32,7 @@ MCP tools on the project-scope `dh` server (Code Mode:
 - Create a feature branch per plan execution; if not on one, ask before any change. In monorepos with submodules, branch each submodule in alignment.
 - Read `plan.md` first with `dh_plan_read` (`{ slug }`). Fallback: manual read following the phased markers (`## Phases` → `### Phase N: <title>` → `#### Sub-Task N.M: <title>` with `- **Status:**` bullets). Missing → stop and suggest `dh-planning`.
 - **Paused handoff:** if `handoff.md` is `status: paused`, stop and redirect to `dh-resume-plan`. Resume defaults to standard; after it marks the handoff `resumed`, re-enter **fast mode** when `plan_fast.md` exists.
-- **Scope freeze + allowed differences:** never change `plan.md` scope, requirements, acceptance criteria, or done-when. The mirror may differ only by (a) omitted top-level sections — `## Objective`, `## Requirements Snapshot`, `## Scope`, `## Assumptions and Constraints`, `## Risks and Areas Requiring Care`, `## Core concepts`, `## Visual Context`, `## Agent Selection`, `## Open Questions`; (b) fast sections — `## Fast Execution Policy`, `## Alignment Contract`, `## Final Verification`; and (c) status progression. Use `plan.md` for every requirements/scope check.
+- **Scope freeze + allowed differences:** never change `plan.md` scope, requirements, acceptance criteria, or done-when. The mirror may differ only by (a) omitted top-level sections — `## Objective`, `## Requirements Snapshot`, `## Scope`, `## Workspace Impact`, `## Assumptions and Constraints`, `## Risks and Areas Requiring Care`, `## Core concepts`, `## Visual Context`, `## Agent Selection`, `## Execution Record`, `## Open Questions`; (b) fast sections — `## Fast Execution Policy`, `## Alignment Contract`, `## Final Verification`; and (c) status progression. Use `plan.md` for every requirements/scope check.
 - **Dual status is mandatory.** Every phase/sub-task change goes to **both plans** via `dh_plan_fast_update_status` (`{ slug, target, index, status }`; normalized `dh_plan_fast_update_status`, Code Mode `tools.dh.plan_fast_update_status`), which applies both writes and reverts on a failed mirror write. Fallback: manual dual edits with retry/revert. Never update only one plan.
 - **Skip-check ledger:** append every skipped, deferred, or not-applicable standard check to `plan_fast_skip_checks.md` via `dh_plan_fast_skip_check` (append-only, never delete). The task skill records per-task rows; this orchestrator records end-level rows.
 - **Integrity hash:** record `source_sha256` at creation — SHA-256 of the `plan.md` body (after the closing frontmatter) with every line whose trimmed form starts with `- **Status:**` deleted. Recompute at startup, resume, Step 4, and Step 6; validate `slug` and `source_plan: plan.md`. Mismatch → **stop and ask**; never auto-adopt. Only a pre-execution transcription fix (hash matches but structure/fields disagree, statuses excluded) may be done with confirmation; any realignment bumps `plan_version`.
@@ -44,6 +44,13 @@ MCP tools on the project-scope `dh` server (Code Mode:
 - **Agent selection:** the phases region copied into `plan_fast.md` carries each sub-task's `Delegated to agent`; confirm it against `plan.md`'s `## Agent Selection`. Missing/empty/unknown field or unavailable agent → **stop and ask**; never substitute silently. One responsible agent per sub-task — no complexity- or type-based split.
 - **Project type, once:** `package.json`, `pyproject.toml`, `Cargo.toml`, `composer.json`, `go.mod`, `CMakeLists.txt`, `setup.py`, `setup.cfg`, `Gemfile`, `project.clj`, `deps.edn`, `mix.exs`, `pubspec.yaml`, `Build.scala`, `build.gradle`, `*.csproj`, `*.sln`. Record it once for end gates; it never changes the sub-task's delegated agent.
 - **Frontmatter lifecycle:** `status: In Progress` in both plans when the first sub-task starts; `Completed` in both at close; bump `plan_version` on realignment.
+- **Execution record (T1/T3):** write `## Execution Record` in `plan.md` before
+  the final-review gate (T1, `Execution status: In progress`), then recompute
+  `source_sha256` and bump `plan_version` — the record changes the `plan.md`
+  body, so the mirror must stay current for the plan-end gate. Treat this as the
+  documented record realignment, not a hash-mismatch stop. Finalize the record
+  and the `## Execution Records` index row after approval, before `Completed`
+  ([`../dh-planning/references/execution-record.md`](../dh-planning/references/execution-record.md)).
 - Update `./docs/plans/index.md` only when complete, then run `dh-create-documentation` (docs + evolution/observation notes).
 
 ## Workflow
@@ -142,22 +149,33 @@ Run the gates once, in order:
 3. **Domain check (conditional):** `dh-domain-check` only for architectural
    multi-module software plans; otherwise append `not applicable`.
 4. **Preflight + artifact check:** `dh-preflight` + `dh-artifact-check`.
-5. **Final review:** `dh-final-review`, instructed to reuse the alignment and
-   gate results above and not re-run preflight, artifact-check, or semver.
-6. **Ledger outcomes:** append every gate outcome (`run: PASS/FAIL` or
+5. **Execution record (T1):** fill `## Execution Record` in `plan.md` with every
+   field (`Execution status: In progress`), then refresh `source_sha256` and
+   `plan_version` in `plan_fast.md` as the documented record realignment; never
+   copy the record into the mirror.
+6. **Final review (T2):** `dh-final-review`, instructed to verify the record and
+   reuse the alignment and gate results above; do not re-run preflight,
+   artifact-check, or semver.
+7. **Ledger outcomes:** append every gate outcome (`run: PASS/FAIL` or
    `not applicable`) via `dh_plan_fast_skip_check`, then report the skip-checks
    path and any **unresolved** ledger rows.
-7. **Any P0/P1:** stop, fix, re-run the failing gate, then every downstream gate.
+8. **Any P0/P1:** stop, fix, re-run the failing gate, then every downstream gate.
 
 ### Step 7: Close the plan
 
-1. **Documentation:** `dh-create-documentation` to update project docs and write
-   `docs/evolution/<date>-<slug>.md` + `docs/evolution/observations/<date>-<hhmm>-<slug>.md`.
-2. **Version bump (software only):** `dh-semver` **once**; backfill the
+1. **Finalize the execution record (T3):** set `Execution status`
+   (`Completed` / `Completed with deferrals`), finalize `Commit range` and
+   `Executed at`, and update the `docs/plans/index.md` `## Execution Records`
+   row per [`../dh-planning/references/execution-record.md`](../dh-planning/references/execution-record.md).
+2. **Documentation (T4):** `dh-create-documentation` to update project docs and
+   write `docs/evolution/<date>-<slug>.md` +
+   `docs/evolution/observations/<date>-<hhmm>-<slug>.md`; link the finalized
+   execution record.
+3. **Version bump (software only):** `dh-semver` **once**; backfill the
    version/tag into the evolution note and index entry.
-3. **Mark complete:** `status: Completed` in both plans (all phases/sub-tasks
-   `Completed` in both), then update the `./docs/plans/index.md` row.
-4. **Report:** both plan paths, skip-checks path, dual-status confirmation, both
+4. **Mark complete:** set `status: Completed` in both plans (all
+   phases/sub-tasks `Completed` in both) and update the plan's status row.
+5. **Report:** both plan paths, skip-checks path, dual-status confirmation, both
    alignment verdicts, each end gate outcome, unresolved ledger rows,
    plan-specific results, final review verdict, P2/P3 findings, docs paths,
    version bump, readiness for merge.

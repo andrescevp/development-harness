@@ -25,6 +25,15 @@ Create a practical execution plan in `./docs/plans/<plan-slug>/plan.md`, not imp
 - Treat `./docs/plans/<plan-slug>/sdd.md` as the source of truth for requirements when it exists.
 - Include a concise requirements snapshot in the plan so each sub-task preserves the original intent.
 - Map each sub-task to the specific requirements, constraints, or acceptance criteria it addresses.
+- **Workspace Impact (when the workspace map exists):** read `WORKSPACE.md` at
+  the workspace root and fill `## Workspace Impact` — after `## Scope` and
+  outside `## Phases` — with the workspace root, the affected packages (the
+  subset touched, never the whole map), the shared/root paths touched and, per
+  package, its stack, test, build, docs root and version policy from the map
+  ([`../dh-setup/references/workspace-map.md`](../dh-setup/references/workspace-map.md)).
+  Affected packages are declared, never inferred from the cwd. Standalone
+  repositories write `None — standalone repository`; plans without the section
+  stay valid.
 - Use stable requirement IDs such as `R1`, `R2`, and `R3` in the Requirements Snapshot so sub-tasks can refer to them unambiguously.
 - Make every sub-task self-contained enough that another agent can implement it directly from `plan.md` without a separate handoff file.
 - Initialize every newly created sub-task with status `Pending`.
@@ -83,7 +92,7 @@ Before leaving interview mode, confirm the collected answers provide enough info
    unless the user explicitly waives the gate.
 1. Identify the goal, requirements, constraints, risks, dependencies, and out-of-scope items from the request (or interview answers).
 2. If critical information is still missing (interview mode was skipped or partial), ask focused numbered questions before proceeding.
-3. If `./docs/plans/<plan-slug>/sdd.md` exists extract a short requirements snapshot from it, including acceptance criteria, edge cases, out-of-scope boundaries, and constraints relevant to implementation, and assign stable IDs such as `R1`, `R2`, and `R3`. If it is an update request, preserve the original requirements and acceptance criteria from `./docs/plans/<plan-slug>/sdd.md` in the requirements snapshot, and call out any new requirements or changes as additions or modifications to the original requirements.
+3. If `./docs/plans/<plan-slug>/sdd.md` exists extract a short requirements snapshot from it, including acceptance criteria, edge cases, out-of-scope boundaries, and constraints relevant to implementation, and assign stable IDs such as `R1`, `R2`, and `R3`. If it is an update request, preserve the original requirements and acceptance criteria from `./docs/plans/<plan-slug>/sdd.md` in the requirements snapshot, and call out any new requirements or changes as additions or modifications to the original requirements. When `WORKSPACE.md` exists, read it and record `## Workspace Impact` from it.
 4. **Select agents:** after the requirements snapshot, inspect the runtime agent list (then project config/agent directories, then global definitions) and resolve the capability roles the plan will delegate — architecture/design, implementation/engineering, testing/QA, review, final review, documentation, and any domain specialist — using [`references/agent-selection.md`](references/agent-selection.md). Record the choices, rationale, and generic fallback in `## Agent Selection`; write `None — no specialized agent required` when nothing is delegated. Do this before any delegation.
 5. **For software projects only:** If the scope involves architectural decisions or cross-module changes, run the `dh-domain-check` skill to validate bounded contexts and SOLID principles, and incorporate findings into the plan structure. If multiple plausible approaches exist, run the `dh-contingency` skill to explore alternatives before committing to a single path.
 6. Break the work into **ordered phases**, and within each phase into
@@ -118,6 +127,11 @@ plan delegates work, following
 [`references/agent-selection.md`](references/agent-selection.md). Write
 `None — no specialized agent required` when no delegation is needed.
 
+Fill `## Workspace Impact` from `WORKSPACE.md` when present (standalone plans
+write `None — standalone repository`). Keep the `## Execution Record` placeholder
+after `## Final Integration & Verification`; execution fills and finalizes it
+([`references/execution-record.md`](references/execution-record.md)).
+
 ## Final Check
 
 - The plan is complete, ordered, and actionable.
@@ -131,6 +145,10 @@ plan delegates work, following
 - Each sub-task is self-contained and includes scope, dependencies, completion, caution, implementation, and testing guidance.
 - Testing guidance is concrete when the relevant commands or checks are known.
 - `## Visual Context` exists and its links resolve (or it explicitly says `None — no structural change`).
+- `## Workspace Impact` is present when `WORKSPACE.md` exists (standalone plans
+  say `None — standalone repository`); `## Execution Record` follows
+  `## Final Integration & Verification` and neither section sits inside
+  `## Phases`.
 - The plan stays within the requested scope.
 
 ## Doc search

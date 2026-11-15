@@ -29,6 +29,21 @@ metadata:
 - Cross-reference `./docs/plans/<plan-slug>/contingency.md` if it exists for planned deployment paths
 - Report each check independently; aggregate into a single pass/fail
 
+## Workspace-Aware Builds
+
+- Read `## Workspace Impact` from the active plan and the workspace map
+  (`WORKSPACE.md`); build each affected package with its mapped command, or run
+  the workspace aggregate when the change is workspace-wide. Patterns and
+  selection rules: [`../dh-preflight/references/workspace-gates.md`](../dh-preflight/references/workspace-gates.md).
+- Verify the artifact of **each** affected package (existence + non-zero size);
+  report a row per package as pass / fail / skipped.
+- Never report green for a package whose build did not run: a skipped package
+  keeps its recorded reason, and a green aggregate does not cover it.
+- A package in `## Workspace Impact` with no map row, no build command, or a
+  missing path is `unknown package` → **FAIL**, never skipped.
+- **Standalone** (no map, no affected packages): keep the single-root behavior
+  and single-table report below unchanged.
+
 ## Output Template
 
 ```markdown
@@ -40,6 +55,11 @@ metadata:
 | Build system | Docker / pip / npm / cargo / go | [command used] |
 | Build result | ✅ Pass / ❌ Fail | [output summary] |
 | Artifact exists | ✅ Pass / ❌ Fail | `path/to/artifact` (size) |
+
+## Package Builds (workspace only)
+| Package | Build command | Result | Artifact |
+|---|---|---|---|
+| `apps/web` | `pnpm --filter web build` | ✅ Pass / ❌ Fail / ⏭️ Skipped | `apps/web/dist` (size or reason) |
 
 ## Deployment Validation
 | Check | Result | Details |

@@ -21,6 +21,22 @@ update, delete, retrieve) — everything EXCEPT plan documents
   planning/execution/review workflow: `dh-planning` / `dh-execute-plan` /
   `dh-final-review`).
 
+## Workspace First
+
+Read `WORKSPACE.md` at the workspace root, else `docs/WORKSPACE.md`, when
+present (schema: [workspace map](../skills/dh-setup/references/workspace-map.md));
+the map names the workspace and package docs roots. No map and no
+workspace marker means standalone: the single root is workspace, package and
+plan root.
+
+- Take **affected packages** from the plan's `## Workspace Impact`; never infer
+  them from the session cwd.
+- Write workspace docs at `{workspace_root}/docs` and package docs at
+  `{package}/docs` with frontmatter `package: <name>`; evolution and observation
+  notes always stay at the workspace root.
+- Keep `docs/plans` read-only and workspace-root only (no package-local plan
+  directory); standalone keeps `{project_root}/docs`.
+
 ## Key Skills
 
 - `dh-create-documentation` — document structure, vault push, evolution and
@@ -41,8 +57,14 @@ update, delete, retrieve) — everything EXCEPT plan documents
 4. **Obsidian frontmatter** is mandatory on every document: `title`, `tags`,
    `project`, `created`, `updated`, `stack`, `feature` (see
    dh-create-documentation references).
-5. Documents live in the Obsidian vault = `{project_root}`; all documentation
-   under `{project_root}/docs`.
+5. Documents live in the Obsidian vault = `{workspace_root}`; the docs root comes
+   from the workspace map, not `$PWD`:
+   - workspace docs → `{workspace_root}/docs` (no `package` field);
+   - package docs → `{package}/docs` with frontmatter `package: <name>`;
+   - evolution and observation notes always at the workspace root;
+   - `OBSIDIAN_VAULT` moves the vault copy only — never `docs/plans`
+     ([workspace-docs](../skills/dh-create-documentation/references/workspace-docs.md)).
+   A standalone repository keeps `{project_root}/docs`.
 
 ## Diagram Workflow
 

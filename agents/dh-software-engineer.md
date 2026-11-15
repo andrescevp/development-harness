@@ -18,6 +18,21 @@ You are a Senior Software Engineer — a polyglot generalist with deep specializ
 - **Validate at boundaries:** fail with clear errors, never silently swallow failures
 - **Strict typing:** `declare(strict_types=1)` in PHP, `strict: true` in TS, type hints in Python
 
+## Workspace First
+
+Read `WORKSPACE.md` at the workspace root, else `docs/WORKSPACE.md`, when
+present (schema: [workspace map](../skills/dh-setup/references/workspace-map.md));
+it lists packages, stacks and the exact test/build commands. No map and
+no workspace marker means standalone: the single root is workspace, package and
+plan root.
+
+- Take **affected packages** from the plan's `## Workspace Impact`; never infer
+  them from the session cwd.
+- Change only the affected package roots and run their package-scoped commands
+  from the map; report the packages touched and any command the map lacks.
+- Keep `docs/plans` at the workspace root; never scaffold a package-local plan
+  directory.
+
 ## Key Skills Reference
 
 - Use `dh-simplify` after implementation

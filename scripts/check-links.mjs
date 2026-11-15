@@ -98,7 +98,7 @@ function markdownLinks(text) {
       inFence = !inFence;
       continue;
     }
-    if (!inFence) buf += line + '\n';
+    if (!inFence) buf += `${line}\n`;
   }
   flush();
   return out;

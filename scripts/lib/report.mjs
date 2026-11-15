@@ -32,11 +32,11 @@ ${r.summary.dimensions.map((d) => `| ${d.name} | ${d.count} | ${d.sev} | ${d.not
 
 ## Deviations (warn, per file)
 
-${warns.length ? '| File | Dimension | Severity | Note |\n|---|---|---|---|\n' + warns.map(rowMd).join('\n') : '_None._'}
+${warns.length ? `| File | Dimension | Severity | Note |\n|---|---|---|---|\n${warns.map(rowMd).join('\n')}` : '_None._'}
 
 ## Schema deviations (known content deviations)
 
-${r.schemaDevs.length ? '| File | Severity | Note |\n|---|---|---|---|\n' + r.schemaDevs.map((d) => `| ${d.file} | ${d.severity} | ${d.note} |`).join('\n') : '_None._'}
+${r.schemaDevs.length ? `| File | Severity | Note |\n|---|---|---|---|\n${r.schemaDevs.map((d) => `| ${d.file} | ${d.severity} | ${d.note} |`).join('\n')}` : '_None._'}
 
 ## Loop membership
 
@@ -47,7 +47,7 @@ ${r.loop.agents.map((a) => `| agent | ${a.name} | ${a.status} |`).join('\n')}
 
 ## Cross-reference failures
 
-${atTop.length ? '| File | Line | Mention | Note |\n|---|---|---|---|\n' + atTop.map((m) => `| ${m.file} | ${m.line} | ${m.mention} | ${m.note} |`).join('\n') : '_None (all @mentions resolve to bundled agents/skills, aliases, code context, or the curated allowlist)._'}
+${atTop.length ? `| File | Line | Mention | Note |\n|---|---|---|---|\n${atTop.map((m) => `| ${m.file} | ${m.line} | ${m.mention} | ${m.note} |`).join('\n')}` : '_None (all @mentions resolve to bundled agents/skills, aliases, code context, or the curated allowlist)._ '}
 
 Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; full list in reports/audit.json):
 
@@ -69,7 +69,7 @@ ${kebabTop.length ? kebabTop.map((k) => `- \`${k.token}\` × ${k.count}`).join('
 
 ## Junk scan
 
-- Junk files: **${junkList.length}** ${junkList.length ? '— ' + junkList.join('; ') : '_(none)_'}.
+- Junk files: **${junkList.length}** ${junkList.length ? `— ${junkList.join('; ')}` : '_(none)_'}.
 - Symlinks: **${r.symlinkCount}**.
 
 ## Re-run
