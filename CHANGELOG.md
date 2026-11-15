@@ -5,7 +5,7 @@ All notable changes to this project are documented here. The format follows
 Semantic Versioning. During the 0.x line, breaking changes bump the minor
 version.
 
-## [Unreleased]
+## [0.7.0] — 2026-11-15
 
 ### Added
 
@@ -149,6 +149,7 @@ First release of the standalone OpenCode V2 harness.
 - Plan close-outs include the pause/resume, fast-plan, Mermaid, and
   agent-selection plans with evolution/observation notes.
 
+[0.7.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.7.0
 [0.6.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.6.0
 [0.5.1]: https://github.com/andrescevp/development-harness/releases/tag/v0.5.1
 [0.5.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.5.0
