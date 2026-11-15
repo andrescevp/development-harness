@@ -1,10 +1,10 @@
 # Audit Report — dev-harness-skills plugin
 
-Generated 2026-11-09T23:41:41.760Z by `scripts/audit.mjs`.
+Generated 2026-11-11T00:19:36.903Z by `scripts/audit.mjs`.
 
 ## Verdict
 
-**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 267. Documented schema deviations: 0.
+**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 296. Documented schema deviations: 0.
 
 ## Summary verdict table
 
@@ -14,9 +14,9 @@ Generated 2026-11-09T23:41:41.760Z by `scripts/audit.mjs`.
 | Frontmatter parse | 32 | PASS | 32 files on audit surface |
 | Name regex | 31 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 1 | WARN | 501 resolved; 0 code-context; 0 allowlisted; 261 prose tokens (warn) |
+| Cross-references | 1 | WARN | 539 resolved; 0 code-context; 0 allowlisted; 290 prose tokens (warn) |
 | Loop membership | 31 | PASS | 26/26 skills present; 5/5 agents present |
-| Secret scan | 47 | PASS | 47 low-signature prose hits (instructional), 0 high-signature |
+| Secret scan | 49 | PASS | 49 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
 
 ## Deviations (warn, per file)
@@ -73,39 +73,39 @@ _None._
 
 | File | Line | Mention | Note |
 |---|---|---|---|
-| skills/dh-setup/SKILL.md | 64 | @playwright | unresolved @mention (external role/product or prose) — warn-only per plan |
+| skills/dh-setup/SKILL.md | 55 | @playwright | unresolved @mention (external role/product or prose) — warn-only per plan |
 
 Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; full list in reports/audit.json):
 
 - `agent-selection` × 37
 - `project-name` × 28
 - `per-task` × 17
+- `execution-record` × 16
+- `workspace-diff-scope` × 14
+- `final-review` × 13
 - `pre-execution` × 13
-- `project-scope` × 12
+- `plan-end` × 13
 - `tests-reaching` × 12
-- `final-review` × 12
-- `plan-end` × 12
-- `repo-path` × 10
+- `workspace-docs` × 11
+- `project-scope` × 11
+- `repo-path` × 11
+- `read-only` × 10
+- `workspace-map` × 9
 - `qualified-name` × 9
-- `read-only` × 9
 - `plan-fast-skip-checks` × 8
+- `package-scope` × 8
 - `osv-scanner` × 7
 - `test-only` × 7
+- `package-local` × 6
+- `code-rules-resolution` × 6
 - `plan-fast-template` × 6
 - `skip-checks` × 6
 - `artifact-check` × 6
 - `re-pause` × 6
-- `handoff-template` × 6
-- `domain-check` × 5
-- `status-based` × 5
-- `re-validation` × 5
-- `phased-plan-template` × 5
-- `bounded-context` × 4
-- `type-based` × 4
 
 ## Secret scan
 
-- Low-signature prose hits (instructional): **47** (env-var names, max_tokens, "never expose" rules).
+- Low-signature prose hits (instructional): **49** (env-var names, max_tokens, "never expose" rules).
 - High-signature matches: **0** _none_.
 
 ## Junk scan

@@ -18,13 +18,19 @@ Produce a comprehensive final sign-off review for a completed plan. Verify all s
 - Read the plan (via `dh_plan_read` when available; fallback: manual read of `./docs/plans/<plan-slug>/plan.md`) to verify sub-task AND phase completion. The plan tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 - If any sub-task is not `Completed` (and therefore any phase is not `Completed`), stop and report which tasks remain — do not proceed to full review.
 - This skill is loop step 4 (`dh-final-review`); the full loop 1–5 lives in repo-root AGENTS.md (pointer only, no duplication).
-- Perform full-diff review against the entire scope, not just individual sub-tasks.
+- Perform full-diff review against the entire scope, not just individual sub-tasks — "full" means every path the plan declares: the affected packages from `## Workspace Impact` plus the root/shared files it names, reviewed with `git diff <base>...HEAD -- <paths>` plus `git diff HEAD -- <paths>` / `git status --porcelain -- <paths>` for uncommitted work. Report untouched packages as **unaffected** and never drop a declared root/shared file; standalone plans keep the full diff ([`../dh-review/references/workspace-diff-scope.md`](../dh-review/references/workspace-diff-scope.md)).
 - **Resolve the final-review agent:** read `## Agent Selection` in `plan.md` and use its Final review row. If the section or row is absent or stale, run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md), record the row (fast mode: in `tasks/review.md`, per the fast-mode recording rule below), and continue. A selected agent that is unavailable and has no capability fallback stops sign-off — never substitute silently.
 - Delegate in-depth code review to the selected final-review agent (which uses the `dh-code-review` skill).
 - Write the final report to `./docs/plans/<plan-slug>/tasks/review.md`.
 - Use severity levels: P0 (blocking), P1 (high), P2 (medium), P3 (low).
 - Do not modify any implementation files — this skill is review-only.
 - If sdd.md does not exist, use plan.md's requirements snapshot as the fallback requirements source.
+- **Execution record (T2):** verify `## Execution Record` exists after
+  `## Final Integration & Verification`, carries every field and agrees with the
+  diff (repository kind/path, branch/worktree, commit range, summary,
+  architectural changes). A missing, stale or inconsistent record is a blocking
+  finding (P1), not a P3 note
+  ([`../dh-planning/references/execution-record.md`](../dh-planning/references/execution-record.md)).
 - **For software projects:** run `dh-artifact-check` and `dh-preflight` for release readiness validation, and determine the recommended version bump with the `dh-semver` skill in the final report.
 - **Fast mode:** when invoked by `dh-execute-plan-fast`, reuse the pre-run preflight/artifact-check/semver results it already recorded instead of re-running them.
 - **Fast-mode recording:** when a `plan_fast.md` mirror exists (fast mode), never edit `plan.md` content to record findings or selection rows — any body edit changes `source_sha256` and invalidates the mirror. Write the verdict to `./docs/plans/<plan-slug>/tasks/review.md` and update statuses with `dh_plan_fast_update_status` (or the manual dual edit of the matching status lines in `plan.md` and `plan_fast.md`).
@@ -52,12 +58,13 @@ If sdd.md does not exist, fall back to the Requirements Snapshot section in plan
 
 ### Step 3: Plan-level completion scan
 
-Generate the full diff (`git diff main...HEAD` or `git diff $(git merge-base main HEAD)`) and perform a lightweight scan — do **not** deeply review code here. Check only:
+Generate the plan-scoped full diff — affected package paths from `## Workspace Impact` plus the declared root/shared files (`git diff <base>...HEAD -- <paths>`, plus `git diff HEAD -- <paths>` / `git status --porcelain -- <paths>` for uncommitted work); standalone plans use `git diff main...HEAD` with no pathspec — and perform a lightweight scan — do **not** deeply review code here. Check only:
 
 - Are all files listed in each sub-task present?
 - Are there any missing deliverables (empty files, stubs where real implementation was expected)?
 - Are there cross-sub-task integration gaps (e.g., Sub-Task 2 expects a file Sub-Task 3 was supposed to create)?
 - **Per-phase completion:** list each `Phase N` with its status and confirm no phase was marked `Completed` with open sub-tasks (blocker rule 2.4: never mark a phase around a blocker).
+- **Execution record (T2):** confirm `## Execution Record` is present, complete and consistent with the diff; otherwise raise the blocking finding above.
 - **Graph-assisted integration scan:** when the project graph is indexed, use the `dh-code-query` skill on the changed symbols — `callers`/`importers` for missed integration points, `tests-reaching` for untested call sites, `implementors`/`overrides` for contract breaks. Confirm each candidate in the diff or source before reporting it.
 - Are there obvious scope violations (out-of-scope items implemented)?
 
@@ -119,6 +126,16 @@ Any requirement marked FAIL must have a corresponding finding below with an appr
 ### [P2] Medium
 ### [P3] Low
 
+## Package Coverage (workspace only)
+
+| Package | Status | Scoped diff | Gates | Notes |
+|---|---|---|---|---|
+| `apps/web` | affected | reviewed | preflight pass | |
+| `services/api` | unaffected | not reviewed | not run | plan marks it unaffected |
+
+Any affected package without a reviewed diff or a validated gate is a blocking
+finding; an unaffected package is reported, never silently omitted.
+
 ## Integration Assessment
 
 - Cross-sub-task integration issues: [none / list]
@@ -143,6 +160,7 @@ Return the sign-off verdict to the caller. If P0/P1 findings exist, recommend fi
 
 ## References
 
+- [`../dh-review/references/workspace-diff-scope.md`](../dh-review/references/workspace-diff-scope.md): affected-package path derivation, `git diff -- <paths>`, root/shared files and package labels.
 - [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): final-review-role resolution and re-validation.
 - `dh-code-review` skill: the in-depth review methodology used by the selected final-review agent.
 - `dh-artifact-check` skill: build validation for release readiness (software projects only).

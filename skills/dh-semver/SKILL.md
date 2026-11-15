@@ -41,9 +41,31 @@ commands.
   Fixes, and Chores & Maintenance; every entry keeps its short commit hash.
 - Create the tag locally:
   `git tag -a v<major>.<minor>.<patch> -m "Release v<major>.<minor>.<patch>"`.
+- **Monorepo policy:** when `WORKSPACE.md` exists, read its
+  `## Version policy`; **fixed** = one tag for the workspace, **independent** =
+  per-package tags (`<package>@<version>`) and per-package changelog. Default
+  fixed when the policy is absent; standalone keeps the single tag.
 - Do NOT push the tag — the user confirms before pushing.
 - Run ALL git commands through the `dh-execute-cli` skill — never run bash
   directly from the agent applying this skill.
+
+## Monorepo Version Policy
+
+In a workspace the policy comes from `WORKSPACE.md`, else `docs/WORKSPACE.md`
+→ `## Version policy`; never infer it from multiple manifests:
+
+- **fixed** — one `vX.Y.Z` tag for the workspace; bump from all commits since
+  the last workspace tag; one workspace `CHANGELOG.md`.
+- **independent** — one `<package>@<version>` tag per released package; bump
+  from that package's commits (`git log <tag>..HEAD -- <package path>`);
+  per-package changelog or a package section in the workspace changelog.
+- A workspace map without a policy → ask; `fixed` is only the standalone
+  default.
+- Tags stay local; never push without confirmation; nothing is tagged before
+  the decision and changelog are reported.
+
+Fixed vs independent, tag formats, release trains and dependency order:
+[`references/monorepo-versioning.md`](references/monorepo-versioning.md).
 
 ## Edge Cases
 
@@ -109,6 +131,8 @@ import. This skill runs when:
 
 ## References
 
+- [`references/monorepo-versioning.md`](references/monorepo-versioning.md):
+  fixed vs independent policy, per-package tags and release trains.
 - `dh-execute-plan` and `dh-final-review` skills: the bundled loop steps
   that invoke this skill.
 - `AGENTS.md` versioning note: tags are semver on `main` only.

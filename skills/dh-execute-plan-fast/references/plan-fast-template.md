@@ -91,8 +91,9 @@ updated: <YYYY-MM-DD>
   `Related Requirements`, acceptance criteria, done-when, and scope boundaries.
 - `plan_fast.md` intentionally omits these top-level sections (never findings):
   `## Objective`, `## Requirements Snapshot`, `## Scope`,
-  `## Assumptions and Constraints`, `## Risks and Areas Requiring Care`,
-  `## Core concepts`, `## Visual Context`, `## Agent Selection`,
+  `## Workspace Impact`, `## Assumptions and Constraints`,
+  `## Risks and Areas Requiring Care`, `## Core concepts`,
+  `## Visual Context`, `## Agent Selection`, `## Execution Record`,
   `## Open Questions`. Use `plan.md`
   for those checks.
 - Allowed fast sections: `## Fast Execution Policy`, `## Alignment Contract`,

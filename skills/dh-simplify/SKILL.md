@@ -16,7 +16,9 @@ Review all changed files for reuse, quality, and efficiency. Fix any issues foun
 
 ## Phase 1: Identify Changes
 
-Run `git diff` (or `git diff HEAD` if there are staged changes) to see what changed. If there are no git changes, review the most recently modified files that the user mentioned or that you edited earlier in this conversation.
+Run `git diff` (or `git diff HEAD` if there are staged changes) to see what changed. In a workspace, read `## Workspace Impact` in the plan and scope the diff to the affected packages plus the root/shared files it declares — `git diff <base>...HEAD -- <paths>`, plus `git diff HEAD -- <paths>` / `git status --porcelain -- <paths>` for uncommitted work — and report untouched packages as unaffected. Standalone projects keep the full diff. Path derivation, root/shared handling and commands: [`../dh-review/references/workspace-diff-scope.md`](../dh-review/references/workspace-diff-scope.md).
+
+If there are no git changes, review the most recently modified files that the user mentioned or that you edited earlier in this conversation.
 
 ## Phase 1a: Graph-Assisted Reuse (when indexed)
 
@@ -38,7 +40,7 @@ indexed or the graph is stale.
 
 Resolve the review role first: use the plan's `## Agent Selection` Review row, or run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md) when the section or row is absent or stale — prefer a project-specific review agent and fall back to the bundled review capability. Use the same resolved agent/capability for all three passes.
 
-Use the Agent tool to launch all three agents concurrently in a single message. Pass each agent the full diff so it has the complete context.
+Use the Agent tool to launch all three agents concurrently in a single message. Pass each agent the full scoped diff so it has the complete context, and label findings with the package (`apps/web`) or `[workspace]` for root/shared files.
 
 ### Agent 1: Code Reuse Review
 
@@ -76,7 +78,7 @@ Review the same changes for efficiency:
 
 Wait for all three agents to complete. Aggregate their findings and fix each issue directly. If a finding is a false positive or not worth addressing, note it and move on — do not argue with the finding, just skip it.
 
-When done, briefly summarize what was fixed (or confirm the code was already clean).
+When done, briefly summarize what was fixed (or confirm the code was already clean). Name the package per fix and state which affected packages were untouched (unaffected).
 
 ## Doc search
 

@@ -32,6 +32,9 @@ Agent choices follow [`agent-selection.md`](agent-selection.md).
     heading (e.g. `## Final Integration & Verification`) or EOF.
 11. `## Agent Selection` sits before `## Phases`; it is outside the phases
     region, so the parser ignores it for phase/sub-task extraction.
+12. `## Workspace Impact` (after `## Scope`) and `## Execution Record` (after
+    `## Final Integration & Verification`) are optional top-level sections
+    outside the phases region; legacy plans without them parse unchanged.
 
 ## Template
 
@@ -62,6 +65,16 @@ project: <project>
 ## Scope
 
 - [In-scope work]
+
+## Workspace Impact
+
+- **Workspace root:** [absolute workspace root, or `None — standalone repository`]
+- **Affected packages:** [package paths, or `None — standalone`]
+- **Shared paths:** [root/shared files touched, e.g. `docs/`, `AGENTS.md`, `pnpm-workspace.yaml`; or `None`]
+
+| Package | Stack | Test | Build | Docs | Version policy |
+|---|---|---|---|---|---|
+| [package] | [stack] | [test command] | [build command] | [docs root] | [fixed \| independent] |
 
 ## Assumptions and Constraints
 
@@ -132,10 +145,41 @@ None — no structural change.
 - **System-Wide Test:** [End-to-end verification]
 - **Completion Checklist:** [Final checks]
 
+## Execution Record
+
+- **Execution status:** [In progress | Completed | Completed with deferrals | Not executed]
+- **Executed at:** [YYYY-MM-DD]
+- **Workspace root:** [absolute workspace root]
+- **Repository kind:** [workspace | nested project | submodule | worktree]
+- **Repository path:** [workspace-relative path; `.` for the workspace root]
+- **Branch / worktree:** [branch; worktree path when not the main checkout]
+- **Commit range:** [base..head]
+- **Plan path:** docs/plans/<plan-slug>/plan.md
+- **Mirrored plan path:** [none, or the non-authoritative copy path]
+- **Summary:**
+  - [What shipped]
+- **Architectural changes:** [ADRs/contracts/interfaces created or changed, or None]
+- **References:** [review, handoff, evolution note and ADR links]
+
 ## Open Questions
 
 - [Only if important non-blocking uncertainty remains]
 ```
+
+## Workspace Impact and Execution Record sections
+
+- `## Workspace Impact` goes after `## Scope` and before
+  `## Assumptions and Constraints`; `## Execution Record` goes after
+  `## Final Integration & Verification` and before `## Open Questions`. Both
+  are top-level sections **outside** `## Phases`, so the parser ignores them.
+- `## Workspace Impact` is optional: a standalone repository writes
+  `None — standalone repository` for the root and affected packages. When
+  `WORKSPACE.md` exists at the workspace root, `dh-planning` fills the section
+  from the map — affected packages are declared, never inferred from the cwd
+  ([`workspace-map.md`](../../dh-setup/references/workspace-map.md)).
+- `## Execution Record` is filled when the plan executes (T1/T3); see
+  [`execution-record.md`](execution-record.md). Legacy plans without it stay
+  valid.
 
 ## Delegated agent field
 

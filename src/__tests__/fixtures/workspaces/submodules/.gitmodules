@@ -1,0 +1,6 @@
+[submodule "engine"]
+	path = packages/engine
+	url = ../engine.git
+[submodule "ui"]
+	path = packages/ui
+	url = ../ui.git

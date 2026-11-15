@@ -25,6 +25,24 @@ indexing, and MCP wiring are owned by `dh-setup` — see
 Assumption: `dh-setup` has installed `cgr` and indexed the current project.
 If `cgr status` does not list the project, ask for setup before querying.
 
+## Index Routing (Workspace Or Package)
+
+In a workspace there may be one workspace index and/or one index per package;
+querying the wrong one returns false negatives. Read the routing table,
+staleness rules and answer template in
+[`references/workspace-index.md`](references/workspace-index.md).
+
+- Default to the workspace index; use a package index when the user names the
+  package or `## Workspace Impact` names exactly one.
+- `cgr graph`, `dead-code` and `duplicates` select a project with `--project` or
+  `--repo-path`; `--workspace NAME` scopes `cgr start`/`stats`/`export` and the
+  MCP server, not `cgr graph`. Several projects → run per project and merge.
+- Several indexes and an ambiguous question → list them from `cgr status` and
+  ask; never guess the index.
+- State the scope in every answer: `**Scope:** workspace index <project>` or
+  `package index <project> (<path>)`, plus packages not queried.
+- Standalone: one project at `$PWD`; `cgr status` is the only scope check.
+
 ## Deterministic Queries (Preferred)
 
 These commands use fixed graph queries, print JSON, and need no LLM. Prefer
@@ -151,6 +169,7 @@ LLM. Configure nothing from this skill; use the server that setup registered.
 ## Code graph answer
 
 **Project:** <name> (synced <last sync>)
+**Scope:** <workspace | package: <name> | project: <name>>
 **Question:** <what was asked>
 
 **Finding:** <direct answer>

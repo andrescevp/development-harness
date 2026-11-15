@@ -15,6 +15,7 @@ Produce high-signal, evidence-based reviews focused on real risk. Write the find
 ## Core Rules
 
 - Review changed code first, then only the context needed to judge impact.
+- **Scoped diff:** review the affected package paths declared in `## Workspace Impact` (`git diff -- <paths>`), plus the root/shared files the plan names. Label every finding with its package (or `[workspace]`) and report untouched packages as unaffected. Standalone reviews keep the full diff ([`../dh-review/references/workspace-diff-scope.md`](../dh-review/references/workspace-diff-scope.md)).
 - Be skeptical, not speculative.
 - Report only actionable findings with evidence.
 - Prefer a few high-confidence findings over many weak ones.
@@ -68,6 +69,7 @@ Raise a finding only if the issue is real or highly likely, causes meaningful ha
 # Code Review Summary
 
 **Scope**: [feature/fix reviewed]
+**Packages**: [affected packages, or `None — standalone`]
 **Overall risk**: High / Medium / Low
 **Verdict**: Approve / Approve with comments / Request changes
 
@@ -76,7 +78,8 @@ Raise a finding only if the issue is real or highly likely, causes meaningful ha
 ### [P0] Blocking
 
 - **Title**
-  - **Location**: `path/to/file.ext:10-24`
+  - **Package**: `apps/web` (or `[workspace]` for root/shared files)
+  - **Location**: `apps/web/src/file.ext:10-24`
   - **Why it matters**: [impact]
   - **Evidence**: [failure path]
   - **Fix**: [specific recommendation]

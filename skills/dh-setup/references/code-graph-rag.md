@@ -118,6 +118,36 @@ cgr watch --repo-path "$PWD"
 - `cgr start --update-graph` refuses `$HOME`, `/`, and a project name owned by
   another repository unless `--yes` is given. Do not bypass that guard.
 
+## Workspace And Package Indexing
+
+The workspace map (`WORKSPACE.md`, else `docs/WORKSPACE.md`) records the graph
+scope in `## Code-graph scope`: `Index: workspace` (one project for the whole
+repository) or `Index: per package` (one project per package root).
+
+| Scope | Index command | Query routing |
+|---|---|---|
+| workspace (one repo) | `cgr start --repo-path <workspace_root> --update-graph` | the workspace project covers every package |
+| per package | `cgr start --repo-path <package_root> --update-graph` per package | one package project per question |
+| named workspace (submodules, nested repos) | `cgr workspace create <name>` + `cgr workspace add-repo <name> <path>`; index each repo with `cgr start --repo-path <path> --update-graph` | `--workspace <name>` on stats/export/mcp-server; `cgr start --workspace <name> --update-graph` opens the interactive assistant after syncing (not a batch index) |
+
+- Index the repository root once, not every nested directory: `--repo-path` on a
+  package of an already-indexed repository creates a second project with
+  duplicated symbols.
+- Use a named cgr workspace only for repositories that are separate git
+  checkouts (submodules, nested standalone repos); it groups projects, it does
+  not merge them. State lives in `~/.cgr/workspaces/<name>.toml`.
+- Exclusions (`--exclude`, `.cgrignore`) follow the map's excluded paths; never
+  index generated/vendor output or secrets.
+- `cgr status` lists every indexed project and its last sync; `(missing)` means
+  the checkout moved — delete the project (`cgr delete-project --project
+  <name>`) and re-index, do not query it.
+- Re-index after edits: `cgr watch` per project; for a named workspace, index
+  each repo with `cgr start --repo-path <path> --update-graph`. `cgr start
+  --workspace <name> --update-graph` syncs the group and opens the interactive
+  assistant, so do not use it as a blocking setup step.
+- Routing, staleness and the answer scope line:
+  [`workspace-index.md`](../../dh-code-query/references/workspace-index.md).
+
 ## Exclusions And Ignore Rules
 
 - Repeatable `--exclude PATTERN` on `cgr start` / `cgr index`.
@@ -194,6 +224,8 @@ GUI-launched clients find it:
 - [ ] `GRAPH_BACKEND=sqlite`; no Memgraph/Neo4j extra, no `cgr daemon`.
 - [ ] `cgr start --repo-path "$PWD" --update-graph` completed without errors.
 - [ ] `cgr status` lists the project and `cgr stats` reports non-zero nodes.
+- [ ] Index scope matches the map (workspace or per package); no duplicate
+      project for a package inside an already-indexed repository.
 - [ ] Exclusions cover generated/vendor output and secrets.
 - [ ] `dh-code-query` can resolve a known symbol in the project.
 - [ ] Optional MCP server is read-only and wired only on user decision.

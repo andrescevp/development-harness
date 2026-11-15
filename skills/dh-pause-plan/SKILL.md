@@ -47,10 +47,8 @@ implements work, edits code, or replaces `dh-review` / `dh-final-review`.
   append one history row, and preserve every prior history row.
 - **Git is optional.** When git is unavailable, write `null` for `branch`,
   `base_commit`, and `worktree_dirty`, note it, and continue.
-- **Keep it readable.** Target ≤150 lines of handoff content; summarize,
-  never dump logs or large output.
-- **Do not delegate implementation.** Pause collects and writes; it never
-  invokes implementation or review agents.
+- **Keep it readable.** Target ≤150 lines of handoff content; summarize, never dump logs or large output.
+- **Do not delegate implementation.** Pause collects and writes; it never invokes implementation or review agents.
 
 ## Workflow
 
@@ -76,9 +74,8 @@ implements work, edits code, or replaces `dh-review` / `dh-final-review`.
 Use `dh_plan_read` (`{ slug }` → structured JSON: meta, phases, subTasks).
 Fallback when the tool is unavailable: read `plan.md` manually with the phased
 markers (`## Phases` → `### Phase N:` → `#### Sub-Task N.M:` and the first
-`- **Status:**` bullet). These tools are exposed by the project-scope `dh` MCP
-server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>`
-is the tool's normalized name (permission actions match `dh_*`).
+`- **Status:**` bullet). Under Code Mode the `dh` tools run as `tools.dh.<tool>`
+(`dh_<tool>` is the normalized name; permission actions match `dh_*`).
 
 Compute:
 
@@ -131,6 +128,9 @@ Run only read-only commands; never capture full diffs or file contents.
   ids that affect continuation (path + ids only).
 - Validation state: commands and observed outcomes from this session;
   everything else is `not run` / `unavailable`.
+- Package scope (workspace plans): read `## Workspace Impact`, fingerprint the
+  affected packages and record the optional `## Package Scope` section per
+  [`references/package-scope.md`](references/package-scope.md).
 
 ### Step 3: Compose the handoff
 
@@ -144,7 +144,8 @@ do not restate or extend the contract here.
   current content like `worktree_dirty`, and `next_action` equal to
   `## Next Steps` step 1. Quote timestamps and `subtask_index`.
 - Sections: `## Snapshot`, `## Current Position`, `## Work Completed`,
-  `## Work In Flight`, `## Uncommitted Changes`,
+  `## Work In Flight`, `## Package Scope` (optional when a workspace map exists),
+  `## Uncommitted Changes`,
   `## Decisions and Rationale`, `## Blockers and Risks`,
   `## Validation State`, `## Next Steps`, `## Resume Checklist`,
   `## Pause History`.
@@ -234,6 +235,7 @@ orchestrator's phase lifecycle, or `dh-final-review`.
 ## References
 
 - [`references/handoff-template.md`](references/handoff-template.md): the `handoff.md` contract (fields, sections, lifecycle, redaction).
+- [`references/package-scope.md`](references/package-scope.md): affected-package scope, fingerprints and the out-of-scope rule.
 - `dh-execute-plan`: position priority and resume mode this skill mirrors.
 - `dh-resume-plan`: consumer that validates the handoff and re-enters execution.
 - `dh-review`: source of open P0/P1 findings recorded in the handoff.

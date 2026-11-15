@@ -37,38 +37,29 @@ where they differ) and re-verify.
 | duckdb (CLI, optional) | optional | `duckdb --version` | https://duckdb.org — native CLI alternative to the `dh` MCP server's sheet tools (dh_read_sheet/dh_update_sheet use the duckdb npm package) |
 | phpenv | optional | `phpenv --version` / `phpenv versions` | https://github.com/phpenv/phpenv — skip with a note when absent |
 
-For anything missing, do NOT silently skip (except the optional items —
-`phpenv`, `obsidian`, `notesmd-cli`): install it or report the blocker with
-the exact command the user must run. `notesmd-cli` / `obsidian` support the
-Obsidian vault workflow used by `dh-create-documentation` (vault = project
-root, docs under `{project_root}/docs`) and the doc-search convention
-(AGENTS.md → Generated documentation search).
+For anything missing, do NOT silently skip (except `phpenv`, `obsidian` and
+`notesmd-cli`): install it or report the blocker with the exact command the user
+must run. The two doc tools support the Obsidian vault workflow used by
+`dh-create-documentation` (vault = project root, docs under
+`{project_root}/docs`) and the doc-search convention (AGENTS.md → Generated
+documentation search).
 
 **Vault check (project root):** a project root is an Obsidian vault when it
-contains the `.obsidian/` folder. In Step 3, check for it; when absent,
-INITIALIZE the vault at the project root:
+contains `.obsidian/`; initialize it only with consent (it adds a directory to
+the repo) and add `.obsidian/` to `.gitignore` when it should stay local:
 
 ```bash
-# Initialize the vault (Obsidian marks a folder as a vault via .obsidian/)
-mkdir -p .obsidian
-printf '{}\n' > .obsidian/app.json
-# Optional: full workspace file on first open; Obsidian CLI can open it:
-obsidian open path="$PWD" 2>/dev/null || true
-# Verify: notesmd-cli sees the vault without Obsidian running
+mkdir -p .obsidian && printf '{}\n' > .obsidian/app.json   # marks the vault
+obsidian open path="$PWD" 2>/dev/null || true               # optional first open
 notesmd-cli search-content "health" --vault "$(basename "$PWD")" 2>&1 | head -3 || true
 ```
-
-Only initialize with the user's consent (adding `.obsidian/` to a repo
-affects the project); add `.obsidian/` to `.gitignore` when it should stay
-local.
 
 ## Step 2: User-Level Integrations (config choices — up to the user)
 
 These are system/user-level integrations; verify they are present and offer
 the configuration, but let the user decide whether to enable each.
 
-**MCP servers** (add to `opencode.jsonc` `mcp` section; local servers run via
-`npx`):
+**MCP servers** (add to `opencode.jsonc` `mcp`; local servers run via `npx`):
 
 - chrome-devtools-mcp — https://github.com/ChromeDevTools/chrome-devtools-mcp — `"chrome-devtools": { "type": "local", "enabled": true, "command": ["npx", "-y", "chrome-devtools-mcp@latest"] }`
 - Playwright MCP — https://playwright.dev/docs/getting-started-mcp — `"playwright": { "type": "local", "enabled": true, "command": ["npx", "-y", "@playwright/mcp@latest"] }`
@@ -86,17 +77,30 @@ entries resolved). Report as "available — user decision" for each.
 
 For the target project (current workdir or the given project):
 
+**Workspace anchor and map (do this first):** probe upward from the cwd for a
+monorepo layout — `pnpm-workspace.yaml`, `package.json#workspaces`, `turbo.json`,
+`nx.json`, `lerna.json`, Cargo `[workspace]`, `go.work`, `settings.gradle`,
+`*.sln` and `.gitmodules`; a parent marker means restart at that root. Confirm
+with the user (a nested `package.json` alone is not a workspace). With consent
+write `{workspace_root}/WORKSPACE.md` (packages, stacks, test/build commands,
+docs roots, code-graph and worktree scope, version policy) and set
+`DH_WORKSPACE_ROOT` to the absolute workspace root in the `dh` entry. Then
+verify the anchor: `pwd -P` equals the workspace root, the override is unset or
+equal after realpath, and the `dh` plan dir equals the skill `./docs/plans`; on
+mismatch STOP before any plan write, name both roots/plan dirs and tell the user
+to restart at the workspace root. Interview, template, standalone fallback and
+checklist: [references/workspace-map.md](references/workspace-map.md).
+
 **1. Pre-commit / husky or equivalent, with clear rules:**
 - Install the project-appropriate hook runner: `husky` + `lint-staged` for
-  JS/TS/pnpm projects; `pre-commit` (https://pre-commit.com) for Python and
-  general repos; or a plain `.git/hooks/pre-commit` script when no native
-  runner fits.
-- Encode CLEAR rules in the hook: run formatting check, lint, and the fast
-  test suite on staged changes; block the commit on any failure; allow a
-  documented escape hatch (e.g. `--no-verify` with reason required) and
-  document the rules in the hook file header + project README/AGENTS.md.
-- Do not add hooks silently: hook policy belongs to the project — propose the
-  rules, then create the hook on confirmation.
+  JS/TS/pnpm, `pre-commit` (https://pre-commit.com) for Python and general
+  repos, or a plain `.git/hooks/pre-commit` script when no native runner fits.
+- Encode CLEAR rules in the hook: formatting check, lint and the fast test
+  suite on staged changes; block on failure; allow a documented escape hatch
+  (e.g. `--no-verify` with a required reason) and document the rules in the
+  hook header + README/AGENTS.md.
+- Never add hooks silently: propose the rules, then create the hook on
+  confirmation.
 
 **2. QA toolset for the project's stack** (install + wire into a `qa:check`
 script + CI where a workflow exists):
@@ -144,7 +148,6 @@ and that existing architecture artifacts are accounted for.
 these probes and report what exists:
 
 ```bash
-# candidate locations — report matches, do not modify anything yet
 ls -d docs/architecture docs/adr docs/design docs/specs 2>/dev/null
 ls docs/ARCHITECTURE.md docs/architecture.md ARCHITECTURE.md architecture.md 2>/dev/null
 find . -maxdepth 3 -type f -name '*.md' \( -path '*/adr/*' -o -path '*/architecture/*' -o -path '*/design/*' \) -not -path './node_modules/*' 2>/dev/null
@@ -156,40 +159,36 @@ about each artifact (keep answers recorded in the report):
 
 - **Up to date?** — are these documents still accurate (yes / no / partial)?
 - **Movable?** — may they be **moved** into `docs/architecture/` to
-  consolidate, or must they stay where they are (e.g., linked from a
-  README/CI)?
+  consolidate, or must they stay (e.g., linked from a README/CI)?
 - **Updatable?** — do they need **updating/rewriting** (delegate the refresh
   to the selected architecture agent) or archiving (old/obsolete)?
 - **Tracked?** — are they **tracked in git**; if untracked, should they be
-  committed, and is `docs/architecture/` itself tracked (else propose adding
-  a `.gitkeep` + `.gitignore` line)? Should they be linked from the repo
-  README?
+  committed, and is `docs/architecture/` tracked (else propose `.gitkeep` +
+  `.gitignore`)? Should the README link them?
 
 Never move, update, archive, or commit anything without explicit
 confirmation — this interview decides each item; the default is
 **keep in place, keep as-is** until the user says otherwise.
 
 **3. Create the architecture directory when absent** (with consent — it adds
-a dir to the project): `mkdir -p {project_root}/docs/architecture`, and if
-the repo would leave it empty/untracked, add `.gitkeep` (or an `index.md`
-placeholder) and note the `.gitignore` choice.
+a dir): `mkdir -p {project_root}/docs/architecture`; when it would stay empty
+or untracked, add `.gitkeep` (or `index.md`) and note the `.gitignore` choice.
 
-**4. Create the architecture documentation when it does NOT exist:**
-delegate to the selected architecture agent (architecture author; bundled
-architecture capability as fallback) with a brief requiring: a system/module
-overview, bounded contexts or module boundaries, key decisions (ADR-style
-entries), and data/control flow — all under `{project_root}/docs/architecture`,
-following the `dh-create-documentation` conventions (vault = project root, docs
-under `{project_root}/docs`). Then ensure an **index** (`README.md`) links every
-architecture document; the index and other generated docs are owned by the
-selected documentation role (bundled documentation capability as fallback).
+**4. Create the architecture documentation when it does NOT exist:** delegate
+to the selected architecture agent (bundled architecture capability as
+fallback) with a brief requiring: a system/module overview, bounded contexts or
+module boundaries, key decisions (ADR-style entries) and data/control flow —
+all under `{project_root}/docs/architecture`, following the
+`dh-create-documentation` conventions (vault = project root, docs under
+`{project_root}/docs`). Then ensure an **index** (`README.md`) links every
+document; generated docs are owned by the selected documentation role.
 
 ## Step 5: Harness Directives in AGENTS.md
 
 Ensure the **project root AGENTS.md** carries a section with the directives
 to use this harness — so any agent working in the project knows the loop,
-delegation, and plan tools. Idempotent: if a `## Dev Harness` section already
-exists, review and update it instead of duplicating.
+delegation, and plan tools; if a `## Dev Harness` section already exists,
+review and update it instead of duplicating.
 
 **If AGENTS.md is absent:** create it with the section below.
 
@@ -236,6 +235,7 @@ This project is managed with the dev-harness plugin (dev-harness-skills):
 - [ ] Step 1: every required system tool present with version (phpenv optional)
 - [ ] Step 2: user-level MCPs/plugins verified and enabled per user decision
 - [ ] Step 3: hooks installed with documented rules; QA toolset wired and gate green; `dh` server wired/already wired **or explicitly skipped by the user**; prewarm **attempted** (cold start noted on timeout); `opencode mcp list` shows `dh` connected when wired
+- [ ] Step 3 anchor: `pwd -P` = workspace root, `DH_WORKSPACE_ROOT` unset or equal to it, `dh` plan dir = skill `./docs/plans`, no package-local `docs/plans`; `WORKSPACE.md` written on consent **or** standalone confirmed; on mismatch nothing written
 - [ ] Step 3.5: code graph installed and indexed with SQLite (`cgr status`, `cgr stats`) **or explicitly skipped by the user**
 - [ ] Step 4: architecture artifacts explored + interview answers recorded (if files exist); `docs/architecture/` created; docs created via the selected architecture agent when absent; index present
 - [ ] Step 5: project AGENTS.md has the harness directives section (updated, not duplicated)
