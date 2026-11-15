@@ -99,3 +99,9 @@ found not applicable.
 | 2026-11-15T21:46:06.174Z | dh-preflight | Sub-Task 4.3 | fast mode defers per-task verification | deferred to end-of-plan |
 | 2026-11-15T21:46:06.174Z | dh-artifact-check | Sub-Task 4.3 | fast mode defers per-task verification | deferred to end-of-plan |
 | 2026-11-15T21:46:06.174Z | dh-domain-check | Sub-Task 4.3 | fast mode defers per-task verification | deferred to end-of-plan |
+| 2026-11-15T22:27:59.736Z | dh-review | Plan | fast-mode end gate: final review approved with comments; gates green | run: PASS |
+| 2026-11-15T22:27:59.736Z | dh-simplify | Plan | fast-mode end gate: final review approved with comments; gates green | run: PASS |
+| 2026-11-15T22:27:59.736Z | dh-code-review | Plan | fast-mode end gate: final review approved with comments; gates green | run: PASS |
+| 2026-11-15T22:27:59.736Z | dh-preflight | Plan | fast-mode end gate: final review approved with comments; gates green | run: PASS |
+| 2026-11-15T22:27:59.736Z | dh-artifact-check | Plan | fast-mode end gate: final review approved with comments; gates green | run: PASS |
+| 2026-11-15T22:27:59.741Z | dh-domain-check | Plan | TUI presentation layer; no bounded-context or domain-model change | not applicable |

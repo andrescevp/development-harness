@@ -3,10 +3,10 @@ title: "TUI Plan Progress — Fast Execution"
 slug: tui-plan-progress
 description: "Fast execution mirror of plan.md; critical verification deferred to plan end."
 source_plan: plan.md
-source_sha256: 24ac9a5ed7546319e0aebb46cefc57692745a76af5bfc58c01c0b2cc34881b81
-plan_version: fast-1
-status: In Progress
-active: true
+source_sha256: 08b8ced4632462f20ee44478d2edcb00546af184875e9d86da15529aa13fcd80
+plan_version: fast-4
+status: Completed
+active: false
 tags: [plan, fast]
 project: "dev-harness-skills"
 created: 2026-11-15
@@ -298,7 +298,7 @@ updated: 2026-11-15
 
 ### Phase 4: Packaging, Installer, Docs and QA
 
-- **Status:** In Progress
+- **Status:** Completed
 
 #### Sub-Task 4.1: Wire the TUI build, package exports and peers
 
@@ -370,7 +370,7 @@ updated: 2026-11-15
 
 #### Sub-Task 4.4: Run the full QA gate and close the plan
 
-- **Status:** In Progress
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Validate the full feature end-to-end and close the plan.
 - **Related Requirements:** R1–R8
@@ -401,13 +401,18 @@ updated: 2026-11-15
   source/package/managed install modes load the TUI part and the server smoke
   tests remain green.
 - **Completion Checklist:**
-  - [ ] All 4 phases and 14 sub-tasks `Completed`.
+  - [x] All 4 phases and 14 sub-tasks `Completed`.
   - [ ] TUI card and panel render with real plan data and refresh.
-  - [ ] Data-layer tests and TUI smoke pass.
-  - [ ] `pnpm qa:check:full` green.
-  - [ ] Docs/CHANGELOG and execution record/index updated.
-  - [ ] No new skills/agents; counts stay 5 agents + 26 skills.
-  - [ ] Standalone and workspace plan resolution respected.
+  - [x] Data-layer tests and TUI smoke pass.
+  - [x] `pnpm qa:check:full` green.
+  - [x] Docs/CHANGELOG and execution record/index updated.
+  - [x] No new skills/agents; counts stay 5 agents + 26 skills.
+  - [x] Standalone and workspace plan resolution respected.
+
+  Deferred: live TUI pixel verification (sidebar/panel rendering) — this
+  environment has no TTY/session; the host evaluated the bundle and the view
+  models/unit tests cover the rendering contract. Recorded as a completion
+  deferral.
 
 ### End gates (run once across plan end)
 

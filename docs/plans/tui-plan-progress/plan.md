@@ -4,8 +4,8 @@ slug: tui-plan-progress
 description: Add an OpenCode TUI part to dev-harness-skills that shows live plan-execution progress in the sidebar and a full session panel (phases, sub-tasks, checklists, current agent/activity).
 created: 2026-11-15
 updated: 2026-11-15
-status: In Progress
-active: true
+status: Completed
+active: false
 tags: [plan]
 project: dev-harness-skills
 ---
@@ -386,7 +386,7 @@ harness capabilities available in this runtime.
 
 ### Phase 4: Packaging, Installer, Docs and QA
 
-- **Status:** In Progress
+- **Status:** Completed
 
 #### Sub-Task 4.1: Wire the TUI build, package exports and peers
 
@@ -458,7 +458,7 @@ harness capabilities available in this runtime.
 
 #### Sub-Task 4.4: Run the full QA gate and close the plan
 
-- **Status:** In Progress
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Validate the full feature end-to-end and close the plan.
 - **Related Requirements:** R1–R8
@@ -487,23 +487,28 @@ harness capabilities available in this runtime.
   source/package/managed install modes load the TUI part and the server smoke
   tests remain green.
 - **Completion Checklist:**
-  - [ ] All 4 phases and 14 sub-tasks `Completed`.
+  - [x] All 4 phases and 14 sub-tasks `Completed`.
   - [ ] TUI card and panel render with real plan data and refresh.
   - [x] Data-layer tests and TUI smoke pass.
   - [x] `pnpm qa:check:full` green.
-  - [ ] Docs/CHANGELOG and execution record/index updated.
+  - [x] Docs/CHANGELOG and execution record/index updated.
   - [x] No new skills/agents; counts stay 5 agents + 26 skills.
   - [x] Standalone and workspace plan resolution respected.
 
+  Deferred: live TUI pixel verification (sidebar/panel rendering) — this
+  environment has no TTY/session; the host evaluated the bundle and the view
+  models/unit tests cover the rendering contract. Recorded as a completion
+  deferral.
+
 ## Execution Record
 
-- **Execution status:** In progress
+- **Execution status:** Completed with deferrals
 - **Executed at:** 2026-11-15
 - **Workspace root:** `/home/andres/workspace/dev-harness-skills`
 - **Repository kind:** workspace
 - **Repository path:** `.`
 - **Branch / worktree:** `feature/tui-plan-progress` (main checkout)
-- **Commit range:** `814a8b7..uncommitted` (finalized at T3)
+- **Commit range:** `814a8b7..5dd085f` (implementation; close-out commit follows)
 - **Plan path:** `docs/plans/tui-plan-progress/plan.md`
 - **Mirrored plan path:** `docs/plans/tui-plan-progress/plan_fast.md`
 - **Summary:**
@@ -516,13 +521,16 @@ harness capabilities available in this runtime.
     coverage plus docs/CHANGELOG.
   - Full `pnpm qa:check:full` green; live TUI pixel verification is blocked by
     the lack of a TTY/session in this environment (host evaluates the bundle).
+  - Recommended SemVer: **0.8.0** (minor; no tag created).
 - **Architectural changes:** TUI part (`exports["./tui"]`) beside the server
   part; plan-progress read-only data pipeline; sidebar/panel slot architecture;
   host-singleton peer model with bundled `yaml`; managed-install layout ships
   `dist/tui.js` and the `./tui` export; `@opencode/plugin` pinned to 2.2.7.
 - **References:** [SDD](sdd.md), [progress contract](progress-contract.md),
   [API notes](tui-api-notes.md), [alignment](tasks/review-fast-final.md),
-  [code review](tasks/review-code.md).
+  [code review](tasks/review-code.md), [final review](tasks/review.md),
+  [evolution note](../../evolution/2026-11-15-tui-plan-progress.md),
+  [observation note](../../evolution/observations/2026-11-15-2330-tui-plan-progress.md).
 
 ## Open Questions
 
