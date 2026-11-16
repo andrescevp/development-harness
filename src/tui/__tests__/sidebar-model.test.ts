@@ -20,10 +20,15 @@ describe('sidebarWidth', () => {
 
 describe('planCardLines — multi-plan sections', () => {
   it('renders a compact per-plan block with active-task count', () => {
-    const plan = stateOf([candidate()]).plan!;
+    const contents = fixture('active-plan.md').replace(
+      '#### Sub-Task 2.1: Implement the checkout endpoint\n\n- **Status:** Completed',
+      '#### Sub-Task 2.1: Implement the checkout endpoint\n\n- **Status:** In Progress'
+    );
+    const plan = stateOf([candidate()], { details: detailsOf(contents) }).plan!;
     const lines = planCardLines(plan, 38);
     expect(lines.join('\n')).toContain('Phase');
-    expect(lines.join('\n')).toContain('Active: 1 task');
+    expect(lines.join('\n')).toContain('Active: 2 tasks');
+    expect(lines.join('\n')).toContain('+1');
     expect(lines.join('\n')).toContain('Agent:');
   });
 });

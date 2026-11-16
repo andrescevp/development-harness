@@ -31,7 +31,10 @@ Execute one self-contained sub-task from `./docs/plans/<plan-slug>/plan.md`.
 ## Parallel Worker Mode
 
 When the orchestrator invokes this skill with `parallel-worker` and an exact
-`subTask` ID, this skill is a worker, not the selector/orchestrator:
+`subTask` ID, this skill is a worker, not the selector/orchestrator. The prompt
+must start with the literal header `MODE: parallel-worker subTask=<N.M>`; if the
+header is missing while sibling tasks are active, stop instead of taking the
+standalone write path.
 
 - Read the plan only for the brief; do not choose another sub-task.
 - Resolve the delegated agent and implement with TDD, `dh-coding`, and narrow
@@ -73,6 +76,10 @@ Delegation is IDENTICAL for both types: **every sub-task is executed by its
 Read `## Agent Selection` in `plan.md` and confirm the sub-task's `Delegated to agent` names one of its agents. If the section or the field is absent, empty, or stale, STOP and ask the planner/user to fix the plan — do not run the selection protocol as a substitute for the missing field. If the named agent is unavailable and no bundled capability covers the role, stop and report the gap.
 
 ### Step 1: Select the active sub-task
+
+**Parallel-worker mode** selects the exact ID from the mode header and requires
+it to be `In Progress`; multiple active tasks are expected. The phase-aware
+order below applies to standalone mode.
 
 Read the plan with the `dh_plan_read` tool (`{ slug }`) and find exactly one sub-task using this phase-aware order. Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually per the marker rules:
 
@@ -131,7 +138,7 @@ Run the `dh-create-documentation` skill to generate or update API references, mo
 
 ### Step 4: Request review
 
-(Orchestration note) When invoked from `dh-execute-plan` orchestrator, skip this step — the orchestrator runs the `dh-review` skill after this sub-task completes. When invoked standalone, ask the plan's selected review agent to review the changes against the active sub-task's acceptance criteria, scope boundaries, and done-when conditions. The reviewer writes findings to `./docs/plans/<plan-slug>/tasks/review.md`.
+(Orchestration note) When invoked from `dh-execute-plan` orchestrator, skip this step — the orchestrator runs the `dh-review` skill after this sub-task completes. When invoked standalone, ask the plan's selected review agent to review the changes against the active sub-task's acceptance criteria, scope boundaries, and done-when conditions, passing `subTask: "<N.M>"` and the changed file list. The reviewer writes findings to the per-task report `./docs/plans/<plan-slug>/tasks/review-<N.M>.md` (never the aggregate `tasks/review.md` while other tasks may be active).
 
 ### Step 5: Address review feedback
 
@@ -140,7 +147,7 @@ Read the review and address findings:
 - For P0/P1 (blocking/high): fix immediately, then proceed to Step 5a.
 - For P2/P3: use judgment — fix if meaningful, defer if low impact.
 - After fixes, re-run the relevant validation with the `dh-execute-cli` skill.
-- Update `./docs/plans/<plan-slug>/tasks/review.md` marking each finding as `Addressed` or `Not Addressed` with a brief rationale.
+- Update `./docs/plans/<plan-slug>/tasks/review-<N.M>.md` marking each finding as `Addressed` or `Not Addressed` with a brief rationale.
 - If re-validation fails 2 additional times after initial fixes, stop and report the failure with full error output — do not proceed; recommend `dh-pause-plan` to preserve state in `handoff.md` (resume with `dh-resume-plan`).
 
 ### Step 5a: Confirm review resolution

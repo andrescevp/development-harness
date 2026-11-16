@@ -144,6 +144,17 @@ describe('parallel metadata: legacy defaults', () => {
     const plan = parsePlan(doc);
     expect(plan.phases[0]!.subTasks[0]!.filesScope).toEqual(['apps/web/**', 'services/api/**', 'tests/api/**']);
   });
+
+  it('keeps brace globs as one entry (commas inside braces do not split)', () => {
+    const doc = withSubTaskBullet('- **Files/Scope:** src/**/*.{ts,tsx}, tests/**/*.{ts,tsx}');
+    const plan = parsePlan(doc);
+    expect(plan.phases[0]!.subTasks[0]!.filesScope).toEqual(['src/**/*.{ts,tsx}', 'tests/**/*.{ts,tsx}']);
+  });
+
+  it('rejects unmatched braces in Files/Scope', () => {
+    expect(() => parsePlan(withSubTaskBullet('- **Files/Scope:** src/**/*.{ts,tsx'))).toThrow(/unmatched '\{'/);
+    expect(() => parsePlan(withSubTaskBullet('- **Files/Scope:** src/**/*.ts,tsx}'))).toThrow(/unmatched '\}'/);
+  });
 });
 
 describe('parallel metadata: invalid values', () => {

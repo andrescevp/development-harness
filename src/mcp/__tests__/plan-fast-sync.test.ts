@@ -136,6 +136,21 @@ describe('plan_fast_sync', () => {
     const blocked = await h.callToolJson<SyncPayload>('plan_fast_sync', { slug: PLAN_SLUG, apply: true });
     expect(blocked).toMatchObject({ ok: false, requiresConfirmation: true });
   });
+
+  it('treats parallel-metadata edits in the mirror as structural drift', async () => {
+    const h = await connectPlanHarness();
+    await createFast(h);
+    const fastPath = fastFile(h.workspaceRoot);
+    const before = fs.readFileSync(fastPath, 'utf8');
+    const edited = before.replace('- **Depends on:** 1.1', '- **Depends on:** None');
+    expect(edited).not.toBe(before);
+    fs.writeFileSync(fastPath, edited);
+    const dry = await h.callToolJson<SyncPayload>('plan_fast_sync', { slug: PLAN_SLUG });
+    expect(dry.differences.some((d) => d.kind === 'structure' && d.severity === 'P0')).toBe(true);
+    const blocked = await h.callToolJson<SyncPayload>('plan_fast_sync', { slug: PLAN_SLUG, apply: true });
+    expect(blocked).toMatchObject({ ok: false, requiresConfirmation: true });
+    expect(fs.readFileSync(fastPath, 'utf8')).toBe(edited);
+  });
 });
 
 describe('path ACL rejections', () => {

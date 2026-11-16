@@ -56,9 +56,16 @@ export function scopesOverlap(left: readonly string[], right: readonly string[])
 }
 
 /** A phase is ready when pending, dependency-complete, and sequential-next or parallel. */
-export function phaseReady(phase: SchedulerPhase, phases: readonly SchedulerPhase[]): boolean {
+export function phaseReady(
+  phase: SchedulerPhase,
+  phases: readonly SchedulerPhase[],
+  activePhases: readonly SchedulerPhase[] = []
+): boolean {
   if (phase.status !== PENDING) return false;
   if (!phase.dependsOn.every((ref) => phases.find((p) => p.index === Number(ref))?.status === COMPLETE)) return false;
+  const active = activePhases.filter((candidate) => candidate.status === 'In Progress');
+  if (!phase.parallelizable && active.length > 0) return false;
+  if (active.some((candidate) => !candidate.parallelizable)) return false;
   if (phase.parallelizable) return true;
   return phases.every((other) => other.index >= phase.index || other.status === COMPLETE);
 }
@@ -71,6 +78,8 @@ export function subTaskReady(
 ): boolean {
   if (task.status !== PENDING || phase.status !== 'In Progress') return false;
   if (!task.dependsOn.every((ref) => tasks.find((t) => t.index === ref)?.status === COMPLETE)) return false;
-  if (task.parallelizable) return true;
-  return tasks.find((t) => t.status === PENDING)?.index === task.index;
+  if (phase.parallelizable) return task.parallelizable;
+  return tasks
+    .filter((entry) => Number(entry.index.split('.')[1]) < Number(task.index.split('.')[1]))
+    .every((entry) => entry.status === COMPLETE);
 }

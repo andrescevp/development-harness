@@ -12,6 +12,7 @@ Canonical format for `handoff.md` (written by `dh-pause-plan`, consumed by
 - **Git is optional.** Unknown values are `null`; resume degrades to `plan_sha256` plus file evidence.
 
 ## Versioning
+
 - `handoff_version: 1` is current. Bump it **only** for breaking changes:
   removed/renamed fields or sections, altered status/history semantics; additive changes do not bump it.
 - `dh-resume-plan` accepts only `1`. A missing, non-integer, or unknown/higher
@@ -49,7 +50,7 @@ Quote timestamps and `subtask_index` (`"2.3"`); ISO-8601 UTC with `Z` is require
 
 - `## Snapshot` — 2–4 sentences: plan, position, why paused, branch/worktree state, git availability; retained after resume as the pause-point audit snapshot (resume does not rewrite it).
 - `## Current Position` — phase/sub-task index, title and status, previous completed, next in order, `progress`, ambiguity.
-- Active Sub-Tasks (optional) — parallel table: `Index | Phase | Isolation | Worktree/Branch | Validation | Pending review`; `None` for single-task/legacy handoffs. Never omit an active task.
+- `## Active Sub-Tasks` (optional) — parallel table: `Index | Phase | Isolation | Worktree/Branch | Validation | Pending review`; `None` for single-task/legacy handoffs. Never omit an active task.
 - `## Work Completed` — one line per completed sub-task: outcome plus paths and review/commit ids (never contents).
 - `## Work In Flight` — files touched, intent, exact stopping point, what remains.
 - `## Uncommitted Changes` — paths + content fingerprint, grouped modified/added/deleted/untracked with a one-line purpose, excluding the handoff and `*.tmp`; `worktree_dirty`/`worktree_fingerprint` reflect the remaining paths; `None` when clean, `Unverifiable` without git.

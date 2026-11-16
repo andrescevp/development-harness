@@ -56,6 +56,9 @@ const REQUIRED_SECTIONS = [
   'Pause History',
 ] as const;
 
+/** Additive sections a handoff may include without breaking the contract. */
+const OPTIONAL_SECTIONS = ['Active Sub-Tasks'] as const;
+
 const HISTORY_EVENTS = ['paused', 'resumed', 're-paused'] as const;
 const PAUSE_MARKERS = [
   'dh_plan_read',
@@ -119,7 +122,12 @@ const resumeSkill = parseFrontmatter(read(RESUME_SKILL_PATH));
 describe('handoff worked example', () => {
   it('documents exactly the required fields and sections', () => {
     expect(documentedFields(templateText).sort()).toEqual([...REQUIRED_KEYS].sort());
-    expect(documentedSections(templateText).sort()).toEqual([...REQUIRED_SECTIONS].sort());
+    expect(
+      documentedSections(templateText)
+        .filter((section) => !(OPTIONAL_SECTIONS as readonly string[]).includes(section))
+        .sort()
+    ).toEqual([...REQUIRED_SECTIONS].sort());
+    for (const section of OPTIONAL_SECTIONS) expect(documentedSections(templateText)).toContain(section);
   });
 
   it('has exactly the required frontmatter keys', () => {
@@ -188,6 +196,14 @@ describe('pause and resume skills', () => {
     const text = read(RESUME_SKILL_PATH);
     for (const marker of RESUME_MARKERS) expect(text, marker).toContain(marker);
   });
+
+  it('record every active sub-task in parallel handoffs (never only the first)', () => {
+    const pause = read(PAUSE_SKILL_PATH);
+    const resume = read(RESUME_SKILL_PATH);
+    expect(pause).toMatch(/\*\*every\*\* `In Progress` sub-task/);
+    expect(pause).toContain('active_subtasks');
+    expect(resume).toContain('active_subtasks');
+  });
 });
 
 describe('plan status contract', () => {
@@ -199,6 +215,6 @@ describe('plan status contract', () => {
 
   it('keeps the handoff template within the skill-asset line limit', () => {
     // The optional Package Scope section is additive; keep the template lean.
-    expect(countLines(templateText)).toBeLessThanOrEqual(210);
+    expect(countLines(templateText)).toBeLessThanOrEqual(212);
   });
 });

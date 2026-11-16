@@ -7,6 +7,7 @@
  * checklists, review, fast state and issues.
  */
 import { type PlanDocument, parsePlan } from '../tools/plan-lifecycle.js';
+import { planLayout } from '../tools/plan-sections.js';
 import { type ChecklistExtraction, extractChecklists } from './plan-checklists.js';
 import { type PlanIssue, planIssue } from './plan-issue.js';
 import {
@@ -30,13 +31,9 @@ const MAX_SUBTASK_CHECKBOXES = 50;
 function headingLines(contents: string): { phases: Map<number, number>; subTasks: Map<string, number> } {
   const phases = new Map<number, number>();
   const subTasks = new Map<string, number>();
-  const lines = contents.split('\n');
-  for (let index = 0; index < lines.length; index += 1) {
-    const line = (lines[index] ?? '').replace(/\r$/, '');
-    const phase = line.match(/^###\s+Phase\s+(\d+):/);
-    if (phase) phases.set(Number(phase[1]), index + 1);
-    const subTask = line.match(/^####\s+Sub-Task\s+(\d+)\.(\d+):/);
-    if (subTask) subTasks.set(`${subTask[1]}.${subTask[2]}`, index + 1);
+  for (const section of planLayout(contents).sections) {
+    if (section.kind === 'phase') phases.set(section.phase, section.headerLine + 1);
+    else subTasks.set(section.ref, section.headerLine + 1);
   }
   return { phases, subTasks };
 }
@@ -85,7 +82,6 @@ function deriveCurrent(phases: readonly PhaseProgress[]): {
     );
   }
   const subTask =
-    activeSubTasks.find((entry) => entry.phase.index === phase.index) ??
     phase.subTasks.find((entry) => entry.status === 'In Progress') ??
     phase.subTasks.find((entry) => entry.status === 'Pending') ??
     null;

@@ -52,6 +52,11 @@ describe('phase readiness', () => {
     const p2 = phase(2, { parallelizable: true });
     expect(phaseReady(p2, [p1, p2])).toBe(true);
     expect(phaseReady(phase(2), [p1, phase(2)])).toBe(false);
+    expect(phaseReady(p2, [p1, p2], [phase(1, { status: 'In Progress' })])).toBe(false);
+    expect(phaseReady(p2, [p1, p2], [phase(1, { status: 'In Progress', parallelizable: true })])).toBe(true);
+    expect(phaseReady(phase(2), [p1, phase(2)], [phase(1, { status: 'In Progress', parallelizable: true })])).toBe(
+      false
+    );
   });
 });
 
@@ -65,8 +70,16 @@ describe('sub-task readiness', () => {
   });
 
   it('allows parallel tasks and the next sequential task', () => {
+    const parallelPhase = phase(1, { status: 'In Progress', parallelizable: true });
     expect(subTaskReady(task('1.1'), active, [task('1.1')])).toBe(true);
-    expect(subTaskReady(task('1.2', { parallelizable: true }), active, [task('1.1'), task('1.2')])).toBe(true);
+    expect(subTaskReady(task('1.2', { parallelizable: true }), parallelPhase, [task('1.1'), task('1.2')])).toBe(true);
     expect(subTaskReady(task('1.2'), active, [task('1.1', { status: 'Completed' }), task('1.2')])).toBe(true);
+  });
+
+  it('does not start a later sequential task while an earlier one is In Progress', () => {
+    expect(subTaskReady(task('1.2'), active, [task('1.1', { status: 'In Progress' }), task('1.2')])).toBe(false);
+    expect(subTaskReady(task('1.3'), active, [task('1.1', { status: 'Completed' }), task('1.2'), task('1.3')])).toBe(
+      false
+    );
   });
 });

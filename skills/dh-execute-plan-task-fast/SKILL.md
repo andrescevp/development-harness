@@ -88,9 +88,8 @@ worker, not the selector/orchestrator:
 - Return `{ subTask, agent, status, filesChanged, validation, blockers, notes }`
   and stop. The orchestrator owns dual status writes, ledger rows, commits, and
   end gates.
-- **Fail closed:** if invoked by an orchestrator but `parallel-worker` is absent
-  while more than one sub-task is `In Progress`, stop and report — do not write
-  statuses or ledger rows.
+- **Fail closed:** without the `MODE: parallel-worker subTask=<N.M>` header,
+  stop when siblings are active — never fall back to standalone writes.
 
 Standalone mode (no `parallel-worker`) keeps the workflow below.
 
@@ -110,7 +109,12 @@ Standalone mode (no `parallel-worker`) keeps the workflow below.
 
 ### Step 2: Select the active sub-task and record skipped checks
 
-Use the phase-aware priority on `plan_fast.md`:
+**Parallel-worker mode** (`MODE: parallel-worker subTask=<N.M>`): select that
+exact `In Progress` sub-task, sanity-check it, and record its ledger row.
+Multiple active tasks are expected; skip the standalone list below.
+
+**Standalone mode** (no mode header): use the phase-aware priority on
+`plan_fast.md`:
 
 1. First phase marked `In Progress` → its first `In Progress` sub-task, else
    its first `Pending` sub-task. If one is `In Progress`, resume it without

@@ -104,9 +104,9 @@ and no P0/P1 finding. The mirror may be ahead of `plan.md` only in statuses;
 
 Follow [`../dh-execute-plan/references/parallel-scheduler.md`](../dh-execute-plan/references/parallel-scheduler.md). At each cycle:
 
-0. Run the phase-close sweep and `dh_plan_fast_sync`; validate dependencies/cycles, the agent roster, and every ready sub-task's `Delegated to agent`. On resume, collect **all** `In Progress` tasks and their worktrees/branches first.
+0. Run the phase-close sweep and `dh_plan_fast_sync`; read `plan.md` through `dh_plan_read` and stop on error-severity `issues[]` (refs, cycles, worktree scope, parallel-phase eligibility), then validate the agent roster and every ready sub-task's `Delegated to agent`. On resume, collect **all** `In Progress` tasks and their worktrees/branches first.
 
-1. Compute the ready set (phase/sub-task dependencies, `Parallelizable`, scope compatibility) and dispatch up to the limit (default 3, hard cap 8). Mark each sub-task `In Progress` (and its phase on first start) in **both** plans **before** dispatch; invoke `dh-execute-plan-task-fast` in `parallel-worker` mode with the exact sub-task ID.
+1. Compute the ready set (phase/sub-task dependencies, `Parallelizable`, scope compatibility) and dispatch up to the limit (default 3, hard cap 8). Mark each sub-task `In Progress` (and its phase on first start) in **both** plans **before** dispatch; invoke `dh-execute-plan-task-fast` in `parallel-worker` mode with a prompt starting `MODE: parallel-worker subTask=<N.M>` and the exact ID. Confirm the worktree set once before the first `Isolation: worktree` dispatch; dependent worktrees start from the integrated head.
 
 2. As each worker finishes, the orchestrator appends that task's six ledger rows **serially** via `dh_plan_fast_skip_check`, then marks the sub-task `Completed` via `dh_plan_fast_update_status`. Workers never write status/ledger or commit.
 
