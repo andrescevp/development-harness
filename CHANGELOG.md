@@ -7,6 +7,14 @@ version.
 
 ## [Unreleased]
 
+## [0.13.0] — 2026-11-16
+
+### Added
+
+- **TUI Markdown tab:** Mermaid flowcharts render as terminal diagrams using
+  the bundled `mermaid-ascii` renderer; unsupported diagram types fall back to
+  the fenced code block.
+
 ## [0.12.2] — 2026-11-16
 
 ### Fixed
@@ -336,7 +344,8 @@ First release of the standalone OpenCode V2 harness.
 - Plan close-outs include the pause/resume, fast-plan, Mermaid, and
   agent-selection plans with evolution/observation notes.
 
-[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.12.2...HEAD
+[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/andrescevp/development-harness/compare/v0.12.2...v0.13.0
 [0.12.2]: https://github.com/andrescevp/development-harness/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/andrescevp/development-harness/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/andrescevp/development-harness/compare/v0.11.0...v0.12.0

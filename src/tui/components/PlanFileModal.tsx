@@ -1,9 +1,16 @@
 import type { Keymap } from '@opencode/plugin/tui/context';
 import type { ResolvedTheme } from '@opencode/theme/tui';
-import { type CliRenderer, type ScrollBoxRenderable, SyntaxStyle, type ThemeTokenStyle } from '@opentui/core';
+import {
+  type CliRenderer,
+  createMarkdownCodeBlockRenderer,
+  type ScrollBoxRenderable,
+  SyntaxStyle,
+  TextRenderable,
+  type ThemeTokenStyle,
+} from '@opentui/core';
 import { useTerminalDimensions } from '@opentui/solid';
 import { createMemo, createSignal, onCleanup } from 'solid-js';
-import { planFileMarkdown, planTreeText } from '../plan-file-model.js';
+import { planFileMarkdown, planMermaidAscii, planTreeText } from '../plan-file-model.js';
 import { PLAN_MAX_BYTES, readFileAt } from '../plan-read-files.js';
 import { reactiveShow, reactiveText } from './reactive.js';
 
@@ -66,6 +73,19 @@ export function PlanFileModal(props: PlanFileModalProps) {
   const dimensions = useTerminalDimensions();
   const [tab, setTab] = createSignal<PlanFileTab>('tree');
   const syntax = createSyntaxStyle(props.theme, props.renderer.nativeScene);
+  const mermaid = createMarkdownCodeBlockRenderer({
+    mermaid: (block) => {
+      const ascii = planMermaidAscii(block.text);
+      if (ascii === null) return undefined;
+      return new TextRenderable(props.renderer, {
+        content: ascii,
+        width: '100%',
+        wrapMode: 'none',
+        selectable: false,
+        fg: props.theme.text.base,
+      });
+    },
+  });
   let scroll: ScrollBoxRenderable | undefined;
   const height = () => Math.max(8, dimensions().height - 14);
 
@@ -147,7 +167,15 @@ export function PlanFileModal(props: PlanFileModalProps) {
         })}
         {reactiveShow({
           when: () => tab() === 'markdown',
-          children: <markdown content={markdown()} syntaxStyle={syntax} fg={props.theme.text.base} conceal />,
+          children: (
+            <markdown
+              content={markdown()}
+              syntaxStyle={syntax}
+              renderBlock={mermaid}
+              fg={props.theme.text.base}
+              conceal
+            />
+          ),
         })}
       </scrollbox>
       <text fg={props.theme.text.faint}>tab 1/2 switch · ↑/↓ PgUp/PgDn scroll · esc close</text>

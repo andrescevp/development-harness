@@ -2,7 +2,7 @@
  * plan-file-model.test.ts — pure models behind the plan-file modal tabs.
  */
 import { describe, expect, it } from 'vitest';
-import { planFileMarkdown, planTreeText } from '../plan-file-model.js';
+import { planFileMarkdown, planMermaidAscii, planTreeText } from '../plan-file-model.js';
 import { fixture } from './helpers.js';
 
 const PLAN = fixture('active-plan.md');
@@ -18,6 +18,13 @@ describe('plan-file-model', () => {
   it('keeps fenced mermaid blocks for the host renderer', () => {
     const withMermaid = PLAN.replace('## Phases', '```mermaid\ngraph TD\n  A-->B\n```\n\n## Phases');
     expect(planFileMarkdown(withMermaid)).toContain('```mermaid\ngraph TD');
+  });
+
+  it('renders a flowchart to ASCII and returns null for unsupported syntax', () => {
+    const rendered = planMermaidAscii('graph TD\n  A[Start] --> B[End]');
+    expect(rendered).toContain('Start');
+    expect(rendered).toContain('End');
+    expect(planMermaidAscii('sequenceDiagram\n  A->>B: hi')).toBeNull();
   });
 
   it('builds a phase/sub-task tree with status symbols and agents', () => {

@@ -1,6 +1,6 @@
 {
   "name": "dev-harness-skills",
-  "version": "0.12.2",
+  "version": "0.13.0",
   "type": "module",
   "description": "OpenCode V2 plugin with an opinionated development harness based in plan execution loop architecture",
   "main": "./dist/plugin.js",
@@ -67,6 +67,7 @@
     "@toon-format/toon": "4.4.0",
     "duckdb": "^1.4.4",
     "jsonc-parser": "^3.3.1",
+    "mermaid-ascii": "1.0.0",
     "yaml": "^2.9.1",
     "zod": "^4.6.6"
   },

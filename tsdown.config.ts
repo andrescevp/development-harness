@@ -78,8 +78,9 @@ const tui = {
     neverBundle: ['@opencode/plugin', /^@opencode\/plugin\//, 'solid-js', /^solid-js\//, /^@opentui\//],
     // `plan-lifecycle` parses plan frontmatter; the managed install has no
     // node_modules, so `yaml` must ship inside the single-file artifact
-    // (progress-contract §2 bundling note).
-    alwaysBundle: ['yaml'],
+    // (progress-contract §2 bundling note). `mermaid-ascii` renders plan
+    // Mermaid diagrams in the modal and must ship too.
+    alwaysBundle: ['yaml', 'mermaid-ascii'],
     onlyBundle: false,
   },
   // The server aliases exist only for the bundled `yaml`/`jsonc-parser` copies.
