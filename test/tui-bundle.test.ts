@@ -104,6 +104,11 @@ function stubContext() {
         current: () => undefined,
       },
       format: { path: (value: string) => value },
+      router: {
+        register: () => () => {},
+        navigate: () => {},
+        current: () => ({ type: 'home' as const }),
+      },
     },
   };
 

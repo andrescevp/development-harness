@@ -68,6 +68,8 @@ export interface PlanState {
   plansDir: string | null;
   selection: PlanSelection;
   plan: PlanProgress | null;
+  /** All executing plans (In Progress or active), primary first when possible. */
+  plans?: PlanProgress[];
   activity: Activity;
   sessionID: string | null;
   errors: PlanIssue[];

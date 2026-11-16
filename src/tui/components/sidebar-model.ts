@@ -62,9 +62,10 @@ function positionLine(plan: PlanProgress, wide: boolean): string {
   const totals = phaseTotals(plan);
   if (plan.current.phase === null) return 'Completed';
   const reference = plan.current.position ?? totals.subTask;
-  if (reference === null || reference === undefined) return `Phase ${totals.phase}/${totals.phaseTotal}`;
+  const suffix = plan.activeSubTasks.length > 1 ? ` +${plan.activeSubTasks.length - 1}` : '';
+  if (reference === null || reference === undefined) return `Phase ${totals.phase}/${totals.phaseTotal}${suffix}`;
   const label = wide ? `Sub-Task ${reference}` : `${reference}`;
-  return `Phase ${totals.phase}/${totals.phaseTotal} · ${label}/${totals.subTaskTotal}`;
+  return `Phase ${totals.phase}/${totals.phaseTotal} · ${label}/${totals.subTaskTotal}${suffix}`;
 }
 
 function statusLine(state: PlanState, plan: PlanProgress): string {
@@ -103,6 +104,26 @@ function readyCard(state: PlanState, plan: PlanProgress, width: number, ascii: b
   const stale = state.activity.stale ? ' (stale)' : '';
   lines.push(truncate(`${activitySymbol(state.activity)} ${state.activity.summary}${stale}`, width));
   return { heading: truncate(plan.title, width), lines };
+}
+
+/** Compact lines for one plan (used by single- and multi-plan cards). */
+export function planCardLines(plan: PlanProgress, width: number, ascii = false): string[] {
+  const clamped = clampWidth(width);
+  const wide = clamped >= WIDE_MIN_WIDTH;
+  const lines: string[] = [];
+  if (clamped >= SLUG_MIN_WIDTH) lines.push(truncate(`docs/plans/${plan.slug}`, clamped));
+  lines.push(truncate(positionLine(plan, wide), clamped));
+  lines.push(truncate(`${statusSymbol(plan.status)} ${plan.status}`, clamped));
+  const bar = progressBar(plan.progress.ratio, wide ? WIDE_BAR_CELLS : NARROW_BAR_CELLS, { ascii });
+  const count = `${plan.counts.subTasks.completed}/${plan.counts.subTasks.total}`;
+  lines.push(truncate(`[${bar}] ${count}${wide ? ' sub-tasks' : ''}`, clamped));
+  if (plan.activeSubTasks.length > 0) {
+    lines.push(
+      truncate(`Active: ${plan.activeSubTasks.length} task${plan.activeSubTasks.length === 1 ? '' : 's'}`, clamped)
+    );
+  }
+  lines.push(truncate(`Agent: ${plan.current.subTask?.delegatedTo ?? '—'}`, clamped));
+  return lines;
 }
 
 function selectorCard(state: PlanState, width: number): SidebarCard {
