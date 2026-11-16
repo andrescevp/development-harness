@@ -59,7 +59,7 @@ Plans are **phased**: `## Phases` → `### Phase N: <title>` (with `- **Status:*
 contract: `skills/dh-planning/references/phased-plan-template.md`.
 
 1. `dh-planning` → use `dh-domain-check` while planning (creates phased plans)
-2. `dh-execute-plan` (iterates phases in order → their sub-tasks)
+2. `dh-execute-plan` (schedules the ready set from the phase/sub-task dependency graph; legacy plans iterate in order)
    2.1 `dh-execute-plan-task` → use `dh-coding`
    2.2 `dh-simplify`
    2.3 `dh-review` + `dh-code-review`
@@ -90,10 +90,22 @@ review, docs, semver) run once across plan end. `dh-execute-plan-task-fast`
 handles one sub-task; `dh_plan_fast_sync` + `dh-review` Plan Alignment Mode
 verify mirror alignment.
 
+**Parallel scheduling (both modes).** Phases/sub-tasks may declare
+`Parallelizable`, `Depends on`, `Files/Scope`, and `Isolation`; the shared
+scheduler in
+[`dh-execute-plan/references/parallel-scheduler.md`](dh-execute-plan/references/parallel-scheduler.md)
+dispatches the ready set up to 3 workers by default (hard cap 8), allows several
+`In Progress` sub-tasks, and keeps status/ledger/commit writes with the
+orchestrator. Workers (`parallel-worker` mode of either task skill) implement one
+exact sub-task and return a result envelope; they never write plans. Missing
+fields default to `no`/`None`/`None`/`shared`, so legacy plans stay sequential.
+
 **Plan lifecycle tools:** use `dh_plan_read` to parse a phased plan
-(including each sub-task's `delegatedTo`), `dh_plan_update_status` to flip
+(including each sub-task's `delegatedTo` and parallel metadata —
+`parallelizable`, `dependsOn`, `filesScope`, `isolation`), `dh_plan_update_status` to flip
 phase/sub-task status markers, and `dh_plan_create` to scaffold a new plan
-(passing `delegatedTo` for every sub-task) — fall back to direct plan.md edits
+(passing `delegatedTo` for every sub-task; optional parallel metadata is
+rendered when supplied) — fall back to direct plan.md edits
 only when the tools are unavailable. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 
 ## Workspace behavior
@@ -121,14 +133,14 @@ Standalone repositories keep the single-root behavior unchanged.
 
 | Skill | Role in the loop |
 |---|---|
-| [`dh-planning`](dh-planning/SKILL.md) | Step 1 — write plans (`docs/plans/<slug>/plan.md`), interview mode |
+| [`dh-planning`](dh-planning/SKILL.md) | Step 1 — write plans (`docs/plans/<slug>/plan.md`), interview mode; declares/validates parallel metadata (`Parallelizable`, `Depends on`, `Files/Scope`, `Isolation`) |
 | [`dh-domain-check`](dh-domain-check/SKILL.md) | During planning + before complex implementation — DDD/SOLID validation |
 | [`dh-contingency`](dh-contingency/SKILL.md) | Planning support — generate Plan A/B/C alternatives with risk, complexity, and trade-off analysis (`docs/plans/<slug>/contingency.md`) |
 | [`dh-research`](dh-research/SKILL.md) | Support / optional unblock — one bounded, cited research pass for an external-fact question; note at `docs/research/<topic>.md` plus the registry `docs/research/index.md` |
-| [`dh-execute-plan`](dh-execute-plan/SKILL.md) | Step 2 — orchestrate full plan execution, review each sub-task, resume mode |
-| [`dh-execute-plan-fast`](dh-execute-plan-fast/SKILL.md) | Fast step 2 — execute from `plan_fast.md` with no per-task gates; critical gates at plan end, skipped-check ledger |
-| [`dh-execute-plan-task`](dh-execute-plan-task/SKILL.md) | Step 2.1 — execute one sub-task (project-type-aware delegation) |
-| [`dh-execute-plan-task-fast`](dh-execute-plan-task-fast/SKILL.md) | Fast step 2.1 — one sub-task from the mirror: dual-plan status + per-task ledger rows, no per-task gates |
+| [`dh-execute-plan`](dh-execute-plan/SKILL.md) | Step 2 — schedule ready phases/sub-tasks in parallel (default 3, cap 8), review fan-in, orchestrator-owned status/commits, resume mode |
+| [`dh-execute-plan-fast`](dh-execute-plan-fast/SKILL.md) | Fast step 2 — same parallel scheduler from `plan_fast.md`, no per-task gates; critical gates at plan end, serialized skipped-check ledger |
+| [`dh-execute-plan-task`](dh-execute-plan-task/SKILL.md) | Step 2.1 — execute one sub-task (project-type-aware delegation), or `parallel-worker` mode: implement/validate one exact sub-task and return a result envelope, no status writes |
+| [`dh-execute-plan-task-fast`](dh-execute-plan-task-fast/SKILL.md) | Fast step 2.1 — one sub-task from the mirror: standalone dual-plan status + ledger rows, or `parallel-worker` mode with the orchestrator owning those writes |
 | [`dh-pause-plan`](dh-pause-plan/SKILL.md) | Cross-cutting — snapshot the active plan into `handoff.md`; read-only pause, no status changes |
 | [`dh-resume-plan`](dh-resume-plan/SKILL.md) | Cross-cutting — validate the handoff, detect drift, rehydrate context, and resume execution |
 | [`dh-coding`](dh-coding/SKILL.md) | **NEW** — TDD best practices; reads `CODE_RULES.md` at project root |

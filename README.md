@@ -6,6 +6,7 @@ An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated develop
 
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks, with every sub-task naming its responsible agent (`Delegated to agent`) and strict halt-on-blocker safeguards.
+- **Parallel plan execution**: Opt-in `Parallelizable`, `Depends on`, `Files/Scope`, and `Isolation` metadata let a shared scheduler run ready work concurrently — 3 workers by default, hard cap 8 — with orchestrator-only status writes and hybrid shared/worktree isolation. Legacy plans stay sequential.
 - **6 agents and 27 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts, plus two native `execute` hooks for TOON output.
 - **Source-cited research**: `dh-researcher` + `dh-research` answer one external-fact question per pass with primary sources, retrieval dates, and confidence labels; notes live in one workspace registry at [`docs/research/index.md`](docs/research/index.md). An optional bounded pass may precede an execution-blocker report, but it never clears an unresolved blocker.
 - **`dh` MCP server (12 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents, skills, and the two TOON hooks; the tools come from the MCP server.
@@ -137,7 +138,7 @@ Run `dh-grill-sdd` to generate requirements (`sdd.md`), create a phased plan usi
 Plan execution inside the plugin runs the 5-step skills loop:
 
 1. `dh-planning` — Prepares phased plans, validating architectural constraints with `dh-domain-check`.
-2. `dh-execute-plan` — Iterates through phases in sequential order and executes their sub-tasks:
+2. `dh-execute-plan` — Schedules the ready phases/sub-tasks from the dependency graph (default 3 workers, hard cap 8; legacy plans run in order):
    - 2.1 `dh-execute-plan-task` — Implements the sub-task code using `dh-coding`.
    - 2.2 `dh-simplify` — Refactors and simplifies changed code for clarity and reuse.
    - 2.3 `dh-review` + `dh-code-review` — Verifies acceptance criteria and code correctness.
@@ -152,6 +153,58 @@ Plans are stored under `docs/plans/<slug>/plan.md` using a phased structure. Eve
 
 **Pause/resume (cross-cutting).** A plan can pause at any point without changing its statuses: `dh-pause-plan` writes `docs/plans/<slug>/handoff.md` with the active phase/sub-task, git/worktree state, decisions, blockers, validation, and next steps. `dh-resume-plan` validates the handoff, detects drift, rehydrates context, marks it `resumed`, and re-enters step 2. `dh-execute-plan` redirects when a paused handoff exists. The handoff is a sidecar, not a fourth status.
 
+### Parallel plan execution
+
+Plans can declare safe concurrency instead of relying on a fixed order. Phases
+and sub-tasks may carry these optional fields:
+
+```markdown
+### Phase 2: Backend and frontend
+
+- **Status:** Pending
+- **Parallelizable:** yes
+- **Depends on:** 1
+
+#### Sub-Task 2.1: API endpoint
+
+- **Status:** Pending
+- **Delegated to agent:** dh-software-engineer
+- **Parallelizable:** yes
+- **Depends on:** 1.3
+- **Files/Scope:** services/api/**, tests/api/**
+- **Isolation:** shared
+```
+
+| Field | Level | Values | Default |
+|---|---|---|---|
+| `Parallelizable` | phase, sub-task | `yes` \| `no` | `no` |
+| `Depends on` | phase, sub-task | phase numbers / `N.M` ids, or `None` | `None` |
+| `Files/Scope` | sub-task | comma-separated paths/globs, or `None` | `None` |
+| `Isolation` | sub-task | `shared` \| `worktree` | `shared` |
+
+- **Shared scheduler.** One contract —
+  [`skills/dh-execute-plan/references/parallel-scheduler.md`](skills/dh-execute-plan/references/parallel-scheduler.md)
+  — drives both `dh-execute-plan` and `dh-execute-plan-fast`. Each cycle it
+  computes the ready set from phase/sub-task dependencies and declared scopes,
+  dispatches up to **3 workers** by default (hard cap **8**), and allows several
+  sub-tasks to be `In Progress` at once. A phase closes only when all of its
+  sub-tasks are `Completed`.
+- **Orchestrator owns state.** Only the orchestrator marks statuses, writes
+  fast-mode ledger rows (serially), reviews, and commits. Workers run
+  `dh-execute-plan-task`/`-fast` in `parallel-worker` mode, implement and
+  validate exactly one sub-task, and return
+  `{ subTask, agent, status, filesChanged, validation, blockers, notes }`.
+- **Hybrid isolation.** Tasks with disjoint declared scopes share the current
+  worktree; overlapping scopes serialize unless the sub-task declares
+  `Isolation: worktree`. Worktree branches integrate in dependency/plan order;
+  a conflict stops integration and preserves the worktree for inspection.
+- **Legacy plans stay sequential.** Absent fields default to
+  `Parallelizable: no` / `Depends on: None` / `Files/Scope: None` /
+  `Isolation: shared`, so existing plans execute exactly as before.
+
+Operational details — overrides, readiness, worker mode, worktrees, resume, and
+limits: [`docs/LOADING.md` → Parallel plan execution](docs/LOADING.md#parallel-plan-execution).
+
 ### TUI plan progress
 
 The package also ships a **TUI part** (`exports["./tui"]`) that loads
@@ -159,7 +212,8 @@ automatically beside the server part — no second entry — so plan execution c
 be followed without leaving OpenCode. It is read-only and reads the **local**
 workspace only.
 
-- **Sidebar card** (`sidebar.content`): active plan, `Phase N · N.M` position,
+- **Sidebar card** (`sidebar.content`): active plan, `Phase N · N.M` position
+  (`+K` and `Active: N tasks` while several sub-tasks run in parallel),
   completed/total sub-tasks with a text progress bar, the current sub-task's
   delegated agent, plan status and a one-line activity (`Running edit`,
   `2 active plans — choose one`).

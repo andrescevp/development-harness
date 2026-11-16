@@ -12,7 +12,6 @@ Canonical format for `handoff.md` (written by `dh-pause-plan`, consumed by
 - **Git is optional.** Unknown values are `null`; resume degrades to `plan_sha256` plus file evidence.
 
 ## Versioning
-
 - `handoff_version: 1` is current. Bump it **only** for breaking changes:
   removed/renamed fields or sections, altered status/history semantics; additive changes do not bump it.
 - `dh-resume-plan` accepts only `1`. A missing, non-integer, or unknown/higher
@@ -39,6 +38,7 @@ Quote timestamps and `subtask_index` (`"2.3"`); ISO-8601 UTC with `Z` is require
 | `plan_sha256` | string \| null | Lowercase SHA-256 of `plan.md` (`sha256sum` / `shasum -a 256`); `null` when no hashing tool exists. |
 | `phase_index` | integer \| null | 1-based phase number, e.g. `2`; `null` when no phase is active. |
 | `subtask_index` | string \| null | Sub-task id `"N.M"`, e.g. `"2.3"`; `null` when no sub-task is active. |
+| `active_subtasks` | list | Optional additive parallel list of active `"N.M"` ids; empty/absent for single-task/legacy handoffs. |
 | `progress` | string | `"completed/total"` sub-tasks, e.g. `"4/12"`. |
 | `next_action` | string | One imperative line: the first thing the next session must do. |
 | `blocked` | boolean | `true` when a hard blocker or P0/P1 finding stopped the loop. |
@@ -49,6 +49,7 @@ Quote timestamps and `subtask_index` (`"2.3"`); ISO-8601 UTC with `Z` is require
 
 - `## Snapshot` — 2–4 sentences: plan, position, why paused, branch/worktree state, git availability; retained after resume as the pause-point audit snapshot (resume does not rewrite it).
 - `## Current Position` — phase/sub-task index, title and status, previous completed, next in order, `progress`, ambiguity.
+- Active Sub-Tasks (optional) — parallel table: `Index | Phase | Isolation | Worktree/Branch | Validation | Pending review`; `None` for single-task/legacy handoffs. Never omit an active task.
 - `## Work Completed` — one line per completed sub-task: outcome plus paths and review/commit ids (never contents).
 - `## Work In Flight` — files touched, intent, exact stopping point, what remains.
 - `## Uncommitted Changes` — paths + content fingerprint, grouped modified/added/deleted/untracked with a one-line purpose, excluding the handoff and `*.tmp`; `worktree_dirty`/`worktree_fingerprint` reflect the remaining paths; `None` when clean, `Unverifiable` without git.
@@ -107,6 +108,7 @@ worktree_fingerprint: 3f786850e387550fdab836ed7e6dc881de23001b9f1f2f1a3c4d5e6f70
 plan_sha256: 9b1d2f3a4c5e6b7a8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b
 phase_index: 2
 subtask_index: "2.3"
+active_subtasks: ["2.3"]
 progress: "4/12"
 next_action: "Read docs/plans/example-plan/tasks/review.md and fix finding R-3."
 blocked: true

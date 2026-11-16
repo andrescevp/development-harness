@@ -142,8 +142,9 @@ do not restate or extend the contract here.
   `status: paused`, `resumed_at: null`, `updated` = `paused_at` (ISO-8601
   UTC), `created` preserved on re-pause, `worktree_fingerprint` refreshed from
   current content like `worktree_dirty`, and `next_action` equal to
-  `## Next Steps` step 1. Quote timestamps and `subtask_index`.
-- Sections: `## Snapshot`, `## Current Position`, `## Work Completed`,
+  `## Next Steps` step 1. Quote timestamps and `subtask_index`; for parallel execution also record `active_subtasks` and worktrees/branches.
+- Sections: `## Snapshot`, `## Current Position`, `## Active Sub-Tasks`
+  (optional; `None` for single-task/legacy), `## Work Completed`,
   `## Work In Flight`, `## Package Scope` (optional when a workspace map exists),
   `## Uncommitted Changes`,
   `## Decisions and Rationale`, `## Blockers and Risks`,

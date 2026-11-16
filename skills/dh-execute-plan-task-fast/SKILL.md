@@ -73,6 +73,27 @@ and records status.
 - Do not modify files outside the sub-task scope; verify dependencies on
   earlier sub-tasks are `Completed` before starting.
 
+## Parallel Worker Mode
+
+When invoked with `parallel-worker` and an exact `subTask` ID, act as a fast
+worker, not the selector/orchestrator:
+
+- Read `plan_fast.md`/`plan.md` for the brief; do not choose another task and do
+  not edit plan content.
+- Resolve the delegated agent, implement with TDD, and run only the narrow
+  sanity check.
+- Do **not** write statuses in either plan, append ledger rows, run
+  `dh-review`/`dh-simplify`/`dh-code-review`/preflight/artifact/domain/final
+  gates, or commit.
+- Return `{ subTask, agent, status, filesChanged, validation, blockers, notes }`
+  and stop. The orchestrator owns dual status writes, ledger rows, commits, and
+  end gates.
+- **Fail closed:** if invoked by an orchestrator but `parallel-worker` is absent
+  while more than one sub-task is `In Progress`, stop and report — do not write
+  statuses or ledger rows.
+
+Standalone mode (no `parallel-worker`) keeps the workflow below.
+
 ## Workflow
 
 ### Step 1: Read the fast mirror and confirm the plan

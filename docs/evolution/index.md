@@ -7,8 +7,8 @@ project: "dev-harness-skills"
 created: 2026-11-08
 updated: 2026-11-16
 stack: "Markdown skills + TypeScript inventory/test tooling"
-feature: "TOON Output Integration"
-epic: "Context efficiency"
+feature: "Parallel Plan Execution"
+epic: "Orchestration"
 status: active
 ---
 
@@ -20,6 +20,8 @@ Newest-first register of evolution and observation notes for this project.
 
 | Date | Type | Title | Plan/Release | Link |
 |---|---|---|---|---|
+| 2026-11-16 | observation | Parallel Plan Execution — session learnings | plan: parallel-plan-execution | [obs-20261116-1131-parallel-plan-execution](./observations/2026-11-16-1131-parallel-plan-execution.md) |
+| 2026-11-16 | evolution | Parallel Plan Execution | plan: parallel-plan-execution / unreleased | [evo-20261116-parallel-plan-execution](./2026-11-16-parallel-plan-execution.md) |
 | 2026-11-16 | observation | TOON Output Integration — session learnings | plan: toon-output-integration | [obs-20261116-0248-toon-output-integration](./observations/2026-11-16-0248-toon-output-integration.md) |
 | 2026-11-16 | evolution | TOON Output Integration | plan: toon-output-integration / unreleased | [evo-20261116-toon-output-integration](./2026-11-16-toon-output-integration.md) |
 | 2026-11-16 | observation | Web Research Agent and Skill — session learnings | plan: dh-research-agent-skill | [obs-20261116-0110-dh-research-agent-skill](./observations/2026-11-16-0110-dh-research-agent-skill.md) |

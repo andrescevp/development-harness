@@ -21,6 +21,7 @@ import { appendPlanIndexRow, assertPlanIndexWritable, readPlanFile } from '../to
 import { buildPlanTemplate, PHASE_STATUSES, parsePlan, STATUS_TARGETS, setStatus } from '../tools/plan-lifecycle.js';
 import { resolvePlanPath } from '../tools/plan-paths.js';
 import { readSheet, sheetSchema, updateSheet } from '../tools/sheet-tools.js';
+import { planPhasesSchema } from './plan-schemas.js';
 import { guarded, guardedAsync, textResult } from './tool-results.js';
 
 export interface BuildServerOptions {
@@ -54,7 +55,7 @@ export function buildServer({ workspaceRoot, version, instructions }: BuildServe
     'plan_read',
     {
       description: withToonNote(
-        'Parse a phased plan (docs/plans/<slug>/plan.md) into structured JSON: meta, phases[] with status, subTasks[] with phase/status/relatedRequirements/delegatedTo. Input: slug (or path relative to docs/plans). Errors clearly when missing or unparseable.'
+        'Parse a phased plan (docs/plans/<slug>/plan.md) into structured JSON: meta, phases[] with status/parallelizable/dependsOn, subTasks[] with phase/status/relatedRequirements/delegatedTo/parallelizable/dependsOn/filesScope/isolation. Errors clearly when missing or unparseable.'
       ),
       inputSchema: z.object({
         slug: z.string().describe('Plan slug (docs/plans/<slug>/plan.md)').optional(),
@@ -104,20 +105,7 @@ export function buildServer({ workspaceRoot, version, instructions }: BuildServe
         slug: z.string(),
         title: z.string(),
         objective: z.string(),
-        phases: z.array(
-          z.object({
-            title: z.string(),
-            subTasks: z.array(
-              z.object({
-                title: z.string(),
-                delegatedTo: z
-                  .string()
-                  .min(1)
-                  .describe('Agent ID responsible for executing this sub-task (must exist in ## Agent Selection)'),
-              })
-            ),
-          })
-        ),
+        phases: planPhasesSchema,
         updateIndex: z.boolean().describe('Append a row to docs/plans/index.md').optional(),
       }),
     },

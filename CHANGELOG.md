@@ -5,6 +5,45 @@ All notable changes to this project are documented here. The format follows
 Semantic Versioning. During the 0.x line, breaking changes bump the minor
 version.
 
+## [0.11.0] — 2026-11-16
+
+### Added
+
+- **Parallel plan execution:** phases and sub-tasks may declare
+  `Parallelizable` (`yes|no`) and `Depends on` (ids or `None`); sub-tasks also
+  declare `Files/Scope` and `Isolation` (`shared|worktree`). Absent fields
+  default to `no`/`None`/`None`/`shared`, so legacy plans keep their sequential
+  behavior.
+- Shared scheduler contract
+  [`skills/dh-execute-plan/references/parallel-scheduler.md`](skills/dh-execute-plan/references/parallel-scheduler.md),
+  linked by both orchestrators: dependency/cycle validation, ready-set
+  computation, default **3** concurrent workers (hard cap **8**), multiple
+  `In Progress` sub-tasks, review fan-in, failure drain, phase closure only when
+  every sub-task is `Completed`, and resumable multi-active state.
+- Parallel worker mode in `dh-execute-plan-task` and
+  `dh-execute-plan-task-fast`: `parallel-worker` implements and validates one
+  exact sub-task and returns
+  `{ subTask, agent, status, filesChanged, validation, blockers, notes }`
+  without writing plans, ledger rows, reviews, or commits.
+- Hybrid isolation: disjoint declared scopes share the current worktree;
+  overlapping scopes serialize or use `Isolation: worktree`; worktree branches
+  integrate in dependency/plan order, conflicts block with the worktree
+  preserved, and removal stays manual.
+- `dh_plan_read` exposes the parallel metadata and `dh_plan_create` scaffolds it;
+  the TUI renders multiple active sub-tasks (`Phase N · N.M +K`,
+  `Active: N tasks`).
+
+### Changed
+
+- `dh-execute-plan` and `dh-execute-plan-fast` dispatch from the shared ready
+  set instead of a fixed sub-task order; orchestrator-only status, ledger, and
+  commit writes are unchanged.
+- `dh-planning` teaches and validates parallel decomposition (safe defaults,
+  dependency references, disjoint scopes, worktree isolation) in the plan
+  template and scaffold.
+- Bundle inventory is unchanged: 6 agents, 27 skills, 12 MCP tools, and the two
+  native `execute` hooks.
+
 ## [0.10.0] — 2026-11-16
 
 ### Added
@@ -244,7 +283,8 @@ First release of the standalone OpenCode V2 harness.
 - Plan close-outs include the pause/resume, fast-plan, Mermaid, and
   agent-selection plans with evolution/observation notes.
 
-[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/andrescevp/development-harness/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/andrescevp/development-harness/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/andrescevp/development-harness/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.8.0

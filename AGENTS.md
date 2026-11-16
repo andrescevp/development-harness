@@ -1,8 +1,9 @@
 # AGENTS.md — dev-harness V2 plugin (harness runtime contract)
 
 Role summary, provenance, plugin registration, the 5-step skills loop that
-every agent executing plans inside this plugin must follow, the workspace
-contract for monorepos, and the runtime delegation routing.
+every agent executing plans inside this plugin must follow, the parallel
+scheduler contract, the workspace contract for monorepos, and the runtime
+delegation routing.
 
 ## Role summary
 
@@ -29,7 +30,7 @@ sub-tasks, with status markers at BOTH levels (Pending | In Progress |
 Completed). The loop:
 
 1. `dh-planning` → use `dh-domain-check` while planning and `dh-mermaid` for visual context (creates phased plans)
-2. `dh-execute-plan` (iterates phases in order → their sub-tasks)
+2. `dh-execute-plan` (schedules the ready set from the phase/sub-task dependency graph; legacy plans iterate in order)
    2.1 `dh-execute-plan-task` → use `dh-coding`
    2.2 `dh-simplify`
    2.3 `dh-review` + `dh-code-review`
@@ -41,7 +42,9 @@ Completed). The loop:
 **Fast execution (alternative).** `dh-execute-plan-fast` +
 `dh-execute-plan-task-fast` execute the same phased plan from `plan_fast.md`,
 defer per-task gates to plan end, and record skipped checks in
-`plan_fast_skip_checks.md`. The standard loop above remains the default.
+`plan_fast_skip_checks.md`. Both orchestrators share the parallel scheduler,
+worker envelope, and isolation rules above; the standard loop remains the
+default.
 
 **Close-out documentation.** Step 5's `dh-create-documentation` also creates
 the plan's evolution note (`docs/evolution/<date>-<slug>.md`) and observation
@@ -49,9 +52,31 @@ note (`docs/evolution/observations/<date>-<hhmm>-<slug>.md`), and updates
 `docs/evolution/index.md`. `docs/evolve/` is historical and stays untouched.
 
 **Phase lifecycle:** a phase becomes `In Progress` when its first sub-task
-starts and `Completed` only when ALL its sub-tasks are `Completed`. Resume
-mode continues the first `In Progress` phase → its first `In Progress` /
-`Pending` sub-task.
+starts and `Completed` only when ALL its sub-tasks are `Completed`. Several
+sub-tasks may be `In Progress` at once; resume mode reconciles **all** active
+sub-tasks (not just the first) before dispatching anything.
+
+**Parallel scheduler (shared contract).** Both orchestrators follow
+[`skills/dh-execute-plan/references/parallel-scheduler.md`](skills/dh-execute-plan/references/parallel-scheduler.md).
+Phases and sub-tasks may declare `Parallelizable`, `Depends on`, `Files/Scope`,
+and `Isolation`; each cycle the scheduler computes the ready set and dispatches
+up to **3** workers by default (hard cap **8**) respecting phase gates,
+dependency order, and scope compatibility. Missing fields default to
+`no`/`None`/`None`/`shared`, so legacy plans run sequentially. Declared metadata
+is the only source of independence — the scheduler never infers file scopes.
+
+**Orchestrator-only writes; workers return envelopes.** The orchestrator marks
+`In Progress` before dispatch, runs review fan-in, writes fast-mode ledger rows
+serially, and serializes commits. A worker (`parallel-worker` mode of
+`dh-execute-plan-task`/`-fast`) implements and validates one exact sub-task and
+returns `{ subTask, agent, status, filesChanged, validation, blockers, notes }`
+— it never edits `plan.md`/`plan_fast.md`, the ledger, reviews, or commits.
+
+**Hybrid isolation.** Shared-worktree work needs disjoint declared scopes;
+overlapping scopes serialize or use `Isolation: worktree`. Worktree branches
+integrate in dependency/plan order; a conflict stops integration and preserves
+the worktree (never auto-deleted). A blocking failure stops new dispatch, drains
+in-flight work, and leaves the task and phase open.
 
 **Step 2.4 halts automation.** When `dh-execute-plan-task` (or any loop step)
 hits a hard blocker — repeated validation failures (3 consecutive strikes),

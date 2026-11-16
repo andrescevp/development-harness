@@ -28,6 +28,26 @@ Execute one self-contained sub-task from `./docs/plans/<plan-slug>/plan.md`.
 - Update the sub-task status only after review passes — via `dh_plan_update_status` (`target: "subtask"`, status `Completed`); fallback: manual plan.md edit per the marker rules.
 - If the sub-task has dependencies on earlier sub-tasks, verify they are Completed before starting.
 
+## Parallel Worker Mode
+
+When the orchestrator invokes this skill with `parallel-worker` and an exact
+`subTask` ID, this skill is a worker, not the selector/orchestrator:
+
+- Read the plan only for the brief; do not choose another sub-task.
+- Resolve the delegated agent and implement with TDD, `dh-coding`, and narrow
+  validation.
+- Do **not** write `plan.md`, reviews, or commits; do **not** mark statuses or
+  append ledger rows.
+- Do **not** run `dh-review`, `dh-simplify`, `dh-code-review`, `dh-preflight`,
+  `dh-artifact-check`, or `dh-final-review`.
+- Return the result envelope from
+  [`../dh-execute-plan/references/parallel-scheduler.md`](../dh-execute-plan/references/parallel-scheduler.md):
+  `{ subTask, agent, status, filesChanged, validation, blockers, notes }`.
+- Stop after the envelope. The orchestrator owns review, status, phase closure,
+  commits, and failure drain.
+
+Standalone mode (no `parallel-worker`) keeps the current workflow below.
+
 ## Project Type Detection
 
 Check the project root for software marker files to determine project type. This must be done before any agent delegation.

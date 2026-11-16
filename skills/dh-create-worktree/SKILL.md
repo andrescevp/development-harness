@@ -23,8 +23,17 @@ template: [`dh-setup/references/worktree-lifecycle.md`](../dh-setup/references/w
 
 ## Hard rules
 
-- **User request only.** Never create, merge, reuse, or remove a worktree because a plan
-  starts, finishes, or pauses. The user must ask in this session.
+- **User request only, with one parallel exception.** Never create, merge, reuse,
+  or remove a worktree merely because a plan starts, finishes, or pauses. The
+  user must ask in this session. **Exception:** the parallel orchestrator may
+  request one worktree per sub-task that declares `Isolation: worktree` (or
+  when overlapping scopes require isolation); confirm the set with the user
+  first, then follow the lifecycle. It is still not an automatic per-plan
+  worktree.
+- **Parallel integration.** Worktrees created for parallel sub-tasks are
+  integrated by the orchestrator in dependency/plan order; a merge conflict
+  stops integration and preserves the worktree/branch. Never delete conflicted
+  or unmerged worktrees.
 - **Read before acting.** Load the root `WORKTREE_LIFECYCLE.md` first. If it is missing,
   empty, or lacks a required section, STOP and ask the user to run `dh-setup`. Never
   create, guess, or overwrite the file from this skill.

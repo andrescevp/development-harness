@@ -173,6 +173,13 @@ export interface CurrentPosition {
   source: CurrentPositionSource;
 }
 
+export interface ActiveSubTask {
+  index: string;
+  title: string;
+  delegatedTo: string | null;
+  phase: { index: number; title: string };
+}
+
 export interface PlanProgress {
   slug: string;
   title: string;
@@ -186,6 +193,7 @@ export interface PlanProgress {
   counts: { phases: StatusCounts; subTasks: StatusCounts };
   progress: { ratio: number; percent: number };
   current: CurrentPosition;
+  activeSubTasks: ActiveSubTask[];
   checklists: { plan: Checklist; finalVerification: Checklist };
   review: ReviewState;
   fast: FastState;

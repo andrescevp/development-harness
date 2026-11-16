@@ -34,6 +34,7 @@ const REQUIRED_KEYS = [
   'plan_sha256',
   'phase_index',
   'subtask_index',
+  'active_subtasks',
   'progress',
   'next_action',
   'blocked',

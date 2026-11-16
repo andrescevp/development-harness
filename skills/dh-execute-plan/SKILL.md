@@ -10,7 +10,7 @@ metadata:
   workflow: development
 ---
 
-Orchestrate the complete execution of a plan from start to finish. Iterate through all phases and their sub-tasks in order, delegate execution and review, handle interruptions, and produce a final sign-off.
+Orchestrate plan execution with the shared parallel scheduler: validate dependencies, dispatch ready workers up to the limit, fan in reviews, drain on failure, reconcile all active tasks on resume, and produce a final sign-off. Legacy plans without parallel metadata run sequentially.
 
 ## Core Rules
 
@@ -21,14 +21,13 @@ Orchestrate the complete execution of a plan from start to finish. Iterate throu
 - Read the plan with the `dh_plan_read` tool (`{ slug }` → structured JSON: meta, phases[].title/status, subTasks[].phase/title/status). Fallback when the tool is unavailable: read `./docs/plans/<plan-slug>/plan.md` manually, following the phased template markers (`## Phases` → `### Phase N: <title>` → `#### Sub-Task N.M: <title>` with `- **Status:**` bullets). These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 - If the plan file does not exist, stop and report — suggest running the `dh-planning` skill first.
 - **Paused handoff guard:** if `./docs/plans/<plan-slug>/handoff.md` exists with `status: paused`, do not start execution from plan statuses. Stop and direct the user to `dh-resume-plan` for that slug (it rehydrates context and detects drift). Bypass only on an explicit user instruction to skip rehydration.
-- Iterate **phases in order**; within each phase, iterate its sub-tasks in order.
+- **Scheduler:** use [`references/parallel-scheduler.md`](references/parallel-scheduler.md) as the authoritative readiness/concurrency/isolation contract. Legacy plans (missing fields) run sequentially; declared-ready work runs concurrently up to 3 workers (hard cap 8).
 - Phase lifecycle: a phase becomes `In Progress` when its first sub-task starts; it becomes `Completed` only when ALL its sub-tasks are `Completed`.
-- Do not re-execute sub-tasks already marked `Completed`.
-- If a sub-task is marked `In Progress`, resume from it (don't restart from the beginning).
-- Update statuses with the `dh_plan_update_status` tool (`{ slug, target: "phase"|"subtask", index: "N"|"N.M", status }`): mark a sub-task `In Progress` before execution, `Completed` after its review passes, and a phase `Completed` only when all its sub-tasks are `Completed`. Fallback when the tool is unavailable: manual plan.md edits following the marker rules (only blank lines precede status bullets).
-- After each sub-task execution, run the `dh-review` skill before proceeding to the next.
-- If a review produces P0/P1 findings, stop and report — do not continue to the next sub-task (a blocked sub-task blocks its phase).
-- After the final sub-task, run the `dh-final-review` skill for sign-off.
+- **Orchestrator owns state:** only this orchestrator writes plan statuses, commits, and reviews. Parallel workers return a result envelope and never edit plan files or commit in a shared worktree.
+- Do not re-execute sub-tasks already marked `Completed`; on resume, reconcile **all** `In Progress` tasks, not just the first.
+- Update statuses with `dh_plan_update_status` serially (`target: "phase"|"subtask"`); a phase cannot be `Completed` while any sub-task is open.
+- **Review fan-in:** run `dh-review` for each completed worker as it finishes; a P0/P1 finding stops new dispatch, drains in-flight work, and leaves the task/phase open. Never review before dispatch or serialize the whole plan to satisfy a per-task review.
+- After all sub-tasks are completed and reviewed, run `dh-final-review` for sign-off.
 - **Execution record (T1/T3):** when the last sub-task completes and before
   `dh-final-review`, write `## Execution Record` in `plan.md` with every field
   (`Execution status: In progress`). After an `Approve` / `Approve with comments`
@@ -51,29 +50,32 @@ Read the plan (via `dh_plan_read`; fallback: manual read) and determine the star
 
 0. Paused handoff: if `./docs/plans/<plan-slug>/handoff.md` exists with `status: paused`, stop and direct the user to `dh-resume-plan`. Do not apply priorities 1–4 until the handoff is `resumed` or the user explicitly bypasses it.
 1. If all sub-tasks are `Completed` (every phase `Completed`), run `dh-final-review` skill only and proceed to Step 3. Skip the execution loop.
-2. Resume mode: if one or more phases are `In Progress`, start from the FIRST `In Progress` phase, then its FIRST sub-task marked `In Progress` or `Pending`.
+2. Resume mode: if one or more phases are `In Progress`, collect **all** `In Progress` sub-tasks (and their worktrees/branches) and hand that set to the scheduler; do not stop on multiple active tasks and do not restart completed work. If none is active, start from the first pending task of the first `In Progress` phase.
 3. If all phases are `Pending` (all sub-tasks `Pending`), start from Phase 1's first sub-task.
 4. If the plan has no phases/sub-tasks, or every phase/sub-task has an unrecognized status, report the ambiguous state and stop.
 
-### Step 2: Execution loop
+### Step 2: Execution loop (parallel scheduler)
 
-Iterate **phases in order** (skip phases already `Completed`); within each phase, iterate its sub-tasks starting from the determined starting point:
+Follow [`references/parallel-scheduler.md`](references/parallel-scheduler.md) exactly. At each cycle:
 
-0. **Mark In Progress**: Ensure the active sub-task is marked `In Progress` via `dh_plan_update_status` (`target: "subtask"`). If it is already `In Progress` (resume), leave the state. Marking the first sub-task of a phase also moves that phase to `In Progress` (phase lifecycle). Fallback: manual plan.md edit per the marker rules. This ensures resume works if interrupted.
+0. **Reconcile state**: run the phase-close sweep; validate every dependency ref/cycle; resolve the `## Agent Selection` roster and each ready sub-task's `Delegated to agent` (missing/unknown → stop). On resume, collect **all** `In Progress` tasks and their worktrees/branches before dispatching anything.
 
-0b. **Resolve agents**: confirm the plan's `## Agent Selection` names available agents for the delegated, review, and (at the end) final-review roles, and confirm the active sub-task carries a `Delegated to agent` that matches one of them. A missing/empty/unknown field is a hard blocker: stop and ask the planner/user to fix the plan before delegating. A selected agent missing with no capability fallback also stops the run.
+1. **Compute the ready set**: phases whose dependencies are `Completed`, then sub-tasks that are `Pending`, dependency-complete, `Parallelizable: yes` (or the next task of a sequential phase), and scope-compatible with running shared-worktree tasks.
 
-1. **Execute**: Follow the `dh-execute-plan-task` skill to implement this sub-task. Since this is called from the orchestrator, `dh-execute-plan-task` skips its internal review and completion steps (per its orchestration guard).
+2. **Dispatch up to the limit** (default 3, hard cap 8):
+   - mark the sub-task `In Progress` (and its phase on first start) with `dh_plan_update_status` **before** dispatch;
+   - invoke `dh-execute-plan-task` in `parallel-worker` mode with the exact sub-task ID and isolation mode;
+   - never dispatch two overlapping shared-worktree scopes, and never let workers commit.
+   - Dispatch order: phase order, sub-task order, dependency order.
 
-2. **Verify**: Run the `dh-review` skill to verify the sub-task result against its acceptance criteria and produce findings in `./docs/plans/<plan-slug>/tasks/review.md`.
+3. **Fan in as workers finish**:
+   - run `dh-review` (and `dh-code-review` through the selected reviewer) for the completed task;
+   - P0/P1 → stop new dispatch, drain in-flight work, leave the task/phase open, preserve worktrees, and report (recommend `dh-pause-plan`);
+   - no P0/P1 → mark `Completed` and close the phase only when all its sub-tasks are `Completed`.
 
-3. **Check findings**: Read the review output:
-   - If P0/P1 findings exist: stop the execution loop and report the blocking issues. Do not mark this sub-task `Completed` — a blocked sub-task blocks its phase (loop rule 2.4). Recommend fixing findings and re-running.
-   - If no P0/P1 findings: mark the sub-task `Completed` via `dh_plan_update_status` (`target: "subtask"`, status `Completed`). Fallback: manual edit.
+4. **Isolation integration**: for shared worktrees, the orchestrator serializes commits; for worktree tasks, integrate branches/worktrees in dependency/plan order, preserving any conflict for inspection.
 
-3a. **Close the phase**: When ALL sub-tasks of the current phase are `Completed`, mark the phase `Completed` via `dh_plan_update_status` (`target: "phase"`, status `Completed`; the tool refuses phase → `Completed` while any sub-task is open) and report the phase completion. Fallback: manual edit.
-
-4. **Repeat**: Continue to the next sub-task, then the next phase, until all phases are completed.
+5. **Repeat** until all sub-tasks are `Completed`; then run Step 3. Any deadlock/no-ready state with pending work is a hard stop — report missing/cyclic metadata, do not guess.
 
 ### Step 3: Final sign-off
 
@@ -125,8 +127,8 @@ After final sign-off passes and before marking the plan complete:
 The execution loop automatically handles interruptions:
 
 - A paused handoff takes precedence over status-based resume: run `dh-resume-plan` first. If the handoff is absent or already `resumed`, continue with the phase-aware priority in Step 1.
-- Step 2.0 explicitly marks the current sub-task as `In Progress` before delegating to `dh-execute-plan-task`. If the tool is interrupted, the next invocation reads the plan and finds this `In Progress` sub-task.
-- Resume from Step 1, which detects the phase-aware state (priority 2: first `In Progress` phase → its first `In Progress`/`Pending` sub-task) and continues the loop from there.
+- Step 2.1 marks each dispatched sub-task as `In Progress` before delegating. If interrupted, the next invocation reads the plan and reconciles **all** `In Progress` tasks and their worktrees/branches.
+- Resume from Step 1 priority 2: build the active-task set, revalidate completed-but-unreviewed work, and hand it to the scheduler without duplicate dispatch.
 - If interruption occurs after review but before the `Completed` mark, the sub-task remains `In Progress` on resume — re-run the review to verify before marking Complete.
 
 ## Error Handling
@@ -166,6 +168,7 @@ blockers, and next steps in `handoff.md`; resume later with `dh-resume-plan`.
 
 ## References
 
+- [`references/parallel-scheduler.md`](references/parallel-scheduler.md): authoritative parallel scheduler contract (readiness, worker mode, isolation, failure drain).
 - Fast variant: `dh-execute-plan-fast` executes from `plan_fast.md` with no per-task gates and defers critical verification to plan end; `plan.md` stays the scope truth.
 - [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md): discovery, ranking, recording, and re-validation protocol for every delegated role.
 - `dh-execute-plan-task` skill: executes a single sub-task.
