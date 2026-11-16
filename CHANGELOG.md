@@ -7,6 +7,8 @@ version.
 
 ## [Unreleased]
 
+## [0.13.2] — 2026-11-16
+
 ### Fixed
 
 - **TUI plan modal preview:** selecting another file updates the Markdown
@@ -358,7 +360,8 @@ First release of the standalone OpenCode V2 harness.
 - Plan close-outs include the pause/resume, fast-plan, Mermaid, and
   agent-selection plans with evolution/observation notes.
 
-[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.13.1...HEAD
+[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.13.2...HEAD
+[0.13.2]: https://github.com/andrescevp/development-harness/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/andrescevp/development-harness/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/andrescevp/development-harness/compare/v0.12.2...v0.13.0
 [0.12.2]: https://github.com/andrescevp/development-harness/compare/v0.12.1...v0.12.2
