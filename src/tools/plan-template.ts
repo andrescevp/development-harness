@@ -4,6 +4,7 @@
  * Mirrors skills/dh-planning/references/phased-plan-template.md structure,
  * including the optional parallel metadata (rendered as its defaults).
  */
+import type { PlanDocument } from './plan-lifecycle.js';
 import type { PlanIsolation } from './plan-metadata.js';
 
 /** Status every scaffolded phase/sub-task starts with (index rows reuse it). */
@@ -81,6 +82,11 @@ export interface PlanScaffoldInput {
   }[];
 }
 
+/** Quote a YAML scalar so titles with `:`/`#`/quotes stay valid. */
+function yamlString(value: string): string {
+  return JSON.stringify(value);
+}
+
 export function planScaffold(input: PlanScaffoldInput): string {
   const today = new Date().toISOString().slice(0, 10);
   const phaseBlocks = input.phases
@@ -102,15 +108,15 @@ export function planScaffold(input: PlanScaffoldInput): string {
     .join('\n\n');
 
   return `---
-title: ${input.title}
-slug: ${input.slug}
-description: ${input.title}
+title: ${yamlString(input.title)}
+slug: ${yamlString(input.slug)}
+description: ${yamlString(input.title)}
 created: ${today}
 updated: ${today}
 status: ${INITIAL_PHASE_STATUS}
 active: true
 tags: [plan]
-project: ${input.slug}
+project: ${yamlString(input.slug)}
 ---
 
 # Plan: ${input.title}
@@ -200,4 +206,75 @@ ${phaseBlocks}
 
 - [Only if important non-blocking uncertainty remains]
 `;
+}
+
+/** Strip scaffold-time quoting (backticks/spaces) the parser also normalizes. */
+function normalizeEntry(entry: string): string {
+  return entry
+    .trim()
+    .replace(/^`+|`+$/g, '')
+    .trim();
+}
+
+function sameEntries(left: readonly string[], right: readonly string[]): boolean {
+  if (left.length !== right.length) return false;
+  return left.every((entry, index) => normalizeEntry(entry) === right[index]);
+}
+
+/**
+ * Fail when the rendered scaffold does not parse back to the requested shape.
+ * Guards the empty-title/newline class of bugs that `parsePlan` alone cannot
+ * see (a dropped sub-task still yields a "valid" document).
+ */
+export function assertScaffoldRoundTrip(input: PlanScaffoldInput, plan: PlanDocument): void {
+  function fail(message: string): never {
+    throw new Error(`plan scaffold round-trip mismatch: ${message}`);
+  }
+  if (plan.phases.length !== input.phases.length) {
+    fail(`expected ${input.phases.length} phases, parsed ${plan.phases.length}`);
+  }
+  input.phases.forEach((phaseInput, phaseIndex) => {
+    const phase = plan.phases[phaseIndex];
+    const ref = String(phaseIndex + 1);
+    if (!phase) fail(`phase ${ref} is missing after parsing`);
+    if (phase.index !== phaseIndex + 1) fail(`phase ${ref} has index ${phase.index}`);
+    if (phase.title !== phaseInput.title.trim()) {
+      fail(`phase ${ref} title '${phase.title}' !== '${phaseInput.title.trim()}'`);
+    }
+    if (phase.status !== INITIAL_PHASE_STATUS) fail(`phase ${ref} status ${phase.status} is not Pending`);
+    if (phase.parallelizable !== (phaseInput.parallelizable ?? false)) {
+      fail(`phase ${ref} parallelizable does not round-trip`);
+    }
+    if (!sameEntries(phaseInput.dependsOn ?? [], phase.dependsOn)) {
+      fail(`phase ${ref} dependsOn does not round-trip`);
+    }
+    if (phase.subTasks.length !== phaseInput.subTasks.length) {
+      fail(`phase ${ref} expected ${phaseInput.subTasks.length} sub-tasks, parsed ${phase.subTasks.length}`);
+    }
+    phaseInput.subTasks.forEach((subInput, subIndex) => {
+      const subRef = `${ref}.${subIndex + 1}`;
+      const sub = phase.subTasks[subIndex];
+      if (!sub) fail(`sub-task ${subRef} is missing after parsing`);
+      if (sub.index !== subRef) fail(`sub-task ${subRef} has index ${sub.index}`);
+      if (sub.title !== subInput.title.trim()) {
+        fail(`sub-task ${subRef} title '${sub.title}' !== '${subInput.title.trim()}'`);
+      }
+      if (sub.status !== INITIAL_PHASE_STATUS) fail(`sub-task ${subRef} status ${sub.status} is not Pending`);
+      if (sub.delegatedTo !== subInput.delegatedTo.trim()) {
+        fail(`sub-task ${subRef} delegatedTo '${sub.delegatedTo}' !== '${subInput.delegatedTo.trim()}'`);
+      }
+      if (sub.parallelizable !== (subInput.parallelizable ?? false)) {
+        fail(`sub-task ${subRef} parallelizable does not round-trip`);
+      }
+      if (!sameEntries(subInput.dependsOn ?? [], sub.dependsOn)) {
+        fail(`sub-task ${subRef} dependsOn does not round-trip`);
+      }
+      if (!sameEntries(subInput.filesScope ?? [], sub.filesScope)) {
+        fail(`sub-task ${subRef} filesScope does not round-trip`);
+      }
+      if (sub.isolation !== (subInput.isolation ?? 'shared')) {
+        fail(`sub-task ${subRef} isolation does not round-trip`);
+      }
+    });
+  });
 }

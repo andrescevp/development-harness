@@ -178,7 +178,8 @@ and sub-tasks may carry these optional fields:
 | Field | Level | Values | Default |
 |---|---|---|---|
 | `Parallelizable` | phase, sub-task | `yes` \| `no` | `no` |
-| `Depends on` | phase, sub-task | phase numbers / `N.M` ids, or `None` | `None` |
+| `Depends on` | phase | phase numbers, comma-separated, or `None` | `None` |
+| `Depends on` | sub-task | `N.M` ids, comma-separated, or `None` | `None` |
 | `Files/Scope` | sub-task | comma-separated paths/globs, or `None` | `None` |
 | `Isolation` | sub-task | `shared` \| `worktree` | `shared` |
 
@@ -202,8 +203,8 @@ and sub-tasks may carry these optional fields:
   `Parallelizable: no` / `Depends on: None` / `Files/Scope: None` /
   `Isolation: shared`, so existing plans execute exactly as before.
 
-Operational details — overrides, readiness, worker mode, worktrees, resume, and
-limits: [`docs/LOADING.md` → Parallel plan execution](docs/LOADING.md#parallel-plan-execution).
+Operational details — readiness, worker mode, worktrees, review fan-in, resume,
+and limits: [`docs/LOADING.md` → Parallel plan execution](docs/LOADING.md#parallel-plan-execution).
 
 ### TUI plan progress
 
@@ -259,7 +260,7 @@ harness tools are served by a local stdio MCP server
 
 | Tool | Purpose |
 |---|---|
-| `dh_plan_read` | Parse a phased plan (`docs/plans/<slug>/plan.md`) into structured JSON |
+| `dh_plan_read` | Parse a phased plan (`docs/plans/<slug>/plan.md`) into structured JSON plus scheduling `issues[]` |
 | `dh_plan_update_status` | Edit phase/sub-task status markers (phase completion is gated) |
 | `dh_plan_create` | Scaffold a phased plan; optionally append the `index.md` row |
 | `dh_plan_fast_create` | Create `plan_fast.md` from `plan.md` and seed the skipped-check ledger |

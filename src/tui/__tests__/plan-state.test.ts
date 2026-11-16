@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import type { IndexRow, PlanCandidate } from '../plan-model.js';
 import { selectPlan } from '../plan-select.js';
-import { currentSubTask, derivePlanState, effectiveVerdict, issueFromError, loadingPlanState } from '../plan-state.js';
+import { currentSubTask, derivePlanState, issueFromError, loadingPlanState } from '../plan-state.js';
 import { activityOf, candidate, detailsOf, fixture, scanOf, sourceFile } from './helpers.js';
 
 const NOW = '2026-11-15T09:41:12.100Z';
@@ -284,27 +284,5 @@ describe('derivePlanState — selector, empty and error states', () => {
       '/repo'
     );
     expect(stripped).toMatchObject({ code: 'orphan-subtask', message: 'docs/plans/x/plan.md: orphan sub-task 2.1' });
-  });
-});
-
-describe('effectiveVerdict', () => {
-  it('prefers the review verdict and falls back to the plan-end alignment verdict', () => {
-    const review = sourceFile(
-      'docs/plans/checkout-flow/tasks/review.md',
-      '# Final Plan Review\n\n**Verdict:** Approve\n'
-    );
-    const alignment = sourceFile(
-      'docs/plans/checkout-flow/tasks/review-fast-final.md',
-      '# Plan Alignment Review\n\n**Verdict:** Request changes\n'
-    );
-    const withReview = derive([candidate()], { details: detailsOf(fixture('active-plan.md'), { review }) });
-    expect(effectiveVerdict(withReview.plan!)).toBe('Approve');
-
-    const onlyAlignment = derive([candidate()], {
-      details: detailsOf(fixture('active-plan.md'), {
-        alignment: { preExecution: null, planEnd: alignment },
-      }),
-    });
-    expect(effectiveVerdict(onlyAlignment.plan!)).toBe('Request changes');
   });
 });

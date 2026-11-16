@@ -9,13 +9,8 @@
 import { describe, expect, it } from 'vitest';
 import { parsePlan, setStatus } from '../tools/plan-lifecycle.js';
 
-/** Minimal legacy plan: one real phase after the examples. */
-const LEGACY = `---
-title: Legacy
-slug: legacy
----
-
-## Phases
+/** Minimal legacy plan body: one real phase after the examples. */
+const LEGACY_BODY = `## Phases
 
 ### Phase 1: Only
 
@@ -124,7 +119,7 @@ slug: fenced
 \`\`\`
 
 `;
-    const result = setStatus(`${fenced}${LEGACY.split('---\n\n')[1]}`, 'phase', '1', 'In Progress');
+    const result = setStatus(`${fenced}${LEGACY_BODY}`, 'phase', '1', 'In Progress');
     expect(result.contents).toContain('### Phase 1: Example\n\n- **Status:** Pending');
     expect(result.plan.phases.map((p) => p.index)).toEqual([1]);
     expect(result.plan.phases[0]!.status).toBe('In Progress');
@@ -149,5 +144,14 @@ slug: fenced
 No phases yet.
 `;
     expect(() => parsePlan(doc)).toThrow(/no `### Phase N:` headers/);
+  });
+
+  it('reports an unterminated fence instead of a bare missing-region error', () => {
+    const doc = `## Core concepts
+
+\`\`\`markdown
+### Phase 1: Example
+`;
+    expect(() => parsePlan(doc)).toThrow(/unterminated code fence at line 3/);
   });
 });

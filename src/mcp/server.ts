@@ -20,8 +20,10 @@ import { syncFastPlan } from '../tools/plan-fast-sync.js';
 import { appendPlanIndexRow, assertPlanIndexWritable, readPlanFile } from '../tools/plan-io.js';
 import { buildPlanTemplate, PHASE_STATUSES, parsePlan, STATUS_TARGETS, setStatus } from '../tools/plan-lifecycle.js';
 import { resolvePlanPath } from '../tools/plan-paths.js';
+import { assertScaffoldRoundTrip } from '../tools/plan-template.js';
+import { assertValidPlan, validatePlan } from '../tools/plan-validation.js';
 import { readSheet, sheetSchema, updateSheet } from '../tools/sheet-tools.js';
-import { planPhasesSchema } from './plan-schemas.js';
+import { planPhasesSchema, singleLine } from './plan-schemas.js';
 import { guarded, guardedAsync, textResult } from './tool-results.js';
 
 export interface BuildServerOptions {
@@ -55,7 +57,7 @@ export function buildServer({ workspaceRoot, version, instructions }: BuildServe
     'plan_read',
     {
       description: withToonNote(
-        'Parse a phased plan (docs/plans/<slug>/plan.md) into structured JSON: meta, phases[] with status/parallelizable/dependsOn, subTasks[] with phase/status/relatedRequirements/delegatedTo/parallelizable/dependsOn/filesScope/isolation. Errors clearly when missing or unparseable.'
+        'Parse a phased plan (docs/plans/<slug>/plan.md) into structured JSON: meta, phases[] with status/parallelizable/dependsOn, subTasks[] with phase/status/relatedRequirements/delegatedTo/parallelizable/dependsOn/filesScope/isolation. Also returns scheduling `issues[]` (errors block dispatch, warnings are advisory). Errors clearly when missing or unparseable.'
       ),
       inputSchema: z.object({
         slug: z.string().describe('Plan slug (docs/plans/<slug>/plan.md)').optional(),
@@ -66,7 +68,8 @@ export function buildServer({ workspaceRoot, version, instructions }: BuildServe
       guarded(() => {
         const file = resolvePlanPath(workspaceRoot, slug, relPath);
         const contents = readPlanFile(file);
-        return textResult({ ok: true, path: file, plan: parsePlan(contents) });
+        const plan = parsePlan(contents);
+        return textResult({ ok: true, path: file, plan, issues: validatePlan(plan) });
       })
   );
 
@@ -102,9 +105,9 @@ export function buildServer({ workspaceRoot, version, instructions }: BuildServe
         'Scaffold a new phased plan (docs/plans/<slug>/plan.md) from a title, objective, and phases with sub-task titles + the responsible agent per sub-task; all statuses start Pending. Optionally append the index.md row.'
       ),
       inputSchema: z.object({
-        slug: z.string(),
-        title: z.string(),
-        objective: z.string(),
+        slug: singleLine('slug').refine((value) => !value.includes('..'), 'slug must not contain ".."'),
+        title: singleLine('title'),
+        objective: z.string().min(1),
         phases: planPhasesSchema,
         updateIndex: z.boolean().describe('Append a row to docs/plans/index.md').optional(),
       }),
@@ -121,6 +124,8 @@ export function buildServer({ workspaceRoot, version, instructions }: BuildServe
         // Parse before writing anything: an invalid scaffold must not leave a
         // broken plan behind (retries would then hit `plan already exists`).
         const plan = parsePlan(template);
+        assertValidPlan(plan, 'plan scaffold');
+        assertScaffoldRoundTrip({ slug, title, objective, phases }, plan);
         fs.mkdirSync(path.dirname(file), { recursive: true });
         try {
           writeFileExclusiveAtomic(file, template);

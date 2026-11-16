@@ -57,13 +57,39 @@ function readList(raw: string, where: string, field: string): string[] {
   const value = raw.trim();
   if (value === '') throw new Error(`${where}: empty ${field} marker`);
   if (value.toLowerCase() === 'none') return [];
-  const entries = value.split(',').map((entry) =>
+  const entries = splitEntries(value, where, field).map((entry) =>
     entry
       .trim()
       .replace(/^`+|`+$/g, '')
       .trim()
   );
   if (entries.some((entry) => entry === '')) throw new Error(`${where}: empty entry in ${field}`);
+  return entries;
+}
+
+/**
+ * Split on commas outside `{...}` so brace globs such as `*.{ts,tsx}` stay one
+ * entry. Unmatched braces are a format error: silently treating half a glob as
+ * a path would weaken scope conflict checks.
+ */
+function splitEntries(value: string, where: string, field: string): string[] {
+  const entries: string[] = [];
+  let depth = 0;
+  let start = 0;
+  for (let i = 0; i < value.length; i++) {
+    const char = value[i];
+    if (char === '{') {
+      depth += 1;
+    } else if (char === '}') {
+      if (depth === 0) throw new Error(`${where}: unmatched '}' in ${field} '${value}'`);
+      depth -= 1;
+    } else if (char === ',' && depth === 0) {
+      entries.push(value.slice(start, i));
+      start = i + 1;
+    }
+  }
+  if (depth !== 0) throw new Error(`${where}: unmatched '{' in ${field} '${value}'`);
+  entries.push(value.slice(start));
   return entries;
 }
 

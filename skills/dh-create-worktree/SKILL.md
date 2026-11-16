@@ -33,7 +33,9 @@ template: [`dh-setup/references/worktree-lifecycle.md`](../dh-setup/references/w
 - **Parallel integration.** Worktrees created for parallel sub-tasks are
   integrated by the orchestrator in dependency/plan order; a merge conflict
   stops integration and preserves the worktree/branch. Never delete conflicted
-  or unmerged worktrees.
+  or unmerged worktrees. A dependent worktree task starts from the current
+  integration head (never a stale base), and the orchestrator records that base
+  commit in its run state/handoff.
 - **Read before acting.** Load the root `WORKTREE_LIFECYCLE.md` first. If it is missing,
   empty, or lacks a required section, STOP and ask the user to run `dh-setup`. Never
   create, guess, or overwrite the file from this skill.

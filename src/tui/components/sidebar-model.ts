@@ -2,7 +2,7 @@
  * sidebar-model.ts — pure view model for the always-visible `sidebar.content`
  * card (progress-contract §11 card column, §5.4 bar, §8.4 summary).
  *
- * The card is deliberately small: a heading plus at most six short lines,
+ * The card is deliberately small: a heading plus at most eight short lines,
  * each truncated to the measured width. No Solid, no renderer, no I/O.
  */
 import type { PlanProgress } from '../plan-model.js';
@@ -117,10 +117,8 @@ export function planCardLines(plan: PlanProgress, width: number, ascii = false):
   const bar = progressBar(plan.progress.ratio, wide ? WIDE_BAR_CELLS : NARROW_BAR_CELLS, { ascii });
   const count = `${plan.counts.subTasks.completed}/${plan.counts.subTasks.total}`;
   lines.push(truncate(`[${bar}] ${count}${wide ? ' sub-tasks' : ''}`, clamped));
-  if (plan.activeSubTasks.length > 0) {
-    lines.push(
-      truncate(`Active: ${plan.activeSubTasks.length} task${plan.activeSubTasks.length === 1 ? '' : 's'}`, clamped)
-    );
+  if (plan.activeSubTasks.length > 1) {
+    lines.push(truncate(`Active: ${plan.activeSubTasks.length} tasks`, clamped));
   }
   lines.push(truncate(`Agent: ${plan.current.subTask?.delegatedTo ?? '—'}`, clamped));
   return lines;

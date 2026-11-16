@@ -1,7 +1,7 @@
 ---
 name: dh-code-review
 description: >
-  Review code: correctness, security, robustness, performance, maintainability; high-signal findings (P0-P3) via code-review skill to tasks/review.md. Use for PR reviews, code audits, sub-task reviews, 'review this'.
+  Review code: correctness, security, robustness, performance, maintainability; high-signal findings (P0-P3) via code-review skill to the caller's report path (per-task tasks/review-<N.M>.md, legacy tasks/review.md). Use for PR reviews, code audits, sub-task reviews, 'review this'.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: bash, read, write
@@ -10,7 +10,7 @@ metadata:
   workflow: development
 ---
 
-Produce high-signal, evidence-based reviews focused on real risk. Write the findings in `./docs/plans/<plan-slug>/tasks/review.md`.
+Produce high-signal, evidence-based reviews focused on real risk. Write the findings to the caller-specified report path — `./docs/plans/<plan-slug>/tasks/review-<N.M>.md` for a per-task review, `tasks/review.md` as the legacy default.
 
 ## Core Rules
 
@@ -20,7 +20,7 @@ Produce high-signal, evidence-based reviews focused on real risk. Write the find
 - Report only actionable findings with evidence.
 - Prefer a few high-confidence findings over many weak ones.
 - If no diff or scope is provided, ask instead of scanning broadly.
-- Do not modify any file other than `./docs/plans/<plan-slug>/tasks/review.md`.
+- Do not modify any file other than the review report path the caller specifies (`tasks/review-<N.M>.md` per-task, or `tasks/review.md`).
 
 ## Graph-Assisted Review
 

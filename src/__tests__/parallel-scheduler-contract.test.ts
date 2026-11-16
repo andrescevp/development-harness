@@ -36,8 +36,6 @@ describe('shared scheduler contract', () => {
       'Files/Scope',
       'Isolation',
       'ready',
-      '3',
-      '8',
       'worker',
       'parallel-worker',
       'orchestrator',
@@ -48,6 +46,16 @@ describe('shared scheduler contract', () => {
     ]) {
       expect(text.toLowerCase(), phrase).toContain(phrase.toLowerCase());
     }
+    expect(text).toContain('Default limit: **3**');
+    expect(text).toContain('hard\n  limit of **8**');
+  });
+
+  it('states the sequential, parallel-phase, and scope readiness clauses', () => {
+    const text = read(SCHEDULER);
+    expect(text).toMatch(/every earlier sub-task in that phase is\s+`Completed`/);
+    expect(text).toMatch(/no incompatible phase is currently active/);
+    expect(text).toMatch(/re-check conflicts|every dispatch/);
+    expect(text).toMatch(/tasks\/review-<N\.M>\.md/);
   });
 
   it('is the only detailed scheduler contract (orchestrators link it)', () => {

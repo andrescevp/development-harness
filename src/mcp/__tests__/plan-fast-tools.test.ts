@@ -16,6 +16,7 @@ import {
   FIXTURE_CONTENTS,
   PLAN_SLUG,
   plansFile,
+  seedPlan,
 } from '../../__tests__/helpers/plan-fixtures.js';
 import type { FastCreatePayload, FastReadPayload, FastStatusPayload } from './helpers/plan-fast-fixtures.js';
 import { createFast, diskPlan, fastFile, ledgerFile } from './helpers/plan-fast-fixtures.js';
@@ -94,6 +95,44 @@ describe('plan_fast_create / plan_fast_read', () => {
       skipChecksPath: created.skipChecksPath,
     });
     expect(read.plan.phases.map((p) => p.title)).toEqual(['Foundation', 'Execution']);
+  });
+
+  it('ignores a fenced ## Phases example and mirrors the real region', async () => {
+    const source = `---
+title: Fenced Plan
+slug: fenced
+status: Pending
+active: true
+---
+
+## Core concepts
+
+\`\`\`markdown
+## Phases
+
+### Phase 9: Example only
+
+- **Status:** Pending
+
+#### Sub-Task 9.1: Example only
+\`\`\`
+
+## Phases
+
+### Phase 1: Real
+
+- **Status:** Pending
+
+#### Sub-Task 1.1: Real task
+
+- **Status:** Pending
+- **Delegated to agent:** dh-software-engineer
+`;
+    const h = await connectPlanHarness((root) => seedPlan(root, 'fenced', source));
+    const created = await createFast(h, 'fenced');
+    expect(created.plan.phases.map((phase) => phase.title)).toEqual(['Real']);
+    expect(created.plan.phases[0]!.subTasks.map((sub) => sub.title)).toEqual(['Real task']);
+    expect(fs.readFileSync(created.path, 'utf8')).not.toContain('Phase 9: Example only');
   });
 
   it('refuses an existing mirror and replaces only when everything is Pending', async () => {

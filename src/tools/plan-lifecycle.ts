@@ -5,8 +5,9 @@
  * skills/dh-planning/references/phased-plan-template.md:
  *   - `## Phases` → `### Phase N: <title>` (+ `- **Status:**`)
  *     → `#### Sub-Task N.M: <title>` (+ fields + `- **Status:**`)
- *   - status lines are the first `- **Status:**` bullet in their section;
- *     keep them directly after the header (a later bullet is not authoritative).
+ *   - status lines are the first `- **Status:**` bullet in their section
+ *     (metadata bullets may precede it; keep it near the header for
+ *     readability — a later duplicate is not authoritative).
  *   - only the `## Phases` region is parsed and fenced examples are ignored
  *     (plan-sections.ts); parallel metadata lives in plan-metadata.ts.
  *
@@ -17,7 +18,7 @@
  */
 import { parse } from 'yaml';
 import { splitFrontmatter } from '../lib/frontmatter.js';
-import { type PlanIsolation, readPhaseMetadata, readSubTaskMetadata } from './plan-metadata.js';
+import { type PhaseMetadata, readPhaseMetadata, readSubTaskMetadata, type SubTaskMetadata } from './plan-metadata.js';
 import { planLayout } from './plan-sections.js';
 import { type PlanScaffoldInput, planScaffold } from './plan-template.js';
 
@@ -27,7 +28,7 @@ export type PhaseStatus = (typeof PHASE_STATUSES)[number];
 export const STATUS_TARGETS = ['phase', 'subtask'] as const;
 export type StatusTarget = (typeof STATUS_TARGETS)[number];
 
-interface PlanSubTask {
+interface PlanSubTask extends SubTaskMetadata {
   /** Canonical "N.M" ref (phase.subtask). */
   index: string;
   phase: number;
@@ -37,25 +38,13 @@ interface PlanSubTask {
   relatedRequirements: string[];
   /** Agent named by `- **Delegated to agent:**`; null on legacy plans. */
   delegatedTo: string | null;
-  /** `- **Parallelizable:** yes|no`; false when absent (legacy default). */
-  parallelizable: boolean;
-  /** `- **Depends on:**` refs; empty when absent/None. */
-  dependsOn: string[];
-  /** `- **Files/Scope:**` declared paths/globs; empty when absent/None (unknown). */
-  filesScope: string[];
-  /** `- **Isolation:** shared|worktree`; shared when absent. */
-  isolation: PlanIsolation;
 }
 
-interface PlanPhase {
+interface PlanPhase extends PhaseMetadata {
   /** 1-based phase number. */
   index: number;
   title: string;
   status: PhaseStatus;
-  /** `- **Parallelizable:** yes|no`; false when absent (legacy default). */
-  parallelizable: boolean;
-  /** `- **Depends on:**` phase refs; empty when absent/None. */
-  dependsOn: string[];
   subTasks: PlanSubTask[];
 }
 
@@ -71,15 +60,15 @@ const DELEGATED_RE = /^-\s+\*\*Delegated to agent:\*\*\s+(.+?)\r?$/;
 const DELEGATED_EMPTY_RE = /^-\s+\*\*Delegated to agent:\*\*\s*\r?$/;
 
 /** Return (value, hadCr) for a status line; throws on unknown statuses. */
-function readStatusRaw(contents: string, line: number): { raw: string; cr: boolean } {
-  const l = contents.split('\n')[line] ?? '';
+function readStatusRaw(lines: readonly string[], line: number): { raw: string; cr: boolean } {
+  const l = lines[line] ?? '';
   const m = l.match(/^-\s+\*\*Status:\*\*\s+(.+?)(\r?)$/);
   if (!m) throw new Error(`plan line ${line + 1}: no status marker`);
   return { raw: m[1]!.trim(), cr: m[2] === '\r' };
 }
 
-function statusOf(contents: string, line: number, file = '<plan>'): PhaseStatus {
-  const { raw } = readStatusRaw(contents, line);
+function statusOf(lines: readonly string[], line: number, file = '<plan>'): PhaseStatus {
+  const { raw } = readStatusRaw(lines, line);
   if (!(PHASE_STATUSES as readonly string[]).includes(raw)) {
     throw new Error(`${file}: invalid status '${raw}' at line ${line + 1} (expected ${PHASE_STATUSES.join(' | ')})`);
   }
@@ -101,9 +90,11 @@ function parseMeta(contents: string): Record<string, unknown> {
 export function parsePlan(contents: string, file = '<plan>'): PlanDocument {
   const meta = parseMeta(contents);
   const layout = planLayout(contents);
-  if (!layout.region) throw new Error('not a phased plan: missing `## Phases` section');
+  const fenceNote =
+    layout.unterminatedFence === null ? '' : ` (unterminated code fence at line ${layout.unterminatedFence + 1})`;
+  if (!layout.region) throw new Error(`not a phased plan: missing \`## Phases\` section${fenceNote}`);
   if (!layout.sections.some((section) => section.kind === 'phase')) {
-    throw new Error('not a phased plan: no `### Phase N:` headers found');
+    throw new Error(`not a phased plan: no \`### Phase N:\` headers found${fenceNote}`);
   }
   const phases: PlanPhase[] = [];
 
@@ -112,7 +103,7 @@ export function parsePlan(contents: string, file = '<plan>'): PlanDocument {
     phases.push({
       index: section.phase,
       title: section.title,
-      status: statusOf(contents, section.statusLine ?? section.headerLine, file),
+      status: statusOf(layout.lines, section.statusLine ?? section.headerLine, file),
       ...readPhaseMetadata(
         layout.lines,
         section.headerLine + 1,
@@ -162,7 +153,7 @@ export function parsePlan(contents: string, file = '<plan>'): PlanDocument {
       phase: section.phase,
       number: section.number!,
       title: section.title,
-      status: statusOf(contents, section.statusLine ?? section.headerLine, file),
+      status: statusOf(layout.lines, section.statusLine ?? section.headerLine, file),
       relatedRequirements: related,
       delegatedTo,
       ...readSubTaskMetadata(

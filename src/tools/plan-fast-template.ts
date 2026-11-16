@@ -10,6 +10,7 @@
 import crypto from 'node:crypto';
 import { splitFrontmatter } from '../lib/frontmatter.js';
 import type { PlanDocument } from './plan-lifecycle.js';
+import { fencedLines } from './plan-sections.js';
 
 /** Top-level plan.md sections the fast mirror intentionally omits. */
 const FAST_OMITTED_SECTIONS = [
@@ -48,22 +49,24 @@ function planBody(contents: string): string {
   return split.body.startsWith('\n') ? split.body.slice(1) : split.body;
 }
 
-/** SHA-256 of the plan body with every `- **Status:**` line removed. */
+/** SHA-256 of the plan body with every authoritative `- **Status:**` line removed. */
 export function computeSourceSha256(contents: string): string {
-  const filtered = planBody(contents)
-    .split('\n')
-    .filter((line) => !STATUS_LINE.test(line))
-    .join('\n');
+  const lines = planBody(contents).split('\n');
+  const fenced = fencedLines(lines);
+  const filtered = lines.filter((line, index) => fenced[index] || !STATUS_LINE.test(line)).join('\n');
   return crypto.createHash('sha256').update(filtered, 'utf8').digest('hex');
 }
 
 /** Extract a top-level `## <heading>` section, including its heading line. */
 function extractSection(contents: string, heading: string): string | undefined {
   const lines = contents.split('\n');
-  const start = lines.findIndex((line) => line.replace(/\r$/, '').trimEnd() === `## ${heading}`);
+  const fenced = fencedLines(lines);
+  const start = lines.findIndex(
+    (line, index) => !fenced[index] && line.replace(/\r$/, '').trimEnd() === `## ${heading}`
+  );
   if (start === -1) return undefined;
   let end = start + 1;
-  while (end < lines.length && !HEADING.test(lines[end]!.replace(/\r$/, ''))) end += 1;
+  while (end < lines.length && (fenced[end] || !HEADING.test(lines[end]!.replace(/\r$/, '')))) end += 1;
   return lines.slice(start, end).join('\n');
 }
 

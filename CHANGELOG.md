@@ -13,6 +13,25 @@ version.
   `sidebar.content` section (`▾`/`▸`), with its own progress bar, active-task
   count, delegated agent, status, and activity line. An `[open]` action opens
   the plan file in a read-only plugin page.
+- `validatePlan` (exposed through `dh_plan_read` `issues[]` and enforced by
+  `dh_plan_create`) checks dependency refs/cycles, duplicate refs, worktree
+  scope, and parallel-phase eligibility before dispatch.
+
+### Fixed
+
+- **Scheduler readiness:** sequential phases only dispatch when every earlier
+  sub-task is `Completed`; phases respect plan order, active sequential phases,
+  and per-dispatch scope checks. Legacy plans stay sequential.
+- **Review fan-in:** `dh-review` accepts an exact `subTask` and writes
+  `tasks/review-<N.M>.md`; both orchestrators pass the target and read that
+  report instead of racing on `tasks/review.md`.
+- **Plan creation hardening:** single-line titles/agents/dependencies, quoted
+  YAML, round-trip assertions, brace-aware `Files/Scope` parsing, and a
+  fence-aware fast mirror that ignores `## Phases` examples.
+- **Fast sync** compares `Parallelizable`, `Depends on`, `Files/Scope`, and
+  `Isolation`, so metadata edits are structural drift.
+- **Worktrees and pause/resume:** one-time worktree-set confirmation, integrated
+  dependent bases, and pause/resume record every active sub-task.
 
 ## [0.11.0] — 2026-11-16
 

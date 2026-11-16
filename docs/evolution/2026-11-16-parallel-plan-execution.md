@@ -50,7 +50,7 @@ orchestrator stays the only writer of statuses, ledger rows, and commits.
 
 ## Validation
 
-- 73 test files / 1212 tests pass.
+- 77 test files / 1249 tests pass.
 - Typecheck, build, Biome, knip, jscpd (0 clones), dependency-cruiser, links.
 - Audit PASS: 6 agents, 27 skills, 12 MCP tools, 0 high-signature secrets,
   0 junk.

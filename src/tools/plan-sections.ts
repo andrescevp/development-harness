@@ -29,6 +29,8 @@ export interface PlanLayout {
   lines: string[];
   /** Lines that belong to a fenced code block (delimiters included). */
   fenced: boolean[];
+  /** 0-based opener line when a fence never closes; null otherwise. */
+  unterminatedFence: number | null;
   /** `## Phases` heading line and exclusive end; null when the heading is absent. */
   region: { start: number; end: number } | null;
   sections: PlanSection[];
@@ -44,10 +46,11 @@ const FENCE = /^\s*(`{3,}|~{3,})(.*)$/;
  * Mark every line that belongs to a fenced block: the opening/closing
  * delimiters must use the same character, and a closing fence must be at
  * least as long as the opener with nothing but whitespace after it.
+ * Also reports the 0-based opener line of a fence that never closes.
  */
-function fencedLines(lines: readonly string[]): boolean[] {
+function scanFences(lines: readonly string[]): { fenced: boolean[]; opener: number | null } {
   const fenced = new Array<boolean>(lines.length).fill(false);
-  let open: { char: string; length: number } | null = null;
+  let open: { char: string; length: number; line: number } | null = null;
   for (let i = 0; i < lines.length; i++) {
     const match = (lines[i] ?? '').match(FENCE);
     if (open === null) {
@@ -55,7 +58,7 @@ function fencedLines(lines: readonly string[]): boolean[] {
       const marker = match[1]!;
       // A backtick opener with a backtick in its info string is inline code.
       if (marker[0] === '`' && match[2]!.includes('`')) continue;
-      open = { char: marker[0]!, length: marker.length };
+      open = { char: marker[0]!, length: marker.length, line: i };
       fenced[i] = true;
     } else {
       fenced[i] = true;
@@ -64,7 +67,12 @@ function fencedLines(lines: readonly string[]): boolean[] {
       }
     }
   }
-  return fenced;
+  return { fenced, opener: open?.line ?? null };
+}
+
+/** Fenced-line map for callers that only need the boolean view. */
+export function fencedLines(lines: readonly string[]): boolean[] {
+  return scanFences(lines).fenced;
 }
 
 /** `## Phases` heading → next top-level `##` (exclusive) or EOF. */
@@ -86,10 +94,11 @@ function phasesRegion(lines: readonly string[], fenced: readonly boolean[]): { s
 /** Scan a plan document into its fenced map, phases region, and sections. */
 export function planLayout(contents: string): PlanLayout {
   const lines = contents.split('\n');
-  const fenced = fencedLines(lines);
+  const scan = scanFences(lines);
+  const fenced = scan.fenced;
   const region = phasesRegion(lines, fenced);
   const sections: PlanSection[] = [];
-  if (!region) return { lines, fenced, region, sections };
+  if (!region) return { lines, fenced, unterminatedFence: scan.opener, region, sections };
 
   let current: PlanSection | undefined;
   const lastLine = region.end - 1;
@@ -128,5 +137,5 @@ export function planLayout(contents: string): PlanLayout {
       current.statusLine = i;
     }
   }
-  return { lines, fenced, region, sections };
+  return { lines, fenced, unterminatedFence: scan.opener, region, sections };
 }

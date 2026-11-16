@@ -58,18 +58,20 @@ Read the plan (via `dh_plan_read`; fallback: manual read) and determine the star
 
 Follow [`references/parallel-scheduler.md`](references/parallel-scheduler.md) exactly. At each cycle:
 
-0. **Reconcile state**: run the phase-close sweep; validate every dependency ref/cycle; resolve the `## Agent Selection` roster and each ready sub-task's `Delegated to agent` (missing/unknown → stop). On resume, collect **all** `In Progress` tasks and their worktrees/branches before dispatching anything.
+0. **Reconcile state**: run the phase-close sweep; read `plan.md` through `dh_plan_read` and stop on any `issues[]` with `severity: "error"` (dangling/typed refs, cycles, worktree without scope, parallel phase with a sequential task); resolve the `## Agent Selection` roster and each ready sub-task's `Delegated to agent` (missing/unknown → stop). On resume, collect **all** `In Progress` tasks and their worktrees/branches before dispatching anything.
 
-1. **Compute the ready set**: phases whose dependencies are `Completed`, then sub-tasks that are `Pending`, dependency-complete, `Parallelizable: yes` (or the next task of a sequential phase), and scope-compatible with running shared-worktree tasks.
+1. **Compute the ready set**: phases whose dependencies are `Completed`, then sub-tasks that are `Pending`, dependency-complete, `Parallelizable: yes` (or, in a sequential phase, every earlier sub-task in that phase is `Completed`), and scope-compatible with running shared-worktree tasks (re-check conflicts on every dispatch).
 
 2. **Dispatch up to the limit** (default 3, hard cap 8):
    - mark the sub-task `In Progress` (and its phase on first start) with `dh_plan_update_status` **before** dispatch;
-   - invoke `dh-execute-plan-task` in `parallel-worker` mode with the exact sub-task ID and isolation mode;
-   - never dispatch two overlapping shared-worktree scopes, and never let workers commit.
+   - invoke `dh-execute-plan-task` in `parallel-worker` mode with the exact sub-task ID and isolation mode (worker prompt header: `MODE: parallel-worker subTask=<N.M>`);
+   - never dispatch two overlapping shared-worktree scopes, and never let workers commit;
+   - the first time a task declares `Isolation: worktree`, confirm the worktree set with the user and record it in the run state/handoff;
+   - a worktree task starts only after its dependencies are integrated (reachable from the main worktree); record its base commit.
    - Dispatch order: phase order, sub-task order, dependency order.
 
 3. **Fan in as workers finish**:
-   - run `dh-review` (and `dh-code-review` through the selected reviewer) for the completed task;
+   - run `dh-review` with `subTask: "<N.M>"` and the envelope's `filesChanged` for the completed task (and `dh-code-review` through the selected reviewer); read the matching `tasks/review-<N.M>.md` report — never fall back to the first `In Progress` task or the aggregate `tasks/review.md`;
    - P0/P1 → stop new dispatch, drain in-flight work, leave the task/phase open, preserve worktrees, and report (recommend `dh-pause-plan`);
    - no P0/P1 → mark `Completed` and close the phase only when all its sub-tasks are `Completed`.
 

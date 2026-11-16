@@ -306,35 +306,46 @@ concurrency, isolation, or status ownership.
 | Field | Level | Values | Default (absent) |
 |---|---|---|---|
 | `Parallelizable` | phase, sub-task | `yes` \| `no` | `no` |
-| `Depends on` | phase, sub-task | phase numbers / `N.M` ids, comma-separated, or `None` | `None` |
-| `Files/Scope` | sub-task | paths/globs, comma-separated, or `None` | `None` (unknown) |
+| `Depends on` | phase | phase numbers, comma-separated, or `None` | `None` |
+| `Depends on` | sub-task | `N.M` ids, comma-separated, or `None` | `None` |
+| `Files/Scope` | sub-task | paths/globs, comma-separated (brace-aware), or `None` | `None` (unknown) |
 | `Isolation` | sub-task | `shared` \| `worktree` | `shared` |
 
 The defaults are the legacy contract: a plan without these fields parses and
-executes sequentially. `dh_plan_read` returns the metadata and
-`dh_plan_create` accepts it per phase/sub-task.
+executes sequentially. `dh_plan_read` returns the metadata plus scheduling
+`issues[]` (errors block dispatch; warnings are advisory), and
+`dh_plan_create` accepts the metadata but refuses error-level combinations
+before writing.
 
 ### Readiness and concurrency
 
 - A **phase** is ready when it is `Pending`, every phase in its `Depends on` is
-  `Completed`, and it has no blocked sub-task.
+  `Completed`, it is the next pending phase in plan order (or
+  `Parallelizable: yes`), no incompatible phase is active (a sequential phase
+  needs an idle plan; a parallel phase needs no active sequential phase), and
+  it has no blocked sub-task.
 - A **sub-task** is ready when its phase is active, it is `Pending`, every
-  dependency is `Completed`, it is `Parallelizable: yes` (or it is the next
-  listed sub-task of a sequential phase), and it does not conflict with a
-  running shared-worktree task.
+  dependency is `Completed`, it is `Parallelizable: yes` (or, in a sequential
+  phase, **every earlier sub-task in that phase is `Completed`**), and it does
+  not conflict with a running shared-worktree task. Conflicts are re-checked on
+  every dispatch.
 - Each cycle the scheduler dispatches up to the limit: **3 workers by default**,
-  changed only by an explicit orchestrator request or a plan-level `parallelism`
-  value, and never above the hard cap of **8**.
+  changed only by an explicit orchestrator request and never above the hard cap
+  of **8**. The ready queue is FIFO (phase, sub-task, dependency order).
 - Several sub-tasks may be `In Progress` at once. A phase becomes `Completed`
-  only when all of its sub-tasks are `Completed`. Missing, cyclic, or deadlocked
-  dependencies stop scheduling and are reported, never guessed around.
+  only when all of its sub-tasks are `Completed`. Missing, cyclic, malformed, or
+  deadlocked dependencies stop scheduling and are reported, never guessed
+  around (`validatePlan` runs before dispatch and backs `plan_read`/`plan_create`).
 
 ### Worker mode and ownership
 
 The orchestrator marks a sub-task (and its phase on first start) `In Progress`
 before dispatch, then invokes `dh-execute-plan-task` (or `-fast`) with
-`parallel-worker` and the exact sub-task ID. A worker reads the brief,
-implements with TDD, runs narrow validation, returns an envelope, and stops:
+`parallel-worker` and the exact sub-task ID. The worker prompt starts with
+`MODE: parallel-worker subTask=<N.M>`; a missing header while siblings are
+active is a hard stop, not a fallback to the standalone write path. A worker
+reads the brief, implements with TDD, runs narrow validation, returns an
+envelope, and stops:
 
 ```json
 {
@@ -352,8 +363,11 @@ Only the orchestrator writes plan statuses (`dh_plan_update_status` /
 `dh_plan_fast_update_status`, serially), fast-mode ledger rows
 (`dh_plan_fast_skip_check`, serially), reviews, and commits. Workers never edit
 `plan.md`, `plan_fast.md`, the ledger, or commit in a shared worktree. Reviews
-fan in as workers finish; a P0/P1 finding stops new dispatch, drains in-flight
-work, and leaves the task and phase open.
+fan in as workers finish: `dh-review` receives the exact `subTask` and the
+envelope's `filesChanged`, writes `tasks/review-<N.M>.md`, and the orchestrator
+reads that report (never the first `In Progress` task or the aggregate
+`tasks/review.md`). A P0/P1 finding stops new dispatch, drains in-flight work,
+and leaves the task and phase open.
 
 ### Isolation and worktrees
 
@@ -365,11 +379,16 @@ work, and leaves the task and phase open.
 | `Isolation: worktree` | Dedicated branch/worktree; integrate after completion |
 | Two worktree tasks | Concurrent; integrated in dependency/plan order |
 
-- `Isolation: worktree` requires a non-empty `Files/Scope`; create the worktree
-  with `dh-create-worktree` and run the worker there.
-- Integration follows dependency/plan order (merge or cherry-pick). A conflict
-  stops integration and preserves the worktree/branch for inspection; worktrees
-  are removed only with confirmation, never automatically after a failure.
+- `Isolation: worktree` requires a non-empty `Files/Scope`. Before the first
+  worktree dispatch, confirm the plan's worktree set with the user once and
+  record it in the run state/handoff; then create each worktree with
+  `dh-create-worktree`.
+- A dependent worktree task starts only after its dependencies are integrated
+  (reachable from the main worktree), from the current integration head; the
+  orchestrator records the base commit. Integration follows dependency/plan
+  order (merge or cherry-pick). A conflict stops integration and preserves the
+  worktree/branch for inspection; worktrees are removed only with confirmation,
+  never automatically after a failure.
 - Build/test outputs, caches, ports, and lockfiles are outside source scope —
   tooling-heavy tasks belong in worktrees, and the orchestrator serializes
   commits and git index operations.
@@ -472,7 +491,7 @@ retired by this release.
 
 | Tool | Input | Returns |
 |---|---|---|
-| `dh_plan_read` | `{ slug }` or `{ path }` (relative to `docs/plans`) | `{ ok, path, plan }` — parsed phases/sub-tasks with statuses |
+| `dh_plan_read` | `{ slug }` or `{ path }` (relative to `docs/plans`) | `{ ok, path, plan, issues }` — parsed phases/sub-tasks with statuses plus scheduling issues |
 | `dh_plan_update_status` | `{ slug?, path?, target: phase\|subtask, index: "N"\|"N.M", status }` | `{ ok, path, plan }` — line-aware status edit |
 | `dh_plan_create` | `{ slug, title, objective, phases: [{title, subTasks:[{title}]}], updateIndex? }` | `{ ok, path, plan }` — scaffolds a phased plan |
 | `dh_plan_fast_create` | `{ slug, replace? }` | `{ ok, path, plan, sourceSha256, skipChecksPath }` — creates the fast mirror + seeds the ledger |
