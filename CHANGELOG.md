@@ -7,6 +7,17 @@ version.
 
 ## [Unreleased]
 
+### Fixed
+
+- **TUI collapse:** reopening a collapsed plan works again; the toggle replaces
+  the collapsed-slug array so the store always notifies, and the section
+  header opens on mouse-up.
+- **TUI modal:** opens on mouse-up (deferred past the dialog backdrop's
+  dismissal event), so it no longer closes immediately after opening.
+- **TUI modal tabs:** the plan-file modal now has a **Plan tree** tab and a
+  **Markdown** tab (`Tab`/`1`/`2`), rendering the plan body as Markdown with
+  host syntax highlighting and builtin Mermaid diagram rendering.
+
 ## [0.12.1] — 2026-11-16
 
 ### Fixed

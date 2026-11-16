@@ -56,13 +56,23 @@ export default Plugin.define({
           collapsed={() => store.ui().collapsedSlugs}
           onToggle={store.toggleCollapsed}
           onOpen={(plan) => {
-            context.ui.dialog.show(
-              () => (
-                <PlanFileModal path={plan.absPath} title={plan.title} theme={context.theme} keymap={context.keymap} />
-              ),
-              () => {}
-            );
-            context.ui.dialog.set({ size: 'xlarge' });
+            // Defer past the sidebar mouseup: the dialog backdrop also closes
+            // on mouseup and would otherwise dismiss the modal immediately.
+            queueMicrotask(() => {
+              context.ui.dialog.show(
+                () => (
+                  <PlanFileModal
+                    path={plan.absPath}
+                    title={plan.title}
+                    theme={context.theme}
+                    renderer={context.renderer}
+                    keymap={context.keymap}
+                  />
+                ),
+                () => {}
+              );
+              context.ui.dialog.set({ size: 'xlarge' });
+            });
           }}
         />
       ),
