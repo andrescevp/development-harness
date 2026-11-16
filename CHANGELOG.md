@@ -5,6 +5,32 @@ All notable changes to this project are documented here. The format follows
 Semantic Versioning. During the 0.x line, breaking changes bump the minor
 version.
 
+## [0.10.0] — 2026-11-16
+
+### Added
+
+- Automatic TOON output for the `dh` MCP server: successful tool payloads
+  whose serialized JSON is at least 256 characters and whose TOON form is
+  strictly shorter are returned as TOON; every other payload (and every error
+  result) stays JSON/plain text. `@toon-format/toon` 4.4.x is a runtime
+  dependency, bundled into `dist/plugin.js` and `dist/mcp/stdio.js`.
+- Native TOON compression and restoration: the plugin's `execute.after` hook
+  compresses eligible completed tool output (default `bash`, overridable with
+  `OPENCODE_TOON_PLUGIN_TOOLS`) and remembers the original JSON in a
+  process-local 100-entry cache; `execute.before` restores JSON inside
+  forwarded quoted strings and heredoc bodies (exact cache match first, strict
+  TOON decode second).
+
+### Changed
+
+- MCP tool text is now JSON **or** TOON; payload semantics, tool names, tool
+  inputs, error messages, and the 12-tool surface are unchanged. JSON remains
+  canonical internally and on disk.
+- The plugin now registers exactly two native `execute` tool hooks
+  (`execute.after`, `execute.before`) alongside the 6 agents and 27 skills. It
+  still registers no tools, commands, or prompts and performs no tool, command,
+  or prompt transforms.
+
 ## [0.9.0] — 2026-11-16
 
 ### Added
@@ -218,7 +244,8 @@ First release of the standalone OpenCode V2 harness.
 - Plan close-outs include the pause/resume, fast-plan, Mermaid, and
   agent-selection plans with evolution/observation notes.
 
-[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/andrescevp/development-harness/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/andrescevp/development-harness/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.8.0
 [0.7.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.7.0

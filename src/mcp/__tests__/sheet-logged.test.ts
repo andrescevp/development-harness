@@ -11,7 +11,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { closeHarness, connectHarness, textOf } from '../../__tests__/helpers/mcp.js';
+import { closeHarness, connectHarness, parseToolText, textOf } from '../../__tests__/helpers/mcp.js';
 import type { LoggedCommandResult } from '../../tools/logged-command.js';
 import type { SheetResult } from '../../tools/sheet-tools.js';
 
@@ -77,7 +77,7 @@ describe('read_sheet', () => {
     const h = await connectHarness();
     const res = await h.callTool('read_sheet', { path: path.join(h.workspaceRoot, 'missing.csv') });
     expect(res.isError).toBeFalsy();
-    const payload = JSON.parse(textOf(res)) as SheetResult;
+    const payload = parseToolText<SheetResult>(textOf(res));
     expect(payload.ok).toBe(false);
     expect(payload.error).toContain('duckdb error:');
     expect(payload.columns).toEqual([]);
@@ -185,7 +185,7 @@ describe('logged_command', () => {
     // Plan suggested `node -e "process.exit(3)"` — that reports exit 0 (same masking).
     const res = await h.callTool('logged_command', { command: 'echo boom && exit 3' });
     expect(res.isError).toBeFalsy();
-    const payload = JSON.parse(textOf(res)) as LoggedCommandResult;
+    const payload = parseToolText<LoggedCommandResult>(textOf(res));
     expect(payload.ok).toBe(false);
     expect(payload.exitCode).toBe(3);
     expect(payload.logPath).toBeTruthy();

@@ -3,7 +3,10 @@
   // NOTE (verified against opencode v2.0.18): `plugins` entries that are
   // `file://` URLs must point to a DIRECTORY, not a plugin.js file — the
   // file form is rejected with "configured plugin path must be a directory".
-  // Bundled surface: 6 agents + 27 skills (the `dh` MCP server adds 12 tools).
+  // Bundled surface: 6 agents + 27 skills + two TOON execute hooks (the `dh`
+  // MCP server adds 12 tools). Set OPENCODE_TOON_PLUGIN_TOOLS (comma-separated
+  // native tool names, default `bash`) to change which tool outputs the plugin
+  // may compress; restoration always targets bash.
   // Delegation is capability-based: skills resolve each role through
   // skills/dh-planning/references/agent-selection.md (discover the runtime
   // agents, prefer project-specific matches, fall back to the bundled
@@ -22,8 +25,10 @@
     //   "../shared/dev-harness-skills"
   ],
   // Project-scope MCP server serving the 12 harness tools (plan lifecycle,
-  // sheets, logged commands). The plugin itself registers agents + skills
-  // only — add this block to the PROJECT's opencode.jsonc. The server starts
+  // sheets, logged commands). The plugin itself registers agents + skills +
+  // two TOON execute hooks only — add this block to the PROJECT's
+  // opencode.jsonc. Successful tool payloads are JSON or TOON (errors stay
+  // plain text). The server starts
   // per project via npx from the git repository; `protocol` pins the native
   // MCP revision (legacy initialize clients are still served).
   "mcp": {

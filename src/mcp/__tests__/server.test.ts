@@ -51,6 +51,19 @@ describe('MCP server tools/list contract', () => {
     }
   });
 
+  it('states the full JSON/TOON payload contract in every tool description', async () => {
+    const { tools } = await harness!.listTools();
+    expect(tools).toHaveLength(HARNESS_TOOLS.length);
+    for (const tool of tools) {
+      const description = tool.description ?? '';
+      expect(description.toLowerCase()).toContain('toon');
+      expect(description.toLowerCase()).toContain('json');
+      // The threshold and object/array conditions are part of the contract.
+      expect(description).toContain('256');
+      expect(description).toContain('object/array');
+    }
+  });
+
   it('anchors plan handlers on the injected workspace root', async () => {
     const created = await harness!.callToolJson<PlanPayload>('plan_create', {
       slug: 'demo',

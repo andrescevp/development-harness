@@ -6,9 +6,10 @@ An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated develop
 
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks, with every sub-task naming its responsible agent (`Delegated to agent`) and strict halt-on-blocker safeguards.
-- **6 agents and 27 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
+- **6 agents and 27 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts, plus two native `execute` hooks for TOON output.
 - **Source-cited research**: `dh-researcher` + `dh-research` answer one external-fact question per pass with primary sources, retrieval dates, and confidence labels; notes live in one workspace registry at [`docs/research/index.md`](docs/research/index.md). An optional bounded pass may precede an execution-blocker report, but it never clears an unresolved blocker.
-- **`dh` MCP server (12 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents and skills only.
+- **`dh` MCP server (12 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents, skills, and the two TOON hooks; the tools come from the MCP server.
+- **Automatic TOON output**: Successful `dh` MCP payloads are JSON, or TOON when the payload is an object/array whose JSON is at least 256 characters and TOON is strictly shorter. The two `execute` hooks compress eligible native `bash` JSON output (default `bash`; override with `OPENCODE_TOON_PLUGIN_TOOLS`) and restore JSON inside forwarded quoted strings and quoted-marker heredocs. JSON remains canonical on disk; errors stay plain text.
 - **Code graph queries**: `dh-setup` installs code-graph-rag (`cgr`) on the embedded SQLite backend and indexes the project; `dh-code-query` answers structural questions — definitions, callers/callees, importers, dead code, duplicates — without scanning every file.
 - **Full QA gate**: Thorough verification suite integrating Biome, Knip, jscpd, dependency-cruiser, OSV-Scanner, Semgrep, Vitest, and TypeScript.
 - **Source-mode loading**: Automatic discovery by OpenCode via root `index.ts` with direct asset loading from the repository.
@@ -99,9 +100,9 @@ Then load via `file:///path/to/development-harness` in your `opencode.json` or
 }
 ```
 
-The plugin installation above loads agents and skills only; the harness tools
-require the project-scope `mcp.servers.dh` entry described in
-[MCP server (`dh`)](#mcp-server-dh). For a git-only checkout, run
+The plugin installation above loads the agents, skills, and the two TOON
+`execute` hooks; the harness tools require the project-scope `mcp.servers.dh`
+entry described in [MCP server (`dh`)](#mcp-server-dh). For a git-only checkout, run
 `npx -y github:andrescevp/development-harness install --project --mcp-only`.
 
 ## Quickstart
@@ -115,8 +116,9 @@ opencode mcp list       # expect: dh connected (server/status only)
 ```
 
 The plugin also registers 27 skills (there is no skills debug subcommand on
-v2.0.18 — see `skills/index.md`) and zero tools; the harness tools come from
-the project-scope MCP server — see [MCP server (`dh`)](#mcp-server-dh).
+v2.0.18 — see `skills/index.md`) and zero tools — only the two native `execute`
+hooks for TOON output; the harness tools come from the project-scope MCP server
+— see [MCP server (`dh`)](#mcp-server-dh).
 
 2. Audit your environment and initialize QA:
 
@@ -177,9 +179,10 @@ Loading modes, the `cli.json` rule, verification and the manual session check:
 
 ### MCP server (`dh`)
 
-The plugin registers **no tools**. The 12 harness tools are served by a local
-stdio MCP server (`@modelcontextprotocol/server` v2), enabled **per project**
-in that project's `opencode.jsonc`:
+The plugin registers **no tools** — only the two TOON `execute` hooks. The 12
+harness tools are served by a local stdio MCP server
+(`@modelcontextprotocol/server` v2), enabled **per project** in that project's
+`opencode.jsonc`:
 
 ```jsonc
 {
@@ -222,6 +225,42 @@ Server key `dh` + tool `plan_read` → **`dh_plan_read`** (MCP host naming
 retired. Consumer permission actions match `dh_*`. Full wiring, verification
 (`opencode mcp list`), prewarm, and troubleshooting:
 [`docs/LOADING.md`](docs/LOADING.md#mcp-server-dh).
+
+### TOON output
+
+Both output surfaces can use TOON — a compact encoding of the JSON data model —
+but only when it pays off. Payload semantics are unchanged: every TOON payload
+decodes to the same value as its JSON form, and JSON remains canonical
+internally and on disk.
+
+- **MCP tools (automatic).** All 12 tools serialize successful payloads through
+  one helper: JSON by default, TOON only when the payload is an object/array,
+  its serialized JSON is at least 256 characters, encoding succeeds, and the
+  TOON text is strictly shorter. Error results stay plain text with
+  `isError: true`. Tool names, inputs, counts, and payload meaning are
+  unchanged.
+- **Native `bash` (plugin hooks).** The plugin registers exactly two tool
+  hooks. `execute.after` replaces eligible completed tool output (default
+  `bash`) under the same 256-character/strictly-shorter rule and remembers the
+  original JSON in a process-local 100-entry least-recently-used cache (the
+  least recently used entry is evicted, and a cache hit or re-store refreshes
+  recency; entries above 256 KiB are emitted but not cached).
+  `execute.before` restores JSON inside forwarded bash single/double-quoted
+  strings and quoted-marker heredoc bodies (`<<'EOF'`, `<<"EOF"`) — exact cache
+  match first, strict decode of a clean TOON object/array payload second — and
+  leaves edited, invalid, or unquoted text untouched. Unquoted heredocs
+  (`<<EOF`) are not rewritten because the shell would expand the body.
+  Commands above 1 MiB are not scanned.
+- **Configuration.** `OPENCODE_TOON_PLUGIN_TOOLS` (comma-separated native tool
+  names) changes the eligible compression set; the default is `bash`.
+  Restoration always targets `bash` only.
+- **Limits.** The cache is memory-only, bounded at 100 entries (256 KiB per
+  entry), and process-local. The MCP server and plugin are separate processes,
+  so MCP TOON forwarded into a bash command restores through the decode
+  fallback, not the exact cache.
+
+Details, eligibility rules, and a decode snippet:
+[`docs/LOADING.md` → TOON output](docs/LOADING.md#toon-output).
 
 ## Monorepo workspaces
 
@@ -271,7 +310,7 @@ Evidence and gaps:
 
 ## Agents & skills
 
-The plugin defines 6 agents and 27 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
+The plugin defines 6 agents and 27 skills using the `@opencode/plugin` SDK, plus exactly two `execute` tool hooks for TOON output. No tool, command, or prompt transforms are registered.
 
 ### Agent selection
 
@@ -369,8 +408,8 @@ agents/          Markdown definitions and system prompts for the 6 bundled agent
 skills/          Instructions, templates, and references for the 27 bundled skills
 src/cli/         Installer CLI (args, scope, JSONC config, manifest, commands)
 src/mcp/         Local stdio MCP server and workspace resolver
-src/tools/       Plan/sheet/logged-command tool implementations
-src/lib/         Shared assets, records, atomic writes, package metadata, main guard
+src/tools/       Plan/sheet/logged-command implementations + TOON execute hooks
+src/lib/         Shared assets, records, atomic writes, package metadata, main guard, TOON codec
 scripts/         Audit, smoke tests (load/MCP/install/pack), Docker runner
 docker/test/     Derived OpenCode test image (pinned 2.0.18)
 test/            Vitest unit and registration tests
