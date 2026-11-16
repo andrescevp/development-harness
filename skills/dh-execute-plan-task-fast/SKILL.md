@@ -88,6 +88,9 @@ worker, not the selector/orchestrator:
 - Return `{ subTask, agent, status, filesChanged, validation, blockers, notes }`
   and stop. The orchestrator owns dual status writes, ledger rows, commits, and
   end gates.
+- **Fail closed:** if invoked by an orchestrator but `parallel-worker` is absent
+  while more than one sub-task is `In Progress`, stop and report — do not write
+  statuses or ledger rows.
 
 Standalone mode (no `parallel-worker`) keeps the workflow below.
 

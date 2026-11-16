@@ -4,7 +4,7 @@ slug: parallel-plan-execution
 description: Explicit phase/sub-task parallel metadata, DAG scheduling, hybrid isolation, and orchestrator-owned status for standard and fast execution.
 created: 2026-11-16
 updated: 2026-11-16
-status: In Progress
+status: Completed
 active: true
 tags: [plan, orchestration, parallelism]
 project: dev-harness-skills
@@ -539,19 +539,38 @@ external references are not required.
 
 ## Execution Record
 
-- **Execution status:** Not executed
-- **Executed at:** [YYYY-MM-DD]
+- **Execution status:** Completed
+- **Executed at:** 2026-11-16
 - **Workspace root:** /home/andres/workspace/dev-harness-skills
 - **Repository kind:** workspace
 - **Repository path:** `.`
-- **Branch / worktree:** [branch]
-- **Commit range:** [base..head]
+- **Branch / worktree:** feature/parallel-plan-execution
+- **Commit range:** d3d785b..fd59475
 - **Plan path:** docs/plans/parallel-plan-execution/plan.md
-- **Mirrored plan path:** none
+- **Mirrored plan path:** docs/plans/parallel-plan-execution/plan_fast.md
 - **Summary:**
-  - [What shipped]
-- **Architectural changes:** [Parallel plan schema, shared scheduler, worker mode, hybrid isolation, orchestrator-owned status]
-- **References:** [review, handoff, evolution note and ADR links]
+  - Added phase/sub-task `Parallelizable`, `Depends on`, `Files/Scope`, and
+    `Isolation` metadata with legacy-safe defaults.
+  - Added a fence-aware parser and a shared DAG scheduler contract used by both
+    orchestrators (max 3 workers, hard cap 8).
+  - Added `parallel-worker` mode to both task skills and orchestrator-owned
+    status/ledger/commit writes.
+  - Added hybrid shared/worktree isolation, multi-active TUI/tools, and
+    pause/resume reconciliation.
+  - Updated planning guidance, tests, docs, changelog, and close-out notes.
+- **Architectural changes:** Parallel plan schema; shared scheduler contract;
+  orchestrator-only state; worker result envelope; hybrid worktree isolation;
+  fence-aware plan parser.
+- **References:** [pre-execution alignment](./tasks/review-fast.md) ·
+  [plan-end alignment](./tasks/review-fast-final.md) ·
+  [final review](./tasks/review.md) ·
+  [code review](./tasks/code-review.md) ·
+  [domain check](./tasks/domain-check.md) ·
+  [preflight](./tasks/preflight.md) ·
+  [artifact check](./tasks/artifact-check.md) ·
+  [final verification](./tasks/final-verification.md) ·
+  [evolution note](../../evolution/2026-11-16-parallel-plan-execution.md) ·
+  [observation note](../../evolution/observations/2026-11-16-1131-parallel-plan-execution.md)
 
 ## Open Questions
 

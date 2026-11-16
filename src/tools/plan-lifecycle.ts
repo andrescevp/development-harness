@@ -6,7 +6,7 @@
  *   - `## Phases` → `### Phase N: <title>` (+ `- **Status:**`)
  *     → `#### Sub-Task N.M: <title>` (+ fields + `- **Status:**`)
  *   - status lines are the first `- **Status:**` bullet in their section;
- *     only blank lines may precede them.
+ *     keep them directly after the header (a later bullet is not authoritative).
  *   - only the `## Phases` region is parsed and fenced examples are ignored
  *     (plan-sections.ts); parallel metadata lives in plan-metadata.ts.
  *

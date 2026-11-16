@@ -10,7 +10,7 @@ metadata:
   workflow: development
 ---
 
-Orchestrate the complete execution of a plan from start to finish. Iterate through all phases and their sub-tasks in order, delegate execution and review, handle interruptions, and produce a final sign-off.
+Orchestrate plan execution with the shared parallel scheduler: validate dependencies, dispatch ready workers up to the limit, fan in reviews, drain on failure, reconcile all active tasks on resume, and produce a final sign-off. Legacy plans without parallel metadata run sequentially.
 
 ## Core Rules
 
@@ -26,9 +26,8 @@ Orchestrate the complete execution of a plan from start to finish. Iterate throu
 - **Orchestrator owns state:** only this orchestrator writes plan statuses, commits, and reviews. Parallel workers return a result envelope and never edit plan files or commit in a shared worktree.
 - Do not re-execute sub-tasks already marked `Completed`; on resume, reconcile **all** `In Progress` tasks, not just the first.
 - Update statuses with `dh_plan_update_status` serially (`target: "phase"|"subtask"`); a phase cannot be `Completed` while any sub-task is open.
-- After each sub-task execution, run the `dh-review` skill before proceeding to the next.
-- If a review produces P0/P1 findings, stop and report — do not continue to the next sub-task (a blocked sub-task blocks its phase).
-- After the final sub-task, run the `dh-final-review` skill for sign-off.
+- **Review fan-in:** run `dh-review` for each completed worker as it finishes; a P0/P1 finding stops new dispatch, drains in-flight work, and leaves the task/phase open. Never review before dispatch or serialize the whole plan to satisfy a per-task review.
+- After all sub-tasks are completed and reviewed, run `dh-final-review` for sign-off.
 - **Execution record (T1/T3):** when the last sub-task completes and before
   `dh-final-review`, write `## Execution Record` in `plan.md` with every field
   (`Execution status: In progress`). After an `Approve` / `Approve with comments`

@@ -50,10 +50,17 @@ Unknown values are format errors, not silent defaults.
 
 ## 3. Readiness
 
+The executable oracle for these rules is
+`src/__tests__/helpers/plan-scheduler.ts` (`phaseReady`, `subTaskReady`, `scopesOverlap`);
+keep it in sync with this section.
+
 A **phase** is ready when:
 
 - its status is `Pending`;
 - every phase in its `Depends on` is `Completed`;
+- it is the next phase in plan order, or `Parallelizable: yes`;
+- no non-parallelizable phase is currently active (sequential phases never
+  overlap another phase);
 - it is not blocked by a failed/blocked sub-task.
 
 A **sub-task** is ready when:
@@ -120,6 +127,14 @@ in a shared worktree.
 
 Shared worktree rules:
 
+- **Scope normalization:** convert `\` to `/`, trim whitespace/backticks, strip
+  trailing `/`; a bare path is a prefix, `**` matches any depth, `*`/`?` match
+  within a segment.
+- **Overlap test:** two entries overlap when one normalized literal is a prefix
+  of the other, or their literal prefixes intersect in a directory segment
+  (`src/tools/**` overlaps `src/tools/plan-*.ts`; `src/tools` does not overlap
+  `src/tools-extra`). Any unparseable entry or `Files/Scope: None` is unknown →
+  serialize. Conservative false positives are preferred over concurrent edits.
 - Workers never commit. The orchestrator serializes commits after a batch (or
   after each task, one at a time).
 - Build/test outputs, caches, ports, and lockfiles are not covered by source
@@ -148,7 +163,7 @@ Worktree rules:
 
 On a blocking failure (worker blocked, validation strikes, P0/P1 review):
 
-1. Stop scheduling new work.
+1. Stop scheduling new work; do not mark any undispatched task `In Progress`.
 2. Let in-flight workers finish or time out.
 3. Record their results; do not mark blocked work `Completed`.
 4. Leave failed/blocked tasks `In Progress` and their phase open.
@@ -196,7 +211,7 @@ loop:
     .filter(no_scope_conflict(running))
     .sort(phase, task, dependencies)
 
-  while ready and len(running) < limit:
+  while not stop_new_dispatch and ready and len(running) < limit:
     task = ready.pop()
     mark(task, phase, "In Progress")   # serialized
     running.add(dispatch_worker(task, task.isolation))

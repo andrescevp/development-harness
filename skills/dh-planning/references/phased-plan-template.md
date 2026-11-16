@@ -12,13 +12,13 @@ Agent choices follow [`agent-selection.md`](agent-selection.md).
 1. Phases live under a `## Phases` heading.
 2. Each phase is `### Phase N: <title>` (N is 1-based, ordered).
 3. The **first** `- **Status:**` bullet in a phase section is the phase
-   status; only blank lines may precede it, and it must appear before any
-   other heading or field bullet (the next `#### Sub-Task` header).
+   status; keep it directly after the header. A later status bullet is not
+   authoritative.
 4. Each sub-task is `#### Sub-Task N.M: <title>` (N = phase number, M =
    1-based sub-task number within the phase).
 5. The **first** `- **Status:**` bullet in a sub-task section is the
-   sub-task status; only blank lines may precede it, and it must appear
-   before any other heading or field bullet.
+   sub-task status; keep it directly after the header. A later status bullet
+   is not authoritative.
 6. Every sub-task carries `- **Delegated to agent:** <agent-id>` after the
    status and before the other fields. It names the single agent responsible
    for executing that sub-task and must match a role/agent recorded in
@@ -259,7 +259,8 @@ or empty values are format errors rather than silent defaults.
 
 - Phase `Pending` → `In Progress` when its first sub-task starts.
 - Phase `Completed` only when ALL its sub-tasks are `Completed`.
-- Resume mode: continue the first `In Progress` phase, then its first
-  `In Progress` / `Pending` sub-task.
+- Resume mode: multiple `In Progress` phases/sub-tasks are valid; collect **all**
+  active tasks, reconcile worktrees/branches, and dispatch from the shared
+  scheduler. Never take only the first active task or close a phase early.
 - Hard blockers halt the loop (see AGENTS.md step 2.4): never mark a phase
   `Completed` around a blocked sub-task.

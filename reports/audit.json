@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-11-16T10:30:54.295Z",
+    "generated": "2026-11-16T10:42:00.551Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 1,
         "sev": "WARN",
-        "note": "599 resolved; 0 code-context; 0 allowlisted; 311 prose tokens (warn)"
+        "note": "599 resolved; 0 code-context; 0 allowlisted; 313 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
@@ -312,6 +312,16 @@
       ]
     },
     {
+      "token": "parallel-worker",
+      "count": 7,
+      "files": [
+        "skills/dh-execute-plan/SKILL.md",
+        "skills/dh-execute-plan-fast/SKILL.md",
+        "skills/dh-execute-plan-task/SKILL.md",
+        "skills/dh-execute-plan-task-fast/SKILL.md"
+      ]
+    },
+    {
       "token": "code-rules-resolution",
       "count": 6,
       "files": [
@@ -320,13 +330,13 @@
       ]
     },
     {
-      "token": "parallel-worker",
+      "token": "in-flight",
       "count": 6,
       "files": [
         "skills/dh-execute-plan/SKILL.md",
         "skills/dh-execute-plan-fast/SKILL.md",
-        "skills/dh-execute-plan-task/SKILL.md",
-        "skills/dh-execute-plan-task-fast/SKILL.md"
+        "skills/dh-pause-plan/SKILL.md",
+        "skills/dh-resume-plan/SKILL.md"
       ]
     },
     {
@@ -376,16 +386,6 @@
         "skills/dh-domain-check/SKILL.md",
         "skills/dh-execute-plan-fast/SKILL.md",
         "skills/dh-review/SKILL.md"
-      ]
-    },
-    {
-      "token": "in-flight",
-      "count": 5,
-      "files": [
-        "skills/dh-execute-plan/SKILL.md",
-        "skills/dh-execute-plan-fast/SKILL.md",
-        "skills/dh-pause-plan/SKILL.md",
-        "skills/dh-resume-plan/SKILL.md"
       ]
     },
     {
@@ -921,6 +921,14 @@
       ]
     },
     {
+      "token": "completed-but-unreviewed",
+      "count": 2,
+      "files": [
+        "skills/dh-execute-plan/SKILL.md",
+        "skills/dh-execute-plan-fast/SKILL.md"
+      ]
+    },
+    {
       "token": "re-running",
       "count": 2,
       "files": [
@@ -945,14 +953,6 @@
     },
     {
       "token": "dual-status",
-      "count": 2,
-      "files": [
-        "skills/dh-execute-plan-fast/SKILL.md",
-        "skills/dh-execute-plan-task-fast/SKILL.md"
-      ]
-    },
-    {
-      "token": "out-of-order",
       "count": 2,
       "files": [
         "skills/dh-execute-plan-fast/SKILL.md",
@@ -1627,6 +1627,13 @@
       ]
     },
     {
+      "token": "fan-in",
+      "count": 1,
+      "files": [
+        "skills/dh-execute-plan/SKILL.md"
+      ]
+    },
+    {
       "token": "re-detect",
       "count": 1,
       "files": [
@@ -1648,14 +1655,14 @@
       ]
     },
     {
-      "token": "completed-but-unreviewed",
+      "token": "not-applicable",
       "count": 1,
       "files": [
-        "skills/dh-execute-plan/SKILL.md"
+        "skills/dh-execute-plan-fast/SKILL.md"
       ]
     },
     {
-      "token": "not-applicable",
+      "token": "task-fast",
       "count": 1,
       "files": [
         "skills/dh-execute-plan-fast/SKILL.md"
@@ -1761,6 +1768,13 @@
     },
     {
       "token": "sanity-checks",
+      "count": 1,
+      "files": [
+        "skills/dh-execute-plan-task-fast/SKILL.md"
+      ]
+    },
+    {
+      "token": "out-of-order",
       "count": 1,
       "files": [
         "skills/dh-execute-plan-task-fast/SKILL.md"
@@ -2877,7 +2891,7 @@
     {
       "file": "skills/dh-execute-plan/SKILL.md",
       "kind": "skill",
-      "lines": 185,
+      "lines": 184,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2895,7 +2909,7 @@
     {
       "file": "skills/dh-execute-plan-fast/SKILL.md",
       "kind": "skill",
-      "lines": 227,
+      "lines": 232,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2931,7 +2945,7 @@
     {
       "file": "skills/dh-execute-plan-task-fast/SKILL.md",
       "kind": "skill",
-      "lines": 243,
+      "lines": 246,
       "frontmatter": {
         "status": "ok",
         "errors": [],
