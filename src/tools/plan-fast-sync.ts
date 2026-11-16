@@ -40,11 +40,27 @@ export type FastSyncResult =
 
 const STATUS_RANK: Record<PhaseStatus, number> = { Pending: 0, 'In Progress': 1, Completed: 2 };
 
+/** Order-insensitive list equality for dependency/scope metadata. */
+function sameList(left: readonly string[], right: readonly string[]): boolean {
+  if (left.length !== right.length) return false;
+  const a = [...left].sort();
+  const b = [...right].sort();
+  return a.every((value, index) => value === b[index]);
+}
+
 function sameStructure(fast: PlanDocument, plan: PlanDocument): boolean {
   if (fast.phases.length !== plan.phases.length) return false;
   return plan.phases.every((planPhase, i) => {
     const fastPhase = fast.phases[i];
-    if (!fastPhase || fastPhase.index !== planPhase.index || fastPhase.title !== planPhase.title) return false;
+    if (
+      !fastPhase ||
+      fastPhase.index !== planPhase.index ||
+      fastPhase.title !== planPhase.title ||
+      fastPhase.parallelizable !== planPhase.parallelizable ||
+      !sameList(fastPhase.dependsOn, planPhase.dependsOn)
+    ) {
+      return false;
+    }
     if (fastPhase.subTasks.length !== planPhase.subTasks.length) return false;
     return planPhase.subTasks.every((planSub, j) => {
       const fastSub = fastPhase.subTasks[j];
@@ -52,7 +68,11 @@ function sameStructure(fast: PlanDocument, plan: PlanDocument): boolean {
         fastSub &&
           fastSub.index === planSub.index &&
           fastSub.title === planSub.title &&
-          fastSub.delegatedTo === planSub.delegatedTo
+          fastSub.delegatedTo === planSub.delegatedTo &&
+          fastSub.parallelizable === planSub.parallelizable &&
+          fastSub.isolation === planSub.isolation &&
+          sameList(fastSub.dependsOn, planSub.dependsOn) &&
+          sameList(fastSub.filesScope, planSub.filesScope)
       );
     });
   });

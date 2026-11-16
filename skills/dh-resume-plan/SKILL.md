@@ -133,13 +133,16 @@ and never continue silently.
 ### Step 3: Reconcile plan against handoff
 
 Recompute the plan position with the same priority as `dh-execute-plan`
-Step 1 (first `In Progress` phase → its first `In Progress`/`Pending`
-sub-task; otherwise the first sub-task of the first `Pending` phase).
+Step 1 (collect all `In Progress` tasks; otherwise the first sub-task of the
+first `Pending` phase).
 
-- Multiple `In Progress` phases or sub-tasks, or null `phase_index`/
-  `subtask_index` with candidates in `## Current Position` → list the
-  candidates and ask which one to continue; never silently take the first by
-  execute-plan priority. Carry the ambiguity into the Step 4 summary.
+- Multiple `In Progress` phases/sub-tasks are valid for parallel plans: build
+  the active-task set from the plan plus `## Active Sub-Tasks`/`active_subtasks`,
+  reconcile worktrees/branches, and hand the whole set to the scheduler. Do not
+  ask "which one" unless the handoff/plan disagree on the set.
+- Null `phase_index`/`subtask_index` with no `## Active Sub-Tasks` and no
+  `In Progress` tasks → use the first pending task; if candidate positions
+  conflict, list them and ask. Carry any ambiguity into the Step 4 summary.
 - Handoff sub-task now `Completed` → the plan advanced: note it and use the
   plan position.
 - Plan statuses moved backwards relative to the handoff → stop and ask.

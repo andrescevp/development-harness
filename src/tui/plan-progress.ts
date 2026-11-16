@@ -7,9 +7,11 @@
  * checklists, review, fast state and issues.
  */
 import { type PlanDocument, parsePlan } from '../tools/plan-lifecycle.js';
+import { planLayout } from '../tools/plan-sections.js';
 import { type ChecklistExtraction, extractChecklists } from './plan-checklists.js';
 import { type PlanIssue, planIssue } from './plan-issue.js';
 import {
+  type ActiveSubTask,
   type CurrentPosition,
   type CurrentPositionSource,
   countStatuses,
@@ -29,13 +31,9 @@ const MAX_SUBTASK_CHECKBOXES = 50;
 function headingLines(contents: string): { phases: Map<number, number>; subTasks: Map<string, number> } {
   const phases = new Map<number, number>();
   const subTasks = new Map<string, number>();
-  const lines = contents.split('\n');
-  for (let index = 0; index < lines.length; index += 1) {
-    const line = (lines[index] ?? '').replace(/\r$/, '');
-    const phase = line.match(/^###\s+Phase\s+(\d+):/);
-    if (phase) phases.set(Number(phase[1]), index + 1);
-    const subTask = line.match(/^####\s+Sub-Task\s+(\d+)\.(\d+):/);
-    if (subTask) subTasks.set(`${subTask[1]}.${subTask[2]}`, index + 1);
+  for (const section of planLayout(contents).sections) {
+    if (section.kind === 'phase') phases.set(section.phase, section.headerLine + 1);
+    else subTasks.set(section.ref, section.headerLine + 1);
   }
   return { phases, subTasks };
 }
@@ -50,12 +48,23 @@ function titleOf(document: PlanDocument, contents: string, slug: string): string
 /** Lifecycle-aligned position (§5.3): first In Progress phase, else next Pending. */
 function deriveCurrent(phases: readonly PhaseProgress[]): {
   current: CurrentPosition;
+  activeSubTasks: ActiveSubTask[];
   warnings: PlanIssue[];
 } {
   const warnings: PlanIssue[] = [];
   const started = phases.find((phase) => phase.status === 'In Progress');
   const next = started === undefined ? phases.find((phase) => phase.status === 'Pending') : undefined;
   const phase = started ?? next ?? null;
+  const activeSubTasks: ActiveSubTask[] = phases.flatMap((entry) =>
+    entry.subTasks
+      .filter((subTask) => subTask.status === 'In Progress')
+      .map((subTask) => ({
+        index: subTask.index,
+        title: subTask.title,
+        delegatedTo: subTask.delegatedTo,
+        phase: { index: entry.index, title: entry.title },
+      }))
+  );
   if (phase === null) {
     const current: CurrentPosition = {
       phase: null,
@@ -65,7 +74,7 @@ function deriveCurrent(phases: readonly PhaseProgress[]): {
       ordinal: null,
       source: 'done',
     };
-    return { current, warnings };
+    return { current, activeSubTasks, warnings };
   }
   if (started === undefined && phase.subTasks.some((subTask) => subTask.status === 'In Progress')) {
     warnings.push(
@@ -78,16 +87,18 @@ function deriveCurrent(phases: readonly PhaseProgress[]): {
     null;
   const source: CurrentPositionSource = started === undefined ? 'next-pending' : 'in-progress';
   const subTaskOrdinal = subTask === null ? null : Number(subTask.index.split('.')[1]);
+  const suffix = activeSubTasks.length > 1 ? ` +${activeSubTasks.length - 1}` : '';
   return {
     current: {
       phase: { index: phase.index, title: phase.title },
       subTask:
         subTask === null ? null : { index: subTask.index, title: subTask.title, delegatedTo: subTask.delegatedTo },
-      label: subTask === null ? `Phase ${phase.index}` : `Phase ${phase.index} · ${subTask.index}`,
+      label: subTask === null ? `Phase ${phase.index}` : `Phase ${phase.index} · ${subTask.index}${suffix}`,
       position: subTask?.index ?? null,
       ordinal: { phase: phase.index, subTask: subTaskOrdinal },
       source,
     },
+    activeSubTasks,
     warnings,
   };
 }
@@ -170,6 +181,7 @@ export function derivePlanProgress(input: {
     counts,
     progress: progressOf(counts.subTasks),
     current: position.current,
+    activeSubTasks: position.activeSubTasks,
     checklists: { plan: extraction.plan, finalVerification: extraction.finalVerification },
     review,
     fast: fast.fast,

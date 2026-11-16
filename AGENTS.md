@@ -1,24 +1,27 @@
 # AGENTS.md — dev-harness V2 plugin (harness runtime contract)
 
 Role summary, provenance, plugin registration, the 5-step skills loop that
-every agent executing plans inside this plugin must follow, the workspace
-contract for monorepos, and the runtime delegation routing.
+every agent executing plans inside this plugin must follow, the parallel
+scheduler contract, the workspace contract for monorepos, and the runtime
+delegation routing.
 
 ## Role summary
 
 The `dev-harness-skills` OpenCode V2 plugin bundles a self-contained dev harness for
-plan-driven development: **5 agents** — `dh-software-architect`,
-`dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-documentor` —
-and **26 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
-`dh-execute-plan-fast`, `dh-execute-plan-task`, `dh-execute-plan-task-fast`,
-`dh-pause-plan`, `dh-resume-plan`, `dh-coding`, `dh-execute-cli`, `dh-explore`,
-`dh-code-query`, `dh-contingency`, `dh-simplify`,
-`dh-review`, `dh-code-review`, `dh-preflight`, `dh-artifact-check`,
-`dh-final-review`, `dh-create-documentation`, `dh-create-worktree`, `dh-mermaid`, `dh-grill-sdd`, `dh-setup`,
-`dh-code-ruler`, `dh-semver`. The plugin registers
-agents and skills only; the harness tools are served by the shipped
-`dev-harness-mcp` MCP server (no tools, commands, or prompts are registered).
-All plan execution inside the plugin runs the skills loop below.
+plan-driven development: **6 agents** — `dh-software-architect`,
+`dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-documentor`,
+`dh-researcher` — and **27 skills** — `dh-planning`, `dh-domain-check`,
+`dh-execute-plan`, `dh-execute-plan-fast`, `dh-execute-plan-task`,
+`dh-execute-plan-task-fast`, `dh-pause-plan`, `dh-resume-plan`, `dh-coding`,
+`dh-execute-cli`, `dh-explore`, `dh-code-query`, `dh-research`,
+`dh-contingency`, `dh-simplify`, `dh-review`, `dh-code-review`, `dh-preflight`,
+`dh-artifact-check`, `dh-final-review`, `dh-create-documentation`,
+`dh-create-worktree`, `dh-mermaid`, `dh-grill-sdd`, `dh-setup`,
+`dh-code-ruler`, `dh-semver`. The plugin registers agents and skills plus
+exactly two native `execute` tool hooks (TOON compression and forwarded-payload
+restoration); it registers no tools, commands, or prompts. The harness tools are
+served by the shipped `dev-harness-mcp` MCP server. All plan execution inside
+the plugin runs the skills loop below.
 
 ## The skills loop (harness runtime contract)
 
@@ -27,7 +30,7 @@ sub-tasks, with status markers at BOTH levels (Pending | In Progress |
 Completed). The loop:
 
 1. `dh-planning` → use `dh-domain-check` while planning and `dh-mermaid` for visual context (creates phased plans)
-2. `dh-execute-plan` (iterates phases in order → their sub-tasks)
+2. `dh-execute-plan` (schedules the ready set from the phase/sub-task dependency graph; legacy plans iterate in order)
    2.1 `dh-execute-plan-task` → use `dh-coding`
    2.2 `dh-simplify`
    2.3 `dh-review` + `dh-code-review`
@@ -39,7 +42,9 @@ Completed). The loop:
 **Fast execution (alternative).** `dh-execute-plan-fast` +
 `dh-execute-plan-task-fast` execute the same phased plan from `plan_fast.md`,
 defer per-task gates to plan end, and record skipped checks in
-`plan_fast_skip_checks.md`. The standard loop above remains the default.
+`plan_fast_skip_checks.md`. Both orchestrators share the parallel scheduler,
+worker envelope, and isolation rules above; the standard loop remains the
+default.
 
 **Close-out documentation.** Step 5's `dh-create-documentation` also creates
 the plan's evolution note (`docs/evolution/<date>-<slug>.md`) and observation
@@ -47,18 +52,42 @@ note (`docs/evolution/observations/<date>-<hhmm>-<slug>.md`), and updates
 `docs/evolution/index.md`. `docs/evolve/` is historical and stays untouched.
 
 **Phase lifecycle:** a phase becomes `In Progress` when its first sub-task
-starts and `Completed` only when ALL its sub-tasks are `Completed`. Resume
-mode continues the first `In Progress` phase → its first `In Progress` /
-`Pending` sub-task.
+starts and `Completed` only when ALL its sub-tasks are `Completed`. Several
+sub-tasks may be `In Progress` at once; resume mode reconciles **all** active
+sub-tasks (not just the first) before dispatching anything.
+
+**Parallel scheduler (shared contract).** Both orchestrators follow
+[`skills/dh-execute-plan/references/parallel-scheduler.md`](skills/dh-execute-plan/references/parallel-scheduler.md).
+Phases and sub-tasks may declare `Parallelizable`, `Depends on`, `Files/Scope`,
+and `Isolation`; each cycle the scheduler computes the ready set and dispatches
+up to **3** workers by default (hard cap **8**) respecting phase gates,
+dependency order, and scope compatibility. Missing fields default to
+`no`/`None`/`None`/`shared`, so legacy plans run sequentially. Declared metadata
+is the only source of independence — the scheduler never infers file scopes.
+
+**Orchestrator-only writes; workers return envelopes.** The orchestrator marks
+`In Progress` before dispatch, runs review fan-in, writes fast-mode ledger rows
+serially, and serializes commits. A worker (`parallel-worker` mode of
+`dh-execute-plan-task`/`-fast`) implements and validates one exact sub-task and
+returns `{ subTask, agent, status, filesChanged, validation, blockers, notes }`
+— it never edits `plan.md`/`plan_fast.md`, the ledger, reviews, or commits.
+
+**Hybrid isolation.** Shared-worktree work needs disjoint declared scopes;
+overlapping scopes serialize or use `Isolation: worktree`. Worktree branches
+integrate in dependency/plan order; a conflict stops integration and preserves
+the worktree (never auto-deleted). A blocking failure stops new dispatch, drains
+in-flight work, and leaves the task and phase open.
 
 **Step 2.4 halts automation.** When `dh-execute-plan-task` (or any loop step)
 hits a hard blocker — repeated validation failures (3 consecutive strikes),
 unresolved P0/P1 review findings, or missing preconditions that cannot be
 worked around — the loop STOPS: report the blocker and ask the user for
-guidance. Never silently continue, never skip the blocked step, and never mark
-sub-tasks Complete around a blocker. The rule applies at phase boundaries too:
-a blocked sub-task blocks its phase — do not mark the phase `Completed` around
-a blocker.
+guidance. When the blocker depends on current external facts and browsing tools
+exist, one bounded `dh-research` pass may precede that report; it never
+authorizes continuing past an unresolved blocker. Never silently continue, never
+skip the blocked step, and never mark sub-tasks Complete around a blocker. The
+rule applies at phase boundaries too: a blocked sub-task blocks its phase — do
+not mark the phase `Completed` around a blocker.
 
 **Pause/resume (cross-cutting).** A plan can pause at any point without
 changing its statuses: `dh-pause-plan` writes `docs/plans/<slug>/handoff.md`
@@ -79,6 +108,22 @@ agents prefer these tools over manual plan.md edits (fall back to manual edits
 only when the server is unavailable). Format contract:
 `skills/dh-planning/references/phased-plan-template.md`. Wiring and
 verification: [`docs/LOADING.md`](docs/LOADING.md#mcp-server-dh).
+
+**TOON output contract.** Successful `dh` payloads are JSON, or TOON when the
+payload is an object/array whose JSON is at least 256 characters and TOON is
+strictly shorter; errors stay plain text with `isError`. The plugin's
+`execute.after` hook compresses eligible native tool JSON (default `bash`;
+override the comma-separated set with `OPENCODE_TOON_PLUGIN_TOOLS`) and
+remembers the original in a process-local 100-entry least-recently-used cache
+(entries above 256 KiB are emitted but not cached); `execute.before` restores
+JSON inside forwarded quoted strings and quoted-marker heredoc bodies
+(`<<'EOF'`, `<<"EOF"`; unquoted heredocs are expanded by the shell and stay
+unchanged) — exact cache match first, strict decode of a clean TOON object/array
+payload second — and leaves edited, invalid, or unquoted text unchanged. The
+MCP server and plugin are separate processes: exact-match restoration applies
+only to output compressed by the plugin, so MCP TOON forwarded into bash uses
+the decode fallback. The cache never persists; JSON remains canonical
+internally and on disk.
 
 ## Workspace contract (monorepo awareness)
 
@@ -105,7 +150,9 @@ verification: [`docs/LOADING.md`](docs/LOADING.md#mcp-server-dh).
   in that package (root covers shared files).
 - **Docs and versions.** Workspace docs live under `W/docs`; package docs under
   `{package}/docs` with `package` frontmatter; evolution/observation notes stay
-  at `W/docs/evolution`. `dh-semver` follows the map's `fixed` (one `vX.Y.Z`)
+  at `W/docs/evolution`; research notes and their registry stay at
+  `W/docs/research` (owned by the documentation agent, one registry per
+  workspace). `dh-semver` follows the map's `fixed` (one `vX.Y.Z`)
   or `independent` (`<package>@X.Y.Z`) policy; `dh-create-worktree` discovers
   lifecycles at `W` and each independent package and aligns submodule branches.
 - **Execution record.** An executed plan fills `## Execution Record` in
@@ -130,8 +177,8 @@ References: [workspace map](skills/dh-setup/references/workspace-map.md) ·
 
 **Capability-based selection.** Skills do not name fixed agents: they state the
 capability they need (architecture/design, implementation, testing/QA, review,
-final review, documentation, domain specialist) and resolve it against the
-environment. The authoritative protocol is
+final review, documentation, domain specialist, research) and resolve it against
+the environment. The authoritative protocol is
 [`skills/dh-planning/references/agent-selection.md`](skills/dh-planning/references/agent-selection.md):
 discover the runtime agent list first, then project config/agent directories,
 then global definitions; rank project-specific agents with domain instructions
@@ -161,25 +208,34 @@ exploration, and code-graph querying are instruction layers, not selectable
 personas: run them with the `dh-execute-cli`, `dh-explore`, and `dh-code-query`
 skills.
 
+**Research is a support capability.** `dh-researcher` answers one external-fact
+question per pass with primary sources, retrieval dates, and confidence labels;
+`dh-planning`, `dh-grill-sdd`, `dh-contingency`, and both execution task skills
+may delegate to it, and the resulting note lives in `docs/research/`. It is not
+a loop step: the optional pass never clears an unresolved blocker.
+
 ## Provenance
 
 - Harness content is **fully repo-authored**: `agents/` and `skills/` are
   owned by this repository — the repo is self-contained and independent
   (no external source, no extraction step).
 - OpenCode-only — no copilot/gemini variants.
-- Exactly **5 agents + 26 skills** are bundled. Commands, prompts, and all
+- Exactly **6 agents + 27 skills** are bundled. Commands, prompts, and all
   other non-bundled harness content are intentionally NOT bundled.
 - The `dh-` names are canonical in the repo files; bundled agents ship
   without the `permission` and `tools` frontmatter keys.
 
 ## Plugin registration and loading
 
-- The V2 plugin (`Plugin.define`) registers the 5 agents and 26 skills via
+- The V2 plugin (`Plugin.define`) registers the 6 agents and 27 skills via
   synchronous domain transforms (`ctx.agent.transform`, `ctx.skill.transform`)
   from frontmatter-parsed assets (repo `agents/` + `skills/` in source mode,
-  `dist/assets/` in the bundle). Zero tool or command transforms (tools live
-  in the MCP server; commands are out of scope). The root `index.ts` is the
-  plugin-directory discovery entry:
+  `dist/assets/` in the bundle), plus exactly two native tool execute hooks:
+  `execute.after` (TOON compression of eligible tool output) and
+  `execute.before` (JSON restoration of forwarded quoted/heredoc payloads). It
+  performs no tool, command, or prompt transforms and registers no tools,
+  commands, or prompts (tools live in the MCP server; commands are out of
+  scope). The root `index.ts` is the plugin-directory discovery entry:
   cloning this repo into `~/.config/opencode/plugins/` (global) or
   `<project>/.opencode/plugins/` loads the plugin from source — no build or
   config entry needed.
@@ -188,10 +244,10 @@ skills.
   `opencode.json(c)` pointing at the repo directory (`pnpm install` only; no
   build needed for source loading), or the installed package name. See
   [`docs/LOADING.md`](docs/LOADING.md).
-- **Verify:** launch opencode and confirm the 5 agents and 26 skills appear
-  (including `dh-coding`) and no commands are registered; then confirm the
-  project-scope `dh` MCP server is connected (`opencode mcp list`) so the
-  harness tools are available.
+- **Verify:** launch opencode and confirm the 6 agents and 27 skills appear
+  (including `dh-coding` and `dh-research`) and no commands are registered; then
+  confirm the project-scope `dh` MCP server is connected (`opencode mcp list`)
+  so the harness tools are available.
 - **TUI part:** `exports["./tui"]` loads automatically beside the server part and
   renders read-only plan progress (sidebar card + `/plan-progress`) from the
   local `docs/plans` — see
@@ -201,15 +257,15 @@ skills.
 
 ```text
 index.ts          source-mode plugin entry (re-exports src/plugin.ts)
-agents/           bundled agent definitions (5)
-skills/           bundled skills (26)
+agents/           bundled agent definitions (6)
+skills/           bundled skills (27)
 src/cli/          installer CLI: args, scope, prompt/output, JSONC, config, manifest, commands
 src/mcp/          stdio MCP server + workspace resolver
 src/tools/        plan/sheet/logged-command tool implementations
 src/lib/          shared assets, records, atomic writes, package metadata, main guard
 scripts/          QA, smoke (load/MCP/install/pack), Docker runner, audit
 docker/test/      derived OpenCode test image (pinned 2.0.18)
-docs/             loading/operations docs and phased plans
+docs/             loading/operations docs, research registry, and phased plans
 test/             legacy test directory
 ```
 

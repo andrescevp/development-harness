@@ -40,6 +40,7 @@ Select with stable role names; reuse the same names in the plan table.
 | Review | scoped correctness/security review of changed code |
 | Final review | plan-wide sign-off against requirements and gates |
 | Documentation | docs, guides, README, API references |
+| Research | web research, source verification, current ecosystem facts |
 | Domain specialist | project or domain expertise the plan explicitly needs |
 
 Select only the roles the plan actually delegates. Unused roles stay out of the

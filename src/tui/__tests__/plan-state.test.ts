@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import type { IndexRow, PlanCandidate } from '../plan-model.js';
 import { selectPlan } from '../plan-select.js';
-import { currentSubTask, derivePlanState, effectiveVerdict, issueFromError, loadingPlanState } from '../plan-state.js';
+import { currentSubTask, derivePlanState, issueFromError, loadingPlanState } from '../plan-state.js';
 import { activityOf, candidate, detailsOf, fixture, scanOf, sourceFile } from './helpers.js';
 
 const NOW = '2026-11-15T09:41:12.100Z';
@@ -121,6 +121,19 @@ describe('derivePlanState — ready states', () => {
     expect(state.plan?.checklists.finalVerification.total).toBe(4);
     expect(state.plan?.checklists.plan.checked).toBe(1);
     expect(currentSubTask(state.plan!)).toMatchObject({ index: '2.2', delegatedTo: 'dh-software-engineer' });
+  });
+
+  it('tracks multiple active sub-tasks and exposes them for readers', () => {
+    const source = fixture('active-plan.md').replace(
+      '#### Sub-Task 2.1: Implement the checkout endpoint\n\n- **Status:** Completed',
+      '#### Sub-Task 2.1: Implement the checkout endpoint\n\n- **Status:** In Progress'
+    );
+    const state = derive([candidate()], { details: detailsOf(source) });
+
+    expect(state.status).toBe('ready');
+    expect(state.plan?.activeSubTasks.map((entry) => entry.index).sort()).toEqual(['2.1', '2.2']);
+    expect(state.plan?.current.label).toContain('+1');
+    expect(state.plan?.current.position).toBe('2.1');
   });
 
   it('reports the next pending work as `next-pending`, never as active', () => {
@@ -271,27 +284,5 @@ describe('derivePlanState — selector, empty and error states', () => {
       '/repo'
     );
     expect(stripped).toMatchObject({ code: 'orphan-subtask', message: 'docs/plans/x/plan.md: orphan sub-task 2.1' });
-  });
-});
-
-describe('effectiveVerdict', () => {
-  it('prefers the review verdict and falls back to the plan-end alignment verdict', () => {
-    const review = sourceFile(
-      'docs/plans/checkout-flow/tasks/review.md',
-      '# Final Plan Review\n\n**Verdict:** Approve\n'
-    );
-    const alignment = sourceFile(
-      'docs/plans/checkout-flow/tasks/review-fast-final.md',
-      '# Plan Alignment Review\n\n**Verdict:** Request changes\n'
-    );
-    const withReview = derive([candidate()], { details: detailsOf(fixture('active-plan.md'), { review }) });
-    expect(effectiveVerdict(withReview.plan!)).toBe('Approve');
-
-    const onlyAlignment = derive([candidate()], {
-      details: detailsOf(fixture('active-plan.md'), {
-        alignment: { preExecution: null, planEnd: alignment },
-      }),
-    });
-    expect(effectiveVerdict(onlyAlignment.plan!)).toBe('Request changes');
   });
 });

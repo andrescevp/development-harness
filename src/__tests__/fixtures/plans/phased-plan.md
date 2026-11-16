@@ -48,6 +48,10 @@ Phases group sub-tasks; status lines sit immediately after headers.
 
 None — no structural change.
 
+## Research
+
+None — no research consulted; link `../../research/<topic>.md` notes when used.
+
 ## Agent Selection
 
 | Role | Selected agent | Why | Fallback |
@@ -60,11 +64,15 @@ None — no structural change.
 ### Phase 1: Foundation
 
 - **Status:** In Progress
+- **Parallelizable:** no
+- **Depends on:** None
 
 #### Sub-Task 1.1: Define the contract
 
 - **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
+- **Parallelizable:** no
+- **Depends on:** None
 - **Objective:** Define the format contract.
 - **Related Requirements:** R1
 - **Dependencies and Preconditions:** None.
@@ -81,6 +89,10 @@ None — no structural change.
 
 - **Status:** In Progress
 - **Delegated to agent:** dh-software-engineer
+- **Parallelizable:** yes
+- **Depends on:** 1.1
+- **Files/Scope:** `src/__tests__/fixtures/plans/**`
+- **Isolation:** shared
 - **Objective:** Provide the parser ground truth.
 - **Related Requirements:** R1, R2
 - **Dependencies and Preconditions:** Sub-Task 1.1.
@@ -96,11 +108,17 @@ None — no structural change.
 ### Phase 2: Execution
 
 - **Status:** Pending
+- **Parallelizable:** yes
+- **Depends on:** 1
 
 #### Sub-Task 2.1: Implement the parser
 
 - **Status:** Pending
 - **Delegated to agent:** dh-software-engineer
+- **Parallelizable:** yes
+- **Depends on:** 1.2
+- **Files/Scope:** src/tools/plan-lifecycle.ts, src/tools/plan-template.ts
+- **Isolation:** worktree
 - **Objective:** Implement parsePlan.
 - **Related Requirements:** R1, R2
 - **Dependencies and Preconditions:** Phase 1.

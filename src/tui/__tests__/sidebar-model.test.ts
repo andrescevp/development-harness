@@ -3,7 +3,7 @@
  * `sidebar.content` view model (§11 card column, §5.4).
  */
 import { describe, expect, it } from 'vitest';
-import { sidebarCard, sidebarWidth } from '../components/sidebar-model.js';
+import { planCardLines, sidebarCard, sidebarWidth } from '../components/sidebar-model.js';
 import { derivePlanState, loadingPlanState } from '../plan-state.js';
 import { activityOf, candidate, detailsOf, fixture, noWorkspaceState, scanOf, sourceFile, stateOf } from './helpers.js';
 
@@ -15,6 +15,21 @@ describe('sidebarWidth', () => {
     expect(sidebarWidth(120)).toBe(38);
     expect(sidebarWidth(40)).toBe(20);
     expect(sidebarWidth(Number.NaN)).toBe(32);
+  });
+});
+
+describe('planCardLines — multi-plan sections', () => {
+  it('renders a compact per-plan block with active-task count', () => {
+    const contents = fixture('active-plan.md').replace(
+      '#### Sub-Task 2.1: Implement the checkout endpoint\n\n- **Status:** Completed',
+      '#### Sub-Task 2.1: Implement the checkout endpoint\n\n- **Status:** In Progress'
+    );
+    const plan = stateOf([candidate()], { details: detailsOf(contents) }).plan!;
+    const lines = planCardLines(plan, 38);
+    expect(lines.join('\n')).toContain('Phase');
+    expect(lines.join('\n')).toContain('Active: 2 tasks');
+    expect(lines.join('\n')).toContain('+1');
+    expect(lines.join('\n')).toContain('Agent:');
   });
 });
 

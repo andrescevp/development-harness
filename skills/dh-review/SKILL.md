@@ -1,7 +1,7 @@
 ---
 name: dh-review
 description: >
-  Verify a plan sub-task against acceptance criteria, scope, done-when; review diff, validation, regression risk; structured verdict to tasks/review.md. Plan Alignment Mode (fast execution) is a separate mode: no sub-task selection, no diff review, no code review — it compares plan.md with plan_fast.md and writes tasks/review-fast.md (pre-execution) or tasks/review-fast-final.md (plan-end). Use after implementation, to review/verify the sub-task, or to check fast-plan alignment.
+  Verify a plan sub-task against acceptance criteria, scope, done-when; review diff, validation, regression risk; structured verdict to tasks/review-<N.M>.md (legacy no-ID calls: tasks/review.md). Plan Alignment Mode (fast execution) is a separate mode: no sub-task selection, no diff review, no code review — it compares plan.md with plan_fast.md and writes tasks/review-fast.md (pre-execution) or tasks/review-fast-final.md (plan-end). Use after implementation, to review/verify the sub-task, or to check fast-plan alignment.
 license: MIT
 compatibility: opencode, copilot, antigravity
 allowed-tools: read, write, bash
@@ -10,17 +10,18 @@ metadata:
   workflow: development
 ---
 
-Verify that a single sub-task implementation meets its plan-defined acceptance criteria, stays within scope, and passes code quality review. Write the findings to `./docs/plans/<plan-slug>/tasks/review.md`; Plan Alignment Mode writes to the caller-specified fast report instead (see below).
+Verify that a single sub-task implementation meets its plan-defined acceptance criteria, stays within scope, and passes code quality review. Standard mode accepts an optional `subTask: "N.M"` input and writes `./docs/plans/<plan-slug>/tasks/review-<N.M>.md` (legacy no-ID calls keep `tasks/review.md`). Plan Alignment Mode writes to the caller-specified fast report instead (see below).
 
 ## Core Rules
 
 - Read the plan to find the active sub-task and its criteria — via `dh_plan_read` (`{ slug }`) when available, else manual read of `./docs/plans/<plan-slug>/plan.md` following the phased marker rules. If the plan does not exist, stop and report that no plan was found. The plan tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
 - This skill is loop step 2.3 (`dh-review` + `dh-code-review`); the full loop 1–5 lives in repo-root AGENTS.md (pointer only, no duplication).
 - Do not review code outside the sub-task scope.
+- **Exact sub-task (parallel-safe):** when the caller supplies `subTask: "N.M"`, review exactly that task (require it to be `In Progress` or `Completed`), scope the diff to its `filesChanged` paths when supplied, and write `tasks/review-<N.M>.md`. Never fall back to "first In Progress" in that mode. Without an ID, keep the legacy single-active behavior.
 - **Workspace diff scope (standard review only):** when `## Workspace Impact` lists affected packages, derive the path list and review `git diff <base>...HEAD -- <paths>` plus `git diff HEAD -- <paths>` / `git status --porcelain -- <paths>` for uncommitted work; label every finding with its package; include declared root/shared files explicitly; report untouched packages as **unaffected** (not reviewed, not "clean"). Standalone plans keep the full diff. Rules and commands: [`references/workspace-diff-scope.md`](references/workspace-diff-scope.md). Plan Alignment Mode never uses this.
 - **Resolve the review agent (standard review only):** read `## Agent Selection` in `plan.md` and use its Review row. If the section or row is absent or stale, run the selection protocol in [`../dh-planning/references/agent-selection.md`](../dh-planning/references/agent-selection.md), record the row, and continue. A selected reviewer that is unavailable and has no capability fallback stops the run — never substitute silently.
 - Delegate code quality checks to the selected review agent — do not duplicate the `dh-code-review` skill.
-- Write all findings to `./docs/plans/<plan-slug>/tasks/review.md`. **Exception:** Plan Alignment Mode writes to the caller-specified path — default `tasks/review-fast.md` (pre-execution) or `tasks/review-fast-final.md` (plan-end).
+- Write all findings to `./docs/plans/<plan-slug>/tasks/review-<N.M>.md` when a `subTask` ID is supplied, else `tasks/review.md` (legacy). **Exception:** Plan Alignment Mode writes to the caller-specified path — default `tasks/review-fast.md` (pre-execution) or `tasks/review-fast-final.md` (plan-end).
 - Use severity levels from the `dh-code-review` skill: P0 (blocking), P1 (high), P2 (medium), P3 (low).
 - If no sub-task is In Progress, review the most recently Completed sub-task and state that assumption.
 - **Graph-assisted impact (standard review only):** when the project graph is indexed, use the `dh-code-query` skill on changed symbols — `callers`/`callees` for untested call paths, `importers` for boundary impact, `implementors`/`overrides` for contract changes, and `tests-reaching` for coverage. Confirm each row in the diff or source; do not raise a finding from graph output alone. Plan Alignment Mode never uses this.
@@ -51,7 +52,8 @@ Read `./docs/plans/<plan-slug>/plan.md` and
 - `plan_fast.md` intentionally omits `## Objective`, `## Requirements Snapshot`,
   `## Scope`, `## Workspace Impact`, `## Assumptions and Constraints`,
   `## Risks and Areas Requiring Care`, `## Core concepts`, `## Visual Context`,
-  `## Agent Selection`, `## Execution Record`, and `## Open Questions`. Compare the `## Phases` region
+  `## Research`, `## Agent Selection`, `## Execution Record`, and
+  `## Open Questions`. Compare the `## Phases` region
   and sub-task fields against `plan.md`, and use `plan.md` for
   requirements/scope checks. Do **not** flag those omitted top-level sections
   as missing.
@@ -117,7 +119,7 @@ Review the implementation against these dimensions, in order:
 ### Step 1: Read plan context
 
 Read the plan (via `dh_plan_read` when available; fallback: manual read of `./docs/plans/<plan-slug>/plan.md`) and extract:
-- The active sub-task: the one marked `In Progress` within the first `In Progress` phase. If none is In Progress, use the most recently Completed sub-task and explicitly state that assumption in the review report.
+- The review target: when `subTask: "N.M"` is supplied, use exactly that sub-task; otherwise use the one marked `In Progress` within the first `In Progress` phase, or the most recently Completed sub-task with that assumption stated.
 - The sub-task's phase (`Phase N`), which the review report may note to support the orchestrator's phase-completion tracking
 - Its acceptance criteria, done-when conditions, and scope boundaries
 - Any testing suggestions or validation commands
@@ -125,7 +127,11 @@ Read the plan (via `dh_plan_read` when available; fallback: manual read of `./do
 ### Step 2: Review diff against criteria
 
 Examine the implementation changes and evaluate against the first four review
-dimensions (acceptance criteria, scope, validation, regression). In a workspace,
+dimensions (acceptance criteria, scope, validation, regression). When the caller
+supplies `filesChanged` paths, scope every diff command to them and ignore other
+workers' uncommitted work (`git diff <base>...HEAD -- <filesChanged>` plus
+`git diff HEAD -- <filesChanged>`); for worktree workers, diff their task
+branch. In a workspace,
 use the scoped diff — `git diff <base>...HEAD -- <affected package paths>` plus
 `git diff HEAD -- <paths>` / `git status --porcelain -- <paths>` for uncommitted
 work — plus the root/shared files the plan declares — never the unqualified full
@@ -147,11 +153,17 @@ Combine your plan-level review (steps 1–2), the `dh-domain-check` architecture
 
 ### Step 6: Write review report
 
-Write findings to `./docs/plans/<plan-slug>/tasks/review.md` using this format:
+Write findings to the per-task report `./docs/plans/<plan-slug>/tasks/review-<N.M>.md`
+when a `subTask` ID was supplied, else `tasks/review.md` (legacy single-active
+call). Never overwrite another task's report: concurrent reviews must land in
+distinct files so the orchestrator can read the exact verdict it dispatched.
+
+Use this format:
 
 ```markdown
 # Sub-Task Review: [Sub-task title]
 
+**Sub-task:** N.M
 **Reviewed against:** Sub-task from plan.md  
 **Packages:** [affected package paths, or `None — standalone`]  
 **Overall risk:** High / Medium / Low  

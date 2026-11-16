@@ -7,12 +7,12 @@ import { defineConfig, type UserConfig } from 'tsdown';
  * - Three ESM entries: `dist/plugin.js` (opencode plugin loader),
  *   `dist/mcp/stdio.js` (npx `dev-harness-mcp` bin), and `dist/cli.js`
  *   (npx `dev-harness` / `dev-harness-skills` installer bin).
- * - `@opencode/plugin`, `yaml`, and `jsonc-parser` are BUNDLED IN so the
- *   built plugin is self-contained: opencode's global-plugin loader cannot
- *   resolve bare imports from the ~/.config/opencode/plugins directory, so
- *   the bundle must not evaluate any bare specifier at load time. The MCP
- *   bundle runs with a real node_modules (npx cache) and keeps its SDK deps
- *   external instead.
+ * - `@opencode/plugin`, `yaml`, `jsonc-parser`, and `@toon-format/toon` are
+ *   BUNDLED IN so the built plugin is self-contained: opencode's global-plugin
+ *   loader cannot resolve bare imports from the ~/.config/opencode/plugins
+ *   directory, so the bundle must not evaluate any bare specifier at load
+ *   time. TOON is also bundled into the MCP artifact so the npx bin needs no
+ *   runtime resolution; the MCP bundle keeps its SDK deps external instead.
  * - `duckdb` (CJS-only native module) stays external and is lazy-required
  *   inside sheet-tools, so it is only evaluated when a sheet tool runs.
  * - Each entry gets its OWN single-entry build: Rolldown rejects
@@ -42,7 +42,7 @@ const base = {
   banner: { js: '#!/usr/bin/env node' },
   deps: {
     neverBundle: ['duckdb'],
-    alwaysBundle: [/^@opencode\/plugin/, 'yaml', 'jsonc-parser'],
+    alwaysBundle: [/^@opencode\/plugin/, 'yaml', 'jsonc-parser', '@toon-format/toon'],
     // Bundling node_modules packages is intentional here; suppress the hint.
     onlyBundle: false,
   },

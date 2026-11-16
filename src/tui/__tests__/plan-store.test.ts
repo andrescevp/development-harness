@@ -75,6 +75,28 @@ afterEach(() => {
 });
 
 describe('createPlanStore — plan refresh', () => {
+  it('derives multi-plan snapshots and toggles collapsed sections', async () => {
+    await withTempDir((root) => {
+      writePlan(root, 'checkout-flow', fixture('active-plan.md'));
+      writePlan(root, 'billing-flow', fixture('active-plan.md'));
+      const scope = harness({ locationDirectory: root });
+      try {
+        expect(
+          scope.store
+            .state()
+            .plans?.map((plan) => plan.slug)
+            .sort()
+        ).toEqual(['billing-flow', 'checkout-flow']);
+        scope.store.toggleCollapsed('billing-flow');
+        expect(scope.store.ui().collapsedSlugs).toContain('billing-flow');
+        scope.store.toggleCollapsed('billing-flow');
+        expect(scope.store.ui().collapsedSlugs).not.toContain('billing-flow');
+      } finally {
+        scope.store.dispose();
+      }
+    });
+  });
+
   it('derives one ready snapshot from the workspace plan tree', async () => {
     await withTempDir((root) => {
       writePlan(root, 'checkout-flow', fixture('active-plan.md'));

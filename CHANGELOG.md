@@ -5,6 +5,137 @@ All notable changes to this project are documented here. The format follows
 Semantic Versioning. During the 0.x line, breaking changes bump the minor
 version.
 
+## [Unreleased]
+
+## [0.12.0] — 2026-11-16
+
+### Added
+
+- **Multi-plan TUI sidebar:** each executing plan renders as a collapsible
+  `sidebar.content` section (`▾`/`▸`), with its own progress bar, active-task
+  count, delegated agent, status, and activity line. An `[open]` action opens
+  the plan file in a read-only plugin page.
+- `validatePlan` (exposed through `dh_plan_read` `issues[]` and enforced by
+  `dh_plan_create`) checks dependency refs/cycles, duplicate refs, worktree
+  scope, and parallel-phase eligibility before dispatch.
+
+### Fixed
+
+- **Scheduler readiness:** sequential phases only dispatch when every earlier
+  sub-task is `Completed`; phases respect plan order, active sequential phases,
+  and per-dispatch scope checks. Legacy plans stay sequential.
+- **Review fan-in:** `dh-review` accepts an exact `subTask` and writes
+  `tasks/review-<N.M>.md`; both orchestrators pass the target and read that
+  report instead of racing on `tasks/review.md`.
+- **Plan creation hardening:** single-line titles/agents/dependencies, quoted
+  YAML, round-trip assertions, brace-aware `Files/Scope` parsing, and a
+  fence-aware fast mirror that ignores `## Phases` examples.
+- **Fast sync** compares `Parallelizable`, `Depends on`, `Files/Scope`, and
+  `Isolation`, so metadata edits are structural drift.
+- **Worktrees and pause/resume:** one-time worktree-set confirmation, integrated
+  dependent bases, and pause/resume record every active sub-task.
+
+## [0.11.0] — 2026-11-16
+
+### Added
+
+- **Parallel plan execution:** phases and sub-tasks may declare
+  `Parallelizable` (`yes|no`) and `Depends on` (ids or `None`); sub-tasks also
+  declare `Files/Scope` and `Isolation` (`shared|worktree`). Absent fields
+  default to `no`/`None`/`None`/`shared`, so legacy plans keep their sequential
+  behavior.
+- Shared scheduler contract
+  [`skills/dh-execute-plan/references/parallel-scheduler.md`](skills/dh-execute-plan/references/parallel-scheduler.md),
+  linked by both orchestrators: dependency/cycle validation, ready-set
+  computation, default **3** concurrent workers (hard cap **8**), multiple
+  `In Progress` sub-tasks, review fan-in, failure drain, phase closure only when
+  every sub-task is `Completed`, and resumable multi-active state.
+- Parallel worker mode in `dh-execute-plan-task` and
+  `dh-execute-plan-task-fast`: `parallel-worker` implements and validates one
+  exact sub-task and returns
+  `{ subTask, agent, status, filesChanged, validation, blockers, notes }`
+  without writing plans, ledger rows, reviews, or commits.
+- Hybrid isolation: disjoint declared scopes share the current worktree;
+  overlapping scopes serialize or use `Isolation: worktree`; worktree branches
+  integrate in dependency/plan order, conflicts block with the worktree
+  preserved, and removal stays manual.
+- `dh_plan_read` exposes the parallel metadata and `dh_plan_create` scaffolds it;
+  the TUI renders multiple active sub-tasks (`Phase N · N.M +K`,
+  `Active: N tasks`).
+
+### Changed
+
+- `dh-execute-plan` and `dh-execute-plan-fast` dispatch from the shared ready
+  set instead of a fixed sub-task order; orchestrator-only status, ledger, and
+  commit writes are unchanged.
+- `dh-planning` teaches and validates parallel decomposition (safe defaults,
+  dependency references, disjoint scopes, worktree isolation) in the plan
+  template and scaffold.
+- Bundle inventory is unchanged: 6 agents, 27 skills, 12 MCP tools, and the two
+  native `execute` hooks.
+
+## [0.10.0] — 2026-11-16
+
+### Added
+
+- Automatic TOON output for the `dh` MCP server: successful tool payloads
+  whose serialized JSON is at least 256 characters and whose TOON form is
+  strictly shorter are returned as TOON; every other payload (and every error
+  result) stays JSON/plain text. `@toon-format/toon` 4.4.x is a runtime
+  dependency, bundled into `dist/plugin.js` and `dist/mcp/stdio.js`.
+- Native TOON compression and restoration: the plugin's `execute.after` hook
+  compresses eligible completed tool output (default `bash`, overridable with
+  `OPENCODE_TOON_PLUGIN_TOOLS`) and remembers the original JSON in a
+  process-local 100-entry cache; `execute.before` restores JSON inside
+  forwarded quoted strings and quoted-marker heredoc bodies (exact cache match first, strict
+  TOON decode second).
+
+### Changed
+
+- MCP tool text is now JSON **or** TOON; payload semantics, tool names, tool
+  inputs, error messages, and the 12-tool surface are unchanged. JSON remains
+  canonical internally and on disk.
+- The plugin now registers exactly two native `execute` tool hooks
+  (`execute.after`, `execute.before`) alongside the 6 agents and 27 skills. It
+  still registers no tools, commands, or prompts and performs no tool, command,
+  or prompt transforms.
+
+## [0.9.0] — 2026-11-16
+
+### Added
+
+- `dh-researcher`, the sixth bundled agent: answers one external-fact question
+  per pass with primary sources, retrieval dates, and explicit confidence
+  labels (`verified` / `partially verified` / `model knowledge`). It composes
+  evidence and never edits code, runs project commands, or writes files.
+- `dh-research`, the twenty-seventh bundled skill: the bounded research
+  workflow, note template, note/registry contract, and the handoff that keeps
+  persistence with the documentation agent. A plan-local research folder is
+  rejected and redirected to the workspace registry.
+- One workspace research registry: notes at `docs/research/<topic>.md` plus
+  `docs/research/index.md` (newest first, one row per note), owned by
+  `dh-documentor` via `dh-create-documentation`.
+- Optional `## Research` plan section (outside `## Phases`) linking registry
+  notes with `../../research/<topic>.md`; the fast mirror omits it on purpose.
+- Optional execution unblock: `dh-execute-plan-task` and
+  `dh-execute-plan-task-fast` may run one bounded, cited research pass before
+  reporting a blocker that depends on current external facts, gated on
+  browsing-tool availability. The hard-blocker halt is unchanged — research
+  never authorizes continuing past an unresolved blocker.
+
+### Changed
+
+- Bundle inventory is now **6 agents + 27 skills** (33 unique names); tests,
+  audit loop membership, CLI/package smoke expectations, and project docs
+  reflect it.
+- `dh-planning`, `dh-grill-sdd`, and `dh-contingency` delegate external-fact
+  questions to `dh-research` and cite the resulting note; contingency rates
+  alternatives only on verified facts, labelling missing evidence as an
+  assumption instead of model recollection.
+
+No new dependencies, tool/command/prompt registrations, or changes to the
+hard-blocker policy.
+
 ## [0.8.0] — 2026-11-15
 
 ### Added
@@ -182,7 +313,11 @@ First release of the standalone OpenCode V2 harness.
 - Plan close-outs include the pause/resume, fast-plan, Mermaid, and
   agent-selection plans with evolution/observation notes.
 
-[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/andrescevp/development-harness/compare/v0.11.0...v0.12.0
+[0.11.0]: https://github.com/andrescevp/development-harness/compare/v0.10.0...v0.11.0
+[0.10.0]: https://github.com/andrescevp/development-harness/compare/v0.9.0...v0.10.0
+[0.9.0]: https://github.com/andrescevp/development-harness/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.8.0
 [0.7.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.7.0
 [0.6.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.6.0

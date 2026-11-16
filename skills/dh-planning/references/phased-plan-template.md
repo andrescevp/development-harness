@@ -12,29 +12,46 @@ Agent choices follow [`agent-selection.md`](agent-selection.md).
 1. Phases live under a `## Phases` heading.
 2. Each phase is `### Phase N: <title>` (N is 1-based, ordered).
 3. The **first** `- **Status:**` bullet in a phase section is the phase
-   status; only blank lines may precede it, and it must appear before any
-   other heading or field bullet (the next `#### Sub-Task` header).
+   status; keep it directly after the header. A later status bullet is not
+   authoritative.
 4. Each sub-task is `#### Sub-Task N.M: <title>` (N = phase number, M =
    1-based sub-task number within the phase).
 5. The **first** `- **Status:**` bullet in a sub-task section is the
-   sub-task status; only blank lines may precede it, and it must appear
-   before any other heading or field bullet.
+   sub-task status; keep it directly after the header. A later status bullet
+   is not authoritative.
 6. Every sub-task carries `- **Delegated to agent:** <agent-id>` after the
    status and before the other fields. It names the single agent responsible
    for executing that sub-task and must match a role/agent recorded in
    `## Agent Selection`.
-7. Valid statuses: `Pending`, `In Progress`, `Completed`.
-8. A sub-task's phase is derived from its `N` prefix (Sub-Task 2.1 belongs to
+7. Parallel metadata is optional and additive (legacy plans without it stay
+   sequential). It renders after `Status` on phases and after
+   `Delegated to agent` on sub-tasks:
+   - phase: `- **Parallelizable:** yes|no`, `- **Depends on:** <phase ids | None>`
+   - sub-task: `- **Parallelizable:** yes|no`, `- **Depends on:** <N.M ids | None>`,
+     `- **Files/Scope:** <paths/globs | None>`, `- **Isolation:** shared|worktree`
+   - defaults when absent: `no`, `None` (empty list), `None` (empty list),
+     `shared`.
+   - `Depends on` and `Files/Scope` are comma-separated; `None` means no
+     entries; optional backticks around `Files/Scope` entries are decorative
+     and are stripped by the parser. Unknown or empty values are format errors.
+8. Valid statuses: `Pending`, `In Progress`, `Completed`.
+9. A sub-task's phase is derived from its `N` prefix (Sub-Task 2.1 belongs to
    Phase 2), so mis-numbered sub-tasks are format errors.
-9. The Requirements Snapshot with stable IDs (R1, R2, …) is preserved; each
-   sub-task maps to requirements via its `Related Requirements` field.
-10. The phases region runs from `## Phases` to the next top-level `##`
-    heading (e.g. `## Final Integration & Verification`) or EOF.
-11. `## Agent Selection` sits before `## Phases`; it is outside the phases
+10. The Requirements Snapshot with stable IDs (R1, R2, …) is preserved; each
+    sub-task maps to requirements via its `Related Requirements` field.
+11. The phases region runs from `## Phases` to the next top-level `##`
+    heading (e.g. `## Final Integration & Verification`) or EOF. Only this
+    region is parsed (headings outside it are ignored), and fenced code
+    blocks (triple-backtick or `~~~`) are skipped everywhere, so format
+    examples never become phantom phases, sub-tasks, or status markers.
+12. `## Agent Selection` sits before `## Phases`; it is outside the phases
     region, so the parser ignores it for phase/sub-task extraction.
-12. `## Workspace Impact` (after `## Scope`) and `## Execution Record` (after
+13. `## Workspace Impact` (after `## Scope`), `## Research` (after
+    `## Visual Context`) and `## Execution Record` (after
     `## Final Integration & Verification`) are optional top-level sections
     outside the phases region; legacy plans without them parse unchanged.
+14. `## Research` links research notes and carries no status markers, so the
+    parser ignores it; never move it or a research link inside `## Phases`.
 
 ## Template
 
@@ -94,6 +111,13 @@ None — no structural change.
 
 > `dh-mermaid` replaces this line with links under `./diagrams/` when the plan has visual impact.
 
+## Research
+
+Optional `dh-research` notes that back this plan (single registry:
+`docs/research/`); write `None — no research consulted` when none apply.
+
+- [Node 20 EOL](../../research/node-eol.md) — verified 2026-11-15; drives R4.
+
 ## Agent Selection
 
 | Role | Selected agent | Why | Fallback |
@@ -107,11 +131,17 @@ None — no structural change.
 ### Phase 1: <Phase title>
 
 - **Status:** Pending
+- **Parallelizable:** no
+- **Depends on:** None
 
 #### Sub-Task 1.1: <Clear title>
 
 - **Status:** Pending
 - **Delegated to agent:** <agent-id from Agent Selection>
+- **Parallelizable:** no
+- **Depends on:** None
+- **Files/Scope:** None
+- **Isolation:** shared
 - **Objective:** [What this sub-task should accomplish]
 - **Related Requirements:** [Requirement IDs]
 - **Dependencies and Preconditions:** [Prerequisites]
@@ -128,16 +158,26 @@ None — no structural change.
 
 - **Status:** Pending
 - **Delegated to agent:** <agent-id from Agent Selection>
+- **Parallelizable:** no
+- **Depends on:** None
+- **Files/Scope:** None
+- **Isolation:** shared
 - **Objective:** ...
 
 ### Phase 2: <Phase title>
 
 - **Status:** Pending
+- **Parallelizable:** no
+- **Depends on:** 1
 
 #### Sub-Task 2.1: <Clear title>
 
 - **Status:** Pending
 - **Delegated to agent:** <agent-id from Agent Selection>
+- **Parallelizable:** no
+- **Depends on:** None
+- **Files/Scope:** None
+- **Isolation:** shared
 - **Objective:** ...
 
 ## Final Integration & Verification
@@ -166,12 +206,16 @@ None — no structural change.
 - [Only if important non-blocking uncertainty remains]
 ```
 
-## Workspace Impact and Execution Record sections
+## Optional top-level sections
 
 - `## Workspace Impact` goes after `## Scope` and before
   `## Assumptions and Constraints`; `## Execution Record` goes after
   `## Final Integration & Verification` and before `## Open Questions`. Both
   are top-level sections **outside** `## Phases`, so the parser ignores them.
+- `## Research` goes after `## Visual Context` and before `## Agent Selection`.
+  It is optional, holds relative links to `docs/research/` notes, and carries
+  no status markers; the fast mirror omits it on purpose, so links live in
+  `plan.md` only.
 - `## Workspace Impact` is optional: a standalone repository writes
   `None — standalone repository` for the root and affected packages. When
   `WORKSPACE.md` exists at the workspace root, `dh-planning` fills the section
@@ -193,11 +237,30 @@ Every new sub-task must name its responsible agent:
 - Execution uses the field as the single responsible agent. A missing,
   malformed, or unavailable agent is a hard stop — do not substitute silently.
 
+## Parallel metadata fields
+
+Optional on every phase/sub-task; absent fields keep legacy sequential
+behavior (`no`, `None`, `None`, `shared`).
+
+- `Parallelizable` — `yes` only when the phase/sub-task may run concurrently
+  with other ready work; `no` keeps sequential order.
+- `Depends on` — refs that must be `Completed` first: phase ids (`1, 2`) on
+  phases, sub-task ids (`1.3`) on sub-tasks; `None` when nothing is required.
+- `Files/Scope` — declared paths/globs the sub-task may touch (comma-separated,
+  backticks optional); `None` means no declared scope, so consumers must treat
+  it as unknown.
+- `Isolation` — `shared` for the current worktree; `worktree` for a dedicated
+  git worktree/branch.
+
+`yes|no`, `shared|worktree`, and `None` are matched case-insensitively; unknown
+or empty values are format errors rather than silent defaults.
+
 ## Phase lifecycle (execution contract)
 
 - Phase `Pending` → `In Progress` when its first sub-task starts.
 - Phase `Completed` only when ALL its sub-tasks are `Completed`.
-- Resume mode: continue the first `In Progress` phase, then its first
-  `In Progress` / `Pending` sub-task.
+- Resume mode: multiple `In Progress` phases/sub-tasks are valid; collect **all**
+  active tasks, reconcile worktrees/branches, and dispatch from the shared
+  scheduler. Never take only the first active task or close a phase early.
 - Hard blockers halt the loop (see AGENTS.md step 2.4): never mark a phase
   `Completed` around a blocked sub-task.

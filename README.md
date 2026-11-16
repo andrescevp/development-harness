@@ -1,13 +1,16 @@
 # dev-harness-skills
 
-An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 5 agents and 26 skills.
+An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 6 agents and 27 skills.
 
 ## Features
 
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks, with every sub-task naming its responsible agent (`Delegated to agent`) and strict halt-on-blocker safeguards.
-- **5 agents and 26 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
-- **`dh` MCP server (12 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents and skills only.
+- **Parallel plan execution**: Opt-in `Parallelizable`, `Depends on`, `Files/Scope`, and `Isolation` metadata let a shared scheduler run ready work concurrently — 3 workers by default, hard cap 8 — with orchestrator-only status writes and hybrid shared/worktree isolation. Legacy plans stay sequential.
+- **6 agents and 27 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts, plus two native `execute` hooks for TOON output.
+- **Source-cited research**: `dh-researcher` + `dh-research` answer one external-fact question per pass with primary sources, retrieval dates, and confidence labels; notes live in one workspace registry at [`docs/research/index.md`](docs/research/index.md). An optional bounded pass may precede an execution-blocker report, but it never clears an unresolved blocker.
+- **`dh` MCP server (12 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents, skills, and the two TOON hooks; the tools come from the MCP server.
+- **Automatic TOON output**: Successful `dh` MCP payloads are JSON, or TOON when the payload is an object/array whose JSON is at least 256 characters and TOON is strictly shorter. The two `execute` hooks compress eligible native `bash` JSON output (default `bash`; override with `OPENCODE_TOON_PLUGIN_TOOLS`) and restore JSON inside forwarded quoted strings and quoted-marker heredocs. JSON remains canonical on disk; errors stay plain text.
 - **Code graph queries**: `dh-setup` installs code-graph-rag (`cgr`) on the embedded SQLite backend and indexes the project; `dh-code-query` answers structural questions — definitions, callers/callees, importers, dead code, duplicates — without scanning every file.
 - **Full QA gate**: Thorough verification suite integrating Biome, Knip, jscpd, dependency-cruiser, OSV-Scanner, Semgrep, Vitest, and TypeScript.
 - **Source-mode loading**: Automatic discovery by OpenCode via root `index.ts` with direct asset loading from the repository.
@@ -98,9 +101,9 @@ Then load via `file:///path/to/development-harness` in your `opencode.json` or
 }
 ```
 
-The plugin installation above loads agents and skills only; the harness tools
-require the project-scope `mcp.servers.dh` entry described in
-[MCP server (`dh`)](#mcp-server-dh). For a git-only checkout, run
+The plugin installation above loads the agents, skills, and the two TOON
+`execute` hooks; the harness tools require the project-scope `mcp.servers.dh`
+entry described in [MCP server (`dh`)](#mcp-server-dh). For a git-only checkout, run
 `npx -y github:andrescevp/development-harness install --project --mcp-only`.
 
 ## Quickstart
@@ -108,14 +111,15 @@ require the project-scope `mcp.servers.dh` entry described in
 1. Check that the plugin loaded successfully:
 
 ```sh
-opencode debug agents   # 5 dh-* agents (when the build surfaces plugin agents)
+opencode debug agents   # 6 dh-* agents (when the build surfaces plugin agents)
 opencode debug config   # plugin entry, and mcp.servers.dh once wired
 opencode mcp list       # expect: dh connected (server/status only)
 ```
 
-The plugin also registers 26 skills (there is no skills debug subcommand on
-v2.0.18 — see `skills/index.md`) and zero tools; the harness tools come from
-the project-scope MCP server — see [MCP server (`dh`)](#mcp-server-dh).
+The plugin also registers 27 skills (there is no skills debug subcommand on
+v2.0.18 — see `skills/index.md`) and zero tools — only the two native `execute`
+hooks for TOON output; the harness tools come from the project-scope MCP server
+— see [MCP server (`dh`)](#mcp-server-dh).
 
 2. Audit your environment and initialize QA:
 
@@ -134,7 +138,7 @@ Run `dh-grill-sdd` to generate requirements (`sdd.md`), create a phased plan usi
 Plan execution inside the plugin runs the 5-step skills loop:
 
 1. `dh-planning` — Prepares phased plans, validating architectural constraints with `dh-domain-check`.
-2. `dh-execute-plan` — Iterates through phases in sequential order and executes their sub-tasks:
+2. `dh-execute-plan` — Schedules the ready phases/sub-tasks from the dependency graph (default 3 workers, hard cap 8; legacy plans run in order):
    - 2.1 `dh-execute-plan-task` — Implements the sub-task code using `dh-coding`.
    - 2.2 `dh-simplify` — Refactors and simplifies changed code for clarity and reuse.
    - 2.3 `dh-review` + `dh-code-review` — Verifies acceptance criteria and code correctness.
@@ -149,6 +153,59 @@ Plans are stored under `docs/plans/<slug>/plan.md` using a phased structure. Eve
 
 **Pause/resume (cross-cutting).** A plan can pause at any point without changing its statuses: `dh-pause-plan` writes `docs/plans/<slug>/handoff.md` with the active phase/sub-task, git/worktree state, decisions, blockers, validation, and next steps. `dh-resume-plan` validates the handoff, detects drift, rehydrates context, marks it `resumed`, and re-enters step 2. `dh-execute-plan` redirects when a paused handoff exists. The handoff is a sidecar, not a fourth status.
 
+### Parallel plan execution
+
+Plans can declare safe concurrency instead of relying on a fixed order. Phases
+and sub-tasks may carry these optional fields:
+
+```markdown
+### Phase 2: Backend and frontend
+
+- **Status:** Pending
+- **Parallelizable:** yes
+- **Depends on:** 1
+
+#### Sub-Task 2.1: API endpoint
+
+- **Status:** Pending
+- **Delegated to agent:** dh-software-engineer
+- **Parallelizable:** yes
+- **Depends on:** 1.3
+- **Files/Scope:** services/api/**, tests/api/**
+- **Isolation:** shared
+```
+
+| Field | Level | Values | Default |
+|---|---|---|---|
+| `Parallelizable` | phase, sub-task | `yes` \| `no` | `no` |
+| `Depends on` | phase | phase numbers, comma-separated, or `None` | `None` |
+| `Depends on` | sub-task | `N.M` ids, comma-separated, or `None` | `None` |
+| `Files/Scope` | sub-task | comma-separated paths/globs, or `None` | `None` |
+| `Isolation` | sub-task | `shared` \| `worktree` | `shared` |
+
+- **Shared scheduler.** One contract —
+  [`skills/dh-execute-plan/references/parallel-scheduler.md`](skills/dh-execute-plan/references/parallel-scheduler.md)
+  — drives both `dh-execute-plan` and `dh-execute-plan-fast`. Each cycle it
+  computes the ready set from phase/sub-task dependencies and declared scopes,
+  dispatches up to **3 workers** by default (hard cap **8**), and allows several
+  sub-tasks to be `In Progress` at once. A phase closes only when all of its
+  sub-tasks are `Completed`.
+- **Orchestrator owns state.** Only the orchestrator marks statuses, writes
+  fast-mode ledger rows (serially), reviews, and commits. Workers run
+  `dh-execute-plan-task`/`-fast` in `parallel-worker` mode, implement and
+  validate exactly one sub-task, and return
+  `{ subTask, agent, status, filesChanged, validation, blockers, notes }`.
+- **Hybrid isolation.** Tasks with disjoint declared scopes share the current
+  worktree; overlapping scopes serialize unless the sub-task declares
+  `Isolation: worktree`. Worktree branches integrate in dependency/plan order;
+  a conflict stops integration and preserves the worktree for inspection.
+- **Legacy plans stay sequential.** Absent fields default to
+  `Parallelizable: no` / `Depends on: None` / `Files/Scope: None` /
+  `Isolation: shared`, so existing plans execute exactly as before.
+
+Operational details — readiness, worker mode, worktrees, review fan-in, resume,
+and limits: [`docs/LOADING.md` → Parallel plan execution](docs/LOADING.md#parallel-plan-execution).
+
 ### TUI plan progress
 
 The package also ships a **TUI part** (`exports["./tui"]`) that loads
@@ -156,10 +213,12 @@ automatically beside the server part — no second entry — so plan execution c
 be followed without leaving OpenCode. It is read-only and reads the **local**
 workspace only.
 
-- **Sidebar card** (`sidebar.content`): active plan, `Phase N · N.M` position,
-  completed/total sub-tasks with a text progress bar, the current sub-task's
-  delegated agent, plan status and a one-line activity (`Running edit`,
-  `2 active plans — choose one`).
+- **Sidebar card** (`sidebar.content`): one collapsible section per executing
+  plan (`▾`/`▸` toggles), each with the `Phase N · N.M` position (`+K` and
+  `Active: N tasks` while several sub-tasks run in parallel), completed/total
+  sub-tasks with a text progress bar, the current sub-task's delegated agent,
+  plan status, a one-line activity, and an `[open]` action that opens the plan
+  file in a read-only page.
 - **`/plan-progress` panel** (palette entry "Plan progress"): every phase and
   sub-task with status and delegated agent, checklists, review verdict,
   fast-mode skipped-check ledger and last update. `↑`/`↓` and `PgUp`/`PgDn`
@@ -176,9 +235,10 @@ Loading modes, the `cli.json` rule, verification and the manual session check:
 
 ### MCP server (`dh`)
 
-The plugin registers **no tools**. The 12 harness tools are served by a local
-stdio MCP server (`@modelcontextprotocol/server` v2), enabled **per project**
-in that project's `opencode.jsonc`:
+The plugin registers **no tools** — only the two TOON `execute` hooks. The 12
+harness tools are served by a local stdio MCP server
+(`@modelcontextprotocol/server` v2), enabled **per project** in that project's
+`opencode.jsonc`:
 
 ```jsonc
 {
@@ -200,7 +260,7 @@ in that project's `opencode.jsonc`:
 
 | Tool | Purpose |
 |---|---|
-| `dh_plan_read` | Parse a phased plan (`docs/plans/<slug>/plan.md`) into structured JSON |
+| `dh_plan_read` | Parse a phased plan (`docs/plans/<slug>/plan.md`) into structured JSON plus scheduling `issues[]` |
 | `dh_plan_update_status` | Edit phase/sub-task status markers (phase completion is gated) |
 | `dh_plan_create` | Scaffold a phased plan; optionally append the `index.md` row |
 | `dh_plan_fast_create` | Create `plan_fast.md` from `plan.md` and seed the skipped-check ledger |
@@ -221,6 +281,42 @@ Server key `dh` + tool `plan_read` → **`dh_plan_read`** (MCP host naming
 retired. Consumer permission actions match `dh_*`. Full wiring, verification
 (`opencode mcp list`), prewarm, and troubleshooting:
 [`docs/LOADING.md`](docs/LOADING.md#mcp-server-dh).
+
+### TOON output
+
+Both output surfaces can use TOON — a compact encoding of the JSON data model —
+but only when it pays off. Payload semantics are unchanged: every TOON payload
+decodes to the same value as its JSON form, and JSON remains canonical
+internally and on disk.
+
+- **MCP tools (automatic).** All 12 tools serialize successful payloads through
+  one helper: JSON by default, TOON only when the payload is an object/array,
+  its serialized JSON is at least 256 characters, encoding succeeds, and the
+  TOON text is strictly shorter. Error results stay plain text with
+  `isError: true`. Tool names, inputs, counts, and payload meaning are
+  unchanged.
+- **Native `bash` (plugin hooks).** The plugin registers exactly two tool
+  hooks. `execute.after` replaces eligible completed tool output (default
+  `bash`) under the same 256-character/strictly-shorter rule and remembers the
+  original JSON in a process-local 100-entry least-recently-used cache (the
+  least recently used entry is evicted, and a cache hit or re-store refreshes
+  recency; entries above 256 KiB are emitted but not cached).
+  `execute.before` restores JSON inside forwarded bash single/double-quoted
+  strings and quoted-marker heredoc bodies (`<<'EOF'`, `<<"EOF"`) — exact cache
+  match first, strict decode of a clean TOON object/array payload second — and
+  leaves edited, invalid, or unquoted text untouched. Unquoted heredocs
+  (`<<EOF`) are not rewritten because the shell would expand the body.
+  Commands above 1 MiB are not scanned.
+- **Configuration.** `OPENCODE_TOON_PLUGIN_TOOLS` (comma-separated native tool
+  names) changes the eligible compression set; the default is `bash`.
+  Restoration always targets `bash` only.
+- **Limits.** The cache is memory-only, bounded at 100 entries (256 KiB per
+  entry), and process-local. The MCP server and plugin are separate processes,
+  so MCP TOON forwarded into a bash command restores through the decode
+  fallback, not the exact cache.
+
+Details, eligibility rules, and a decode snippet:
+[`docs/LOADING.md` → TOON output](docs/LOADING.md#toon-output).
 
 ## Monorepo workspaces
 
@@ -270,7 +366,7 @@ Evidence and gaps:
 
 ## Agents & skills
 
-The plugin defines 5 agents and 26 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
+The plugin defines 6 agents and 27 skills using the `@opencode/plugin` SDK, plus exactly two `execute` tool hooks for TOON output. No tool, command, or prompt transforms are registered.
 
 ### Agent selection
 
@@ -295,6 +391,7 @@ execution/validation and `dh-explore` for codebase exploration. Full protocol:
 | `dh-reviewer` | Scoped code reviewer evaluating changes against sub-task criteria and code quality. |
 | `dh-final-reviewer` | Final reviewer conducting full diff review and plan-level sign-off. |
 | `dh-documentor` | Documentation agent responsible for creating, updating, and maintaining project documentation. |
+| `dh-researcher` | Source-cited web research support: one external-fact question per pass, primary sources, retrieval dates, and confidence labels; owns no files. |
 
 ### Skills
 
@@ -303,6 +400,7 @@ execution/validation and `dh-explore` for codebase exploration. Full protocol:
 | `dh-planning` | Creates phased plans in `docs/plans/<slug>/plan.md`. |
 | `dh-domain-check` | Validates domain boundaries and SOLID design during planning and execution. |
 | `dh-contingency` | Generates Plan A/B/C architectural alternatives with risk, complexity, and trade-off analysis. |
+| `dh-research` | Support / optional unblock: one bounded, cited web research pass for an external-fact question; notes and registry under `docs/research/`. |
 | `dh-execute-plan` | Orchestrates the end-to-end execution and status tracking of phased plans. |
 | `dh-execute-plan-fast` | Fast alternative: executes from `plan_fast.md`, defers critical gates to plan end, records skipped checks. |
 | `dh-execute-plan-task` | Executes an individual sub-task by delegating to the plan's selected implementation agent. |
@@ -362,16 +460,16 @@ offline `pnpm qa:check:full` gate.
 
 ```text
 index.ts         Root plugin entry point for OpenCode plugin discovery (source mode)
-agents/          Markdown definitions and system prompts for the 5 bundled agents
-skills/          Instructions, templates, and references for the 26 bundled skills
+agents/          Markdown definitions and system prompts for the 6 bundled agents
+skills/          Instructions, templates, and references for the 27 bundled skills
 src/cli/         Installer CLI (args, scope, JSONC config, manifest, commands)
 src/mcp/         Local stdio MCP server and workspace resolver
-src/tools/       Plan/sheet/logged-command tool implementations
-src/lib/         Shared assets, records, atomic writes, package metadata, main guard
+src/tools/       Plan/sheet/logged-command implementations + TOON execute hooks
+src/lib/         Shared assets, records, atomic writes, package metadata, main guard, TOON codec
 scripts/         Audit, smoke tests (load/MCP/install/pack), Docker runner
 docker/test/     Derived OpenCode test image (pinned 2.0.18)
 test/            Vitest unit and registration tests
-docs/            Plugin documentation, loading guides, release runbook, plans
+docs/            Plugin documentation, loading guides, release runbook, research registry, plans
 ```
 
 ## Documentation

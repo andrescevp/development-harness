@@ -133,6 +133,13 @@ status: proposed
 - Preserve user statements verbatim where they define scope or constraints.
 - Do not invent requirements: anything you infer must be marked as an
   assumption and confirmed during planning.
+- **External-fact gaps are researched, not recalled:** current versions,
+  EOL/support windows, API or service status, and ecosystem comparisons may be
+  answered by one `dh-research` pass
+  ([`../dh-research/SKILL.md`](../dh-research/SKILL.md)), cited by note path
+  (`{workspace_root}/docs/research/<topic>.md`) in the SDD. Research is
+  optional — with no browsing tool the gap stays an open question or a labelled
+  assumption, never a model prior stated as fact.
 - Every requirement/acceptance criterion gets a stable ID used by later
   stages (map sub-tasks to these IDs in `dh-planning`).
 

@@ -93,8 +93,8 @@ updated: <YYYY-MM-DD>
   `## Objective`, `## Requirements Snapshot`, `## Scope`,
   `## Workspace Impact`, `## Assumptions and Constraints`,
   `## Risks and Areas Requiring Care`, `## Core concepts`,
-  `## Visual Context`, `## Agent Selection`, `## Execution Record`,
-  `## Open Questions`. Use `plan.md`
+  `## Visual Context`, `## Research`, `## Agent Selection`,
+  `## Execution Record`, `## Open Questions`. Use `plan.md`
   for those checks.
 - Allowed fast sections: `## Fast Execution Policy`, `## Alignment Contract`,
   `## Final Verification`.

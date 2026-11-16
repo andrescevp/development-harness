@@ -3,7 +3,7 @@
  * skills/ mirror the dist/assets layout) and against temp fixtures for error
  * handling. loadHarnessAssets(root) is CWD-independent (root injectable).
  * Expectations are derived from the repo's own surface — it is fully
- * repo-authored, so the corpus IS the contract (5 agents, 26 skills).
+ * repo-authored, so the corpus IS the contract (6 agents, 27 skills).
  */
 
 import fs from 'node:fs';
@@ -59,13 +59,15 @@ describe('resolveAssetsRoot (source vs built layout)', () => {
 describe('loadHarnessAssets on the real repo layout', () => {
   const assets = loadHarnessAssets(REPO_ROOT);
 
-  it('loads the 5 bundled agents', () => {
-    expect(assets.agents).toHaveLength(5);
+  it('loads the 6 bundled agents including dh-researcher', () => {
+    expect(assets.agents).toHaveLength(6);
+    expect(assets.agents.some((a) => a.name === 'dh-researcher')).toBe(true);
   });
 
-  it('loads the 26 bundled skills including dh-coding', () => {
-    expect(assets.skills).toHaveLength(26);
+  it('loads the 27 bundled skills including dh-coding and dh-research', () => {
+    expect(assets.skills).toHaveLength(27);
     expect(assets.skills.some((s) => s.name === 'dh-coding')).toBe(true);
+    expect(assets.skills.some((s) => s.name === 'dh-research')).toBe(true);
   });
 
   it('every registered name matches the name regex, is dh-prefixed, and unique', () => {
@@ -74,7 +76,7 @@ describe('loadHarnessAssets on the real repo layout', () => {
       expect(n, n).toMatch(NAME_REGEX);
       expect(n, n).toMatch(/^dh-/);
     }
-    expect(new Set(names).size).toBe(31); // corpus: 5 agents, 26 skills, no duplicates
+    expect(new Set(names).size).toBe(33); // corpus: 6 agents, 27 skills, no duplicates
   });
 
   it('captures the index and reports zero errors on the clean corpus', () => {

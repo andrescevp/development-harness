@@ -71,6 +71,9 @@ implements work, edits code, or replaces `dh-review` / `dh-final-review`.
 
 ### Step 1: Read the plan and locate the position
 
+Before snapshotting, stop new dispatch and drain in-flight workers (finish or
+time out), preserving worktrees/branches; pause records the drained state.
+
 Use `dh_plan_read` (`{ slug }` → structured JSON: meta, phases, subTasks).
 Fallback when the tool is unavailable: read `plan.md` manually with the phased
 markers (`## Phases` → `### Phase N:` → `#### Sub-Task N.M:` and the first
@@ -79,19 +82,19 @@ markers (`## Phases` → `### Phase N:` → `#### Sub-Task N.M:` and the first
 
 Compute:
 
-- phase and sub-task counts (total and `Completed`); `progress` is the
-  sub-task ratio `"completed/total"`.
-- current position with the same priority as `dh-execute-plan` Step 1:
-  1. first `In Progress` phase → its first `In Progress` or `Pending` sub-task;
-  2. otherwise the first sub-task of the first `Pending` phase;
-  3. otherwise (all sub-tasks `Completed`) no pause is needed — suggest
-     `dh-final-review`.
-- the next sub-task in order and the active sub-task's remaining work.
+- phase/sub-task counts (`progress` = sub-task `"completed/total"`).
+- **every** `In Progress` sub-task across all phases → `active_subtasks` and
+  `## Active Sub-Tasks` (index, phase, isolation, worktree/branch, validation,
+  review); never keep only the first.
+- current position: the lowest-index active sub-task is primary (named in
+  `## Current Position` via `phase_index`/`subtask_index`); otherwise the first
+  sub-task of the first `Pending` phase; otherwise all sub-tasks are
+  `Completed` — suggest `dh-final-review`.
+- the next sub-task in order and each active task's remaining work.
 
-If multiple phases or multiple sub-tasks are `In Progress`, record the
-candidates explicitly in `## Current Position` and null the ambiguous index
-fields instead of guessing; ask the user when the next action depends on it.
-If the plan has no phases/sub-tasks or unrecognized statuses, stop and report.
+Record all active candidates instead of guessing or nulling indexes; ask only
+when the next action depends on choosing one. Stop if the plan has no
+phases/sub-tasks or unrecognized statuses.
 
 ### Step 2: Collect read-only evidence
 
@@ -122,8 +125,7 @@ Run only read-only commands; never capture full diffs or file contents.
   check), capture `git status --porcelain -- docs/plans/<slug>/plan.md` as a
   pre-write snapshot. If git is also unavailable, mark integrity
   `unverifiable` and say so in `## Validation State` / `## Resume Checklist`.
-- Review: read `docs/plans/<slug>/tasks/review.md` when present; list open
-  P0/P1 findings by id with the review path, note P2/P3 without copying text.
+- Review: read `docs/plans/<slug>/tasks/review.md` and any `tasks/review-<N.M>.md` reports when present; list open P0/P1 findings by id with the review path, note P2/P3 without copying text.
 - SDD: when `docs/plans/<slug>/sdd.md` exists, record the binding constraint
   ids that affect continuation (path + ids only).
 - Validation state: commands and observed outcomes from this session;
@@ -138,12 +140,12 @@ Write `./docs/plans/<slug>/handoff.md` following
 [`references/handoff-template.md`](references/handoff-template.md) exactly —
 do not restate or extend the contract here.
 
-- Frontmatter: every field in the template table, with `handoff_version: 1`,
-  `status: paused`, `resumed_at: null`, `updated` = `paused_at` (ISO-8601
-  UTC), `created` preserved on re-pause, `worktree_fingerprint` refreshed from
-  current content like `worktree_dirty`, and `next_action` equal to
-  `## Next Steps` step 1. Quote timestamps and `subtask_index`.
-- Sections: `## Snapshot`, `## Current Position`, `## Work Completed`,
+- Frontmatter: every template field, with `handoff_version: 1`, `status: paused`,
+  `resumed_at: null`, `updated` = `paused_at`, `created` preserved, refreshed
+  `worktree_fingerprint`, `next_action` = `## Next Steps` step 1, quoted
+  timestamps, and (parallel) every active id in `active_subtasks`.
+- Sections: `## Snapshot`, `## Current Position`, `## Active Sub-Tasks`
+  (optional; `None` for single-task/legacy), `## Work Completed`,
   `## Work In Flight`, `## Package Scope` (optional when a workspace map exists),
   `## Uncommitted Changes`,
   `## Decisions and Rationale`, `## Blockers and Risks`,
@@ -190,8 +192,7 @@ do not restate or extend the contract here.
    `rg -ni "api[_-]?key|secret|password|bearer\s|token|sk-[A-Za-z0-9]{16,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|xox[baprs]-[A-Za-z0-9-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY" docs/plans/<slug>/handoff.md`
 
 Fix issues by editing only the handoff; never commit, checkout, revert, or
-touch `plan.md`. Re-run every check before reporting and never report a check
-you did not run.
+touch `plan.md`. Re-run every check before reporting; never claim an unrun one.
 
 ### Step 5: Report
 
@@ -225,12 +226,11 @@ do not resume by editing plan statuses.
 
 ## Loop Integration (bundled)
 
-Pause is a cross-cutting lifecycle skill, not a loop step: it can run at any
-point and never advances the loop or changes statuses. Use it especially at
-loop step 2.4 hard blockers or when a session ends mid-plan. Resume returns to
-`dh-execute-plan` resume mode (first `In Progress` phase → its first
-`In Progress`/`Pending` sub-task). Pause does not replace `dh-review`, the
-orchestrator's phase lifecycle, or `dh-final-review`.
+Pause is a cross-cutting lifecycle skill, not a loop step: it never advances
+the loop or changes statuses. Use it at loop step 2.4 hard blockers or when a
+session ends mid-plan. Resume re-enters `dh-execute-plan` resume mode, which
+reconciles **all** `In Progress` sub-tasks from `active_subtasks`, never only
+the first. Pause does not replace `dh-review` or `dh-final-review`.
 
 ## References
 

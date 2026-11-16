@@ -73,6 +73,26 @@ and records status.
 - Do not modify files outside the sub-task scope; verify dependencies on
   earlier sub-tasks are `Completed` before starting.
 
+## Parallel Worker Mode
+
+When invoked with `parallel-worker` and an exact `subTask` ID, act as a fast
+worker, not the selector/orchestrator:
+
+- Read `plan_fast.md`/`plan.md` for the brief; do not choose another task and do
+  not edit plan content.
+- Resolve the delegated agent, implement with TDD, and run only the narrow
+  sanity check.
+- Do **not** write statuses in either plan, append ledger rows, run
+  `dh-review`/`dh-simplify`/`dh-code-review`/preflight/artifact/domain/final
+  gates, or commit.
+- Return `{ subTask, agent, status, filesChanged, validation, blockers, notes }`
+  and stop. The orchestrator owns dual status writes, ledger rows, commits, and
+  end gates.
+- **Fail closed:** without the `MODE: parallel-worker subTask=<N.M>` header,
+  stop when siblings are active — never fall back to standalone writes.
+
+Standalone mode (no `parallel-worker`) keeps the workflow below.
+
 ## Workflow
 
 ### Step 1: Read the fast mirror and confirm the plan
@@ -89,7 +109,12 @@ and records status.
 
 ### Step 2: Select the active sub-task and record skipped checks
 
-Use the phase-aware priority on `plan_fast.md`:
+**Parallel-worker mode** (`MODE: parallel-worker subTask=<N.M>`): select that
+exact `In Progress` sub-task, sanity-check it, and record its ledger row.
+Multiple active tasks are expected; skip the standalone list below.
+
+**Standalone mode** (no mode header): use the phase-aware priority on
+`plan_fast.md`:
 
 1. First phase marked `In Progress` → its first `In Progress` sub-task, else
    its first `Pending` sub-task. If one is `In Progress`, resume it without
@@ -128,6 +153,7 @@ Use the phase-aware priority on `plan_fast.md`:
 - Use the `dh-execute-cli` skill to run only the smallest relevant validation for the
   changed files (targeted tests, linters, type checks). Do **not** run the full
   preflight or artifact checks.
+- **Optional external-fact unblock (not a gate):** when the blocker depends on current external facts (version, EOL, known upstream issue, breaking change, migration) and the runtime exposes browsing tools, run `dh-research` for ONE cited pass; the documentation owner registers the note under `docs/research/`; if the evidence is inconclusive, stop and report the blocker for guidance.
 - If validation fails 3 consecutive times, stop and report the full error
   output. Do not mark the sub-task `Completed`; recommend `dh-pause-plan` to
   preserve state before the session ends.

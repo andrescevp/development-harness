@@ -41,7 +41,7 @@ function isDhEntry(entry) {
   );
 }
 
-/** Require the built CLI, both bundles, and the 5-agent/26-skill corpus. */
+/** Require the built CLI, both bundles, and the 6-agent/27-skill corpus. */
 export function preflight(repoRoot, check) {
   const cli = path.join(repoRoot, 'dist', 'cli.js');
   const plugin = path.join(repoRoot, 'dist', 'plugin.js');
@@ -59,15 +59,15 @@ export function preflight(repoRoot, check) {
   check('dist/plugin.js exists and is non-empty', isFileWithContent(plugin), 'run pnpm build');
   check('dist/tui.js exists and is non-empty', isFileWithContent(tui), 'run pnpm build');
   check('dist/assets exists', isDirectory(assets), 'run pnpm build');
-  check('dist/assets has exactly 5 agent files', agents.length === 5, `found ${agents.length}`);
-  check('dist/assets has exactly 26 skill directories', skillDirs.length === 26, `found ${skillDirs.length}`);
+  check('dist/assets has exactly 6 agent files', agents.length === 6, `found ${agents.length}`);
+  check('dist/assets has exactly 27 skill directories', skillDirs.length === 27, `found ${skillDirs.length}`);
   return (
     isFileWithContent(cli) &&
     isFileWithContent(plugin) &&
     isFileWithContent(tui) &&
     isDirectory(assets) &&
-    agents.length === 5 &&
-    skillDirs.length === 26
+    agents.length === 6 &&
+    skillDirs.length === 27
   );
 }
 
