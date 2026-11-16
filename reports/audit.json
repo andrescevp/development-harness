@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-11-15T22:36:27.486Z",
+    "generated": "2026-11-16T00:08:28.812Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -11,19 +11,19 @@
     "dimensions": [
       {
         "name": "Inventory & structure",
-        "count": 31,
+        "count": 33,
         "sev": "PASS",
-        "note": "5 agents, 26 skill dirs + index.md; no commands/, no prompts/"
+        "note": "6 agents, 27 skill dirs + index.md; no commands/, no prompts/"
       },
       {
         "name": "Frontmatter parse",
-        "count": 32,
+        "count": 34,
         "sev": "PASS",
-        "note": "32 files on audit surface"
+        "note": "34 files on audit surface"
       },
       {
         "name": "Name regex",
-        "count": 31,
+        "count": 33,
         "sev": "PASS",
         "note": "/^[a-z0-9]+(-[a-z0-9]+)*$/"
       },
@@ -37,19 +37,19 @@
         "name": "Cross-references",
         "count": 1,
         "sev": "WARN",
-        "note": "539 resolved; 0 code-context; 0 allowlisted; 290 prose tokens (warn)"
+        "note": "580 resolved; 0 code-context; 0 allowlisted; 295 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
-        "count": 31,
+        "count": 33,
         "sev": "PASS",
-        "note": "26/26 skills present; 5/5 agents present"
+        "note": "27/27 skills present; 6/6 agents present"
       },
       {
         "name": "Secret scan",
-        "count": 49,
+        "count": 54,
         "sev": "PASS",
-        "note": "49 low-signature prose hits (instructional), 0 high-signature"
+        "note": "54 low-signature prose hits (instructional), 0 high-signature"
       },
       {
         "name": "Junk scan",
@@ -61,6 +61,11 @@
   },
   "schemaDevs": [],
   "deviations": [
+    {
+      "dimension": "frontmatter",
+      "severity": "warn",
+      "note": "agent missing 'model' (plugin registration impact)"
+    },
     {
       "dimension": "frontmatter",
       "severity": "warn",
@@ -100,7 +105,7 @@
   "kebabList": [
     {
       "token": "agent-selection",
-      "count": 37,
+      "count": 39,
       "files": [
         "agents/dh-software-architect.md",
         "agents/dh-software-engineer.md",
@@ -112,14 +117,14 @@
     },
     {
       "token": "project-name",
-      "count": 28,
+      "count": 30,
       "files": [
         "agents/dh-final-reviewer.md",
+        "agents/dh-researcher.md",
         "agents/dh-reviewer.md",
         "agents/dh-software-architect.md",
         "agents/dh-software-engineer.md",
-        "skills/dh-artifact-check/SKILL.md",
-        "skills/dh-code-review/SKILL.md"
+        "skills/dh-artifact-check/SKILL.md"
       ]
     },
     {
@@ -154,6 +159,15 @@
       ]
     },
     {
+      "token": "workspace-docs",
+      "count": 13,
+      "files": [
+        "agents/dh-documentor.md",
+        "skills/dh-create-documentation/SKILL.md",
+        "skills/dh-research/SKILL.md"
+      ]
+    },
+    {
       "token": "final-review",
       "count": 13,
       "files": [
@@ -181,6 +195,18 @@
       ]
     },
     {
+      "token": "workspace-map",
+      "count": 12,
+      "files": [
+        "agents/dh-documentor.md",
+        "agents/dh-final-reviewer.md",
+        "agents/dh-researcher.md",
+        "agents/dh-reviewer.md",
+        "agents/dh-software-architect.md",
+        "agents/dh-software-engineer.md"
+      ]
+    },
+    {
       "token": "tests-reaching",
       "count": 12,
       "files": [
@@ -190,14 +216,6 @@
         "skills/dh-execute-plan-task/SKILL.md",
         "skills/dh-execute-plan-task-fast/SKILL.md",
         "skills/dh-explore/SKILL.md"
-      ]
-    },
-    {
-      "token": "workspace-docs",
-      "count": 11,
-      "files": [
-        "agents/dh-documentor.md",
-        "skills/dh-create-documentation/SKILL.md"
       ]
     },
     {
@@ -232,18 +250,6 @@
       ]
     },
     {
-      "token": "workspace-map",
-      "count": 9,
-      "files": [
-        "agents/dh-documentor.md",
-        "agents/dh-final-reviewer.md",
-        "agents/dh-reviewer.md",
-        "agents/dh-software-architect.md",
-        "agents/dh-software-engineer.md",
-        "skills/dh-planning/SKILL.md"
-      ]
-    },
-    {
       "token": "qualified-name",
       "count": 9,
       "files": [
@@ -267,6 +273,18 @@
       ]
     },
     {
+      "token": "package-local",
+      "count": 7,
+      "files": [
+        "agents/dh-documentor.md",
+        "agents/dh-final-reviewer.md",
+        "agents/dh-researcher.md",
+        "agents/dh-reviewer.md",
+        "agents/dh-software-architect.md",
+        "agents/dh-software-engineer.md"
+      ]
+    },
+    {
       "token": "osv-scanner",
       "count": 7,
       "files": [
@@ -282,18 +300,6 @@
         "skills/dh-execute-plan-task/SKILL.md",
         "skills/dh-execute-plan-task-fast/SKILL.md",
         "skills/dh-planning/SKILL.md"
-      ]
-    },
-    {
-      "token": "package-local",
-      "count": 6,
-      "files": [
-        "agents/dh-documentor.md",
-        "agents/dh-final-reviewer.md",
-        "agents/dh-reviewer.md",
-        "agents/dh-software-architect.md",
-        "agents/dh-software-engineer.md",
-        "skills/dh-setup/SKILL.md"
       ]
     },
     {
@@ -650,6 +656,13 @@
       ]
     },
     {
+      "token": "node-eol",
+      "count": 3,
+      "files": [
+        "skills/dh-research/SKILL.md"
+      ]
+    },
+    {
       "token": "re-pausing",
       "count": 3,
       "files": [
@@ -791,6 +804,14 @@
       ]
     },
     {
+      "token": "cross-check",
+      "count": 2,
+      "files": [
+        "skills/dh-code-query/SKILL.md",
+        "skills/dh-research/SKILL.md"
+      ]
+    },
+    {
       "token": "project-root",
       "count": 2,
       "files": [
@@ -905,6 +926,14 @@
       "files": [
         "skills/dh-execute-plan-task/SKILL.md",
         "skills/dh-review/SKILL.md"
+      ]
+    },
+    {
+      "token": "external-fact",
+      "count": 2,
+      "files": [
+        "skills/dh-execute-plan-task/SKILL.md",
+        "skills/dh-execute-plan-task-fast/SKILL.md"
       ]
     },
     {
@@ -1024,6 +1053,13 @@
       "count": 1,
       "files": [
         "agents/dh-documentor.md"
+      ]
+    },
+    {
+      "token": "plan-local",
+      "count": 1,
+      "files": [
+        "agents/dh-researcher.md"
       ]
     },
     {
@@ -1175,13 +1211,6 @@
     },
     {
       "token": "git-ref",
-      "count": 1,
-      "files": [
-        "skills/dh-code-query/SKILL.md"
-      ]
-    },
-    {
-      "token": "cross-check",
       "count": 1,
       "files": [
         "skills/dh-code-query/SKILL.md"
@@ -1902,6 +1931,20 @@
       ]
     },
     {
+      "token": "re-ask",
+      "count": 1,
+      "files": [
+        "skills/dh-research/SKILL.md"
+      ]
+    },
+    {
+      "token": "node-eol-2027",
+      "count": 1,
+      "files": [
+        "skills/dh-research/SKILL.md"
+      ]
+    },
+    {
       "token": "merge-base",
       "count": 1,
       "files": [
@@ -2259,7 +2302,7 @@
       ]
     }
   ],
-  "secretLow": 49,
+  "secretLow": 54,
   "secretHigh": [],
   "junkList": [],
   "symlinkCount": 0,
@@ -2350,6 +2393,10 @@
         "status": "present"
       },
       {
+        "name": "dh-research",
+        "status": "present"
+      },
+      {
         "name": "dh-resume-plan",
         "status": "present"
       },
@@ -2377,6 +2424,10 @@
       },
       {
         "name": "dh-final-reviewer",
+        "status": "present"
+      },
+      {
+        "name": "dh-researcher",
         "status": "present"
       },
       {
@@ -2425,6 +2476,27 @@
         "fields": {
           "name": "dh-final-reviewer",
           "description": "Final in-depth reviewer — performs full diff review against task requirements and plan. Selected by the `dh-final-review` skill for the final-review role when the plan's Agent Selection names this agent.",
+          "mode": "subagent"
+        }
+      },
+      "findings": [
+        {
+          "dimension": "frontmatter",
+          "severity": "warn",
+          "note": "agent missing 'model' (plugin registration impact)"
+        }
+      ]
+    },
+    {
+      "file": "agents/dh-researcher.md",
+      "kind": "agent",
+      "lines": 142,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-researcher",
+          "description": "Source-cited web research — answers one external fact question at a time with primary sources, retrieval dates, and explicit confidence labels. Use when planning (dh-planning, dh-grill-sdd, dh-contingency), an execution blocker (dh-execute-plan-task, dh-execute-plan-task-fast), or a review needs current evidence about library versions, EOL dates, breaking changes, migrations, upstream defects, security advisories, or tooling comparisons that the local codebase cannot answer.",
           "mode": "subagent"
         }
       },
@@ -2592,7 +2664,7 @@
     {
       "file": "skills/dh-contingency/SKILL.md",
       "kind": "skill",
-      "lines": 104,
+      "lines": 106,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2718,7 +2790,7 @@
     {
       "file": "skills/dh-execute-plan-task/SKILL.md",
       "kind": "skill",
-      "lines": 190,
+      "lines": 191,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2736,7 +2808,7 @@
     {
       "file": "skills/dh-execute-plan-task-fast/SKILL.md",
       "kind": "skill",
-      "lines": 224,
+      "lines": 225,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2790,7 +2862,7 @@
     {
       "file": "skills/dh-grill-sdd/SKILL.md",
       "kind": "skill",
-      "lines": 153,
+      "lines": 160,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2844,7 +2916,7 @@
     {
       "file": "skills/dh-planning/SKILL.md",
       "kind": "skill",
-      "lines": 159,
+      "lines": 161,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2878,6 +2950,24 @@
       "findings": []
     },
     {
+      "file": "skills/dh-research/SKILL.md",
+      "kind": "skill",
+      "lines": 192,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-research",
+          "description": "Run one bounded, cited web research pass that answers a single external fact question and records the evidence as a research note at {workspace_root}/docs/research/<topic>.md, registered in {workspace_root}/docs/research/index.md. Use when planning, the SDD interview, contingency analysis, or an execution blocker needs current ecosystem facts — library versions, end-of-life dates, breaking changes, migrations, upstream defects, security advisories, or tooling comparisons — that the codebase cannot answer. Notes have one workspace home; a research folder inside a plan is rejected and redirected here.",
+          "license": "MIT",
+          "compatibility": "opencode",
+          "allowed-tools": "read, webfetch, websearch",
+          "metadata": "audience: developers workflow: research"
+        }
+      },
+      "findings": []
+    },
+    {
       "file": "skills/dh-resume-plan/SKILL.md",
       "kind": "skill",
       "lines": 242,
@@ -2898,7 +2988,7 @@
     {
       "file": "skills/dh-review/SKILL.md",
       "kind": "skill",
-      "lines": 212,
+      "lines": 213,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -2970,7 +3060,7 @@
     {
       "file": "skills/index.md",
       "kind": "index",
-      "lines": 175,
+      "lines": 178,
       "frontmatter": {
         "status": "none-expected"
       },

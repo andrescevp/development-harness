@@ -21,6 +21,7 @@ const FAST_OMITTED_SECTIONS = [
   'Risks and Areas Requiring Care',
   'Core concepts',
   'Visual Context',
+  'Research',
   'Agent Selection',
   'Execution Record',
   'Open Questions',

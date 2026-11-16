@@ -32,9 +32,12 @@ Agent choices follow [`agent-selection.md`](agent-selection.md).
     heading (e.g. `## Final Integration & Verification`) or EOF.
 11. `## Agent Selection` sits before `## Phases`; it is outside the phases
     region, so the parser ignores it for phase/sub-task extraction.
-12. `## Workspace Impact` (after `## Scope`) and `## Execution Record` (after
+12. `## Workspace Impact` (after `## Scope`), `## Research` (after
+    `## Visual Context`) and `## Execution Record` (after
     `## Final Integration & Verification`) are optional top-level sections
     outside the phases region; legacy plans without them parse unchanged.
+13. `## Research` links research notes and carries no status markers, so the
+    parser ignores it; never move it or a research link inside `## Phases`.
 
 ## Template
 
@@ -93,6 +96,13 @@ Explain core concepts with code level example if necessary.
 None — no structural change.
 
 > `dh-mermaid` replaces this line with links under `./diagrams/` when the plan has visual impact.
+
+## Research
+
+Optional `dh-research` notes that back this plan (single registry:
+`docs/research/`); write `None — no research consulted` when none apply.
+
+- [Node 20 EOL](../../research/node-eol.md) — verified 2026-11-15; drives R4.
 
 ## Agent Selection
 
@@ -166,12 +176,16 @@ None — no structural change.
 - [Only if important non-blocking uncertainty remains]
 ```
 
-## Workspace Impact and Execution Record sections
+## Optional top-level sections
 
 - `## Workspace Impact` goes after `## Scope` and before
   `## Assumptions and Constraints`; `## Execution Record` goes after
   `## Final Integration & Verification` and before `## Open Questions`. Both
   are top-level sections **outside** `## Phases`, so the parser ignores them.
+- `## Research` goes after `## Visual Context` and before `## Agent Selection`.
+  It is optional, holds relative links to `docs/research/` notes, and carries
+  no status markers; the fast mirror omits it on purpose, so links live in
+  `plan.md` only.
 - `## Workspace Impact` is optional: a standalone repository writes
   `None — standalone repository` for the root and affected packages. When
   `WORKSPACE.md` exists at the workspace root, `dh-planning` fills the section

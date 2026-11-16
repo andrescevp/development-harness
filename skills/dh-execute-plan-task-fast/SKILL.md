@@ -128,6 +128,7 @@ Use the phase-aware priority on `plan_fast.md`:
 - Use the `dh-execute-cli` skill to run only the smallest relevant validation for the
   changed files (targeted tests, linters, type checks). Do **not** run the full
   preflight or artifact checks.
+- **Optional external-fact unblock (not a gate):** when the blocker depends on current external facts (version, EOL, known upstream issue, breaking change, migration) and the runtime exposes browsing tools, run `dh-research` for ONE cited pass and register the note under `docs/research/`; if the evidence is inconclusive, stop and report the blocker for guidance.
 - If validation fails 3 consecutive times, stop and report the full error
   output. Do not mark the sub-task `Completed`; recommend `dh-pause-plan` to
   preserve state before the session ends.

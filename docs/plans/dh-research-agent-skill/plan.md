@@ -4,7 +4,7 @@ slug: dh-research-agent-skill
 description: Add a source-cited web research capability to the harness, with one docs/research registry and optional execution unblock integration.
 created: 2026-11-16
 updated: 2026-11-16
-status: Pending
+status: In Progress
 active: true
 tags: [plan, research]
 project: dev-harness-skills
@@ -91,21 +91,6 @@ skills (`dh-explore`, `dh-execute-cli`).
 |---|---|---|---|---|---|
 | None — standalone repository | Markdown assets + TypeScript | `pnpm test` | `pnpm build` | `docs/` | fixed |
 
-## Alternatives Considered
-
-- **Rebase/update PR #4** — rejected: the branch conflicts with `develop`, its
-  text targets 7 agents (`@dh-explorer`, `@dh-executor`) that are now skills,
-  and a fresh port is smaller and reviewable. PR #4 stays as design input.
-- **Researcher writes `docs/research/` directly** — rejected: it conflicts with
-  the documentation-ownership contract. The researcher composes; the
-  documentation agent persists.
-- **Plan-local research folders** — rejected by the PR review: one registry at
-  `docs/research/` with plans linking into it.
-- **Research as a new loop step 2.4** — rejected by the PR review: one optional
-  line in `dh-execute-plan-task(-fast)`, with the existing halt unchanged.
-- **New search MCP or dependency** — rejected: use the host’s `webfetch`/
-  `websearch` (or an already configured search MCP); no dependency change.
-
 ## Assumptions and Constraints
 
 - Current `develop` (5 agents + 26 skills) is the integration base; PR #4 is a
@@ -121,6 +106,21 @@ skills (`dh-explore`, `dh-execute-cli`).
 - Skill and agent files stay within the 250/300-line audit limits.
 - Domain/SOLID pre-check: [domain-check.md](./tasks/domain-check.md) — clear to
   proceed; the ownership handoff and count sweep are the tracked cautions.
+
+**Rejected alternatives:**
+
+- **Rebase/update PR #4** — the branch conflicts with `develop`, its text
+  targets 7 agents (`@dh-explorer`, `@dh-executor`) that are now skills, and a
+  fresh port is smaller and reviewable. PR #4 stays as design input.
+- **Researcher writes `docs/research/` directly** — conflicts with the
+  documentation-ownership contract. The researcher composes; the documentation
+  agent persists.
+- **Plan-local research folders** — rejected by the PR review: one registry at
+  `docs/research/` with plans linking into it.
+- **Research as a new loop step 2.4** — rejected by the PR review: one optional
+  line in `dh-execute-plan-task(-fast)`, with the existing halt unchanged.
+- **New search MCP or dependency** — use the host’s `webfetch`/`websearch` (or
+  an already configured search MCP); no dependency change.
 
 ## Risks and Areas Requiring Care
 
@@ -233,11 +233,11 @@ once the registry exists.
 
 ### Phase 1: Research assets and contract
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 1.1: Create the dh-researcher agent asset
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Add `agents/dh-researcher.md` as the sixth bundled agent, adapted from PR #4 to the current runtime (skills instead of removed agents, `docs/research/` SSOT, documentation-agent ownership, no loop-step-2.4 framing).
 - **Related Requirements:** R1, R3, R5, R7, AC1, AC2
@@ -257,7 +257,7 @@ once the registry exists.
 
 #### Sub-Task 1.2: Create the dh-research skill asset
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Add `skills/dh-research/SKILL.md` with the bounded research workflow, note/index templates, and documentation-ownership handoff; update the documentation-root reference with the research row.
 - **Related Requirements:** R2, R3, R5, R7, AC2, AC5
@@ -279,27 +279,27 @@ once the registry exists.
 
 #### Sub-Task 1.3: Add the optional Research plan section
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
-- **Objective:** Extend the phased plan format with an optional `## Research` section that links `docs/research/` notes, and propagate it to the scaffold, canonical fixture, planning skill, and fast-plan omission list.
+- **Objective:** Extend the phased plan format with an optional `## Research` section that links `docs/research/` notes, and propagate it to the scaffold, canonical fixture, planning skill, fast-plan omission lists, and fast-alignment prose.
 - **Related Requirements:** R4, AC3
 - **Dependencies and Preconditions:** Sub-Task 1.2 completed (note path/index contract).
-- **In Scope for This Sub-Task:** `skills/dh-planning/references/phased-plan-template.md`; `skills/dh-planning/SKILL.md` (fill/inspect instruction); `src/tools/plan-template.ts`; `src/tools/plan-fast-template.ts` (`FAST_OMITTED_SECTIONS`); `src/__tests__/fixtures/plans/phased-plan.md`.
+- **In Scope for This Sub-Task:** `skills/dh-planning/references/phased-plan-template.md`; `skills/dh-planning/SKILL.md` (fill/inspect instruction); `src/tools/plan-template.ts`; `src/tools/plan-fast-template.ts` (`FAST_OMITTED_SECTIONS`); `src/__tests__/fixtures/plans/phased-plan.md`; `skills/dh-execute-plan-fast/SKILL.md` (allowed-differences list); `skills/dh-execute-plan-fast/references/plan-fast-template.md` (omitted-sections list); `skills/dh-review/SKILL.md` (Plan Alignment Mode allowed differences).
 - **Out of Scope for This Sub-Task:** Parser behavior for phases, fast mirror rendering logic, `docs/research/index.md`, execution task skills.
 - **Instructions:**
   1. Add `## Research` after `## Visual Context` and before `## Agent Selection` in the authoritative template, with a one-line explanation and the relative-link example `../../research/<topic>.md`.
   2. Mirror the section in `planScaffold` and add it to the canonical fixture; keep `Agent Selection` before `## Phases`.
-  3. Add `'Research'` to `FAST_OMITTED_SECTIONS` so the fast mirror lists it among intentional omissions.
+  3. Add `'Research'` to `FAST_OMITTED_SECTIONS` so the fast mirror lists it among intentional omissions; add `## Research` to the omitted-section lists in `skills/dh-execute-plan-fast/SKILL.md`, `skills/dh-execute-plan-fast/references/plan-fast-template.md`, and `skills/dh-review/SKILL.md` Plan Alignment Mode.
   4. In `dh-planning`, add: research notes are linked here; delegate external-fact questions to `dh-research` and cite the note.
-- **Acceptance Criteria:** Section present in template/scaffold/fixture; order is Visual Context → Research → Agent Selection → Phases; fast renderer lists `Research`; parser tests still pass; no section inside `## Phases`.
-- **Cautionary Points (Risks & Edge Cases):** Do not let the section become a phase or carry status markers. Keep the fixture byte-stable relative to the template. Do not add a required section that breaks legacy plans.
+- **Acceptance Criteria:** Section present in template/scaffold/fixture; order is Visual Context → Research → Agent Selection → Phases; fast renderer lists `Research`; both fast-alignment prose surfaces list `## Research` as an allowed omission; parser tests still pass; no section inside `## Phases`.
+- **Cautionary Points (Risks & Edge Cases):** Do not let the section become a phase or carry status markers. Keep the fixture byte-stable relative to the template. Do not add a required section that breaks legacy plans. The omitted-section lists are duplicated in prose and code; miss one and the pre-execution alignment gate will flag the section.
 - **Implementation Suggestions:** Copy the exact prose from the template into the scaffold literal, escaping backticks per `plan-template.ts` style. Add a short note in the template’s “Workspace Impact and Execution Record sections” list that `## Research` is also outside the phases region.
-- **Testing Suggestions:** `pnpm vitest run src/__tests__/mermaid-skill.test.ts src/__tests__/agent-selection.test.ts`; add the research assertions in Sub-Task 3.1; `node scripts/check-links.mjs`.
-- **Done When:** All four surfaces expose the section and the fast omission list includes it.
+- **Testing Suggestions:** `pnpm vitest run src/__tests__/mermaid-skill.test.ts src/__tests__/agent-selection.test.ts`; add the research assertions in Sub-Task 3.1; `node scripts/check-links.mjs`; after the change, re-run `dh_plan_fast_sync` + Plan Alignment Mode.
+- **Done When:** All six surfaces expose/allow the section and the fast omission lists include it.
 
 #### Sub-Task 1.4: Establish the docs/research registry contract
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-documentor
 - **Objective:** Create `docs/research/index.md` as the workspace research registry, with the documentation frontmatter and a newest-first table matching the skill’s index contract.
 - **Related Requirements:** R3, R5, AC2, AC8
@@ -319,11 +319,11 @@ once the registry exists.
 
 ### Phase 2: Runtime integration and inventory
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 2.1: Add the optional research unblock step to both execution task skills
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Add exactly one optional, bounded research-unblock instruction to `dh-execute-plan-task` and `dh-execute-plan-task-fast`, gated on browsing availability, while preserving the hard-blocker halt.
 - **Related Requirements:** R6, R9, AC4
@@ -342,7 +342,7 @@ once the registry exists.
 
 #### Sub-Task 2.2: Integrate research delegation in planning, SDD, and contingency skills
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Wire the research capability into `dh-planning`, `dh-grill-sdd`, and `dh-contingency`: delegate external-fact questions, cite notes, and forbid unverified-fact ratings.
 - **Related Requirements:** R7, AC5
@@ -362,7 +362,7 @@ once the registry exists.
 
 #### Sub-Task 2.3: Update corpus inventory, tests, audit membership, CLI and package smoke expectations
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Move every active inventory surface from 5 agents / 26 skills / 31 names to 6 / 27 / 33, add the new names to audit loop membership, and make the CLI/package expectations match.
 - **Related Requirements:** R8, R9, AC1, AC6
@@ -383,7 +383,7 @@ once the registry exists.
 
 #### Sub-Task 2.4: Update project docs, metadata, and changelog
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-documentor
 - **Objective:** Update the project’s human-facing surfaces for the new capability: role summary, loop/runtime contract, registration counts, skills index, loading docs, demo docs, and changelog.
 - **Related Requirements:** R3, R4, R5, R6, R7, R8, AC8
@@ -406,11 +406,11 @@ once the registry exists.
 
 ### Phase 3: Verification and close-out
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 3.1: Consolidate cross-cutting contract tests for research integration
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Add a focused contract test suite that fails if the research assets, registry, plan section, execution unblock, or planning integration drift.
 - **Related Requirements:** R1, R2, R3, R4, R5, R6, R7, R8, AC1, AC2, AC3, AC4, AC5, AC6
@@ -421,7 +421,7 @@ once the registry exists.
   1. Assert both assets exist, parse with `name`/`description`, `dh-researcher` has `mode: subagent`, neither has `permission`/`tools`, and files respect the audit line limits.
   2. Assert the research skill includes `docs/research/<topic>.md`, `docs/research/index.md`, the citation/retrieval-date rule, the one-question rule, and the documentation-ownership handoff; assert it does **not** include `docs/plans/<slug>/research/` or the string `loop step 2.4` / `step 2.4`.
   3. Assert `docs/research/index.md` exists with frontmatter and the `| Date | Topic | Question | Confidence | Used by | Note |` header.
-  4. Assert `## Research` appears in the template, scaffold, fixture, and `FAST_OMITTED_SECTIONS`; assert it sits before `## Agent Selection` and outside `## Phases`.
+  4. Assert `## Research` appears in the template, scaffold, fixture, and `FAST_OMITTED_SECTIONS`; assert it sits before `## Agent Selection` and outside `## Phases`; assert the fast skill, fast template reference, and `dh-review` Plan Alignment Mode list `## Research` among allowed omissions.
   5. Assert each execution task skill contains exactly one `dh-research` reference and still contains its hard-blocker sentence.
   6. Assert `dh-planning`, `dh-grill-sdd`, and `dh-contingency` mention `dh-research`; assert the contingency Safety section contains the verified-facts/assumption rule.
 - **Acceptance Criteria:** The suite passes on the completed corpus and would fail if any contract above regressed; no duplicated inventory test; file stays under the 300-line code-file guideline.
@@ -432,7 +432,7 @@ once the registry exists.
 
 #### Sub-Task 3.2: Run the full verification gate and regenerate audit artifacts
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Prove the change is release-ready on the current branch and regenerate the audit reports from the new corpus.
 - **Related Requirements:** R8, R9, AC6, AC7
@@ -452,7 +452,7 @@ once the registry exists.
 
 #### Sub-Task 3.3: Write evolution and observation close-out notes
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-documentor
 - **Objective:** Record how the harness evolved and what the session learned, and register both notes in the evolution index.
 - **Related Requirements:** AC8

@@ -33,7 +33,7 @@ function forbiddenReason(entry) {
   return null;
 }
 
-/** Source inventory is the contract: 5 agents and 26 skill directories. */
+/** Source inventory is the contract: 6 agents and 27 skill directories. */
 export function sourceInventory(repoRoot) {
   const agents = fs
     .readdirSync(path.join(repoRoot, 'agents'))

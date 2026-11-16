@@ -48,6 +48,10 @@ Phases group sub-tasks; status lines sit immediately after headers.
 
 None — no structural change.
 
+## Research
+
+None — no research consulted; link `../../research/<topic>.md` notes when used.
+
 ## Agent Selection
 
 | Role | Selected agent | Why | Fallback |

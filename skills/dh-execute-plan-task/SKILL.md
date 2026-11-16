@@ -81,6 +81,7 @@ Use the `dh-execute-cli` skill to run the smallest relevant validation for the c
 
 - Run tests related to the changed files.
 - Run linters and static analysis.
+- **Optional external-fact unblock:** when the blocker depends on current external facts (version, EOL, known upstream issue, breaking change, migration) and the runtime exposes browsing tools, run `dh-research` for ONE cited pass and register the note under `docs/research/`; if the evidence is inconclusive, stop and report the blocker for guidance.
 - Fix any failures before proceeding. If validation fails 3 consecutive times, stop and report the failure with full error output — do not proceed to review.
 
 When stopping on a hard blocker, recommend `dh-pause-plan` so the phase/sub-task, git state, decisions, and next steps are preserved in `handoff.md` before the session ends.

@@ -1,8 +1,9 @@
 # Skills Index — dev-harness-skills plugin
 
-> The plugin bundles **26 skills** (incl. `dh-grill-sdd` SDD interviewer,
-> `dh-setup` harness setup, `dh-contingency` planning support, and
-> `dh-pause-plan` / `dh-resume-plan` lifecycle support).
+> The plugin bundles **27 skills** (incl. `dh-grill-sdd` SDD interviewer,
+> `dh-setup` harness setup, `dh-contingency` planning support, `dh-research`
+> source-cited research, and `dh-pause-plan` / `dh-resume-plan` lifecycle
+> support).
 > Loading a skill injects its instructions and resources into the current
 > conversation. Plans are **phased** (phases → sub-tasks, dual status
 > markers); plan lifecycle is managed via the `dh` MCP server tools
@@ -97,11 +98,11 @@ only when the tools are unavailable. These tools are exposed by the project-scop
 
 ## Workspace behavior
 
-All 26 skills stay workspace-aware — no new skill is added. The workspace root
-owns `docs/plans`; `dh-setup` writes the workspace map (`WORKSPACE.md`, root
-first, else `docs/WORKSPACE.md`) with packages and per-package commands; plans
-declare affected packages in `## Workspace Impact`. Standalone repositories keep
-the single-root behavior unchanged.
+All 27 skills stay workspace-aware. The workspace root owns `docs/plans` and the
+research registry `docs/research`; `dh-setup` writes the workspace map
+(`WORKSPACE.md`, root first, else `docs/WORKSPACE.md`) with packages and
+per-package commands; plans declare affected packages in `## Workspace Impact`.
+Standalone repositories keep the single-root behavior unchanged.
 
 | Area | Reference |
 |---|---|
@@ -116,13 +117,14 @@ the single-root behavior unchanged.
 | Worktree/submodule discovery | [`dh-create-worktree/references/worktree-discovery.md`](dh-create-worktree/references/worktree-discovery.md) |
 | Package-aware pause/resume | [`dh-pause-plan/references/package-scope.md`](dh-pause-plan/references/package-scope.md) |
 
-## The 26 bundled skills
+## The 27 bundled skills
 
 | Skill | Role in the loop |
 |---|---|
 | [`dh-planning`](dh-planning/SKILL.md) | Step 1 — write plans (`docs/plans/<slug>/plan.md`), interview mode |
 | [`dh-domain-check`](dh-domain-check/SKILL.md) | During planning + before complex implementation — DDD/SOLID validation |
 | [`dh-contingency`](dh-contingency/SKILL.md) | Planning support — generate Plan A/B/C alternatives with risk, complexity, and trade-off analysis (`docs/plans/<slug>/contingency.md`) |
+| [`dh-research`](dh-research/SKILL.md) | Support / optional unblock — one bounded, cited research pass for an external-fact question; note at `docs/research/<topic>.md` plus the registry `docs/research/index.md` |
 | [`dh-execute-plan`](dh-execute-plan/SKILL.md) | Step 2 — orchestrate full plan execution, review each sub-task, resume mode |
 | [`dh-execute-plan-fast`](dh-execute-plan-fast/SKILL.md) | Fast step 2 — execute from `plan_fast.md` with no per-task gates; critical gates at plan end, skipped-check ledger |
 | [`dh-execute-plan-task`](dh-execute-plan-task/SKILL.md) | Step 2.1 — execute one sub-task (project-type-aware delegation) |
@@ -149,13 +151,14 @@ the single-root behavior unchanged.
 
 ## Agents
 
-The 5 bundled agents available as harness capabilities (see `AGENTS.md` →
+The 6 bundled agents available as harness capabilities (see `AGENTS.md` →
 Runtime delegation):
 
 `dh-software-architect` (architecture, planning support) ·
 `dh-software-engineer` (implementation, TDD coding) · `dh-reviewer` (review,
 code-review) · `dh-final-reviewer` (final sign-off) · `dh-documentor`
-(documentation owner).
+(documentation owner) · `dh-researcher` (source-cited research support, not a
+loop step).
 
 Delegation is capability-based: skills resolve the architecture,
 implementation, testing/QA, review, final-review, and documentation roles

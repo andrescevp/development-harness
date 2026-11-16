@@ -7,14 +7,15 @@ contract for monorepos, and the runtime delegation routing.
 ## Role summary
 
 The `dev-harness-skills` OpenCode V2 plugin bundles a self-contained dev harness for
-plan-driven development: **5 agents** — `dh-software-architect`,
-`dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-documentor` —
-and **26 skills** — `dh-planning`, `dh-domain-check`, `dh-execute-plan`,
-`dh-execute-plan-fast`, `dh-execute-plan-task`, `dh-execute-plan-task-fast`,
-`dh-pause-plan`, `dh-resume-plan`, `dh-coding`, `dh-execute-cli`, `dh-explore`,
-`dh-code-query`, `dh-contingency`, `dh-simplify`,
-`dh-review`, `dh-code-review`, `dh-preflight`, `dh-artifact-check`,
-`dh-final-review`, `dh-create-documentation`, `dh-create-worktree`, `dh-mermaid`, `dh-grill-sdd`, `dh-setup`,
+plan-driven development: **6 agents** — `dh-software-architect`,
+`dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-documentor`,
+`dh-researcher` — and **27 skills** — `dh-planning`, `dh-domain-check`,
+`dh-execute-plan`, `dh-execute-plan-fast`, `dh-execute-plan-task`,
+`dh-execute-plan-task-fast`, `dh-pause-plan`, `dh-resume-plan`, `dh-coding`,
+`dh-execute-cli`, `dh-explore`, `dh-code-query`, `dh-research`,
+`dh-contingency`, `dh-simplify`, `dh-review`, `dh-code-review`, `dh-preflight`,
+`dh-artifact-check`, `dh-final-review`, `dh-create-documentation`,
+`dh-create-worktree`, `dh-mermaid`, `dh-grill-sdd`, `dh-setup`,
 `dh-code-ruler`, `dh-semver`. The plugin registers
 agents and skills only; the harness tools are served by the shipped
 `dev-harness-mcp` MCP server (no tools, commands, or prompts are registered).
@@ -55,10 +56,12 @@ mode continues the first `In Progress` phase → its first `In Progress` /
 hits a hard blocker — repeated validation failures (3 consecutive strikes),
 unresolved P0/P1 review findings, or missing preconditions that cannot be
 worked around — the loop STOPS: report the blocker and ask the user for
-guidance. Never silently continue, never skip the blocked step, and never mark
-sub-tasks Complete around a blocker. The rule applies at phase boundaries too:
-a blocked sub-task blocks its phase — do not mark the phase `Completed` around
-a blocker.
+guidance. When the blocker depends on current external facts and browsing tools
+exist, one bounded `dh-research` pass may precede that report; it never
+authorizes continuing past an unresolved blocker. Never silently continue, never
+skip the blocked step, and never mark sub-tasks Complete around a blocker. The
+rule applies at phase boundaries too: a blocked sub-task blocks its phase — do
+not mark the phase `Completed` around a blocker.
 
 **Pause/resume (cross-cutting).** A plan can pause at any point without
 changing its statuses: `dh-pause-plan` writes `docs/plans/<slug>/handoff.md`
@@ -105,7 +108,9 @@ verification: [`docs/LOADING.md`](docs/LOADING.md#mcp-server-dh).
   in that package (root covers shared files).
 - **Docs and versions.** Workspace docs live under `W/docs`; package docs under
   `{package}/docs` with `package` frontmatter; evolution/observation notes stay
-  at `W/docs/evolution`. `dh-semver` follows the map's `fixed` (one `vX.Y.Z`)
+  at `W/docs/evolution`; research notes and their registry stay at
+  `W/docs/research` (owned by the documentation agent, one registry per
+  workspace). `dh-semver` follows the map's `fixed` (one `vX.Y.Z`)
   or `independent` (`<package>@X.Y.Z`) policy; `dh-create-worktree` discovers
   lifecycles at `W` and each independent package and aligns submodule branches.
 - **Execution record.** An executed plan fills `## Execution Record` in
@@ -130,8 +135,8 @@ References: [workspace map](skills/dh-setup/references/workspace-map.md) ·
 
 **Capability-based selection.** Skills do not name fixed agents: they state the
 capability they need (architecture/design, implementation, testing/QA, review,
-final review, documentation, domain specialist) and resolve it against the
-environment. The authoritative protocol is
+final review, documentation, domain specialist, research) and resolve it against
+the environment. The authoritative protocol is
 [`skills/dh-planning/references/agent-selection.md`](skills/dh-planning/references/agent-selection.md):
 discover the runtime agent list first, then project config/agent directories,
 then global definitions; rank project-specific agents with domain instructions
@@ -161,20 +166,26 @@ exploration, and code-graph querying are instruction layers, not selectable
 personas: run them with the `dh-execute-cli`, `dh-explore`, and `dh-code-query`
 skills.
 
+**Research is a support capability.** `dh-researcher` answers one external-fact
+question per pass with primary sources, retrieval dates, and confidence labels;
+`dh-planning`, `dh-grill-sdd`, `dh-contingency`, and both execution task skills
+may delegate to it, and the resulting note lives in `docs/research/`. It is not
+a loop step: the optional pass never clears an unresolved blocker.
+
 ## Provenance
 
 - Harness content is **fully repo-authored**: `agents/` and `skills/` are
   owned by this repository — the repo is self-contained and independent
   (no external source, no extraction step).
 - OpenCode-only — no copilot/gemini variants.
-- Exactly **5 agents + 26 skills** are bundled. Commands, prompts, and all
+- Exactly **6 agents + 27 skills** are bundled. Commands, prompts, and all
   other non-bundled harness content are intentionally NOT bundled.
 - The `dh-` names are canonical in the repo files; bundled agents ship
   without the `permission` and `tools` frontmatter keys.
 
 ## Plugin registration and loading
 
-- The V2 plugin (`Plugin.define`) registers the 5 agents and 26 skills via
+- The V2 plugin (`Plugin.define`) registers the 6 agents and 27 skills via
   synchronous domain transforms (`ctx.agent.transform`, `ctx.skill.transform`)
   from frontmatter-parsed assets (repo `agents/` + `skills/` in source mode,
   `dist/assets/` in the bundle). Zero tool or command transforms (tools live
@@ -188,10 +199,10 @@ skills.
   `opencode.json(c)` pointing at the repo directory (`pnpm install` only; no
   build needed for source loading), or the installed package name. See
   [`docs/LOADING.md`](docs/LOADING.md).
-- **Verify:** launch opencode and confirm the 5 agents and 26 skills appear
-  (including `dh-coding`) and no commands are registered; then confirm the
-  project-scope `dh` MCP server is connected (`opencode mcp list`) so the
-  harness tools are available.
+- **Verify:** launch opencode and confirm the 6 agents and 27 skills appear
+  (including `dh-coding` and `dh-research`) and no commands are registered; then
+  confirm the project-scope `dh` MCP server is connected (`opencode mcp list`)
+  so the harness tools are available.
 - **TUI part:** `exports["./tui"]` loads automatically beside the server part and
   renders read-only plan progress (sidebar card + `/plan-progress`) from the
   local `docs/plans` — see
@@ -201,15 +212,15 @@ skills.
 
 ```text
 index.ts          source-mode plugin entry (re-exports src/plugin.ts)
-agents/           bundled agent definitions (5)
-skills/           bundled skills (26)
+agents/           bundled agent definitions (6)
+skills/           bundled skills (27)
 src/cli/          installer CLI: args, scope, prompt/output, JSONC, config, manifest, commands
 src/mcp/          stdio MCP server + workspace resolver
 src/tools/        plan/sheet/logged-command tool implementations
 src/lib/          shared assets, records, atomic writes, package metadata, main guard
 scripts/          QA, smoke (load/MCP/install/pack), Docker runner, audit
 docker/test/      derived OpenCode test image (pinned 2.0.18)
-docs/             loading/operations docs and phased plans
+docs/             loading/operations docs, research registry, and phased plans
 test/             legacy test directory
 ```
 

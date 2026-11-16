@@ -107,6 +107,13 @@ None — no structural change.
 
 > \`dh-mermaid\` replaces this line with links under \`./diagrams/\` when the plan has visual impact.
 
+## Research
+
+Optional \`dh-research\` notes that back this plan (single registry:
+\`docs/research/\`); write \`None — no research consulted\` when none apply.
+
+- [Node 20 EOL](../../research/node-eol.md) — verified 2026-11-15; drives R4.
+
 ## Agent Selection
 
 | Role | Selected agent | Why | Fallback |

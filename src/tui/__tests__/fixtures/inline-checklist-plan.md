@@ -24,7 +24,7 @@ active: false
 ## Final Integration & Verification
 
 - **System-Wide Test:** Counts and links verified manually.
-- **Completion Checklist:** 5 agents / 26 skills; no raw paths; counts unchanged.
+- **Completion Checklist:** 6 agents / 27 skills; no raw paths; counts unchanged.
 
 ## Open Questions
 

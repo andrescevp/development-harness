@@ -60,6 +60,7 @@ Create a practical execution plan in `./docs/plans/<plan-slug>/plan.md`, not imp
   - For **non-software projects**: skip software-specific architecture/engineering agents — their output is not applicable. Select a documentation or domain agent only when the plan needs one.
 - Select a testing/QA agent for concrete languages or frameworks when one is available, using the same protocol.
 - **Visual context:** when the plan changes architecture, data flow, components, lifecycle, or has critical/high-risk modifications, use `dh-mermaid` to create `./docs/plans/<plan-slug>/diagrams/` and link it from the plan's `## Visual Context`. Small or non-structural plans write `None — no structural change`.
+- **Research links (optional):** when requirements or alternatives depend on current external facts, delegate one question to the `dh-research` skill, link the resulting note in `## Research` (after `## Visual Context`, outside `## Phases`) as `../../research/<topic>.md`, and cite it in the sub-task it informs. Never a gate; write `None — no research consulted` when no note applies.
 - Set properly obsidian frontmatter metadata in all files
 
 ## Workflow
@@ -93,25 +94,26 @@ Before leaving interview mode, confirm the collected answers provide enough info
 1. Identify the goal, requirements, constraints, risks, dependencies, and out-of-scope items from the request (or interview answers).
 2. If critical information is still missing (interview mode was skipped or partial), ask focused numbered questions before proceeding.
 3. If `./docs/plans/<plan-slug>/sdd.md` exists extract a short requirements snapshot from it, including acceptance criteria, edge cases, out-of-scope boundaries, and constraints relevant to implementation, and assign stable IDs such as `R1`, `R2`, and `R3`. If it is an update request, preserve the original requirements and acceptance criteria from `./docs/plans/<plan-slug>/sdd.md` in the requirements snapshot, and call out any new requirements or changes as additions or modifications to the original requirements. When `WORKSPACE.md` exists, read it and record `## Workspace Impact` from it.
-4. **Select agents:** after the requirements snapshot, inspect the runtime agent list (then project config/agent directories, then global definitions) and resolve the capability roles the plan will delegate — architecture/design, implementation/engineering, testing/QA, review, final review, documentation, and any domain specialist — using [`references/agent-selection.md`](references/agent-selection.md). Record the choices, rationale, and generic fallback in `## Agent Selection`; write `None — no specialized agent required` when nothing is delegated. Do this before any delegation.
-5. **For software projects only:** If the scope involves architectural decisions or cross-module changes, run the `dh-domain-check` skill to validate bounded contexts and SOLID principles, and incorporate findings into the plan structure. If multiple plausible approaches exist, run the `dh-contingency` skill to explore alternatives before committing to a single path.
-6. Break the work into **ordered phases**, and within each phase into
+4. **Research external facts (optional, never a gate):** when requirements or alternatives depend on current ecosystem facts — versions, EOL, API/service status, licensing — delegate one question to the `dh-research` skill ([`../dh-research/SKILL.md`](../dh-research/SKILL.md)), link the note in `## Research`, and cite it in the sub-task it informs; with no browsing tool, record the fact as an assumption instead.
+5. **Select agents:** after the requirements snapshot, inspect the runtime agent list (then project config/agent directories, then global definitions) and resolve the capability roles the plan will delegate — architecture/design, implementation/engineering, testing/QA, review, final review, documentation, and any domain specialist — using [`references/agent-selection.md`](references/agent-selection.md). Record the choices, rationale, and generic fallback in `## Agent Selection`; write `None — no specialized agent required` when nothing is delegated. Do this before any delegation.
+6. **For software projects only:** If the scope involves architectural decisions or cross-module changes, run the `dh-domain-check` skill to validate bounded contexts and SOLID principles, and incorporate findings into the plan structure. If multiple plausible approaches exist, run the `dh-contingency` skill to explore alternatives before committing to a single path.
+7. Break the work into **ordered phases**, and within each phase into
    **sub-tasks** with clear outcomes. Group phases by logical workstream; keep
    each phase independently completable.
-7. For each sub-task, list the related requirements so downstream agents can trace the work back to the approved task.
-8. For each sub-task, assign the single responsible agent in
+8. For each sub-task, list the related requirements so downstream agents can trace the work back to the approved task.
+9. For each sub-task, assign the single responsible agent in
    `- **Delegated to agent:**` (a value from `## Agent Selection`) and include
    its objective, dependencies, in-scope work, explicit non-goals, key risks,
    implementation suggestions, and validation guidance.
-9. **For software projects:** Include a documentation sub-task that references the `dh-create-documentation` skill for any new modules, APIs, or public interfaces introduced by the plan.
-10. **Create visual context:** invoke `dh-mermaid` for current state, desired state, critical changes, and component graph when applicable; write the diagrams under `./docs/plans/<plan-slug>/diagrams/` and link them from `## Visual Context`. Produce optional timeline/gantt diagrams only after phases are defined.
-11. Initialize each newly created sub-task as `Pending` and each phase as `Pending`, and use explicit status markers such as `Pending`, `In Progress`, and `Completed` so agents can reliably pick the next sub-task. Status lines go immediately after the phase/sub-task header (parser contract).
-12. Prefer concrete validation commands or checks when known.
-13. Explain core concepts with appropriate code example when necessary.
-14. Write a self-contained plan that can be executed without the conversation.
-15. **Tools:** create the plan scaffold with the `dh_plan_create` tool when available (pass `delegatedTo` for every sub-task), then fill details, and read/verify with `dh_plan_read`; fall back to manual writes using `references/phased-plan-template.md` when the tools are not installed. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
-16. Update `./docs/plans/index.md` to add the new plan or reflect the update, including title, slug, description, timestamps and status.
-17. Optionally use chrome mcp tools to validate the work via web if it is possible to do so, and include the results in the plan.
+10. **For software projects:** Include a documentation sub-task that references the `dh-create-documentation` skill for any new modules, APIs, or public interfaces introduced by the plan.
+11. **Create visual context:** invoke `dh-mermaid` for current state, desired state, critical changes, and component graph when applicable; write the diagrams under `./docs/plans/<plan-slug>/diagrams/` and link them from `## Visual Context`. Produce optional timeline/gantt diagrams only after phases are defined.
+12. Initialize each newly created sub-task as `Pending` and each phase as `Pending`, and use explicit status markers such as `Pending`, `In Progress`, and `Completed` so agents can reliably pick the next sub-task. Status lines go immediately after the phase/sub-task header (parser contract).
+13. Prefer concrete validation commands or checks when known.
+14. Explain core concepts with appropriate code example when necessary.
+15. Write a self-contained plan that can be executed without the conversation.
+16. **Tools:** create the plan scaffold with the `dh_plan_create` tool when available (pass `delegatedTo` for every sub-task), then fill details, and read/verify with `dh_plan_read`; fall back to manual writes using `references/phased-plan-template.md` when the tools are not installed. These tools are exposed by the project-scope `dh` MCP server; under Code Mode they are called as `tools.dh.<tool>`, and `dh_<tool>` is the tool's normalized name (permission actions match `dh_*`).
+17. Update `./docs/plans/index.md` to add the new plan or reflect the update, including title, slug, description, timestamps and status.
+18. Optionally use chrome mcp tools to validate the work via web if it is possible to do so, and include the results in the plan.
 
 ## Required Output Template
 
