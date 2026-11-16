@@ -90,29 +90,34 @@ function isClosingLine(command: string, markerStart: number, markerLength: numbe
 }
 
 /**
- * Locate the closing marker line of an opened heredoc. Returns `undefined` for
- * unterminated heredocs; the scan is forward-only, so a miss means no later
- * start position can find one either.
+ * Locate the closing marker line of an opened heredoc. `allowIndent` matches the
+ * shell's `<<-` form (leading tabs before the terminator). Returns `undefined`
+ * for unterminated heredocs; the scan is forward-only.
  */
-function heredocBounds(command: string, bodyStart: number, marker: string): HeredocBounds | undefined {
+function heredocBounds(
+  command: string,
+  bodyStart: number,
+  marker: string,
+  allowIndent: boolean
+): HeredocBounds | undefined {
+  const markerAt = (lineStart: number): number => {
+    let at = lineStart;
+    if (allowIndent) while (command[at] === '\t') at += 1;
+    return command.startsWith(marker, at) && isClosingLine(command, at, marker.length) ? at : -1;
+  };
+
   // An empty body is possible: the closing marker starts right after the opener.
-  if (command.startsWith(marker, bodyStart) && isClosingLine(command, bodyStart, marker.length)) {
-    const after = bodyStart + marker.length;
-    return { bodyEnd: bodyStart, end: after };
-  }
+  const immediate = markerAt(bodyStart);
+  if (immediate !== -1) return { bodyEnd: bodyStart, end: immediate + marker.length };
 
-  let searchFrom = bodyStart;
-  for (;;) {
-    const found = command.indexOf(`\n${marker}`, searchFrom);
-    if (found === -1) return undefined;
-
-    const markerStart = found + 1;
-    if (isClosingLine(command, markerStart, marker.length)) {
-      const after = markerStart + marker.length;
-      return { bodyEnd: found, end: after };
-    }
-    searchFrom = found + 1;
+  let lineStart = command.indexOf('\n', Math.max(0, bodyStart - 1));
+  while (lineStart !== -1) {
+    const nextStart = lineStart + 1;
+    const at = markerAt(nextStart);
+    if (at !== -1) return { bodyEnd: lineStart, end: at + marker.length };
+    lineStart = command.indexOf('\n', nextStart);
   }
+  return undefined;
 }
 
 /** Per-call heredoc scan state: failed markers, spend, and budget. */
@@ -143,7 +148,7 @@ function readHeredoc(command: string, index: number, scan: HeredocScan): { text:
 
   scan.spent += openerLine.length;
   const bodyStart = index + openerLine.length;
-  const bounds = heredocBounds(command, bodyStart, marker);
+  const bounds = heredocBounds(command, bodyStart, marker, openerLine.startsWith('<<-'));
 
   if (bounds === undefined) {
     // Memoize the miss: every later opener with this marker would rescan to

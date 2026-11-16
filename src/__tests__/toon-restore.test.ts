@@ -111,6 +111,11 @@ describe('restoreForwardedCommand — heredocs', () => {
     expect(restoreForwardedCommand(command)).toBe(`cat <<-"JSON"\n${FORWARDED_JSON}\nJSON\n`);
   });
 
+  it('supports <<- with a tab-indented quoted terminator', () => {
+    const command = `cat <<-'JSON'\n${FORWARDED_TOON}\n\tJSON\n`;
+    expect(restoreForwardedCommand(command)).toBe(`cat <<-'JSON'\n${FORWARDED_JSON}\n\tJSON\n`);
+  });
+
   it('handles a quoted closing marker at end of input', () => {
     const command = `cat <<'JSON'\n${FORWARDED_TOON}\nJSON`;
 

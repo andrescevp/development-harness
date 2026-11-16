@@ -18,7 +18,7 @@ version.
   compresses eligible completed tool output (default `bash`, overridable with
   `OPENCODE_TOON_PLUGIN_TOOLS`) and remembers the original JSON in a
   process-local 100-entry cache; `execute.before` restores JSON inside
-  forwarded quoted strings and heredoc bodies (exact cache match first, strict
+  forwarded quoted strings and quoted-marker heredoc bodies (exact cache match first, strict
   TOON decode second).
 
 ### Changed
