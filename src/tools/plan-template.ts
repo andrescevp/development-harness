@@ -1,14 +1,20 @@
 /**
  * plan-template.ts — markdown literals for the phased plan scaffold (M2).
  * Split from plan-lifecycle.ts to keep files under the 300-line rule.
- * Mirrors skills/planning/references/phased-plan-template.md structure.
+ * Mirrors skills/dh-planning/references/phased-plan-template.md structure,
+ * including the optional parallel metadata (rendered as its defaults).
  */
+import type { PlanIsolation } from './plan-metadata.js';
 
 /** Status every scaffolded phase/sub-task starts with (index rows reuse it). */
 export const INITIAL_PHASE_STATUS = 'Pending' as const;
 
-const SUB_TASK_SKELETON = (delegatedTo: string) => `- **Status:** ${INITIAL_PHASE_STATUS}
+const SUB_TASK_SKELETON = (delegatedTo: string, options: SubTaskOptions) => `- **Status:** ${INITIAL_PHASE_STATUS}
 - **Delegated to agent:** ${delegatedTo}
+- **Parallelizable:** ${options.parallelizable ? 'yes' : 'no'}
+- **Depends on:** ${options.dependsOn.length ? options.dependsOn.join(', ') : 'None'}
+- **Files/Scope:** ${options.filesScope.length ? options.filesScope.join(', ') : 'None'}
+- **Isolation:** ${options.isolation}
 - **Objective:** [What this sub-task should accomplish]
 - **Related Requirements:** [Requirement IDs]
 - **Dependencies and Preconditions:** [Prerequisites]
@@ -21,34 +27,76 @@ const SUB_TASK_SKELETON = (delegatedTo: string) => `- **Status:** ${INITIAL_PHAS
 - **Testing Suggestions:** [Validation commands or checks]
 - **Done When:** [Observable completion conditions]`;
 
-function subTaskBlock(phaseNumber: number, subNumber: number, title: string, delegatedTo: string): string {
-  return `#### Sub-Task ${phaseNumber}.${subNumber}: ${title}
-
-${SUB_TASK_SKELETON(delegatedTo)}`;
+interface SubTaskOptions {
+  parallelizable: boolean;
+  dependsOn: string[];
+  filesScope: string[];
+  isolation: PlanIsolation;
 }
 
-function phaseBlock(phaseNumber: number, title: string, subTaskBlocks: string[]): string {
+interface PhaseOptions {
+  parallelizable: boolean;
+  dependsOn: string[];
+}
+
+function subTaskBlock(
+  phaseNumber: number,
+  subNumber: number,
+  title: string,
+  delegatedTo: string,
+  options: SubTaskOptions
+): string {
+  return `#### Sub-Task ${phaseNumber}.${subNumber}: ${title}
+
+${SUB_TASK_SKELETON(delegatedTo, options)}`;
+}
+
+function phaseBlock(phaseNumber: number, title: string, subTaskBlocks: string[], options: PhaseOptions): string {
   const subs = subTaskBlocks.join('\n\n');
   return `### Phase ${phaseNumber}: ${title}
 
 - **Status:** ${INITIAL_PHASE_STATUS}
+- **Parallelizable:** ${options.parallelizable ? 'yes' : 'no'}
+- **Depends on:** ${options.dependsOn.length ? options.dependsOn.join(', ') : 'None'}
 
 ${subs}`;
 }
 
-export function planScaffold(input: {
+export interface PlanScaffoldInput {
   title: string;
   slug: string;
   objective: string;
-  phases: { title: string; subTasks: { title: string; delegatedTo: string }[] }[];
-}): string {
+  phases: {
+    title: string;
+    parallelizable?: boolean;
+    dependsOn?: string[];
+    subTasks: {
+      title: string;
+      delegatedTo: string;
+      parallelizable?: boolean;
+      dependsOn?: string[];
+      filesScope?: string[];
+      isolation?: PlanIsolation;
+    }[];
+  }[];
+}
+
+export function planScaffold(input: PlanScaffoldInput): string {
   const today = new Date().toISOString().slice(0, 10);
   const phaseBlocks = input.phases
     .map((p, i) =>
       phaseBlock(
         i + 1,
         p.title,
-        p.subTasks.map((s, j) => subTaskBlock(i + 1, j + 1, s.title, s.delegatedTo))
+        p.subTasks.map((s, j) =>
+          subTaskBlock(i + 1, j + 1, s.title, s.delegatedTo, {
+            parallelizable: s.parallelizable ?? false,
+            dependsOn: s.dependsOn ?? [],
+            filesScope: s.filesScope ?? [],
+            isolation: s.isolation ?? 'shared',
+          })
+        ),
+        { parallelizable: p.parallelizable ?? false, dependsOn: p.dependsOn ?? [] }
       )
     )
     .join('\n\n');

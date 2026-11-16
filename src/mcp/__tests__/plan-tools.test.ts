@@ -153,6 +153,39 @@ describe('plan_create', () => {
     expect(read.plan).toEqual(created.plan);
   });
 
+  it('scaffolds parallel metadata when provided', async () => {
+    const h = await connectPlanHarness();
+    const created = await h.callToolJson<PlanPayload>('plan_create', {
+      slug: 'parallel-new',
+      title: 'Parallel New',
+      objective: 'Demo parallel metadata',
+      phases: [
+        {
+          title: 'Backend',
+          parallelizable: true,
+          dependsOn: [],
+          subTasks: [
+            {
+              title: 'API',
+              delegatedTo: 'dh-software-engineer',
+              parallelizable: true,
+              dependsOn: [],
+              filesScope: ['services/api/**'],
+              isolation: 'shared',
+            },
+          ],
+        },
+      ],
+    });
+    expect(created.plan.phases[0]?.parallelizable).toBe(true);
+    expect(created.plan.phases[0]?.subTasks[0]?.parallelizable).toBe(true);
+    expect(created.plan.phases[0]?.subTasks[0]?.filesScope).toEqual(['services/api/**']);
+    const text = fs.readFileSync(created.path, 'utf8');
+    expect(text).toContain('- **Parallelizable:** yes');
+    expect(text).toContain('- **Files/Scope:** services/api/**');
+    expect(text).toContain('- **Isolation:** shared');
+  });
+
   it('rejects a sub-task without delegatedTo before writing anything', async () => {
     const h = await connectPlanHarness();
     const file = plansFile(h.workspaceRoot, 'missing-delegation');

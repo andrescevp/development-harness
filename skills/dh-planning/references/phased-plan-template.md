@@ -23,20 +23,34 @@ Agent choices follow [`agent-selection.md`](agent-selection.md).
    status and before the other fields. It names the single agent responsible
    for executing that sub-task and must match a role/agent recorded in
    `## Agent Selection`.
-7. Valid statuses: `Pending`, `In Progress`, `Completed`.
-8. A sub-task's phase is derived from its `N` prefix (Sub-Task 2.1 belongs to
+7. Parallel metadata is optional and additive (legacy plans without it stay
+   sequential). It renders after `Status` on phases and after
+   `Delegated to agent` on sub-tasks:
+   - phase: `- **Parallelizable:** yes|no`, `- **Depends on:** <phase ids | None>`
+   - sub-task: `- **Parallelizable:** yes|no`, `- **Depends on:** <N.M ids | None>`,
+     `- **Files/Scope:** <paths/globs | None>`, `- **Isolation:** shared|worktree`
+   - defaults when absent: `no`, `None` (empty list), `None` (empty list),
+     `shared`.
+   - `Depends on` and `Files/Scope` are comma-separated; `None` means no
+     entries; optional backticks around `Files/Scope` entries are decorative
+     and are stripped by the parser. Unknown or empty values are format errors.
+8. Valid statuses: `Pending`, `In Progress`, `Completed`.
+9. A sub-task's phase is derived from its `N` prefix (Sub-Task 2.1 belongs to
    Phase 2), so mis-numbered sub-tasks are format errors.
-9. The Requirements Snapshot with stable IDs (R1, R2, …) is preserved; each
-   sub-task maps to requirements via its `Related Requirements` field.
-10. The phases region runs from `## Phases` to the next top-level `##`
-    heading (e.g. `## Final Integration & Verification`) or EOF.
-11. `## Agent Selection` sits before `## Phases`; it is outside the phases
+10. The Requirements Snapshot with stable IDs (R1, R2, …) is preserved; each
+    sub-task maps to requirements via its `Related Requirements` field.
+11. The phases region runs from `## Phases` to the next top-level `##`
+    heading (e.g. `## Final Integration & Verification`) or EOF. Only this
+    region is parsed (headings outside it are ignored), and fenced code
+    blocks (triple-backtick or `~~~`) are skipped everywhere, so format
+    examples never become phantom phases, sub-tasks, or status markers.
+12. `## Agent Selection` sits before `## Phases`; it is outside the phases
     region, so the parser ignores it for phase/sub-task extraction.
-12. `## Workspace Impact` (after `## Scope`), `## Research` (after
+13. `## Workspace Impact` (after `## Scope`), `## Research` (after
     `## Visual Context`) and `## Execution Record` (after
     `## Final Integration & Verification`) are optional top-level sections
     outside the phases region; legacy plans without them parse unchanged.
-13. `## Research` links research notes and carries no status markers, so the
+14. `## Research` links research notes and carries no status markers, so the
     parser ignores it; never move it or a research link inside `## Phases`.
 
 ## Template
@@ -117,11 +131,17 @@ Optional `dh-research` notes that back this plan (single registry:
 ### Phase 1: <Phase title>
 
 - **Status:** Pending
+- **Parallelizable:** no
+- **Depends on:** None
 
 #### Sub-Task 1.1: <Clear title>
 
 - **Status:** Pending
 - **Delegated to agent:** <agent-id from Agent Selection>
+- **Parallelizable:** no
+- **Depends on:** None
+- **Files/Scope:** None
+- **Isolation:** shared
 - **Objective:** [What this sub-task should accomplish]
 - **Related Requirements:** [Requirement IDs]
 - **Dependencies and Preconditions:** [Prerequisites]
@@ -138,16 +158,26 @@ Optional `dh-research` notes that back this plan (single registry:
 
 - **Status:** Pending
 - **Delegated to agent:** <agent-id from Agent Selection>
+- **Parallelizable:** no
+- **Depends on:** None
+- **Files/Scope:** None
+- **Isolation:** shared
 - **Objective:** ...
 
 ### Phase 2: <Phase title>
 
 - **Status:** Pending
+- **Parallelizable:** no
+- **Depends on:** 1
 
 #### Sub-Task 2.1: <Clear title>
 
 - **Status:** Pending
 - **Delegated to agent:** <agent-id from Agent Selection>
+- **Parallelizable:** no
+- **Depends on:** None
+- **Files/Scope:** None
+- **Isolation:** shared
 - **Objective:** ...
 
 ## Final Integration & Verification
@@ -206,6 +236,24 @@ Every new sub-task must name its responsible agent:
   as `null` but are not executable under the delegation contract.
 - Execution uses the field as the single responsible agent. A missing,
   malformed, or unavailable agent is a hard stop — do not substitute silently.
+
+## Parallel metadata fields
+
+Optional on every phase/sub-task; absent fields keep legacy sequential
+behavior (`no`, `None`, `None`, `shared`).
+
+- `Parallelizable` — `yes` only when the phase/sub-task may run concurrently
+  with other ready work; `no` keeps sequential order.
+- `Depends on` — refs that must be `Completed` first: phase ids (`1, 2`) on
+  phases, sub-task ids (`1.3`) on sub-tasks; `None` when nothing is required.
+- `Files/Scope` — declared paths/globs the sub-task may touch (comma-separated,
+  backticks optional); `None` means no declared scope, so consumers must treat
+  it as unknown.
+- `Isolation` — `shared` for the current worktree; `worktree` for a dedicated
+  git worktree/branch.
+
+`yes|no`, `shared|worktree`, and `None` are matched case-insensitively; unknown
+or empty values are format errors rather than silent defaults.
 
 ## Phase lifecycle (execution contract)
 

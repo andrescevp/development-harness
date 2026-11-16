@@ -216,7 +216,7 @@ the `/plan-progress` panel.
 
 | Surface | What it shows |
 |---|---|
-| `sidebar.content` card | Active plan title/slug, `Phase N · N.M` position, completed/total sub-tasks with a text progress bar, the current sub-task's delegated agent, plan status and a one-line activity (`Running edit`, `1.1 … — dh-software-engineer`, `2 active plans — choose one`). |
+| `sidebar.content` card | Active plan title/slug, `Phase N · N.M` position, completed/total sub-tasks with a text progress bar, the current sub-task's delegated agent, plan status and a one-line activity (`Running edit`, `1.1 … — dh-software-engineer`, `2 active plans — choose one`). Parallel runs show the active-task count (`Phase N · N.M +K`, `Active: N tasks`) while keeping the lowest index as the primary task. |
 | `/plan-progress` panel (`dev-harness-skills.plan`) | Every phase and sub-task with status and delegated agent, checklists (`plan.md` checkboxes, `Done When`/`Acceptance Criteria`, final verification), review verdict, fast-mode skipped-check ledger and last update. Keys: `↑`/`↓` and `PgUp`/`PgDn` scroll, `f` fullscreen, `r` refresh, `Esc` close; `1`…`9` pin a plan when several are active. |
 
 - **Read-only.** The TUI never edits plan status, checklists, reviews or the
@@ -276,6 +276,126 @@ generic fallbacks in the plan's `## Agent Selection` table (before
 `## Phases`); execution re-validates availability and stops rather than
 substituting silently. Command execution/validation and codebase exploration
 are skills (`dh-execute-cli`, `dh-explore`), not selectable agents.
+
+## Parallel plan execution
+
+`dh-execute-plan` and `dh-execute-plan-fast` share one scheduler contract —
+[`../skills/dh-execute-plan/references/parallel-scheduler.md`](../skills/dh-execute-plan/references/parallel-scheduler.md).
+They differ only in where gates and ledger rows run, never in readiness,
+concurrency, isolation, or status ownership.
+
+### Plan metadata
+
+```markdown
+### Phase 2: Backend and frontend
+
+- **Status:** Pending
+- **Parallelizable:** yes
+- **Depends on:** 1
+
+#### Sub-Task 2.1: API endpoint
+
+- **Status:** Pending
+- **Delegated to agent:** dh-software-engineer
+- **Parallelizable:** yes
+- **Depends on:** 1.3
+- **Files/Scope:** services/api/**, tests/api/**
+- **Isolation:** shared
+```
+
+| Field | Level | Values | Default (absent) |
+|---|---|---|---|
+| `Parallelizable` | phase, sub-task | `yes` \| `no` | `no` |
+| `Depends on` | phase, sub-task | phase numbers / `N.M` ids, comma-separated, or `None` | `None` |
+| `Files/Scope` | sub-task | paths/globs, comma-separated, or `None` | `None` (unknown) |
+| `Isolation` | sub-task | `shared` \| `worktree` | `shared` |
+
+The defaults are the legacy contract: a plan without these fields parses and
+executes sequentially. `dh_plan_read` returns the metadata and
+`dh_plan_create` accepts it per phase/sub-task.
+
+### Readiness and concurrency
+
+- A **phase** is ready when it is `Pending`, every phase in its `Depends on` is
+  `Completed`, and it has no blocked sub-task.
+- A **sub-task** is ready when its phase is active, it is `Pending`, every
+  dependency is `Completed`, it is `Parallelizable: yes` (or it is the next
+  listed sub-task of a sequential phase), and it does not conflict with a
+  running shared-worktree task.
+- Each cycle the scheduler dispatches up to the limit: **3 workers by default**,
+  changed only by an explicit orchestrator request or a plan-level `parallelism`
+  value, and never above the hard cap of **8**.
+- Several sub-tasks may be `In Progress` at once. A phase becomes `Completed`
+  only when all of its sub-tasks are `Completed`. Missing, cyclic, or deadlocked
+  dependencies stop scheduling and are reported, never guessed around.
+
+### Worker mode and ownership
+
+The orchestrator marks a sub-task (and its phase on first start) `In Progress`
+before dispatch, then invokes `dh-execute-plan-task` (or `-fast`) with
+`parallel-worker` and the exact sub-task ID. A worker reads the brief,
+implements with TDD, runs narrow validation, returns an envelope, and stops:
+
+```json
+{
+  "subTask": "2.1",
+  "agent": "dh-software-engineer",
+  "status": "completed",
+  "filesChanged": ["services/api/routes.ts"],
+  "validation": ["pnpm test -- api: pass"],
+  "blockers": [],
+  "notes": []
+}
+```
+
+Only the orchestrator writes plan statuses (`dh_plan_update_status` /
+`dh_plan_fast_update_status`, serially), fast-mode ledger rows
+(`dh_plan_fast_skip_check`, serially), reviews, and commits. Workers never edit
+`plan.md`, `plan_fast.md`, the ledger, or commit in a shared worktree. Reviews
+fan in as workers finish; a P0/P1 finding stops new dispatch, drains in-flight
+work, and leaves the task and phase open.
+
+### Isolation and worktrees
+
+| Situation | Behavior |
+|---|---|
+| Two shared tasks with disjoint declared scopes | May run concurrently in the current worktree |
+| Overlapping scopes (prefix/glob) | Serialize; never concurrent |
+| `Files/Scope: None` (unknown) | Serialize with other shared tasks |
+| `Isolation: worktree` | Dedicated branch/worktree; integrate after completion |
+| Two worktree tasks | Concurrent; integrated in dependency/plan order |
+
+- `Isolation: worktree` requires a non-empty `Files/Scope`; create the worktree
+  with `dh-create-worktree` and run the worker there.
+- Integration follows dependency/plan order (merge or cherry-pick). A conflict
+  stops integration and preserves the worktree/branch for inspection; worktrees
+  are removed only with confirmation, never automatically after a failure.
+- Build/test outputs, caches, ports, and lockfiles are outside source scope —
+  tooling-heavy tasks belong in worktrees, and the orchestrator serializes
+  commits and git index operations.
+
+### Resume
+
+A run may pause with several `In Progress` sub-tasks. `dh-pause-plan` records an
+active-task table (index, phase, isolation, worktree/branch, validation, pending
+review) in `handoff.md`; `dh-resume-plan` rehydrates **all** of them,
+reconciles worktrees/branches, revalidates completed-but-unreviewed work, and
+re-enters the scheduler without duplicate dispatch. Phases stay open until every
+sub-task is `Completed`.
+
+### Limits
+
+- **No automatic scope discovery:** `Parallelizable: yes` is a plan-author
+  claim, and `Files/Scope: None` can only serialize.
+- **No automatic conflict resolution:** a worktree merge conflict always stops
+  for a human decision.
+- **One machine, one repository/workspace per run:** no distributed workers,
+  external queues, or cross-plan parallelism.
+- **Concurrency is not guaranteed:** the runtime may serialize subagent calls;
+  correctness never depends on true wall-clock parallelism.
+- **Plan writes are single-writer:** only the orchestrator writes statuses,
+  ledger rows, and commits, so there is no shared-lock protocol and no
+  lost-update race on plan files.
 
 ## MCP server (`dh`)
 

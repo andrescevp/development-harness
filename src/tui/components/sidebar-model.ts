@@ -96,6 +96,9 @@ function readyCard(state: PlanState, plan: PlanProgress, width: number, ascii: b
   const bar = progressBar(plan.progress.ratio, wide ? WIDE_BAR_CELLS : NARROW_BAR_CELLS, { ascii });
   const count = `${plan.counts.subTasks.completed}/${plan.counts.subTasks.total}`;
   lines.push(truncate(`[${bar}] ${count}${wide ? ' sub-tasks' : ''}`, width));
+  if (plan.activeSubTasks.length > 1) {
+    lines.push(truncate(`Active: ${plan.activeSubTasks.length} tasks`, width));
+  }
   lines.push(truncate(`Agent: ${plan.current.subTask?.delegatedTo ?? '—'}`, width));
   const stale = state.activity.stale ? ' (stale)' : '';
   lines.push(truncate(`${activitySymbol(state.activity)} ${state.activity.summary}${stale}`, width));

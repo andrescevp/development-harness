@@ -123,6 +123,19 @@ describe('derivePlanState — ready states', () => {
     expect(currentSubTask(state.plan!)).toMatchObject({ index: '2.2', delegatedTo: 'dh-software-engineer' });
   });
 
+  it('tracks multiple active sub-tasks and exposes them for readers', () => {
+    const source = fixture('active-plan.md').replace(
+      '#### Sub-Task 2.1: Implement the checkout endpoint\n\n- **Status:** Completed',
+      '#### Sub-Task 2.1: Implement the checkout endpoint\n\n- **Status:** In Progress'
+    );
+    const state = derive([candidate()], { details: detailsOf(source) });
+
+    expect(state.status).toBe('ready');
+    expect(state.plan?.activeSubTasks.map((entry) => entry.index).sort()).toEqual(['2.1', '2.2']);
+    expect(state.plan?.current.label).toContain('+1');
+    expect(state.plan?.current.position).toBe('2.1');
+  });
+
   it('reports the next pending work as `next-pending`, never as active', () => {
     const pending = fixture('active-plan.md')
       .replace(

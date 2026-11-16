@@ -1,10 +1,10 @@
 # Audit Report — dev-harness-skills plugin
 
-Generated 2026-11-16T02:30:39.045Z by `scripts/audit.mjs`.
+Generated 2026-11-16T10:30:54.295Z by `scripts/audit.mjs`.
 
 ## Verdict
 
-**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 305. Documented schema deviations: 0.
+**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 318. Documented schema deviations: 0.
 
 ## Summary verdict table
 
@@ -14,7 +14,7 @@ Generated 2026-11-16T02:30:39.045Z by `scripts/audit.mjs`.
 | Frontmatter parse | 34 | PASS | 34 files on audit surface |
 | Name regex | 33 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 1 | WARN | 578 resolved; 0 code-context; 0 allowlisted; 298 prose tokens (warn) |
+| Cross-references | 1 | WARN | 599 resolved; 0 code-context; 0 allowlisted; 311 prose tokens (warn) |
 | Loop membership | 33 | PASS | 27/27 skills present; 6/6 agents present |
 | Secret scan | 54 | PASS | 54 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
@@ -82,15 +82,16 @@ Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; f
 
 - `agent-selection` × 39
 - `project-name` × 30
-- `per-task` × 17
 - `execution-record` × 16
+- `per-task` × 16
 - `workspace-diff-scope` × 14
+- `parallel-scheduler` × 14
 - `workspace-docs` × 13
-- `final-review` × 13
 - `pre-execution` × 13
 - `plan-end` × 13
 - `workspace-map` × 12
 - `tests-reaching` × 12
+- `final-review` × 12
 - `project-scope` × 11
 - `repo-path` × 11
 - `read-only` × 10
@@ -101,10 +102,9 @@ Unresolved prose tokens (kebab-case, non-bundled, warn-level — top 25 shown; f
 - `osv-scanner` × 7
 - `test-only` × 7
 - `code-rules-resolution` × 6
+- `parallel-worker` × 6
 - `plan-fast-template` × 6
 - `skip-checks` × 6
-- `artifact-check` × 6
-- `re-pause` × 6
 
 ## Secret scan
 

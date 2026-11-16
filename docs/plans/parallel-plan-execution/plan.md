@@ -4,7 +4,7 @@ slug: parallel-plan-execution
 description: Explicit phase/sub-task parallel metadata, DAG scheduling, hybrid isolation, and orchestrator-owned status for standard and fast execution.
 created: 2026-11-16
 updated: 2026-11-16
-status: Pending
+status: In Progress
 active: true
 tags: [plan, orchestration, parallelism]
 project: dev-harness-skills
@@ -209,13 +209,13 @@ external references are not required.
 
 ### Phase 1: Schema, scheduler contract, and readers
 
-- **Status:** Pending
+- **Status:** Completed
 - **Parallelizable:** no
 - **Depends on:** None
 
 #### Sub-Task 1.1: Extend the phased plan schema, parser, scaffold, and fixture with parallel metadata
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Parallelizable:** no
 - **Depends on:** None
@@ -241,7 +241,7 @@ external references are not required.
 
 #### Sub-Task 1.2: Add the shared scheduler contract and validation helpers
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Parallelizable:** no
 - **Depends on:** 1.1
@@ -266,7 +266,7 @@ external references are not required.
 
 #### Sub-Task 1.3: Extend MCP plan tools and TUI readers for multiple active tasks
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Parallelizable:** no
 - **Depends on:** 1.1
@@ -292,13 +292,13 @@ external references are not required.
 
 ### Phase 2: Planning guidance and worker modes
 
-- **Status:** Pending
+- **Status:** Completed
 - **Parallelizable:** no
 - **Depends on:** 1
 
 #### Sub-Task 2.1: Teach dh-planning and the plan template parallel decomposition
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Parallelizable:** no
 - **Depends on:** 1.1
@@ -323,7 +323,7 @@ external references are not required.
 
 #### Sub-Task 2.2: Add parallel worker mode to both per-task skills
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Parallelizable:** no
 - **Depends on:** 1.2
@@ -348,13 +348,13 @@ external references are not required.
 
 ### Phase 3: Orchestrators and isolation
 
-- **Status:** Pending
+- **Status:** Completed
 - **Parallelizable:** no
 - **Depends on:** 2
 
 #### Sub-Task 3.1: Implement the parallel scheduler in dh-execute-plan
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Parallelizable:** no
 - **Depends on:** 1.2, 2.2
@@ -380,7 +380,7 @@ external references are not required.
 
 #### Sub-Task 3.2: Implement the parallel scheduler in dh-execute-plan-fast
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Parallelizable:** no
 - **Depends on:** 3.1
@@ -406,7 +406,7 @@ external references are not required.
 
 #### Sub-Task 3.3: Add hybrid shared/worktree isolation and integration rules
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Parallelizable:** no
 - **Depends on:** 3.1
@@ -431,7 +431,7 @@ external references are not required.
 
 #### Sub-Task 3.4: Support pause/resume and handoff with multiple active tasks
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Parallelizable:** no
 - **Depends on:** 3.1, 3.3
@@ -455,13 +455,13 @@ external references are not required.
 
 ### Phase 4: Documentation, verification, and close-out
 
-- **Status:** Pending
+- **Status:** Completed
 - **Parallelizable:** no
 - **Depends on:** 3
 
 #### Sub-Task 4.1: Update project docs, changelog, and skill index for parallel execution
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-documentor
 - **Parallelizable:** no
 - **Depends on:** 3.4
@@ -485,7 +485,7 @@ external references are not required.
 
 #### Sub-Task 4.2: Run packaging and the full verification gate
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Parallelizable:** no
 - **Depends on:** 4.1
@@ -505,7 +505,7 @@ external references are not required.
 
 #### Sub-Task 4.3: Write evolution and observation close-out notes
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-documentor
 - **Parallelizable:** no
 - **Depends on:** 4.2

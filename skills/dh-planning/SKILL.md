@@ -61,7 +61,56 @@ Create a practical execution plan in `./docs/plans/<plan-slug>/plan.md`, not imp
 - Select a testing/QA agent for concrete languages or frameworks when one is available, using the same protocol.
 - **Visual context:** when the plan changes architecture, data flow, components, lifecycle, or has critical/high-risk modifications, use `dh-mermaid` to create `./docs/plans/<plan-slug>/diagrams/` and link it from the plan's `## Visual Context`. Small or non-structural plans write `None — no structural change`.
 - **Research links (optional):** see Standard Workflow step 5; notes are linked in `## Research` (after `## Visual Context`, outside `## Phases`) as `../../research/<topic>.md`, and `None — no research consulted` is written when no note applies.
+- **Parallel metadata:** every phase/sub-task carries `Parallelizable` (`yes|no`), `Depends on` (ids or `None`); sub-tasks also carry `Files/Scope` and `Isolation` (`shared|worktree`). Default `no`/`None`/`shared` keeps legacy sequential behavior. Mark `yes` only for independent work with disjoint file scopes; use worktree isolation for overlap or tooling-heavy work.
 - Set properly obsidian frontmatter metadata in all files
+
+## Parallel Decomposition
+
+Use these rules when phases/sub-tasks could run concurrently:
+
+1. Start every phase/sub-task at `Parallelizable: no`, `Depends on: None`,
+   `Files/Scope: None`, `Isolation: shared` (legacy-safe defaults).
+2. Mark `Parallelizable: yes` only when the work has no unmet dependency and its
+   declared file scope is disjoint from every other task it could overlap.
+3. Declare `Depends on` with existing phase numbers / `N.M` sub-task refs; never
+   create cycles or forward references inside a sequential phase.
+4. A phase may be `Parallelizable: yes` only when its sub-tasks can safely
+   overlap and its phase dependencies are declared.
+5. Use `Isolation: worktree` for overlapping scopes or tooling-heavy tasks
+   (build outputs, caches, ports, lockfiles); worktree tasks must declare a
+   non-empty `Files/Scope`.
+6. `Files/Scope: None` means unknown: the scheduler serializes it with other
+   shared tasks. Do not mark unknown-scope work parallel.
+7. Validate before writing the plan: every ref exists, no cycles, no shared
+   overlapping tasks marked parallel, every worktree task has a scope.
+
+Example:
+
+```markdown
+### Phase 2: Backend and frontend
+
+- **Status:** Pending
+- **Parallelizable:** yes
+- **Depends on:** 1
+
+#### Sub-Task 2.1: API
+
+- **Status:** Pending
+- **Delegated to agent:** dh-software-engineer
+- **Parallelizable:** yes
+- **Depends on:** 1.3
+- **Files/Scope:** services/api/**, tests/api/**
+- **Isolation:** shared
+
+#### Sub-Task 2.2: Web
+
+- **Status:** Pending
+- **Delegated to agent:** dh-software-engineer
+- **Parallelizable:** yes
+- **Depends on:** 1.3
+- **Files/Scope:** apps/web/**, tests/web/**
+- **Isolation:** shared
+```
 
 ## Workflow
 
