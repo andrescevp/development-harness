@@ -7,6 +7,8 @@ version.
 
 ## [Unreleased]
 
+## [0.13.1] — 2026-11-16
+
 ### Changed
 
 - **TUI plan modal layout:** the modal now takes a centered 80% × 80% region
@@ -351,7 +353,8 @@ First release of the standalone OpenCode V2 harness.
 - Plan close-outs include the pause/resume, fast-plan, Mermaid, and
   agent-selection plans with evolution/observation notes.
 
-[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.13.0...HEAD
+[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.13.1...HEAD
+[0.13.1]: https://github.com/andrescevp/development-harness/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/andrescevp/development-harness/compare/v0.12.2...v0.13.0
 [0.12.2]: https://github.com/andrescevp/development-harness/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/andrescevp/development-harness/compare/v0.12.0...v0.12.1
