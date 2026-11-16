@@ -36,9 +36,10 @@ PR was conflicting and written against an older 7-agent corpus; its intent was
 re-implemented from 5 agents + 26 skills (31 names) to **6 agents + 27 skills
 (33 unique names)**. The PR branch itself was not updated or merged.
 
-Implementation and the verification gate are complete. Plan-end final review
-and the semver decision are recorded in the plan's Execution Record once the
-plan-end gates close; this note does not pre-empt either verdict.
+Implementation and the verification gate are complete. The plan-end final
+review approved with non-blocking comments; the version decision is **v0.9.0**
+(minor: one feature), and tagging is deferred to `main` per the repository's
+Git Flow.
 
 ## What Changed
 
@@ -223,12 +224,13 @@ The plan-level component diagram lives at
   ([tasks/review-fast.md](../plans/dh-research-agent-skill/tasks/review-fast.md))
   approved the mirror and treated the `## Research` omission as intentional;
   Sub-Task 1.3 then added it to every allowed-omission surface.
-- **Release status:** package `0.8.0`; the change sits under `## [Unreleased]`
-  and no tag was created. Final review and the version recommendation are
-  plan-end outcomes, recorded in the plan's Execution Record when those gates
-  close — not claimed here.
-- **Execution record:** this close-out does not edit `docs/plans/`; the
-  orchestrator finalizes the record, its references, and the plans index row.
+- **Release status:** package `0.9.0`; the change sits under `## [0.9.0]` in
+  `CHANGELOG.md`. The final review approved with comments and the semver
+  decision is minor; no tag was created on the feature branch — tagging happens
+  on `main` per Git Flow.
+- **Execution record:** finalized in `docs/plans/dh-research-agent-skill/plan.md`
+  with the commit range `422ab45..4882dba`, references, and the plans index
+  `## Execution Records` row.
 
 ## Follow-ups
 

@@ -87,3 +87,12 @@ found not applicable.
 | 2026-11-16T00:15:36.276Z | dh-domain-check | Sub-Task 3.3 | fast mode defers per-task verification | end-of-plan |
 | 2026-11-16T00:15:36.276Z | dh-preflight | Sub-Task 3.3 | fast mode defers per-task verification | end-of-plan |
 | 2026-11-16T00:15:36.276Z | dh-artifact-check | Sub-Task 3.3 | fast mode defers per-task verification | end-of-plan |
+| 2026-11-16T00:44:31.668Z | dh-review | Plan | plan-end gate outcome | run: PASS |
+| 2026-11-16T00:44:31.668Z | dh-simplify | Plan | plan-end gate outcome | run: PASS |
+| 2026-11-16T00:44:31.668Z | dh-code-review | Plan | plan-end gate outcome | run: PASS |
+| 2026-11-16T00:44:31.668Z | dh-preflight | Plan | plan-end gate outcome | run: PASS |
+| 2026-11-16T00:44:31.668Z | dh-artifact-check | Plan | plan-end gate outcome | run: PASS |
+| 2026-11-16T00:44:31.668Z | dh-final-review | Plan | plan-end gate outcome | run: PASS |
+| 2026-11-16T00:44:31.668Z | dh-create-documentation | Plan | plan-end gate outcome | run: PASS |
+| 2026-11-16T00:44:31.675Z | dh-domain-check | Plan | plan-end gate outcome | not applicable (harness asset/contract change; pre-execution domain check clear) |
+| 2026-11-16T00:44:31.686Z | dh-semver | Plan | plan-end gate outcome | run: MINOR -> v0.9.0 (tag deferred to main per Git Flow) |
