@@ -20,7 +20,7 @@ status: active
 | Unused/deps | ✅ Pass | knip |
 | Duplicates | ✅ Pass | jscpd 0 clones |
 | Import graph | ✅ Pass | dependency-cruiser |
-| Links | ✅ Pass | 499 references |
+| Links | ✅ Pass | 513 references |
 | Audit | ✅ Pass | 6 agents, 27 skills, 12 tools, 0 FAIL |
 | Smokes | ✅ Pass | load/MCP/install/pack |
 | Security | ✅ Pass | OSV 669 packages 0; Semgrep 90 rules 0 |

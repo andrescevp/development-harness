@@ -527,15 +527,15 @@ external references are not required.
 
 - **System-Wide Test:** Parse a legacy plan (sequential) and a parallel fixture; assert the scheduler readiness set, max concurrency, scope conflict/worktree policy, multiple In Progress handling, worker envelope, failure drain, resume, and fast mirror/ledger behavior. Run the full gate, plan tools/TUI tests, and smokes; confirm 12 tools/6 agents/27 skills.
 - **Completion Checklist:**
-  - [ ] Plan metadata fields and defaults are parsed/scaffolded/rendered.
-  - [ ] Legacy plans remain sequential.
-  - [ ] Scheduler respects phase/task deps, max 3, scope conflicts, worktrees.
-  - [ ] Multiple In Progress/resume supported; phases close only when complete.
-  - [ ] Workers never write plan/ledger; orchestrator owns writes.
-  - [ ] Failure drain/pause/resume safe.
-  - [ ] Fast mirror/ledger aligned with parallel statuses.
-  - [ ] MCP/TUI readers support metadata and multiple active tasks.
-  - [ ] Docs/CHANGELOG/notes updated; full gate green.
+  - [x] Plan metadata fields and defaults are parsed/scaffolded/rendered.
+  - [x] Legacy plans remain sequential.
+  - [x] Scheduler respects phase/task deps, max 3, scope conflicts, worktrees.
+  - [x] Multiple In Progress/resume supported; phases close only when complete.
+  - [x] Workers never write plan/ledger; orchestrator owns writes.
+  - [x] Failure drain/pause/resume safe.
+  - [x] Fast mirror/ledger aligned with parallel statuses.
+  - [x] MCP/TUI readers support metadata and multiple active tasks.
+  - [x] Docs/CHANGELOG/notes updated; full gate green.
 
 ## Execution Record
 
@@ -545,7 +545,7 @@ external references are not required.
 - **Repository kind:** workspace
 - **Repository path:** `.`
 - **Branch / worktree:** feature/parallel-plan-execution
-- **Commit range:** d3d785b..fd59475
+- **Commit range:** d3d785b..1d06e73
 - **Plan path:** docs/plans/parallel-plan-execution/plan.md
 - **Mirrored plan path:** docs/plans/parallel-plan-execution/plan_fast.md
 - **Summary:**

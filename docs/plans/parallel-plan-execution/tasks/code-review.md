@@ -101,7 +101,7 @@ None.
 - **P2 scope overlap:** normalization/literal-prefix/glob algorithm documented
   (`src/tools` vs `src/tools-extra` disjoint; `src/tools/**` vs
   `src/tools/plan-*.ts` overlap; `None` serializes).
-- **P2 executable oracle:** added `src/tools/plan-scheduler.ts`
+- **P2 executable oracle:** added `src/__tests__/helpers/plan-scheduler.ts`
   (`phaseReady`, `subTaskReady`, `scopesOverlap`) with 8 table tests; the
   scheduler reference names it as the executable definition.
 - **P2 status bullet:** template/module docs now state the first bullet is

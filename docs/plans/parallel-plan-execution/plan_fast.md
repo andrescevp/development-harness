@@ -3,8 +3,8 @@ title: "Parallel Plan Execution and Orchestration — Fast Execution"
 slug: parallel-plan-execution
 description: "Fast execution mirror of plan.md; critical verification deferred to plan end."
 source_plan: plan.md
-source_sha256: 8b8bdb558325ddac7c7d54c1c91095c69b8b35238394be515817efa49490be55
-plan_version: fast-3
+source_sha256: 09f760691931b9e8c4442bbdbd70590f43f3ee849cce551253b2fa3b134f4d27
+plan_version: fast-4
 status: Completed
 active: true
 tags: [plan, fast]
