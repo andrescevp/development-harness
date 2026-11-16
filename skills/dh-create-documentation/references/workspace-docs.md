@@ -23,6 +23,8 @@ Inputs, in order:
 | Evolution note | `{workspace_root}/docs/evolution/<YYYY-MM-DD>-<slug>.md` | `project: <workspace>` | software evolution is workspace-wide |
 | Observation note | `{workspace_root}/docs/evolution/observations/<YYYY-MM-DD>-<HHMM>-<slug>.md` | `project: <workspace>` | session learnings are workspace-wide |
 | Evolution index row | `{workspace_root}/docs/evolution/index.md` | — | one index for the workspace |
+| Research note | `{workspace_root}/docs/research/<topic>.md` | `project: <workspace>` (no `package`) | one workspace registry; owned by the documentation agent |
+| Research index row | `{workspace_root}/docs/research/index.md` | — | one index for the workspace |
 | Diagram | next to the document it explains | `diagram_type` | keeps the link local |
 
 Rules that follow:
@@ -33,6 +35,9 @@ Rules that follow:
   above its package root; a workspace artifact never moves below it.
 - `docs/plans/` is not a docs root: plans stay at
   `{workspace_root}/docs/plans` only, whatever the docs decision says.
+- Research notes and their index live only under `{workspace_root}/docs/research/`;
+  plans link notes from their `## Research` section and never own a research
+  folder.
 - The map's `Docs root` column is authoritative. When it says workspace `docs/`,
   write there instead of creating `{package}/docs`; when it says
   `<package>/docs`, use that. Report a map/manifest disagreement instead of

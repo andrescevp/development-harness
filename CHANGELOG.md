@@ -5,6 +5,42 @@ All notable changes to this project are documented here. The format follows
 Semantic Versioning. During the 0.x line, breaking changes bump the minor
 version.
 
+## [0.9.0] — 2026-11-16
+
+### Added
+
+- `dh-researcher`, the sixth bundled agent: answers one external-fact question
+  per pass with primary sources, retrieval dates, and explicit confidence
+  labels (`verified` / `partially verified` / `model knowledge`). It composes
+  evidence and never edits code, runs project commands, or writes files.
+- `dh-research`, the twenty-seventh bundled skill: the bounded research
+  workflow, note template, note/registry contract, and the handoff that keeps
+  persistence with the documentation agent. A plan-local research folder is
+  rejected and redirected to the workspace registry.
+- One workspace research registry: notes at `docs/research/<topic>.md` plus
+  `docs/research/index.md` (newest first, one row per note), owned by
+  `dh-documentor` via `dh-create-documentation`.
+- Optional `## Research` plan section (outside `## Phases`) linking registry
+  notes with `../../research/<topic>.md`; the fast mirror omits it on purpose.
+- Optional execution unblock: `dh-execute-plan-task` and
+  `dh-execute-plan-task-fast` may run one bounded, cited research pass before
+  reporting a blocker that depends on current external facts, gated on
+  browsing-tool availability. The hard-blocker halt is unchanged — research
+  never authorizes continuing past an unresolved blocker.
+
+### Changed
+
+- Bundle inventory is now **6 agents + 27 skills** (33 unique names); tests,
+  audit loop membership, CLI/package smoke expectations, and project docs
+  reflect it.
+- `dh-planning`, `dh-grill-sdd`, and `dh-contingency` delegate external-fact
+  questions to `dh-research` and cite the resulting note; contingency rates
+  alternatives only on verified facts, labelling missing evidence as an
+  assumption instead of model recollection.
+
+No new dependencies, tool/command/prompt registrations, or changes to the
+hard-blocker policy.
+
 ## [0.8.0] — 2026-11-15
 
 ### Added
@@ -182,7 +218,8 @@ First release of the standalone OpenCode V2 harness.
 - Plan close-outs include the pause/resume, fast-plan, Mermaid, and
   agent-selection plans with evolution/observation notes.
 
-[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/andrescevp/development-harness/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.8.0
 [0.7.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.7.0
 [0.6.0]: https://github.com/andrescevp/development-harness/releases/tag/v0.6.0

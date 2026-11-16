@@ -67,7 +67,7 @@ describe('extractChecklists', () => {
   it('uses inline prose when the Completion Checklist has no checkbox children', () => {
     const extraction = extractChecklists(fixture('inline-checklist-plan.md'), 'docs/plans/inline-checklist/plan.md');
     expect(extraction.finalVerification.items).toEqual([]);
-    expect(extraction.finalVerification.inlineText).toBe('5 agents / 26 skills; no raw paths; counts unchanged.');
+    expect(extraction.finalVerification.inlineText).toBe('6 agents / 27 skills; no raw paths; counts unchanged.');
     expect(extraction.plan.total).toBe(0);
   });
 

@@ -1,12 +1,13 @@
 # dev-harness-skills
 
-An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 5 agents and 26 skills.
+An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 6 agents and 27 skills.
 
 ## Features
 
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks, with every sub-task naming its responsible agent (`Delegated to agent`) and strict halt-on-blocker safeguards.
-- **5 agents and 26 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
+- **6 agents and 27 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts.
+- **Source-cited research**: `dh-researcher` + `dh-research` answer one external-fact question per pass with primary sources, retrieval dates, and confidence labels; notes live in one workspace registry at [`docs/research/index.md`](docs/research/index.md). An optional bounded pass may precede an execution-blocker report, but it never clears an unresolved blocker.
 - **`dh` MCP server (12 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents and skills only.
 - **Code graph queries**: `dh-setup` installs code-graph-rag (`cgr`) on the embedded SQLite backend and indexes the project; `dh-code-query` answers structural questions — definitions, callers/callees, importers, dead code, duplicates — without scanning every file.
 - **Full QA gate**: Thorough verification suite integrating Biome, Knip, jscpd, dependency-cruiser, OSV-Scanner, Semgrep, Vitest, and TypeScript.
@@ -108,12 +109,12 @@ require the project-scope `mcp.servers.dh` entry described in
 1. Check that the plugin loaded successfully:
 
 ```sh
-opencode debug agents   # 5 dh-* agents (when the build surfaces plugin agents)
+opencode debug agents   # 6 dh-* agents (when the build surfaces plugin agents)
 opencode debug config   # plugin entry, and mcp.servers.dh once wired
 opencode mcp list       # expect: dh connected (server/status only)
 ```
 
-The plugin also registers 26 skills (there is no skills debug subcommand on
+The plugin also registers 27 skills (there is no skills debug subcommand on
 v2.0.18 — see `skills/index.md`) and zero tools; the harness tools come from
 the project-scope MCP server — see [MCP server (`dh`)](#mcp-server-dh).
 
@@ -270,7 +271,7 @@ Evidence and gaps:
 
 ## Agents & skills
 
-The plugin defines 5 agents and 26 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
+The plugin defines 6 agents and 27 skills using the `@opencode/plugin` SDK. Zero tool or command transforms are registered.
 
 ### Agent selection
 
@@ -295,6 +296,7 @@ execution/validation and `dh-explore` for codebase exploration. Full protocol:
 | `dh-reviewer` | Scoped code reviewer evaluating changes against sub-task criteria and code quality. |
 | `dh-final-reviewer` | Final reviewer conducting full diff review and plan-level sign-off. |
 | `dh-documentor` | Documentation agent responsible for creating, updating, and maintaining project documentation. |
+| `dh-researcher` | Source-cited web research support: one external-fact question per pass, primary sources, retrieval dates, and confidence labels; owns no files. |
 
 ### Skills
 
@@ -303,6 +305,7 @@ execution/validation and `dh-explore` for codebase exploration. Full protocol:
 | `dh-planning` | Creates phased plans in `docs/plans/<slug>/plan.md`. |
 | `dh-domain-check` | Validates domain boundaries and SOLID design during planning and execution. |
 | `dh-contingency` | Generates Plan A/B/C architectural alternatives with risk, complexity, and trade-off analysis. |
+| `dh-research` | Support / optional unblock: one bounded, cited web research pass for an external-fact question; notes and registry under `docs/research/`. |
 | `dh-execute-plan` | Orchestrates the end-to-end execution and status tracking of phased plans. |
 | `dh-execute-plan-fast` | Fast alternative: executes from `plan_fast.md`, defers critical gates to plan end, records skipped checks. |
 | `dh-execute-plan-task` | Executes an individual sub-task by delegating to the plan's selected implementation agent. |
@@ -362,8 +365,8 @@ offline `pnpm qa:check:full` gate.
 
 ```text
 index.ts         Root plugin entry point for OpenCode plugin discovery (source mode)
-agents/          Markdown definitions and system prompts for the 5 bundled agents
-skills/          Instructions, templates, and references for the 26 bundled skills
+agents/          Markdown definitions and system prompts for the 6 bundled agents
+skills/          Instructions, templates, and references for the 27 bundled skills
 src/cli/         Installer CLI (args, scope, JSONC config, manifest, commands)
 src/mcp/         Local stdio MCP server and workspace resolver
 src/tools/       Plan/sheet/logged-command tool implementations
@@ -371,7 +374,7 @@ src/lib/         Shared assets, records, atomic writes, package metadata, main g
 scripts/         Audit, smoke tests (load/MCP/install/pack), Docker runner
 docker/test/     Derived OpenCode test image (pinned 2.0.18)
 test/            Vitest unit and registration tests
-docs/            Plugin documentation, loading guides, release runbook, plans
+docs/            Plugin documentation, loading guides, release runbook, research registry, plans
 ```
 
 ## Documentation

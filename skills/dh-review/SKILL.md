@@ -51,7 +51,8 @@ Read `./docs/plans/<plan-slug>/plan.md` and
 - `plan_fast.md` intentionally omits `## Objective`, `## Requirements Snapshot`,
   `## Scope`, `## Workspace Impact`, `## Assumptions and Constraints`,
   `## Risks and Areas Requiring Care`, `## Core concepts`, `## Visual Context`,
-  `## Agent Selection`, `## Execution Record`, and `## Open Questions`. Compare the `## Phases` region
+  `## Research`, `## Agent Selection`, `## Execution Record`, and
+  `## Open Questions`. Compare the `## Phases` region
   and sub-task fields against `plan.md`, and use `plan.md` for
   requirements/scope checks. Do **not** flag those omitted top-level sections
   as missing.

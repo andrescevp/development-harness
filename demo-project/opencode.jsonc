@@ -66,6 +66,12 @@
       "mode": "subagent",
       "model": "opencode-go/deepseek-v4-flash",
       "prompt": "{file:../agents/dh-documentor.md}"
+    },
+    "dh-researcher": {
+      "description": "Source-cited web research — one external-fact question per pass, primary sources, retrieval dates, and confidence labels (planning and execution support).",
+      "mode": "subagent",
+      "model": "opencode-go/deepseek-v4-flash",
+      "prompt": "{file:../agents/dh-researcher.md}"
     }
   }
 }

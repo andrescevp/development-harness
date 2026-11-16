@@ -38,13 +38,21 @@ export const LOOP = {
     'dh-pause-plan',
     'dh-planning',
     'dh-preflight',
+    'dh-research',
     'dh-resume-plan',
     'dh-review',
     'dh-semver',
     'dh-setup',
     'dh-simplify',
   ],
-  agents: ['dh-documentor', 'dh-final-reviewer', 'dh-reviewer', 'dh-software-architect', 'dh-software-engineer'],
+  agents: [
+    'dh-documentor',
+    'dh-final-reviewer',
+    'dh-researcher',
+    'dh-reviewer',
+    'dh-software-architect',
+    'dh-software-engineer',
+  ],
 };
 
 /** Junk classification rules: dependency dirs, secrets, backup/swap/OS junk. */

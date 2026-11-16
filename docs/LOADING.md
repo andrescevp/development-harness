@@ -5,7 +5,7 @@ description: Enable the dev-harness-skills plugin in OpenCode V2, wire the dh MC
 tags: [loading, install, plugin, mcp, workspace]
 project: dev-harness-skills
 created: 2026-09-28
-updated: 2026-11-15
+updated: 2026-11-16
 status: active
 ---
 
@@ -35,7 +35,7 @@ npx -y github:andrescevp/development-harness install --project --path .
 | `--project` | `<project>/.opencode/plugins/dev-harness-skills` | `<project>/opencode.jsonc` (or existing `opencode.json`) |
 
 The managed layout is self-contained: `index.ts`, package metadata,
-`dist/plugin.js`, `dist/assets` (5 agents, 26 skills), and
+`dist/plugin.js`, `dist/assets` (6 agents, 27 skills), and
 `.dev-harness-install.json`; no `pnpm install` is needed in the target.
 
 Common flags:
@@ -247,14 +247,19 @@ After loading, confirm the harness is registered (opencode v2.0.18 exposes
 only the `agents`, `config`, and `paths` debug subcommands):
 
 ```
-opencode debug agents   → the 5 dh-* agents (when the build surfaces plugin agents; otherwise verify in a session)
+opencode debug agents   → the 6 dh-* agents (when the build surfaces plugin agents; otherwise verify in a session)
 opencode debug config   → the plugin entry, and mcp.servers.dh once wired
 opencode mcp list       → `dh` connected (server/status only)
 ```
 
-The plugin also registers 26 skills (there is no skills debug subcommand on
+The plugin also registers 27 skills (there is no skills debug subcommand on
 v2.0.18 — the bundled list lives in `skills/index.md`). Zero tools are
 registered by the plugin: the 12 tools come from the MCP server below.
+
+The bundled set includes `dh-researcher` (source-cited web research support)
+and `dh-research` (the bounded research workflow); research notes live in
+`docs/research/` and are owned by the documentation agent, with plans linking
+them through the optional `## Research` section.
 
 ## Agent selection
 
@@ -373,7 +378,7 @@ opencode mcp list   # expect the `dh` server, connected
 
 MCP servers connect at session start — restart opencode after adding or
 changing the project entry. The in-repo gates are
-`src/__tests__/registration.test.ts` (exactly 5 agents + 26 skills, zero tool
+`src/__tests__/registration.test.ts` (exactly 6 agents + 27 skills, zero tool
 transforms) and `node scripts/smoke-mcp.mjs` (spawns the built binary, lists
 the 12 tools, and round-trips plan create/read/update + fast create/read/update/skip).
 
@@ -422,8 +427,8 @@ the 12 tools, and round-trips plan create/read/update + fast create/read/update/
 - **Agents missing after installing (skills visible)** — the running session
   was started **before** the plugin was installed: plugins load at server
   startup, and a long-lived opencode session keeps its original registry.
-  Restart opencode (or reload the config) and both the 5 `dh-*` agents and
-  26 `dh-*` skills appear — the plugin registers agents via `agent.transform`
+  Restart opencode (or reload the config) and both the 6 `dh-*` agents and
+  27 `dh-*` skills appear — the plugin registers agents via `agent.transform`
   exactly like skills, no `agent` map in config is needed.
 - **`pnpm audit` vs `pnpm run audit`** — `pnpm audit` is pnpm's **dependency
   security audit** (currently reports 1 low dev-only esbuild advisory and
@@ -445,7 +450,7 @@ the 12 tools, and round-trips plan create/read/update + fast create/read/update/
   `docs/plans/dev-harness-v2-plugin/tasks/verification.md`: an early
   observation reported that plugin-registered agents did not surface through
   the tested load forms. Later verification (with the global plugins-directory
-  clone + a fresh server) showed the opposite: the plugin registers all 5
+  clone + a fresh server) showed the opposite: the plugin registers all 6
   agents automatically — the earlier miss was a stale long-lived session
   started before the plugin was installed. If agents do not appear, restart
   opencode first, then confirm the load form and rebuild `dist/assets` if

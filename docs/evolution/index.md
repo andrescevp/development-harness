@@ -5,10 +5,10 @@ description: "Newest-first register of evolution and observation notes for the d
 tags: [evolution, index]
 project: "dev-harness-skills"
 created: 2026-11-08
-updated: 2026-11-15
+updated: 2026-11-16
 stack: "Markdown skills + TypeScript inventory/test tooling"
-feature: "TUI Plan Progress"
-epic: "Plan observability"
+feature: "Web Research Agent and Skill"
+epic: "Research capability"
 status: active
 ---
 
@@ -20,6 +20,8 @@ Newest-first register of evolution and observation notes for this project.
 
 | Date | Type | Title | Plan/Release | Link |
 |---|---|---|---|---|
+| 2026-11-16 | observation | Web Research Agent and Skill — session learnings | plan: dh-research-agent-skill | [obs-20261116-0110-dh-research-agent-skill](./observations/2026-11-16-0110-dh-research-agent-skill.md) |
+| 2026-11-16 | evolution | Web Research Agent and Skill | plan: dh-research-agent-skill / unreleased | [evo-20261116-dh-research-agent-skill](./2026-11-16-dh-research-agent-skill.md) |
 | 2026-11-15 | observation | TUI Plan Progress — session learnings | plan: tui-plan-progress | [obs-20261115-2330-tui-plan-progress](./observations/2026-11-15-2330-tui-plan-progress.md) |
 | 2026-11-15 | evolution | TUI Plan Progress | plan: tui-plan-progress / unreleased (v0.8.0 recommended) | [evo-20261115-tui-plan-progress](./2026-11-15-tui-plan-progress.md) |
 | 2026-11-11 | observation | Harness Monorepo Awareness — session learnings | plan: harness-monorepo-awareness | [obs-20261111-0116-harness-monorepo-awareness](./observations/2026-11-11-0116-harness-monorepo-awareness.md) |
