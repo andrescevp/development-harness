@@ -214,11 +214,11 @@ be followed without leaving OpenCode. It is read-only and reads the **local**
 workspace only.
 
 - **Sidebar card** (`sidebar.content`): one collapsible section per executing
-  plan (`▾`/`▸` toggles), each with the `Phase N · N.M` position (`+K` and
-  `Active: N tasks` while several sub-tasks run in parallel), completed/total
-  sub-tasks with a text progress bar, the current sub-task's delegated agent,
-  plan status, a one-line activity, and an `[open]` action that opens the plan
-  file in a read-only page.
+  non-completed plan (`▾`/`▸` toggles hide the plan details), each with the
+  `Phase N · N.M` position (`+K` and `Active: N tasks` while several sub-tasks
+  run in parallel), completed/total sub-tasks with a text progress bar, the
+  current sub-task's delegated agent, plan status, a one-line activity, and an
+  `[open]` action that opens the plan file in a scrollable read-only modal.
 - **`/plan-progress` panel** (palette entry "Plan progress"): every phase and
   sub-task with status and delegated agent, checklists, review verdict,
   fast-mode skipped-check ledger and last update. `↑`/`↓` and `PgUp`/`PgDn`

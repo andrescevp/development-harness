@@ -7,6 +7,14 @@ version.
 
 ## [Unreleased]
 
+### Fixed
+
+- **TUI plan list:** the sidebar drops `Completed` plans even when their
+  frontmatter still says `active: true`, and the list/collapse state now reacts
+  to store updates (collapsing hides every plan detail line).
+- **TUI open action:** `[open]` shows the plan file in a scrollable read-only
+  modal (↑/↓, PgUp/PgDn, Home/End, Esc) instead of navigating to a plugin page.
+
 ## [0.12.0] — 2026-11-16
 
 ### Added

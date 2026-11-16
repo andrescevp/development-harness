@@ -97,6 +97,19 @@ describe('createPlanStore — plan refresh', () => {
     });
   });
 
+  it('lists only non-completed plans, even when a completed plan is active', async () => {
+    await withTempDir((root) => {
+      writePlan(root, 'checkout-flow', fixture('active-plan.md'));
+      writePlan(root, 'done-plan', fixture('completed-plan.md'));
+      const { store } = harness({ locationDirectory: root });
+      try {
+        expect(store.state().plans?.map((plan) => plan.slug)).toEqual(['checkout-flow']);
+      } finally {
+        store.dispose();
+      }
+    });
+  });
+
   it('derives one ready snapshot from the workspace plan tree', async () => {
     await withTempDir((root) => {
       writePlan(root, 'checkout-flow', fixture('active-plan.md'));
