@@ -127,7 +127,10 @@ export function createPlanStore(options: PlanStoreOptions): PlanStore {
       root === null
         ? []
         : scan.candidates
-            .filter((candidate) => candidate.status === 'In Progress' || candidate.active === true)
+            .filter(
+              (candidate) =>
+                candidate.status !== 'Completed' && (candidate.status === 'In Progress' || candidate.active === true)
+            )
             .map((candidate) => {
               const candidateDetails = readPlanDetails(root, candidate.slug);
               if (!candidateDetails.plan) return null;

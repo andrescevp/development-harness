@@ -11,6 +11,3 @@ export const TUI_PLAN_PANEL = 'dev-harness-skills.plan';
 
 /** Slash/palette command that opens the plan progress panel. */
 export const TUI_PLAN_COMMAND = 'dev-harness-skills.plan-progress';
-
-/** Plugin page that renders one plan file read-only. */
-export const TUI_PLAN_FILE_PAGE = 'dev-harness-skills.plan-file';

@@ -7,6 +7,16 @@ version.
 
 ## [Unreleased]
 
+## [0.12.1] — 2026-11-16
+
+### Fixed
+
+- **TUI plan list:** the sidebar drops `Completed` plans even when their
+  frontmatter still says `active: true`, and the list/collapse state now reacts
+  to store updates (collapsing hides every plan detail line).
+- **TUI open action:** `[open]` shows the plan file in a scrollable read-only
+  modal (↑/↓, PgUp/PgDn, Home/End, Esc) instead of navigating to a plugin page.
+
 ## [0.12.0] — 2026-11-16
 
 ### Added
@@ -313,7 +323,8 @@ First release of the standalone OpenCode V2 harness.
 - Plan close-outs include the pause/resume, fast-plan, Mermaid, and
   agent-selection plans with evolution/observation notes.
 
-[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.12.1...HEAD
+[0.12.1]: https://github.com/andrescevp/development-harness/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/andrescevp/development-harness/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/andrescevp/development-harness/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/andrescevp/development-harness/compare/v0.9.0...v0.10.0
