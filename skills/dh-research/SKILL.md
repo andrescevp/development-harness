@@ -42,10 +42,10 @@ documentation owner.
   vendor advisories, and upstream repositories outrank blogs, aggregators, and
   Q&A sites. Secondary sources may lead in; every conclusion needs a primary
   source or a weaker confidence label.
-- **Every finding carries four things:** the claim, the source URL, the
-  retrieval date, and a confidence label. No source means no finding — mark it
-  `model knowledge` or drop it. Never invent a URL, version, date, author, or
-  quotation.
+- **Every researched finding carries four things:** the claim, the source URL,
+  the retrieval date, and a confidence label. A claim without a source is
+  labelled `model knowledge` (no invented URL) or dropped. Never invent a URL,
+  version, date, author, or quotation.
 - **Label confidence:** `verified` (primary source read), `partially verified`
   (secondary source, or one primary source with gaps), `model knowledge`
   (recall, not research). Label each finding and the answer as a whole.
@@ -178,7 +178,8 @@ status: active
 ## Final Check
 
 - [ ] Exactly one question, with caller and decision recorded.
-- [ ] Every finding has a source URL, a retrieval date, and a confidence label.
+- [ ] Every researched finding has a source URL and a retrieval date;
+      `model knowledge` claims are labelled and carry no invented URL.
 - [ ] The note path is `{workspace_root}/docs/research/<topic>.md`; no plan copy
       exists.
 - [ ] The registry row follows the header and is newest first.

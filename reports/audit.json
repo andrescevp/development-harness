@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-11-16T00:08:28.812Z",
+    "generated": "2026-11-16T00:42:58.588Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 1,
         "sev": "WARN",
-        "note": "580 resolved; 0 code-context; 0 allowlisted; 295 prose tokens (warn)"
+        "note": "578 resolved; 0 code-context; 0 allowlisted; 297 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
@@ -1057,6 +1057,20 @@
     },
     {
       "token": "plan-local",
+      "count": 1,
+      "files": [
+        "agents/dh-researcher.md"
+      ]
+    },
+    {
+      "token": "non-negotiables",
+      "count": 1,
+      "files": [
+        "agents/dh-researcher.md"
+      ]
+    },
+    {
+      "token": "hard-blocker",
       "count": 1,
       "files": [
         "agents/dh-researcher.md"
@@ -2490,13 +2504,13 @@
     {
       "file": "agents/dh-researcher.md",
       "kind": "agent",
-      "lines": 142,
+      "lines": 105,
       "frontmatter": {
         "status": "ok",
         "errors": [],
         "fields": {
           "name": "dh-researcher",
-          "description": "Source-cited web research — answers one external fact question at a time with primary sources, retrieval dates, and explicit confidence labels. Use when planning (dh-planning, dh-grill-sdd, dh-contingency), an execution blocker (dh-execute-plan-task, dh-execute-plan-task-fast), or a review needs current evidence about library versions, EOL dates, breaking changes, migrations, upstream defects, security advisories, or tooling comparisons that the local codebase cannot answer.",
+          "description": "Source-cited web research — answers one external fact question at a time with primary sources, retrieval dates, and explicit confidence labels. Use when planning (dh-planning, dh-grill-sdd, dh-contingency), an execution blocker (dh-execute-plan-task, dh-execute-plan-task-fast), or another planning or execution step needs current evidence about library versions, EOL dates, breaking changes, migrations, upstream defects, security advisories, or tooling comparisons that the local codebase cannot answer.",
           "mode": "subagent"
         }
       },
@@ -2952,7 +2966,7 @@
     {
       "file": "skills/dh-research/SKILL.md",
       "kind": "skill",
-      "lines": 192,
+      "lines": 193,
       "frontmatter": {
         "status": "ok",
         "errors": [],

@@ -7,8 +7,8 @@ project: "dev-harness-skills"
 created: 2026-11-16
 updated: 2026-11-16
 stack: "Markdown skills + TypeScript inventory/test tooling"
-feature: "dh-research-agent-skill"
-epic: "dh-research-agent-skill"
+feature: "Web Research Agent and Skill"
+epic: "Research capability"
 status: active
 ---
 

@@ -11,6 +11,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { parseFrontmatter } from '../lib/frontmatter.js';
+import { renderFastPlan } from '../tools/plan-fast-template.js';
+import { parsePlan } from '../tools/plan-lifecycle.js';
 import { planScaffold } from '../tools/plan-template.js';
 import { REPO_ROOT, read } from './helpers/repo.js';
 import { contentLines, reference, skill } from './helpers/skills.js';
@@ -20,16 +22,29 @@ const RESEARCH_SKILL = skill('dh-research');
 const RESEARCH_INDEX = path.join(REPO_ROOT, 'docs', 'research', 'index.md');
 const PHASED_TEMPLATE = reference('dh-planning', 'phased-plan-template.md');
 const PHASED_FIXTURE = path.join(REPO_ROOT, 'src', '__tests__', 'fixtures', 'plans', 'phased-plan.md');
-const SCAFFOLD_SOURCE = path.join(REPO_ROOT, 'src', 'tools', 'plan-template.ts');
-const FAST_TEMPLATE_SOURCE = path.join(REPO_ROOT, 'src', 'tools', 'plan-fast-template.ts');
+
+/** The plan shape inside the reference template's fenced ```markdown block. */
+function templateBody(text: string): string {
+  return /```markdown\n([\s\S]*?)\n```/.exec(text)?.[1] ?? text;
+}
 
 const RESEARCH = '## Research';
 const AGENT_SELECTION = '## Agent Selection';
 const PHASES = '## Phases';
 
-/** 0-based line index of an exact top-level heading, or -1. */
+/** 0-based line index of an exact top-level heading, or -1 (fence-aware). */
 function headingLine(text: string, heading: string): number {
-  return text.split('\n').findIndex((line) => line.trimEnd() === heading);
+  let inFence = false;
+  const lines = text.split('\n');
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index]!;
+    if (/^\s*```/.test(line)) {
+      inFence = !inFence;
+      continue;
+    }
+    if (!inFence && line.trimEnd() === heading) return index;
+  }
+  return -1;
 }
 
 /** Literal occurrences of a needle. */
@@ -39,7 +54,8 @@ function count(text: string, needle: string): number {
 
 const AGENT_TEXT = read(RESEARCH_AGENT);
 const SKILL_TEXT = read(RESEARCH_SKILL);
-const TEMPLATE_TEXT = read(PHASED_TEMPLATE);
+const TEMPLATE_TEXT = templateBody(read(PHASED_TEMPLATE));
+const FIXTURE_TEXT = read(PHASED_FIXTURE);
 const SCAFFOLD_TEXT = planScaffold({
   slug: 'research-contract',
   title: 'Research Contract',
@@ -67,14 +83,14 @@ describe('research assets', () => {
     expect(agent.data.mode).toBe('subagent');
     const tools = String(research.data['allowed-tools'] ?? '')
       .split(',')
-      .map((tool) => tool.trim());
-    expect(tools).toEqual(expect.arrayContaining(['read', 'webfetch', 'websearch']));
-    expect(tools).not.toContain('write');
+      .map((tool) => tool.trim())
+      .sort();
+    expect(tools).toEqual(['read', 'webfetch', 'websearch']);
   });
 
   it('stays within the audit line limits (agent 300, skill 250)', () => {
-    expect(contentLines(RESEARCH_AGENT)).toBeLessThanOrEqual(300);
-    expect(contentLines(RESEARCH_SKILL)).toBeLessThanOrEqual(250);
+    expect(contentLines(RESEARCH_AGENT)).toBeLessThan(300);
+    expect(contentLines(RESEARCH_SKILL)).toBeLessThan(250);
   });
 });
 
@@ -121,14 +137,11 @@ describe('optional ## Research plan section', () => {
   const ORDERED = [
     { name: 'template', body: TEMPLATE_TEXT },
     { name: 'scaffold', body: SCAFFOLD_TEXT },
+    { name: 'canonical fixture', body: FIXTURE_TEXT },
   ];
 
-  it.each([
-    { name: 'template', file: PHASED_TEMPLATE },
-    { name: 'scaffold source', file: SCAFFOLD_SOURCE },
-    { name: 'canonical fixture', file: PHASED_FIXTURE },
-  ])('$name exposes a top-level ## Research section', ({ file }) => {
-    expect(headingLine(read(file), RESEARCH)).toBeGreaterThanOrEqual(0);
+  it.each(ORDERED)('$name exposes a top-level ## Research section', ({ body }) => {
+    expect(headingLine(body, RESEARCH)).toBeGreaterThanOrEqual(0);
   });
 
   it.each(ORDERED)('$name orders Research, Agent Selection, then Phases', ({ body }) => {
@@ -145,9 +158,19 @@ describe('optional ## Research plan section', () => {
     expect(tail).not.toContain(RESEARCH);
   });
 
+  it('scaffolds the placeholder instead of a fabricated note link', () => {
+    expect(SCAFFOLD_TEXT).toContain('None — no research consulted');
+    expect(SCAFFOLD_TEXT).not.toContain('node-eol.md');
+  });
+
   it('omits Research from the fast mirror on every documented surface', () => {
-    const omitted = /FAST_OMITTED_SECTIONS = \[([\s\S]*?)\] as const/.exec(read(FAST_TEMPLATE_SOURCE))?.[1] ?? '';
-    expect(omitted).toContain("'Research'");
+    const rendered = renderFastPlan({
+      slug: 'research-contract',
+      sourceContents: FIXTURE_TEXT,
+      sourcePlan: parsePlan(FIXTURE_TEXT),
+      timestamp: '2026-11-16T00:00:00.000Z',
+    });
+    expect(rendered.contents).toContain('`## Research`');
     const surfaces = [skill('dh-execute-plan-fast'), reference('dh-execute-plan-fast', 'plan-fast-template.md')];
     for (const file of [...surfaces, skill('dh-review')]) {
       const text = read(file);
@@ -166,6 +189,9 @@ describe('execution integration', () => {
   it.each(EXECUTION_SKILLS)('$mode mode carries one research line and keeps the halt', ({ file, halt }) => {
     const text = read(file);
     expect(count(text, 'dh-research')).toBe(1);
+    expect(text).toMatch(/^- \*\*Optional external-fact unblock/m);
+    expect(text).toMatch(/run `dh-research` for ONE cited pass/);
+    expect(text).toMatch(/documentation owner registers the note under `docs\/research\/`/);
     expect(text).toContain(halt);
   });
 });
@@ -177,6 +203,13 @@ describe('planning integration', () => {
       expect(read(skill(name))).toContain('dh-research');
     }
   );
+
+  it('registers Research as a capability role and documents the handoff rows', () => {
+    expect(read(reference('dh-planning', 'agent-selection.md'))).toContain('| Research |');
+    const docs = read(reference('dh-create-documentation', 'workspace-docs.md'));
+    expect(docs).toContain('docs/research/<topic>.md');
+    expect(docs).toContain('docs/research/index.md');
+  });
 
   it('rates contingency alternatives only on verified facts', () => {
     expect(read(skill('dh-contingency'))).toContain('rated only on verified facts');

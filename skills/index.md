@@ -161,8 +161,8 @@ code-review) · `dh-final-reviewer` (final sign-off) · `dh-documentor`
 loop step).
 
 Delegation is capability-based: skills resolve the architecture,
-implementation, testing/QA, review, final-review, and documentation roles
-against the current environment using
+implementation, testing/QA, review, final-review, documentation, and research
+roles against the current environment using
 [`dh-planning/references/agent-selection.md`](dh-planning/references/agent-selection.md)
 (runtime agent list → project config/agent directories → global definitions;
 project-specific agents win over bundled fallbacks). `dh-planning` records the

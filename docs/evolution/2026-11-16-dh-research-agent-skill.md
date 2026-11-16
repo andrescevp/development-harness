@@ -42,15 +42,16 @@ plan-end gates close; this note does not pre-empt either verdict.
 
 ## What Changed
 
-- **Agent (`agents/dh-researcher.md`, 141 lines).** Folded trigger description,
+- **Agent (`agents/dh-researcher.md`, 104 lines).** Folded trigger description,
   `mode: subagent`, no `permission` or `tools` keys. Workspace First resolves
-  the research root from `WORKSPACE.md`/`docs/WORKSPACE.md`; ten operating rules
-  enforce one question, primary sources, per-claim citations and retrieval
-  dates, confidence labels, version/date pinning, conflict reporting, honest
-  tool availability, one bounded pass, and clean queries. Output is a **note
-  payload plus a proposed registry row**; the agent has no write boundary, no
-  code edits, and no project commands.
-- **Skill (`skills/dh-research/SKILL.md`, 191 lines).** `allowed-tools: read,
+  the research root from `WORKSPACE.md`/`docs/WORKSPACE.md`; six non-negotiable
+  rules point at the skill as the binding workflow and enforce one question,
+  primary sources, per-claim citations and retrieval dates, confidence labels,
+  honest tool availability, one bounded pass, and clean queries. Output is a
+  **note payload plus a proposed registry row** composed from the skill's Note
+  Template; the agent is instructed not to persist, edit code, or run project
+  commands.
+- **Skill (`skills/dh-research/SKILL.md`, 192 lines).** `allowed-tools: read,
   webfetch, websearch` (no `write`), license/compatibility/metadata, Core Rules,
   the single-source-of-truth note/registry contract, a seven-step workflow
   (frame → plan queries → search/fetch → verify → compose → hand off → report),
@@ -128,10 +129,11 @@ content files that were still untracked (`agents/dh-researcher.md`,
   two places.
 - **Documentation ownership stays intact (review comment 1, ownership half).**
   The researcher composes; `dh-documentor` persists through
-  `dh-create-documentation`. The agent has no write tool and the skill grants no
-  `write`; the fallback returns the payload to the caller when nested delegation
-  is unavailable. Research notes therefore follow the same generated-document
-  contract as every other doc.
+  `dh-create-documentation`. The skill declares only `read, webfetch,
+  websearch` and the agent is instructed not to persist; the fallback returns
+  the payload to the caller when nested delegation is unavailable. Research
+  notes therefore follow the same generated-document contract as every other
+  doc.
 - **Optional execution unblock, not a loop step (review comment 2).** Research
   is one line in each execution task skill, gated on browsing availability and
   bounded to one pass. It is not a gate, not mandatory, and never clears an

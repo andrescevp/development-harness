@@ -110,9 +110,10 @@ None — no structural change.
 ## Research
 
 Optional \`dh-research\` notes that back this plan (single registry:
-\`docs/research/\`); write \`None — no research consulted\` when none apply.
+\`docs/research/\`); write \`None — no research consulted\` when none apply, or
+link notes as \`../../research/<topic>.md\`.
 
-- [Node 20 EOL](../../research/node-eol.md) — verified 2026-11-15; drives R4.
+- None — no research consulted.
 
 ## Agent Selection
 

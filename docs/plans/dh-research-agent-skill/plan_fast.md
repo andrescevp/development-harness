@@ -3,14 +3,14 @@ title: "Web Research Agent and Skill (dh-researcher + dh-research) — Fast Exec
 slug: dh-research-agent-skill
 description: "Fast execution mirror of plan.md; critical verification deferred to plan end."
 source_plan: plan.md
-source_sha256: aa6d2b8a4e72174c4b74f4d70cf583c8e276aaa3c06c95e7a76ec40a41ebb7a6
-plan_version: fast-1
+source_sha256: c76f8e53c62bb88f9b89d01819d051e93d81220dc1d731ada4cacea5a35edd58
+plan_version: fast-2
 status: In Progress
 active: true
 tags: [plan, fast]
 project: "dev-harness-skills"
 created: 2026-11-15
-updated: 2026-11-15
+updated: 2026-11-16
 ---
 
 # Plan: Web Research Agent and Skill (dh-researcher + dh-research) (Fast Execution)
@@ -34,7 +34,7 @@ updated: 2026-11-15
   scope, dependencies, instructions, acceptance criteria, done-when.
 - Allowed differences: this policy, this contract, `## Final Verification`, the
   omitted top-level sections, and status progression.
-- Omits from `plan.md`: `## Objective`, `## Requirements Snapshot`, `## Scope`, `## Workspace Impact`, `## Assumptions and Constraints`, `## Risks and Areas Requiring Care`, `## Core concepts`, `## Visual Context`, `## Agent Selection`, `## Execution Record`, `## Open Questions`.
+- Omits from `plan.md`: `## Objective`, `## Requirements Snapshot`, `## Scope`, `## Workspace Impact`, `## Assumptions and Constraints`, `## Risks and Areas Requiring Care`, `## Core concepts`, `## Visual Context`, `## Research`, `## Agent Selection`, `## Execution Record`, `## Open Questions`.
 - Not allowed: missing/extra/reordered/renamed items; changed requirements,
   scope, or acceptance criteria. `plan.md` is the scope reference.
 - Misalignment is fixed here; never rewrite `plan.md` scope.

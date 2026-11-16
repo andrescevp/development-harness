@@ -486,19 +486,31 @@ once the registry exists.
 
 ## Execution Record
 
-- **Execution status:** Not executed
-- **Executed at:** [YYYY-MM-DD]
+- **Execution status:** In progress
+- **Executed at:** 2026-11-16
 - **Workspace root:** /home/andres/workspace/dev-harness-skills
 - **Repository kind:** standalone
 - **Repository path:** `.`
-- **Branch / worktree:** develop
-- **Commit range:** [base..head]
+- **Branch / worktree:** feature/dh-research-agent-skill
+- **Commit range:** 89f28b9..HEAD (finalized at close-out)
 - **Plan path:** docs/plans/dh-research-agent-skill/plan.md
-- **Mirrored plan path:** none
+- **Mirrored plan path:** docs/plans/dh-research-agent-skill/plan_fast.md
 - **Summary:**
-  - [What shipped]
-- **Architectural changes:** [Agent/skill contract, docs/research registry, optional `## Research` plan section, documentation-agent ownership handoff, optional execution unblock]
-- **References:** [review, handoff, evolution note and ADR links]
+  - Added `dh-researcher` (6th agent) and `dh-research` (27th skill) with a
+    single `docs/research/` registry, optional `## Research` plan section, and
+    one optional execution unblock line; updated corpus, tests, audit, docs,
+    demos, and package smokes to 6 agents / 27 skills / 33 names.
+- **Architectural changes:** Research capability contract (agent + skill);
+  single workspace research registry with documentation-agent ownership
+  handoff; optional `## Research` plan section outside the phases region;
+  optional execution unblock without a new loop step or gate.
+- **References:** [pre-execution alignment](./tasks/review-fast.md) ·
+  [plan-end alignment](./tasks/review-fast-final.md) ·
+  [code review](./tasks/code-review.md) ·
+  [domain check](./tasks/domain-check.md) ·
+  [final verification](./tasks/final-verification.md) ·
+  [evolution note](../../evolution/2026-11-16-dh-research-agent-skill.md) ·
+  [observation note](../../evolution/observations/2026-11-16-0110-dh-research-agent-skill.md)
 
 ## Open Questions
 

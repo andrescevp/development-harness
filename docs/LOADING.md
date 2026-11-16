@@ -256,6 +256,11 @@ The plugin also registers 27 skills (there is no skills debug subcommand on
 v2.0.18 — the bundled list lives in `skills/index.md`). Zero tools are
 registered by the plugin: the 12 tools come from the MCP server below.
 
+The bundled set includes `dh-researcher` (source-cited web research support)
+and `dh-research` (the bounded research workflow); research notes live in
+`docs/research/` and are owned by the documentation agent, with plans linking
+them through the optional `## Research` section.
+
 ## Agent selection
 
 Skills do not name fixed agents; they name a capability (architecture,

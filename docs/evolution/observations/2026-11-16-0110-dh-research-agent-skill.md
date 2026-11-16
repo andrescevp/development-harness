@@ -57,9 +57,9 @@ optional execution unblock instead of a "loop step 2.4".
   count edit corrected the off-by-one. A stale count is not always a doc
   problem — sometimes it hides a check that could never fail with the right
   message.
-- **Ownership held because the researcher cannot write.** The agent has no
-  `write` tool and the skill grants only `read, webfetch, websearch`; the
-  contract test asserts both. The payload-plus-row handoff to
+- **Ownership held because the researcher is instructed not to write.** The
+  skill grants only `read, webfetch, websearch`; the contract test asserts that
+  list. The payload-plus-row handoff to
   `dh-documentor`/`dh-create-documentation` kept `docs/research/` under the same
   documentation contract as every other generated doc, and the caller fallback
   covers sessions where nested delegation is unavailable.
@@ -100,11 +100,12 @@ optional execution unblock instead of a "loop step 2.4".
   sub-task fields — it does not know that a missing omission list entry will
   make the alignment review flag the section. The pre-execution review had to
   reason about `## Research` before Sub-Task 1.3 formally allowed it.
-- **The documentation handoff is enforced by prose, not by the runtime.** The
-  agent cannot write, which is structural, but "hand the payload to the
-  documentation owner" depends on the caller resolving that owner. The fallback
-  (return the payload to the caller) keeps the workflow usable, at the cost of
-  two possible writers if a future edit grants the researcher a write tool.
+- **The documentation handoff is enforced by prose and the skill's tool list,
+  not by the runtime.** The agent is instructed not to persist and the skill
+  grants no `write` tool, but "hand the payload to the documentation owner"
+  depends on the caller resolving that owner. The fallback (return the payload
+  to the caller) keeps the workflow usable, at the cost of two possible writers
+  if a future edit grants the researcher a write tool.
 - **Citation presence is testable; citation accuracy is not.** The suite can
   assert that a source URL and retrieval date are required. It cannot tell
   whether the page says what the note claims, whether the retrieval date is

@@ -40,7 +40,7 @@ fresh_limited() {
   fi
 }
 
-AGENTS=(dh-software-architect dh-software-engineer dh-reviewer dh-final-reviewer dh-documentor)
+AGENTS=(dh-software-architect dh-software-engineer dh-reviewer dh-final-reviewer dh-documentor dh-researcher)
 
 if [[ "${1:-}" == "validate" ]]; then
   command -v opencode >/dev/null || { echo "[demo] FAIL: opencode not found"; exit 1; }
