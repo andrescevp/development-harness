@@ -3,13 +3,14 @@ import type { ResolvedTheme } from '@opencode/theme/tui';
 import {
   type CliRenderer,
   createMarkdownCodeBlockRenderer,
+  type MarkdownRenderable,
   type ScrollBoxRenderable,
   SyntaxStyle,
   TextRenderable,
   type ThemeTokenStyle,
 } from '@opentui/core';
 import { useTerminalDimensions } from '@opentui/solid';
-import { createComponent, createMemo, createSignal, For, onCleanup } from 'solid-js';
+import { createComponent, createEffect, createMemo, createSignal, For, onCleanup } from 'solid-js';
 import { planFileMarkdown, planMermaidAscii } from '../plan-file-model.js';
 import {
   defaultPlanFile,
@@ -106,6 +107,7 @@ export function PlanFileModal(props: PlanFileModalProps) {
   const [selected, setSelected] = createSignal<string | null>(initial?.path ?? null);
   let treeScroll: ScrollBoxRenderable | undefined;
   let previewScroll: ScrollBoxRenderable | undefined;
+  let markdownView: MarkdownRenderable | undefined;
 
   const rows = createMemo(() => visiblePlanFiles(tree(), (relative) => expanded().has(relative)));
   const selectedRow = createMemo(() => rows().find((row) => row.node.path === selected()) ?? null);
@@ -126,6 +128,11 @@ export function PlanFileModal(props: PlanFileModalProps) {
 
   onCleanup(() => {
     void props.renderer.idle().then(() => syntax.destroy());
+  });
+
+  createEffect(() => {
+    const value = preview();
+    if (markdownView) markdownView.content = value.kind === 'markdown' ? value.text : '';
   });
 
   const selectAt = (index: number): void => {
@@ -245,18 +252,18 @@ export function PlanFileModal(props: PlanFileModalProps) {
             height={panelHeight()}
             scrollbarOptions={{ visible: true }}
           >
-            {reactiveShow({
-              when: () => preview().kind === 'markdown',
-              children: (
-                <markdown
-                  content={preview().text}
-                  syntaxStyle={syntax}
-                  renderBlock={mermaid}
-                  fg={props.theme.text.base}
-                  conceal
-                />
-              ),
-            })}
+            <markdown
+              ref={(value: MarkdownRenderable) => {
+                markdownView = value;
+                const current = preview();
+                value.content = current.kind === 'markdown' ? current.text : '';
+              }}
+              content=""
+              syntaxStyle={syntax}
+              renderBlock={mermaid}
+              fg={props.theme.text.base}
+              conceal
+            />
             {reactiveShow({
               when: () => preview().kind !== 'markdown',
               children: <text fg={props.theme.text.muted}>{reactiveText(() => preview().text)}</text>,

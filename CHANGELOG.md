@@ -7,6 +7,11 @@ version.
 
 ## [Unreleased]
 
+### Fixed
+
+- **TUI plan modal preview:** selecting another file updates the Markdown
+  renderable in place, so the right panel always shows the selected file.
+
 ## [0.13.1] — 2026-11-16
 
 ### Changed
