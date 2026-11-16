@@ -12,6 +12,7 @@ import type { Store } from 'solid-js/store';
 import type { ActivityPayload } from './activity-adapter.js';
 import { createActivityFeed } from './activity-feed.js';
 import type { PlanProgress, PlanSelection } from './plan-model.js';
+import { derivePlanProgress } from './plan-progress.js';
 import { readPlanDetails, readPlanScan, resolvePlanRoot } from './plan-read.js';
 import type { ActivityEvent, PlanState } from './plan-render-model.js';
 import { derivePlanState, loadingPlanState, selectPlan } from './plan-state.js';
@@ -25,6 +26,8 @@ const PLAN_UI_KEY = 'dev-harness-skills.plan-progress.ui';
 interface PlanUiState {
   pinnedSlug: string | null;
   panelCursor: number;
+  /** Slugs whose sidebar section is collapsed. */
+  collapsedSlugs: string[];
 }
 
 interface StateSlot {
@@ -67,6 +70,7 @@ export interface PlanStore {
   trackSession(sessionID: string | null): void;
   pin(slug: string | null): void;
   setCursor(cursor: number): void;
+  toggleCollapsed(slug: string): void;
   dispose(): void;
 }
 
@@ -83,7 +87,7 @@ export function createPlanStore(options: PlanStoreOptions): PlanStore {
     initial: { state: loadingPlanState(initialActivity(now), null, now()) },
   });
   const [uiStore, updateUi] = options.storage.memory<PlanUiState>(PLAN_UI_KEY, {
-    initial: { pinnedSlug: null, panelCursor: 0 },
+    initial: { pinnedSlug: null, panelCursor: 0, collapsedSlugs: [] },
   });
 
   const state = (): PlanState => store.state;
@@ -119,6 +123,27 @@ export function createPlanStore(options: PlanStoreOptions): PlanStore {
       truncated: scan.truncated,
     });
     const details = root !== null && selection.selectedSlug ? readPlanDetails(root, selection.selectedSlug) : null;
+    const plans =
+      root === null
+        ? []
+        : scan.candidates
+            .filter((candidate) => candidate.status === 'In Progress' || candidate.active === true)
+            .map((candidate) => {
+              const candidateDetails = readPlanDetails(root, candidate.slug);
+              if (!candidateDetails.plan) return null;
+              try {
+                return derivePlanProgress({
+                  candidate,
+                  planContents: candidateDetails.plan.contents,
+                  details: candidateDetails,
+                  now: now(),
+                });
+              } catch {
+                return null;
+              }
+            })
+            .filter((plan): plan is PlanProgress => plan !== null)
+            .sort((a, b) => (a.slug === selection.selectedSlug ? -1 : b.slug === selection.selectedSlug ? 1 : 0));
     const derived = derivePlanState({
       root,
       scan,
@@ -133,6 +158,7 @@ export function createPlanStore(options: PlanStoreOptions): PlanStore {
     });
     const next: PlanState = {
       ...derived,
+      plans,
       activity: feed.activity(derived.plan, derived.selection),
       refresh: { ...derived.refresh, durationMs: Date.now() - started },
     };
@@ -176,6 +202,14 @@ export function createPlanStore(options: PlanStoreOptions): PlanStore {
       if (disposed) return;
       updateUi((draft) => {
         draft.panelCursor = Math.max(0, Math.floor(cursor));
+      });
+    },
+    toggleCollapsed(slug: string): void {
+      if (disposed) return;
+      updateUi((draft) => {
+        const index = draft.collapsedSlugs.indexOf(slug);
+        if (index === -1) draft.collapsedSlugs.push(slug);
+        else draft.collapsedSlugs.splice(index, 1);
       });
     },
     dispose(): void {

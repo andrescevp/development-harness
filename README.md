@@ -212,11 +212,12 @@ automatically beside the server part — no second entry — so plan execution c
 be followed without leaving OpenCode. It is read-only and reads the **local**
 workspace only.
 
-- **Sidebar card** (`sidebar.content`): active plan, `Phase N · N.M` position
-  (`+K` and `Active: N tasks` while several sub-tasks run in parallel),
-  completed/total sub-tasks with a text progress bar, the current sub-task's
-  delegated agent, plan status and a one-line activity (`Running edit`,
-  `2 active plans — choose one`).
+- **Sidebar card** (`sidebar.content`): one collapsible section per executing
+  plan (`▾`/`▸` toggles), each with the `Phase N · N.M` position (`+K` and
+  `Active: N tasks` while several sub-tasks run in parallel), completed/total
+  sub-tasks with a text progress bar, the current sub-task's delegated agent,
+  plan status, a one-line activity, and an `[open]` action that opens the plan
+  file in a read-only page.
 - **`/plan-progress` panel** (palette entry "Plan progress"): every phase and
   sub-task with status and delegated agent, checklists, review verdict,
   fast-mode skipped-check ledger and last update. `↑`/`↓` and `PgUp`/`PgDn`

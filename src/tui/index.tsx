@@ -1,10 +1,11 @@
 import { Plugin } from '@opencode/plugin/tui';
 import { toActivityPayload } from './activity-adapter.js';
+import { PlanFilePage } from './components/PlanFilePage.js';
 import { PlanPanel } from './components/PlanPanel.js';
 import { SidebarPlan } from './components/SidebarPlan.js';
 import { sidebarWidth } from './components/sidebar-model.js';
 import { createPlanStore } from './plan-store.js';
-import { TUI_PLAN_COMMAND, TUI_PLAN_PANEL, TUI_PLUGIN_ID } from './plugin-id.js';
+import { TUI_PLAN_COMMAND, TUI_PLAN_FILE_PAGE, TUI_PLAN_PANEL, TUI_PLUGIN_ID } from './plugin-id.js';
 
 /**
  * TUI part of dev-harness-skills (`package.json` `exports["./tui"]`).
@@ -45,6 +46,26 @@ export default Plugin.define({
           width={() => sidebarWidth(context.renderer.width)}
           sessionID={sessionID}
           onSession={store.trackSession}
+          collapsed={() => store.ui().collapsedSlugs}
+          onToggle={store.toggleCollapsed}
+          onOpen={(plan) =>
+            context.ui.router.navigate({
+              type: 'plugin',
+              name: TUI_PLAN_FILE_PAGE,
+              data: { path: plan.absPath, title: plan.title },
+            })
+          }
+        />
+      ),
+    });
+
+    const removePage = context.ui.router.register({
+      name: TUI_PLAN_FILE_PAGE,
+      render: ({ data }) => (
+        <PlanFilePage
+          path={typeof data?.path === 'string' ? data.path : null}
+          title={typeof data?.title === 'string' ? data.title : 'Plan file'}
+          theme={context.theme}
         />
       ),
     });
@@ -95,6 +116,7 @@ export default Plugin.define({
 
     return () => {
       removeSidebar();
+      removePage();
       removePanel();
       store.dispose();
     };

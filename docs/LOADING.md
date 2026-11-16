@@ -216,7 +216,7 @@ the `/plan-progress` panel.
 
 | Surface | What it shows |
 |---|---|
-| `sidebar.content` card | Active plan title/slug, `Phase N · N.M` position, completed/total sub-tasks with a text progress bar, the current sub-task's delegated agent, plan status and a one-line activity (`Running edit`, `1.1 … — dh-software-engineer`, `2 active plans — choose one`). Parallel runs show the active-task count (`Phase N · N.M +K`, `Active: N tasks`) while keeping the lowest index as the primary task. |
+| `sidebar.content` card | One collapsible section per executing plan (`▾`/`▸` header), each showing title/slug, `Phase N · N.M` position, completed/total sub-tasks with a text progress bar, the current sub-task's delegated agent, plan status, a one-line activity, and an `[open]` action. `[open]` navigates to a read-only plugin page with the plan file; parallel runs show the active-task count (`Phase N · N.M +K`, `Active: N tasks`) while keeping the lowest index as the primary task. |
 | `/plan-progress` panel (`dev-harness-skills.plan`) | Every phase and sub-task with status and delegated agent, checklists (`plan.md` checkboxes, `Done When`/`Acceptance Criteria`, final verification), review verdict, fast-mode skipped-check ledger and last update. Keys: `↑`/`↓` and `PgUp`/`PgDn` scroll, `f` fullscreen, `r` refresh, `Esc` close; `1`…`9` pin a plan when several are active. |
 
 - **Read-only.** The TUI never edits plan status, checklists, reviews or the

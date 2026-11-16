@@ -5,6 +5,15 @@ All notable changes to this project are documented here. The format follows
 Semantic Versioning. During the 0.x line, breaking changes bump the minor
 version.
 
+## [Unreleased]
+
+### Added
+
+- **Multi-plan TUI sidebar:** each executing plan renders as a collapsible
+  `sidebar.content` section (`▾`/`▸`), with its own progress bar, active-task
+  count, delegated agent, status, and activity line. An `[open]` action opens
+  the plan file in a read-only plugin page.
+
 ## [0.11.0] — 2026-11-16
 
 ### Added

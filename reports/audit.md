@@ -1,6 +1,6 @@
 # Audit Report — dev-harness-skills plugin
 
-Generated 2026-11-16T10:42:00.551Z by `scripts/audit.mjs`.
+Generated 2026-11-16T10:59:20.416Z by `scripts/audit.mjs`.
 
 ## Verdict
 
