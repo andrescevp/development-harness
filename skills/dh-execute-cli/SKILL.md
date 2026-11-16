@@ -81,10 +81,13 @@ exposed by the project-scope `dh` MCP server; under Code Mode call it as
 `tools.dh.logged_command` (direct MCP hosts use `dh_logged_command`).
 
 **TOON output:** native `bash` JSON output may appear as TOON for eligible
-tools (compressed only when the JSON is at least 256 characters and TOON is
-shorter); valid TOON forwarded inside a later quoted string or heredoc is
-restored to JSON before that command runs, while edited or unquoted text stays
-unchanged. `dh` MCP tool text may likewise be JSON or TOON — parse both.
+tools (compressed only when the payload is an object/array, its JSON is at
+least 256 characters, and TOON is shorter); a clean TOON object/array payload
+forwarded inside a later quoted string or **quoted-marker** heredoc (`<<'EOF'`,
+`<<"EOF"`) is restored to JSON before that command runs, while edited, invalid,
+or unquoted text — and unquoted heredocs (`<<EOF`), whose bodies the shell
+expands — stay unchanged. `dh` MCP tool text may likewise be JSON or TOON —
+parse both.
 
 ### Fallback: manual temp log + head/tail
 

@@ -430,15 +430,18 @@ The plugin registers exactly two tool hooks:
 - `execute.after` — when an eligible tool call completes with valid JSON text
   of at least 256 characters, its text payload is replaced with TOON only when
   TOON is strictly shorter, and the original JSON is remembered in a
-  process-local 100-entry LRU cache keyed by the SHA-256 of the trimmed TOON
-  text: the least recently used entry is evicted, and a cache hit refreshes
-  recency.
+  process-local 100-entry least-recently-used cache keyed by the SHA-256 of the
+  trimmed TOON text: the least recently used entry is evicted, and a cache hit
+  or re-store refreshes recency. Entries above 256 KiB are emitted as TOON but
+  not cached.
 - `execute.before` — before a `bash` command runs, forwarded single- or
-  double-quoted strings and heredoc bodies are checked: an exact cached TOON
-  payload is replaced with the original JSON; otherwise a clean, strictly valid
-  TOON payload is decoded and re-serialized as JSON. Edited, invalid, or
-  unquoted text is left byte-identical, as is `$'...'` ANSI-C quoting and any
-  command above 1 MiB.
+  double-quoted strings and **quoted-marker** heredoc bodies (`<<'EOF'`,
+  `<<"EOF"`) are checked: an exact cached TOON payload is replaced with the
+  original JSON; otherwise a clean TOON object/array payload (a root key-value
+  or array-header document, not only tabular text) is decoded and
+  re-serialized as JSON. Edited, invalid, or unquoted text is left
+  byte-identical, as are unquoted heredocs (`<<EOF` — the shell would expand
+  the body), `$'...'` ANSI-C quoting, and any command above 1 MiB.
 
 Eligible compression tools default to `bash`. Override the set with a
 comma-separated list of native tool names in the OpenCode server environment:
@@ -453,11 +456,12 @@ only.
 ### Limits
 
 - **Process-local cache.** The 100-entry cache lives in the plugin process, is
-  never written to disk, and is lost when the process exits.
+  never written to disk, and is lost when the process exits. It is bounded per
+  entry too: payloads above 256 KiB are not remembered.
 - **MCP/plugin process boundary.** The MCP server is a separate process from the
   plugin. Exact-match restoration applies only to native tool output compressed
   by the plugin; MCP TOON forwarded into a bash command restores through the
-  valid-TOON decode fallback, not the exact cache.
+  clean-TOON object/array decode fallback, not the exact cache.
 - **Conditional.** TOON is never guaranteed: small, non-JSON, or non-shorter
   payloads remain JSON.
 

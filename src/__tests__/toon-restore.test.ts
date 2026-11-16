@@ -2,17 +2,19 @@
  * toon-restore.test.ts — forwarded quoted/heredoc TOON restoration (Sub-Task 2.2).
  *
  * The `execute.before` hook rewrites a forwarded bash command so remembered
- * TOON payloads become JSON again. Only quoted strings and heredoc bodies are
- * eligible: an exact match in the bounded restore cache wins, a clean TOON
- * payload is decoded as a fallback, and edited, invalid, or unquoted text is
- * left byte-identical. Covered here: single/double quotes, heredocs (plain and
- * `<<-`, quoted markers), exact vs fallback, apostrophe escaping, the 1 MiB
- * cap, unquoted payloads, plain commands, and malformed input.
+ * TOON payloads become JSON again. Only quoted strings and QUOTED-marker
+ * heredoc bodies are eligible: an exact match in the bounded restore cache
+ * wins, a clean TOON object/array payload is decoded as a fallback, and
+ * edited, invalid, unquoted, or unquoted-heredoc text is left byte-identical.
+ * Covered here: single/double quotes, heredocs (plain and `<<-`, quoted
+ * markers), exact vs fallback, apostrophe escaping, the 1 MiB cap, unquoted
+ * payloads, adversarial opener scans, plain commands, and malformed input.
  */
 import { decode } from '@toon-format/toon';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { tryEncodeToon } from '../lib/toon.js';
-import { cacheConvertedOutput, clearToonCache, restoreForwardedCommand } from '../tools/toon-hooks.js';
+import { cacheConvertedOutput, clearToonCache } from '../tools/toon-cache.js';
+import { restoreForwardedCommand, shellSingleQuote } from '../tools/toon-restore.js';
+import { encodeFixture, LOGGED_COMMAND_TOON } from './helpers/toon-fixtures.js';
 
 /** Uniform rows: the tabular shape TOON compresses best. */
 const FORWARDED_ROWS = Array.from({ length: 7 }, (_, i) => ({
@@ -29,22 +31,10 @@ const APOSTROPHE_ROWS = Array.from({ length: 6 }, (_, i) => ({
   note: `note-${i + 1}`,
 }));
 
-/** Encode a fixture through the production codec; guard against drift. */
-function encodeFixture(payload: unknown): string {
-  const toon = tryEncodeToon(payload);
-  if (toon === undefined) throw new Error('fixture payload is not TOON-eligible');
-  return toon;
-}
-
 const FORWARDED_TOON = encodeFixture(FORWARDED_ROWS);
 const FORWARDED_JSON = JSON.stringify(FORWARDED_ROWS);
 const APOSTROPHE_TOON = encodeFixture(APOSTROPHE_ROWS);
 const APOSTROPHE_JSON = JSON.stringify(APOSTROPHE_ROWS);
-
-/** The shell form of a single-quoted JSON string (`'` → `'\''`). */
-function shellSingleQuote(text: string): string {
-  return `'${text.replaceAll("'", "'\\''")}'`;
-}
 
 beforeEach(() => {
   clearToonCache();
@@ -66,6 +56,19 @@ describe('restoreForwardedCommand — quoted payloads', () => {
     expect(restored).toBe(`printf '%s' '${FORWARDED_JSON}'`);
     const payload = restored.slice(restored.lastIndexOf("'", restored.length - 2) + 1, -1);
     expect(JSON.parse(payload)).toEqual(FORWARDED_ROWS);
+  });
+
+  it('restores cross-process TOON with primitive-array headers and no field list', () => {
+    // A realistic `logged_command` payload has no tabular {fields} header, so
+    // this exercises the widened sniffer plus the strict decode fallback.
+    const command = `echo '${LOGGED_COMMAND_TOON}'`;
+
+    const restored = restoreForwardedCommand(command);
+
+    expect(restored).not.toBe(command);
+    const payload = restored.slice(restored.indexOf("'") + 1, -1);
+    expect(JSON.parse(payload)).toEqual(decode(LOGGED_COMMAND_TOON));
+    expect(JSON.parse(payload).head).toHaveLength(20);
   });
 
   it('escapes apostrophes when substituting a shell single-quoted JSON string', () => {
@@ -108,10 +111,19 @@ describe('restoreForwardedCommand — heredocs', () => {
     expect(restoreForwardedCommand(command)).toBe(`cat <<-"JSON"\n${FORWARDED_JSON}\nJSON\n`);
   });
 
-  it('handles a closing marker at end of input', () => {
-    const command = `cat <<JSON\n${FORWARDED_TOON}\nJSON`;
+  it('handles a quoted closing marker at end of input', () => {
+    const command = `cat <<'JSON'\n${FORWARDED_TOON}\nJSON`;
 
-    expect(restoreForwardedCommand(command)).toBe(`cat <<JSON\n${FORWARDED_JSON}\nJSON`);
+    expect(restoreForwardedCommand(command)).toBe(`cat <<'JSON'\n${FORWARDED_JSON}\nJSON`);
+  });
+
+  it('leaves an unquoted heredoc untouched because the shell would expand it', () => {
+    const command = `cat <<JSON\n${FORWARDED_TOON}\nJSON\n`;
+    expect(restoreForwardedCommand(command)).toBe(command);
+
+    const payload = JSON.stringify({ value: 'x$(touch /tmp/pwned)y', path: 'C:\\\\tmp' });
+    const quoted = `cat <<'JSON'\n${payload}\nJSON\n`;
+    expect(restoreForwardedCommand(quoted)).toBe(quoted);
   });
 
   it('leaves an edited/invalid heredoc body untouched', () => {
@@ -157,5 +169,13 @@ describe('restoreForwardedCommand — scope guards', () => {
       expect(() => restoreForwardedCommand(command)).not.toThrow();
       expect(restoreForwardedCommand(command)).toBe(command);
     }
+  });
+
+  it('bounds adversarial heredoc scans with many openers', () => {
+    const command = '<<A\n'.repeat(64 * 1024);
+    const started = Date.now();
+
+    expect(restoreForwardedCommand(command)).toBe(command);
+    expect(Date.now() - started).toBeLessThan(1000);
   });
 });

@@ -29,7 +29,7 @@ status: active
 | LRU cache | PASS | 100-entry bound; hit refreshes recency; eviction test passes. |
 | Plugin registration contract | PASS | 6 agents + 27 skills + exactly two execute hooks; zero tool/command/prompt transforms; cleanup disposes both. |
 | MCP tool contract | PASS | 12 tools unchanged; descriptions/instructions state JSON/TOON. |
-| Full test suite | PASS | 70 files / 1169 tests. |
+| Full test suite | PASS | 70 files / 1186 tests. |
 | Typecheck | PASS | `tsc --noEmit` clean. |
 | Audit | PASS | 6 agents, 27 skills, 0 FAIL, 0 high-signature secrets, 0 junk. |
 | Link check | PASS | 432 references, no dead links. |

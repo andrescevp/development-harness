@@ -35,7 +35,8 @@ import type { Agent, Skill } from '@opencode/plugin';
 import { type Cleanup, type Context, define } from '@opencode/plugin/promise/plugin';
 import { loadHarnessAssets } from './lib/assets.js';
 import type { AgentRecord, SkillRecord } from './lib/records.js';
-import { compressToolResult, getEligibleTools, restoreForwardedCommand } from './tools/toon-hooks.js';
+import { getEligibleTools } from './tools/toon-cache.js';
+import { handleAfterHook, handleBeforeHook } from './tools/toon-hooks.js';
 
 const PLUGIN_ID = 'dev-harness-skills';
 const LOG_PREFIX = '[dev-harness-skills]';
@@ -96,30 +97,13 @@ export default define({
     //    Inert on failure: a conversion error must never surface into the host.
     const eligibleTools = getEligibleTools();
     const afterHook = await ctx.tool.hook('execute.after', (event) => {
-      if (event.status !== 'completed') return;
-      if (!eligibleTools.has(event.tool.toLowerCase())) return;
-      try {
-        compressToolResult(event.result);
-      } catch {
-        // Best-effort hook: keep the original output on any unexpected shape.
-      }
+      handleAfterHook(event, eligibleTools);
     });
 
     // 4. Restore forwarded TOON payloads before a bash command runs. Only
-    //    quoted strings and heredocs are rewritten; unquoted text is untouched.
+    //    quoted strings and quoted heredoc bodies are rewritten.
     const beforeHook = await ctx.tool.hook('execute.before', (event) => {
-      try {
-        if (event.tool.toLowerCase() !== 'bash') return;
-        if (typeof event.input !== 'object' || event.input === null) return;
-
-        const input = event.input as { command?: unknown };
-        if (typeof input.command !== 'string') return;
-
-        const restored = restoreForwardedCommand(input.command);
-        if (restored !== input.command) input.command = restored;
-      } catch {
-        // Best-effort hook: restoration must never surface an error into the host.
-      }
+      handleBeforeHook(event);
     });
 
     logSummary(agents, skills, errors.length);

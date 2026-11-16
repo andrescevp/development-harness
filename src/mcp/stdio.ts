@@ -22,8 +22,9 @@ export const HARNESS_INSTRUCTIONS =
   'docs/plans/<slug>/plan.md of the workspace (a phase cannot be Completed while any ' +
   'sub-task is open), read csv/xlsx and update csv sheets by absolute path, and run ' +
   'shell commands whose output is logged to the system temp dir. ' +
-  'Successful tool payloads are JSON, or TOON when the payload is at least 256 ' +
-  'characters and TOON is shorter; clients should parse JSON or decode TOON.';
+  'Successful tool payloads are JSON, or TOON for object/array payloads whose ' +
+  'JSON is at least 256 characters and TOON is shorter; clients should parse ' +
+  'JSON or decode TOON.';
 
 let cachedVersion: string | undefined;
 

@@ -361,7 +361,7 @@ question arises.
 
 ### Phase 3: Documentation, packaging, verification
 
-- **Status:** In Progress
+- **Status:** Completed
 
 #### Sub-Task 3.1: Update project docs, changelog, and skill guidance
 
@@ -407,7 +407,7 @@ question arises.
 
 #### Sub-Task 3.3: Write evolution and observation close-out notes
 
-- **Status:** In Progress
+- **Status:** Completed
 - **Delegated to agent:** dh-documentor
 - **Objective:** Record what changed, why, the output-pipeline design, validation results, limitations, and session learnings.
 - **Related Requirements:** AC8

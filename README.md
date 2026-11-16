@@ -9,7 +9,7 @@ An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated develop
 - **6 agents and 27 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts, plus two native `execute` hooks for TOON output.
 - **Source-cited research**: `dh-researcher` + `dh-research` answer one external-fact question per pass with primary sources, retrieval dates, and confidence labels; notes live in one workspace registry at [`docs/research/index.md`](docs/research/index.md). An optional bounded pass may precede an execution-blocker report, but it never clears an unresolved blocker.
 - **`dh` MCP server (12 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents, skills, and the two TOON hooks; the tools come from the MCP server.
-- **Automatic TOON output**: Successful `dh` MCP payloads are JSON, or TOON when the serialized JSON is at least 256 characters and TOON is strictly shorter. The two `execute` hooks compress eligible native `bash` JSON output (default `bash`; override with `OPENCODE_TOON_PLUGIN_TOOLS`) and restore JSON inside forwarded quoted/heredoc payloads. JSON remains canonical on disk; errors stay plain text.
+- **Automatic TOON output**: Successful `dh` MCP payloads are JSON, or TOON when the payload is an object/array whose JSON is at least 256 characters and TOON is strictly shorter. The two `execute` hooks compress eligible native `bash` JSON output (default `bash`; override with `OPENCODE_TOON_PLUGIN_TOOLS`) and restore JSON inside forwarded quoted strings and quoted-marker heredocs. JSON remains canonical on disk; errors stay plain text.
 - **Code graph queries**: `dh-setup` installs code-graph-rag (`cgr`) on the embedded SQLite backend and indexes the project; `dh-code-query` answers structural questions — definitions, callers/callees, importers, dead code, duplicates — without scanning every file.
 - **Full QA gate**: Thorough verification suite integrating Biome, Knip, jscpd, dependency-cruiser, OSV-Scanner, Semgrep, Vitest, and TypeScript.
 - **Source-mode loading**: Automatic discovery by OpenCode via root `index.ts` with direct asset loading from the repository.
@@ -242,19 +242,22 @@ internally and on disk.
 - **Native `bash` (plugin hooks).** The plugin registers exactly two tool
   hooks. `execute.after` replaces eligible completed tool output (default
   `bash`) under the same 256-character/strictly-shorter rule and remembers the
-  original JSON in a process-local 100-entry LRU cache (the least recently used
-  entry is evicted, and a cache hit refreshes recency).
+  original JSON in a process-local 100-entry least-recently-used cache (the
+  least recently used entry is evicted, and a cache hit or re-store refreshes
+  recency; entries above 256 KiB are emitted but not cached).
   `execute.before` restores JSON inside forwarded bash single/double-quoted
-  strings and heredoc bodies — exact cache match first, strict TOON decode
-  second — and leaves edited, invalid, or unquoted text untouched. Commands
-  above 1 MiB are not scanned.
+  strings and quoted-marker heredoc bodies (`<<'EOF'`, `<<"EOF"`) — exact cache
+  match first, strict decode of a clean TOON object/array payload second — and
+  leaves edited, invalid, or unquoted text untouched. Unquoted heredocs
+  (`<<EOF`) are not rewritten because the shell would expand the body.
+  Commands above 1 MiB are not scanned.
 - **Configuration.** `OPENCODE_TOON_PLUGIN_TOOLS` (comma-separated native tool
   names) changes the eligible compression set; the default is `bash`.
   Restoration always targets `bash` only.
-- **Limits.** The cache is memory-only, bounded at 100 entries, and
-  process-local. The MCP server and plugin are separate processes, so MCP TOON
-  forwarded into a bash command restores through the decode fallback, not the
-  exact cache.
+- **Limits.** The cache is memory-only, bounded at 100 entries (256 KiB per
+  entry), and process-local. The MCP server and plugin are separate processes,
+  so MCP TOON forwarded into a bash command restores through the decode
+  fallback, not the exact cache.
 
 Details, eligibility rules, and a decode snippet:
 [`docs/LOADING.md` → TOON output](docs/LOADING.md#toon-output).

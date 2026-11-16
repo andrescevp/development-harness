@@ -35,6 +35,7 @@ interface CapturedUpdate {
 function createStubContext() {
   const captured: CapturedUpdate[] = [];
   const hooks: string[] = [];
+  const callbacks = new Map<string, (event: unknown) => unknown>();
   const disposed: string[] = [];
   let toolTransforms = 0;
 
@@ -64,8 +65,9 @@ function createStubContext() {
         toolTransforms += 1;
         throw new Error('tool domain must never be transformed (tools live in the MCP server)');
       },
-      hook: async (name: string, _callback: (event: unknown) => unknown) => {
+      hook: async (name: string, callback: (event: unknown) => unknown) => {
         hooks.push(name);
+        callbacks.set(name, callback);
         return {
           dispose: async () => {
             disposed.push(name);
@@ -80,7 +82,7 @@ function createStubContext() {
     },
   };
 
-  return { ctx, captured, hooks, disposed, toolTransforms: () => toolTransforms };
+  return { ctx, captured, hooks, callbacks, disposed, toolTransforms: () => toolTransforms };
 }
 
 describe('plugin setup registration (built bundle)', () => {
@@ -125,6 +127,50 @@ describe('plugin setup registration (built bundle)', () => {
     await cleanup();
 
     expect([...disposed].sort()).toEqual([...EXPECTED_HOOKS].sort());
+  });
+
+  it('wires the TOON handlers into the captured execute hooks', async () => {
+    const { default: plugin } = (await import(DIST_PLUGIN)) as {
+      default: { setup: (ctx: ReturnType<typeof createStubContext>['ctx']) => Promise<unknown> };
+    };
+    // Eight rows keep the JSON form above the 256-character TOON threshold.
+    const rows = Array.from({ length: 8 }, (_, i) => ({
+      id: i + 1,
+      name: `row-${i + 1}`,
+      value: `value-${i + 1}`,
+    }));
+    const json = JSON.stringify(rows);
+    const { ctx, callbacks } = createStubContext();
+    await plugin.setup(ctx);
+
+    const after = callbacks.get('execute.after');
+    const before = callbacks.get('execute.before');
+    expect(after).toBeTypeOf('function');
+    expect(before).toBeTypeOf('function');
+
+    // execute.after compresses a completed eligible tool and skips the rest.
+    const completed = { tool: 'bash', status: 'completed', result: { content: json } };
+    after!(completed);
+    expect(completed.result.content).not.toBe(json);
+    expect(completed.result.content.length).toBeLessThan(json.length);
+
+    const failed = { tool: 'bash', status: 'error', result: { content: json } };
+    after!(failed);
+    expect(failed.result.content).toBe(json);
+
+    const ineligible = { tool: 'shell', status: 'completed', result: { content: json } };
+    after!(ineligible);
+    expect(ineligible.result.content).toBe(json);
+
+    // execute.before restores the compressed payload inside a quoted string and
+    // leaves non-bash tools alone.
+    const input: { command: string } = { command: `echo '${completed.result.content}'` };
+    before!({ tool: 'bash', input });
+    expect(input.command).toBe(`echo '${json}'`);
+
+    const untouched: { command: string } = { command: `echo '${completed.result.content}'` };
+    before!({ tool: 'shell', input: untouched });
+    expect(untouched.command).toBe(`echo '${completed.result.content}'`);
   });
 });
 

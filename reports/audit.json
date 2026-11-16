@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-11-16T01:46:08.646Z",
+    "generated": "2026-11-16T02:12:16.070Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 1,
         "sev": "WARN",
-        "note": "578 resolved; 0 code-context; 0 allowlisted; 297 prose tokens (warn)"
+        "note": "578 resolved; 0 code-context; 0 allowlisted; 298 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
@@ -1553,6 +1553,13 @@
       ]
     },
     {
+      "token": "quoted-marker",
+      "count": 1,
+      "files": [
+        "skills/dh-execute-cli/SKILL.md"
+      ]
+    },
+    {
       "token": "re-execute",
       "count": 1,
       "files": [
@@ -2750,7 +2757,7 @@
     {
       "file": "skills/dh-execute-cli/SKILL.md",
       "kind": "skill",
-      "lines": 130,
+      "lines": 133,
       "frontmatter": {
         "status": "ok",
         "errors": [],

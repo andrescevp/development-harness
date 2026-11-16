@@ -85,17 +85,20 @@ only when the server is unavailable). Format contract:
 verification: [`docs/LOADING.md`](docs/LOADING.md#mcp-server-dh).
 
 **TOON output contract.** Successful `dh` payloads are JSON, or TOON when the
-serialized JSON is at least 256 characters and TOON is strictly shorter; errors
-stay plain text with `isError`. The plugin's `execute.after` hook compresses
-eligible native tool JSON (default `bash`; override the comma-separated set with
-`OPENCODE_TOON_PLUGIN_TOOLS`) and remembers the original in a process-local
-100-entry cache; `execute.before` restores JSON inside forwarded quoted strings
-and heredoc bodies (exact cache match first, valid-TOON decode second) and
-leaves edited, invalid, or unquoted text unchanged. The MCP server and plugin
-are separate processes: exact-match restoration applies only to output
-compressed by the plugin, so MCP TOON forwarded into bash uses the decode
-fallback. The cache never persists; JSON remains canonical internally and on
-disk.
+payload is an object/array whose JSON is at least 256 characters and TOON is
+strictly shorter; errors stay plain text with `isError`. The plugin's
+`execute.after` hook compresses eligible native tool JSON (default `bash`;
+override the comma-separated set with `OPENCODE_TOON_PLUGIN_TOOLS`) and
+remembers the original in a process-local 100-entry least-recently-used cache
+(entries above 256 KiB are emitted but not cached); `execute.before` restores
+JSON inside forwarded quoted strings and quoted-marker heredoc bodies
+(`<<'EOF'`, `<<"EOF"`; unquoted heredocs are expanded by the shell and stay
+unchanged) — exact cache match first, strict decode of a clean TOON object/array
+payload second — and leaves edited, invalid, or unquoted text unchanged. The
+MCP server and plugin are separate processes: exact-match restoration applies
+only to output compressed by the plugin, so MCP TOON forwarded into bash uses
+the decode fallback. The cache never persists; JSON remains canonical
+internally and on disk.
 
 ## Workspace contract (monorepo awareness)
 

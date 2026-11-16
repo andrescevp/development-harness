@@ -4,20 +4,20 @@
  *
  * The `execute.after` hook replaces eligible tool text with TOON only when the
  * payload is valid JSON of at least 256 characters and TOON is strictly
- * shorter, then remembers the original JSON in a bounded exact-match cache.
- * Covered here: string and block-array result shapes, the no-op cases (short,
- * non-JSON, longer TOON, ineligible tool), the 100-entry cache bound, the env
- * override, and malformed results that must stay inert.
+ * shorter, then remembers the original JSON in a bounded exact-match LRU
+ * cache. Covered here: string and block-array result shapes, the no-op cases
+ * (short, non-JSON, longer TOON, ineligible tool), the pure handler gates the
+ * plugin wires, the cache bounds/recency, the env override, and malformed
+ * results that must stay inert.
  */
 import { decode } from '@toon-format/toon';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { TOON_MAX_CACHE, TOON_MIN_CHARS, tryEncodeToon } from '../lib/toon.js';
+import { TOON_MAX_CACHE, TOON_MAX_ENTRY_CHARS, TOON_MIN_CHARS, tryEncodeToon } from '../lib/toon.js';
+import { cacheConvertedOutput, clearToonCache, getCachedJson, getEligibleTools } from '../tools/toon-cache.js';
 import {
-  cacheConvertedOutput,
-  clearToonCache,
   compressToolResult,
-  getCachedJson,
-  getEligibleTools,
+  handleAfterHook,
+  handleBeforeHook,
   type ToolContentBlockLike,
   type ToolResultLike,
 } from '../tools/toon-hooks.js';
@@ -31,6 +31,17 @@ const SHEET_ROWS = Array.from({ length: 6 }, (_, i) => ({
 }));
 
 const SHEET_JSON = JSON.stringify(SHEET_ROWS);
+
+/** Encode a fixture through the production codec; guard against drift. */
+function encodeFixture(payload: unknown): string {
+  const toon = tryEncodeToon(payload);
+  if (toon === undefined) throw new Error('fixture payload is not TOON-eligible');
+  return toon;
+}
+
+/** TOON form used by the restore-handler cases below. */
+const FORWARDED_TOON = encodeFixture(SHEET_ROWS);
+const FORWARDED_JSON = SHEET_JSON;
 
 /**
  * Deep, non-uniform nesting: the indented TOON form is longer than JSON, so
@@ -112,6 +123,78 @@ describe('compressToolResult (string content)', () => {
     expect(toon).not.toBe(SHEET_JSON);
     expect(decode(toon)).toEqual(SHEET_ROWS);
     expect(getCachedJson(toon)).toBe(SHEET_JSON);
+  });
+
+  it('does not fall through to output when the content string is not convertible', () => {
+    // A string `content` is authoritative: the model-facing channel is what
+    // the client reads, so rewriting only `output` would be pointless.
+    const result: ToolResultLike = { content: 'plain diagnostics, not JSON', output: SHEET_JSON };
+
+    expect(compressToolResult(result)).toBe(false);
+
+    expect(result.content).toBe('plain diagnostics, not JSON');
+    expect(result.output).toBe(SHEET_JSON);
+  });
+});
+
+describe('execute hook handlers', () => {
+  const eligible = getEligibleTools({});
+
+  it('compresses a completed eligible bash result', () => {
+    const event = { tool: 'bash', status: 'completed', result: { content: SHEET_JSON } };
+
+    expect(handleAfterHook(event, eligible)).toBe(true);
+
+    expect(event.result.content).not.toBe(SHEET_JSON);
+    expect(decode(event.result.content as string)).toEqual(SHEET_ROWS);
+  });
+
+  it('ignores error statuses, ineligible tools, and missing results', () => {
+    const failed = { tool: 'bash', status: 'error', result: { content: SHEET_JSON } };
+    expect(handleAfterHook(failed, eligible)).toBe(false);
+    expect(failed.result.content).toBe(SHEET_JSON);
+
+    const ineligible = { tool: 'shell', status: 'completed', result: { content: SHEET_JSON } };
+    expect(handleAfterHook(ineligible, eligible)).toBe(false);
+    expect(ineligible.result.content).toBe(SHEET_JSON);
+
+    expect(handleAfterHook({ tool: 'bash', status: 'completed' }, eligible)).toBe(false);
+  });
+
+  it('never throws on malformed events', () => {
+    const shapes: unknown[] = [undefined, null, {}, { tool: 'bash' }, { tool: 'bash', status: 'completed' }];
+    for (const shape of shapes) {
+      expect(() => handleAfterHook(shape as never, eligible)).not.toThrow();
+      expect(handleAfterHook(shape as never, eligible)).toBe(false);
+      expect(() => handleBeforeHook(shape as never)).not.toThrow();
+      expect(handleBeforeHook(shape as never)).toBe(false);
+    }
+  });
+
+  it('restores a quoted payload in a bash command and reports the change', () => {
+    cacheConvertedOutput(FORWARDED_TOON, FORWARDED_JSON);
+    const input: { command: string } = { command: `echo '${FORWARDED_TOON}'` };
+    const event = { tool: 'bash', input };
+
+    expect(handleBeforeHook(event)).toBe(true);
+
+    expect(input.command).toBe(`echo '${FORWARDED_JSON}'`);
+  });
+
+  it('leaves non-bash tools, missing commands, and non-string commands untouched', () => {
+    cacheConvertedOutput(FORWARDED_TOON, FORWARDED_JSON);
+    const shellInput = { command: `echo '${FORWARDED_TOON}'` };
+    expect(handleBeforeHook({ tool: 'shell', input: shellInput })).toBe(false);
+    expect(shellInput.command).toBe(`echo '${FORWARDED_TOON}'`);
+
+    expect(handleBeforeHook({ tool: 'bash' })).toBe(false);
+    expect(handleBeforeHook({ tool: 'bash', input: null })).toBe(false);
+    expect(handleBeforeHook({ tool: 'bash', input: 42 })).toBe(false);
+    expect(handleBeforeHook({ tool: 'bash', input: { command: 42 } })).toBe(false);
+
+    const unchanged = { command: 'pnpm test' };
+    expect(handleBeforeHook({ tool: 'bash', input: unchanged })).toBe(false);
+    expect(unchanged.command).toBe('pnpm test');
   });
 });
 
@@ -209,6 +292,28 @@ describe('restore cache', () => {
     expect(getCachedJson(toonFor(1))).toBeUndefined();
     expect(getCachedJson(toonFor(0))).toBe(jsonFor(0));
     expect(getCachedJson(toonFor(newest))).toBe(jsonFor(newest));
+  });
+
+  it('refreshes recency when an existing entry is re-stored', () => {
+    for (let i = 0; i < TOON_MAX_CACHE; i += 1) cacheConvertedOutput(toonFor(i), jsonFor(i));
+
+    // Re-storing the oldest key must move it to the most recent position.
+    cacheConvertedOutput(toonFor(0), `${jsonFor(0)} `);
+
+    const newest = TOON_MAX_CACHE;
+    cacheConvertedOutput(toonFor(newest), jsonFor(newest));
+
+    // FIFO would evict 0; the refreshed entry survives and the next-oldest goes.
+    expect(getCachedJson(toonFor(0))).toBe(`${jsonFor(0)} `);
+    expect(getCachedJson(toonFor(1))).toBeUndefined();
+  });
+
+  it(`skips entries above ${TOON_MAX_ENTRY_CHARS} characters without throwing`, () => {
+    const oversized = `"${'x'.repeat(TOON_MAX_ENTRY_CHARS)}"`;
+
+    cacheConvertedOutput(toonFor(0), oversized);
+
+    expect(getCachedJson(toonFor(0))).toBeUndefined();
   });
 
   it('keys entries by the trimmed TOON text', () => {

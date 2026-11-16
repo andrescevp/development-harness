@@ -38,7 +38,8 @@ const SERVER_NAME = 'dev-harness-skills';
  * Payload-format contract shared by every tool: successful text payloads keep
  * the same JSON-or-TOON shape, so clients decode one way for all 12 tools.
  */
-const TOON_NOTE = 'Successful payloads are JSON, or TOON when shorter.';
+const TOON_NOTE =
+  'Successful payloads are JSON, or TOON for object/array payloads whose JSON is at least 256 characters and TOON is shorter.';
 
 /** Single source of truth for the payload note — never duplicate it per tool. */
 function withToonNote(description: string): string {

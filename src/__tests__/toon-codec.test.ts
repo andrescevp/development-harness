@@ -13,9 +13,12 @@ import {
   looksLikeJson,
   looksLikeToon,
   TOON_MAX_CACHE,
+  TOON_MAX_ENTRY_CHARS,
   TOON_MIN_CHARS,
   tryEncodeToon,
+  tryEncodeToonText,
 } from '../lib/toon.js';
+import { loggedCommandPayload } from './helpers/toon-fixtures.js';
 
 /** Uniform rows: the tabular shape TOON compresses best. */
 const UNIFORM_USERS = Array.from({ length: 8 }, (_, i) => ({
@@ -40,6 +43,7 @@ describe('codec constants', () => {
   it('exposes the contract thresholds', () => {
     expect(TOON_MIN_CHARS).toBe(256);
     expect(TOON_MAX_CACHE).toBe(100);
+    expect(TOON_MAX_ENTRY_CHARS).toBe(262_144);
   });
 });
 
@@ -95,6 +99,25 @@ describe('tryEncodeToon', () => {
     expect(tryEncodeToon(UNIFORM_USERS, json)).toBeTypeOf('string');
   });
 
+  it('encodes the JSON-normalized value so undefined properties are omitted', () => {
+    const payload: { ok: boolean; optional?: string; users: typeof UNIFORM_USERS } = {
+      ok: true,
+      optional: undefined,
+      users: UNIFORM_USERS,
+    };
+    const json = JSON.stringify(payload);
+    expect(json.length).toBeGreaterThanOrEqual(TOON_MIN_CHARS);
+    expect(payload).toHaveProperty('optional');
+
+    const toon = tryEncodeToon(payload, json);
+
+    expect(toon).toBeTypeOf('string');
+    // JSON drops `undefined`; the decoded TOON value must match JSON, not null.
+    const decoded = decode(toon!) as Record<string, unknown>;
+    expect(decoded).toEqual(JSON.parse(json));
+    expect(decoded).not.toHaveProperty('optional');
+  });
+
   it('swallows serialization failures without throwing', () => {
     const circular: Record<string, unknown> = {};
     circular.self = circular;
@@ -105,6 +128,29 @@ describe('tryEncodeToon', () => {
     expect(tryEncodeToon({ big: 1n })).toBeUndefined();
 
     expect(tryEncodeToon({ toJSON: () => undefined })).toBeUndefined();
+  });
+});
+
+describe('tryEncodeToonText', () => {
+  it('encodes JSON text above the threshold and round-trips the parsed value', () => {
+    const json = JSON.stringify(UNIFORM_USERS);
+    const toon = tryEncodeToonText(`\n  ${json}  \n`);
+
+    expect(toon).toBeTypeOf('string');
+    expect(decode(toon!)).toEqual(UNIFORM_USERS);
+  });
+
+  it('rejects short, non-JSON, and non-object/array JSON text', () => {
+    expect(tryEncodeToonText('{"tiny":1}')).toBeUndefined();
+    expect(tryEncodeToonText(`${'prose '.repeat(60)}`)).toBeUndefined();
+    expect(tryEncodeToonText(`"${'x'.repeat(TOON_MIN_CHARS)}"`)).toBeUndefined();
+    expect(tryEncodeToonText(`${' '.repeat(4)}{"a":1}`)).toBeUndefined();
+    expect(tryEncodeToonText('{"broken": }')).toBeUndefined();
+  });
+
+  it('rejects JSON whose TOON form is not shorter', () => {
+    const json = JSON.stringify(deeplyNestedPayload(200));
+    expect(tryEncodeToonText(json)).toBeUndefined();
   });
 });
 
@@ -153,11 +199,22 @@ describe('looksLikeToon', () => {
     expect(looksLikeToon(nestedToon!)).toBe(true);
   });
 
+  it('accepts primitive-array headers and key-value documents without field lists', () => {
+    const primitiveArrays = tryEncodeToon(loggedCommandPayload());
+    expect(primitiveArrays).toBeTypeOf('string');
+    expect(primitiveArrays).toContain('head[20\t]:');
+    expect(looksLikeToon(primitiveArrays!)).toBe(true);
+
+    const keyValue = `ok: true\nlogPath: /tmp/log\nnote: ${'x'.repeat(80)}`;
+    expect(looksLikeToon(keyValue)).toBe(true);
+  });
+
   it('rejects JSON, short payloads, single-line payloads, and prose', () => {
     expect(looksLikeToon(JSON.stringify(UNIFORM_USERS))).toBe(false);
     expect(looksLikeToon('')).toBe(false);
     expect(looksLikeToon('user[2\t]{id\tname}:\n  1\ta\n  2\tb')).toBe(false);
     expect(looksLikeToon(`name: ${'x'.repeat(90)}`)).toBe(false);
     expect(looksLikeToon('The output uses users[3\t]{id\tname}: headers in prose.')).toBe(false);
+    expect(looksLikeToon(`plain prose line one\nplain prose line two ${'x'.repeat(80)}`)).toBe(false);
   });
 });

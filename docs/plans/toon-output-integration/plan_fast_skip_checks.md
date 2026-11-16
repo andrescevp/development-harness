@@ -69,3 +69,9 @@ found not applicable.
 | 2026-11-16T01:48:20.312Z | dh-domain-check | Sub-Task 3.2 | fast mode defers per-task verification | end-of-plan |
 | 2026-11-16T01:48:20.312Z | dh-preflight | Sub-Task 3.2 | fast mode defers per-task verification | end-of-plan |
 | 2026-11-16T01:48:20.312Z | dh-artifact-check | Sub-Task 3.2 | fast mode defers per-task verification | end-of-plan |
+| 2026-11-16T01:52:29.860Z | dh-review | Sub-Task 3.3 | fast mode defers per-task verification | end-of-plan |
+| 2026-11-16T01:52:29.860Z | dh-simplify | Sub-Task 3.3 | fast mode defers per-task verification | end-of-plan |
+| 2026-11-16T01:52:29.860Z | dh-code-review | Sub-Task 3.3 | fast mode defers per-task verification | end-of-plan |
+| 2026-11-16T01:52:29.860Z | dh-domain-check | Sub-Task 3.3 | fast mode defers per-task verification | end-of-plan |
+| 2026-11-16T01:52:29.860Z | dh-preflight | Sub-Task 3.3 | fast mode defers per-task verification | end-of-plan |
+| 2026-11-16T01:52:29.860Z | dh-artifact-check | Sub-Task 3.3 | fast mode defers per-task verification | end-of-plan |

@@ -16,7 +16,7 @@ status: active
 
 | Check | Result | Details |
 |---|---|---|
-| Unit + integration tests | ✅ Pass | 70 files / 1169 tests |
+| Unit + integration tests | ✅ Pass | 70 files / 1186 tests |
 | Linter | ✅ Pass | Biome: 168 files, no fixes |
 | Format check | ✅ Pass | Biome format check clean |
 | Static analysis | ✅ Pass | `tsc --noEmit` clean |
