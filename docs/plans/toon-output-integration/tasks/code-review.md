@@ -125,3 +125,16 @@ Validation run during review: `vitest run src/__tests__/{toon-codec,toon-hooks,t
 - **Re-verified:** 70 files / 1186 tests, typecheck, build, Biome, knip, jscpd
   (0), dependency-cruiser, links, audit PASS, smoke-load/mcp/install/pack, OSV
   0 issues, Semgrep 0 findings.
+
+## Remediation Verification
+
+**Range**: `5bde6c3..HEAD` (`47a898c`) · **Verdict**: **Approve** — no residual P0/P1/P2.
+Focused run: `vitest run toon-codec toon-hooks toon-restore mcp-toon registration server` → 6 files / 76 tests passing.
+
+- **Unquoted heredocs (P1):** `readHeredoc` returns the original slice when `quote === ''` (`src/tools/toon-restore.ts:158-159`); only quoted markers restore (`:161-167`). Tests: `toon-restore.test.ts:120-127` (cached TOON in `<<JSON` stays byte-identical) and `:101-118` (`<<'JSON'`, `<<-"JSON"` restore).
+- **Linear heredoc scan (P1/P3):** opener-only sticky regex (`toon-restore.ts:32`), forward-only `indexOf` (`:97-116`), failed-marker memo (`:142,148-154`), 8× budget with byte-identical fallback (`:186-190,213-216`). Adversarial 256 KB opener test (`toon-restore.test.ts:174-180`) passes well under 1 s.
+- **JSON normalization (P2):** `encodeJson` parses before `encode` (`src/lib/toon.ts:51-61`); `undefined`-property test (`toon-codec.test.ts:102-115`).
+- **Cache (P2):** JSON-only entries with a real LRU (hit and re-store refresh) and 100-entry / 256 KiB bounds (`src/tools/toon-cache.ts:44-65`); covered by `toon-hooks.test.ts:270-311`.
+- **Sniffer + docs (P2):** `TOON_ROOT_LINE` accepts tabular, primitive-array (`head[20\t]:`), and key-value roots (`src/lib/toon.ts:43,129-134`); tests `toon-codec.test.ts:191-219`. `AGENTS.md`, `docs/LOADING.md`, `README.md`, and `skills/dh-execute-cli/SKILL.md` now state quoted-marker-only restoration, the unquoted-heredoc exclusion, the 256 KiB entry cap, and the widened sniff scope.
+- **Hook gates (P2):** `handleAfterHook`/`handleBeforeHook` are pure and wired one-line each (`src/plugin.ts:99-107`); status/eligibility/input gates covered in `toon-hooks.test.ts:140-198` and through the registered callbacks in `registration.test.ts:146-169`.
+- **Hygiene (P3):** `TOON_NOTE` states the 256-character object/array condition and the server test asserts `256`; all changed source files ≤250 lines; no logging, secrets, or payload retention. Remaining observations are non-blocking: `<<-` with tab-indented terminators is not recognized and is left byte-identical (safe direction), and the `$`/backslash assertion at `toon-restore.test.ts:124-126` checks a non-cacheable payload, so the hazard is proven structurally by the `quote === ''` early return plus the cached-TOON unquoted test rather than by that line.

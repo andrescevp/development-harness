@@ -4,7 +4,7 @@ slug: toon-output-integration
 description: Automatic TOON output for MCP tools plus native bash compression and JSON restoration for forwarded payloads.
 created: 2026-11-16
 updated: 2026-11-16
-status: In Progress
+status: Completed
 active: true
 tags: [plan, toon, output]
 project: dev-harness-skills
@@ -440,19 +440,39 @@ question arises.
 
 ## Execution Record
 
-- **Execution status:** Not executed
-- **Executed at:** [YYYY-MM-DD]
+- **Execution status:** Completed
+- **Executed at:** 2026-11-16
 - **Workspace root:** /home/andres/workspace/dev-harness-skills
 - **Repository kind:** workspace
 - **Repository path:** `.`
-- **Branch / worktree:** [branch]
-- **Commit range:** [base..head]
+- **Branch / worktree:** feature/toon-output-integration
+- **Commit range:** 5bde6c3..b545ad0
 - **Plan path:** docs/plans/toon-output-integration/plan.md
-- **Mirrored plan path:** none
+- **Mirrored plan path:** docs/plans/toon-output-integration/plan_fast.md
 - **Summary:**
-  - [What shipped]
-- **Architectural changes:** [TOON output pipeline, MCP automatic encoding, native bash hooks, bounded restore cache]
-- **References:** [review, handoff, evolution note and ADR links]
+  - Added `@toon-format/toon` 4.4.0 bundled into the plugin/MCP artifacts.
+  - MCP `textResult` returns TOON for object/array JSON ≥256 chars when TOON
+    is strictly shorter; errors stay plain text.
+  - Native `execute.after` compresses eligible bash JSON and `execute.before`
+    restores it in forwarded quoted strings/quoted heredocs with a 100-entry
+    LRU and 256 KiB per-entry cap.
+  - Corpus/contracts unchanged at 12 MCP tools, 6 agents, 27 skills; no
+    tool/command/prompt registrations or transforms (two execute hooks).
+  - Updated tests, README/AGENTS/LOADING/CHANGELOG/example/skill guidance, and
+    the package/smoke contract.
+- **Architectural changes:** Shared TOON codec; automatic MCP serialization
+  point; two native tool hooks; bounded process-local restore cache; JSON
+  remains canonical.
+- **References:** [pre-execution alignment](./tasks/review-fast.md) ·
+  [plan-end alignment](./tasks/review-fast-final.md) ·
+  [final review](./tasks/review.md) ·
+  [code review](./tasks/code-review.md) ·
+  [domain check](./tasks/domain-check-final.md) ·
+  [preflight](./tasks/preflight.md) ·
+  [artifact check](./tasks/artifact-check.md) ·
+  [final verification](./tasks/final-verification.md) ·
+  [evolution note](../../evolution/2026-11-16-toon-output-integration.md) ·
+  [observation note](../../evolution/observations/2026-11-16-0248-toon-output-integration.md)
 
 ## Open Questions
 

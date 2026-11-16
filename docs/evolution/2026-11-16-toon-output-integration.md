@@ -39,10 +39,10 @@ separate processes, restoration is exact only for native output compressed in
 the same process; MCP TOON forwarded into a shell command takes the
 valid-TOON-decode fallback.
 
-The implementation and the full verification gate are complete. The version
-decision is pending the plan-end semver step: the package is at `0.9.0` and a
-minor bump to `0.10.0` is the likely outcome. No tag was created on the feature
-branch.
+The implementation and the full verification gate are complete. The final
+review approved with non-blocking comments; the plan-end semver decision is a
+minor bump to **`0.10.0`**. No tag was created on the feature branch; tagging
+happens on `main` per Git Flow.
 
 ## What Changed
 
@@ -236,10 +236,10 @@ Observed at the Sub-Task 3.2 gate on 2026-11-16:
   working tree before close-out commits.
 - **Artifact check:** READY, 0 failures; no production deploy scripts are in
   scope.
-- **Release status:** package `0.9.0`; the change sits under
-  `## [Unreleased]` in `CHANGELOG.md`. The likely release decision is a minor
-  bump to `0.10.0` (one feature, no breaking change), pending the plan-end
-  final review and `dh-semver`. No tag or push was performed.
+- **Release status:** package `0.10.0`; the change sits under
+  `## [0.10.0]` in `CHANGELOG.md`. The final review approved with comments and
+  the semver decision is minor (one feature, no breaking change). No tag or push
+  was performed on the feature branch; tagging happens on `main` per Git Flow.
 
 ## Limitations
 
@@ -279,8 +279,8 @@ Observed at the Sub-Task 3.2 gate on 2026-11-16:
 - **Client guidance.** Keep the README/LOADING "parse JSON, then strict TOON"
   instruction prominent; a JSON-only client will surface a parse error on large
   payloads even though the server behavior is correct.
-- **Release.** Run `dh-semver` and finalize `CHANGELOG.md` at plan end; the
-  expected bump is minor (`0.10.0`), and tagging happens on `main` per Git Flow.
+- **Release.** `dh-semver` selected a minor bump (`0.10.0`); `package.json` and
+  `CHANGELOG.md` are updated. Tagging happens on `main` per Git Flow.
 
 ## Related
 
