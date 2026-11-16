@@ -7,6 +7,13 @@ version.
 
 ## [Unreleased]
 
+### Changed
+
+- **TUI plan modal layout:** the modal now takes a centered 80% × 80% region
+  with a 30% plan-file tree (arrow/click selection, left/right folder
+  toggles) and a 70% file preview. Markdown previews keep syntax highlighting
+  and Mermaid flowchart diagrams; non-Markdown files show as text.
+
 ## [0.13.0] — 2026-11-16
 
 ### Added

@@ -71,7 +71,7 @@ export default Plugin.define({
                 ),
                 () => {}
               );
-              context.ui.dialog.set({ size: 'xlarge' });
+              context.ui.dialog.set({ size: 'xlarge', centered: true });
             });
           }}
         />
