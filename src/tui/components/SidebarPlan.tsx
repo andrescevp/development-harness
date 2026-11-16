@@ -1,8 +1,8 @@
 import type { ResolvedTheme } from '@opencode/theme/tui';
-import { createComponent, createEffect, For, type JSX, Show } from 'solid-js';
+import { createComponent, createEffect, For } from 'solid-js';
 import type { PlanProgress } from '../plan-model.js';
 import type { PlanState } from '../plan-render-model.js';
-import { reactiveText } from './reactive.js';
+import { reactiveShow, reactiveText } from './reactive.js';
 import { planCardLines, sidebarCard } from './sidebar-model.js';
 
 export interface SidebarPlanProps {
@@ -21,20 +21,6 @@ export interface SidebarPlanProps {
   onToggle: (slug: string) => void;
   /** Open one plan file in the read-only modal. */
   onOpen: (plan: PlanProgress) => void;
-}
-
-/** `Show` with a reactive accessor condition (this JSX transform does not
- * wrap prop expressions on its own). */
-function reactiveShow(props: { when: () => boolean; fallback?: JSX.Element; children: JSX.Element }): JSX.Element {
-  return Show({
-    get when() {
-      return props.when();
-    },
-    get fallback() {
-      return props.fallback;
-    },
-    children: props.children,
-  });
 }
 
 /**
@@ -59,13 +45,13 @@ export function SidebarPlan(props: SidebarPlanProps) {
         <box flexDirection="column">
           <box flexDirection="row">
             {/* biome-ignore lint/a11y/noStaticElementInteractions: OpenTUI has no button primitive; box mouse handler is the control. */}
-            <box onMouseDown={() => props.onToggle(plan.slug)}>
+            <box onMouseUp={() => props.onToggle(plan.slug)}>
               <text fg={props.theme.text.base}>
                 {reactiveText(() => `${props.collapsed().includes(plan.slug) ? '▸' : '▾'} ${plan.title}`)}
               </text>
             </box>
             {/* biome-ignore lint/a11y/noStaticElementInteractions: OpenTUI has no button primitive; box mouse handler is the control. */}
-            <box onMouseDown={() => props.onOpen(plan)}>
+            <box onMouseUp={() => props.onOpen(plan)}>
               <text fg={props.theme.text.muted}>{reactiveText(() => ' [open]')}</text>
             </box>
           </box>

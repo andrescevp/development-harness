@@ -210,9 +210,9 @@ export function createPlanStore(options: PlanStoreOptions): PlanStore {
     toggleCollapsed(slug: string): void {
       if (disposed) return;
       updateUi((draft) => {
-        const index = draft.collapsedSlugs.indexOf(slug);
-        if (index === -1) draft.collapsedSlugs.push(slug);
-        else draft.collapsedSlugs.splice(index, 1);
+        draft.collapsedSlugs = draft.collapsedSlugs.includes(slug)
+          ? draft.collapsedSlugs.filter((candidate) => candidate !== slug)
+          : [...draft.collapsedSlugs, slug];
       });
     },
     dispose(): void {

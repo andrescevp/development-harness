@@ -218,7 +218,9 @@ workspace only.
   `Phase N · N.M` position (`+K` and `Active: N tasks` while several sub-tasks
   run in parallel), completed/total sub-tasks with a text progress bar, the
   current sub-task's delegated agent, plan status, a one-line activity, and an
-  `[open]` action that opens the plan file in a scrollable read-only modal.
+  `[open]` action that opens the plan file in a scrollable read-only modal with
+  **Plan tree** and **Markdown** tabs; the Markdown tab renders headings,
+  tables, code blocks and Mermaid diagrams.
 - **`/plan-progress` panel** (palette entry "Plan progress"): every phase and
   sub-task with status and delegated agent, checklists, review verdict,
   fast-mode skipped-check ledger and last update. `↑`/`↓` and `PgUp`/`PgDn`
