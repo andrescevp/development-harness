@@ -253,8 +253,9 @@ opencode mcp list       → `dh` connected (server/status only)
 ```
 
 The plugin also registers 27 skills (there is no skills debug subcommand on
-v2.0.18 — the bundled list lives in `skills/index.md`). Zero tools are
-registered by the plugin: the 12 tools come from the MCP server below.
+v2.0.18 — the bundled list lives in `skills/index.md`) and exactly two native
+`execute` tool hooks for TOON output. Zero tools are registered by the plugin:
+the 12 tools come from the MCP server below.
 
 The bundled set includes `dh-researcher` (source-cited web research support)
 and `dh-research` (the bounded research workflow); research notes live in
@@ -279,9 +280,10 @@ are skills (`dh-execute-cli`, `dh-explore`), not selectable agents.
 ## MCP server (`dh`)
 
 The harness **tools do not come from the plugin** — the plugin registers
-agents and skills only. They are served by a local stdio **MCP server** named
-`dh` (`@modelcontextprotocol/server` v2), wired **per project** in that
-project's `opencode.jsonc` (additive to the plugin loading above):
+agents, skills, and exactly two TOON `execute` hooks only. They are served by a
+local stdio **MCP server** named `dh` (`@modelcontextprotocol/server` v2), wired
+**per project** in that project's `opencode.jsonc` (additive to the plugin
+loading above):
 
 ```jsonc
 {
@@ -378,9 +380,86 @@ opencode mcp list   # expect the `dh` server, connected
 
 MCP servers connect at session start — restart opencode after adding or
 changing the project entry. The in-repo gates are
-`src/__tests__/registration.test.ts` (exactly 6 agents + 27 skills, zero tool
-transforms) and `node scripts/smoke-mcp.mjs` (spawns the built binary, lists
-the 12 tools, and round-trips plan create/read/update + fast create/read/update/skip).
+`src/__tests__/registration.test.ts` (exactly 6 agents + 27 skills, zero
+tool/command/prompt transforms, exactly two `execute` hooks) and
+`node scripts/smoke-mcp.mjs` (spawns the built binary, lists the 12 tools, and
+round-trips plan create/read/update + fast create/read/update/skip).
+
+## TOON output
+
+Both output surfaces can emit TOON — a compact, lossless encoding of the JSON
+data model — but only when it is strictly smaller. Payload semantics are
+unchanged: JSON stays canonical internally and on disk, every TOON payload
+decodes to the same value as its JSON form, and no tool, input, or payload
+field was added. `@toon-format/toon` is bundled into both artifacts, so managed
+installs and `npx` runs need no extra package.
+
+### MCP tools (automatic)
+
+All 12 `dh` tools serialize successful payloads through one helper:
+
+```text
+payload serializes to JSON >= 256 chars
+  -> payload is a non-null object/array
+  -> TOON encode succeeds
+  -> TOON is strictly shorter
+  -> return TOON
+otherwise -> return JSON
+```
+
+- Strings, numbers, and payloads below 256 characters stay JSON.
+- Error results are unchanged: plain text with `isError: true`.
+- Clients must parse both formats: try `JSON.parse`, then a strict TOON decode.
+
+```js
+import { decode } from '@toon-format/toon';
+
+function parseToolText(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return decode(text); // strict decode; throws on malformed input
+  }
+}
+```
+
+### Native `bash` compression and restoration
+
+The plugin registers exactly two tool hooks:
+
+- `execute.after` — when an eligible tool call completes with valid JSON text
+  of at least 256 characters, its text payload is replaced with TOON only when
+  TOON is strictly shorter, and the original JSON is remembered in a
+  process-local 100-entry LRU cache keyed by the SHA-256 of the trimmed TOON
+  text: the least recently used entry is evicted, and a cache hit refreshes
+  recency.
+- `execute.before` — before a `bash` command runs, forwarded single- or
+  double-quoted strings and heredoc bodies are checked: an exact cached TOON
+  payload is replaced with the original JSON; otherwise a clean, strictly valid
+  TOON payload is decoded and re-serialized as JSON. Edited, invalid, or
+  unquoted text is left byte-identical, as is `$'...'` ANSI-C quoting and any
+  command above 1 MiB.
+
+Eligible compression tools default to `bash`. Override the set with a
+comma-separated list of native tool names in the OpenCode server environment:
+
+```sh
+OPENCODE_TOON_PLUGIN_TOOLS=bash,my_tool opencode
+```
+
+An empty value falls back to the default. Restoration always targets `bash`
+only.
+
+### Limits
+
+- **Process-local cache.** The 100-entry cache lives in the plugin process, is
+  never written to disk, and is lost when the process exits.
+- **MCP/plugin process boundary.** The MCP server is a separate process from the
+  plugin. Exact-match restoration applies only to native tool output compressed
+  by the plugin; MCP TOON forwarded into a bash command restores through the
+  valid-TOON decode fallback, not the exact cache.
+- **Conditional.** TOON is never guaranteed: small, non-JSON, or non-shorter
+  payloads remain JSON.
 
 ## Troubleshooting
 

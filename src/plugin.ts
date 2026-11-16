@@ -1,10 +1,12 @@
 /**
  * dev-harness-skills — OpenCode V2 plugin.
  *
- * Registers ONLY the bundled dev harness (6 agents, 27 skills) via
- * synchronous domain transforms. The harness tools are NOT registered here —
- * they live in the `dh` MCP server (`src/mcp/server.ts`, served over stdio by
- * `src/mcp/stdio.ts`).
+ * Registers the bundled dev harness (6 agents, 27 skills) via synchronous
+ * domain transforms, plus exactly two native tool execute hooks —
+ * `execute.after` (TOON compression of eligible tool output) and
+ * `execute.before` (JSON restoration of forwarded quoted/heredoc payloads).
+ * The harness tools are NOT registered here — they live in the `dh` MCP server
+ * (`src/mcp/server.ts`, served over stdio by `src/mcp/stdio.ts`).
  *
  * Assets are loaded BEFORE the transforms run (transforms are synchronous;
  * external data must be pre-loaded), resolved from the bundle location
@@ -20,14 +22,20 @@
  *     `prompt`/body becomes `system`.
  *   - `ctx.skill.transform(editor)`: `editor.add(skill)` needs the full
  *     Skill.Info shape { id, name, description, path, content }.
+ *   - `ctx.tool.hook(name, callback)`: returns `{ dispose(): Promise<void> }`.
+ *     The plugin registers only `execute.after` (TOON compression) and
+ *     `execute.before` (forwarded-payload restoration).
  *
- * No tool, command, or prompt transforms.
+ * No tool, command, or prompt transforms or registrations; the only
+ * tool-domain surface is the two execute hooks implementing TOON
+ * compression/restoration.
  */
 
 import type { Agent, Skill } from '@opencode/plugin';
-import { type Context, define } from '@opencode/plugin/promise/plugin';
+import { type Cleanup, type Context, define } from '@opencode/plugin/promise/plugin';
 import { loadHarnessAssets } from './lib/assets.js';
 import type { AgentRecord, SkillRecord } from './lib/records.js';
+import { compressToolResult, getEligibleTools, restoreForwardedCommand } from './tools/toon-hooks.js';
 
 const PLUGIN_ID = 'dev-harness-skills';
 const LOG_PREFIX = '[dev-harness-skills]';
@@ -38,10 +46,13 @@ function logSummary(agents: AgentRecord[], skills: SkillRecord[], skipped: numbe
   );
 }
 
-/** Plugin definition: upsert agents, add skills — no tool/command domains. */
+/**
+ * Plugin definition: upsert agents, add skills, then register the TOON
+ * `execute.after` compression and `execute.before` restoration hooks.
+ */
 export default define({
   id: PLUGIN_ID,
-  async setup(ctx: Context): Promise<void> {
+  async setup(ctx: Context): Promise<Cleanup> {
     // 1. Load ALL assets BEFORE any transform (async setup body, sync reads).
     const { agents, skills, errors } = loadHarnessAssets();
     if (errors.length > 0) {
@@ -81,6 +92,41 @@ export default define({
       }
     });
 
+    // 3. Native TOON compression for eligible tool output (default: bash).
+    //    Inert on failure: a conversion error must never surface into the host.
+    const eligibleTools = getEligibleTools();
+    const afterHook = await ctx.tool.hook('execute.after', (event) => {
+      if (event.status !== 'completed') return;
+      if (!eligibleTools.has(event.tool.toLowerCase())) return;
+      try {
+        compressToolResult(event.result);
+      } catch {
+        // Best-effort hook: keep the original output on any unexpected shape.
+      }
+    });
+
+    // 4. Restore forwarded TOON payloads before a bash command runs. Only
+    //    quoted strings and heredocs are rewritten; unquoted text is untouched.
+    const beforeHook = await ctx.tool.hook('execute.before', (event) => {
+      try {
+        if (event.tool.toLowerCase() !== 'bash') return;
+        if (typeof event.input !== 'object' || event.input === null) return;
+
+        const input = event.input as { command?: unknown };
+        if (typeof input.command !== 'string') return;
+
+        const restored = restoreForwardedCommand(input.command);
+        if (restored !== input.command) input.command = restored;
+      } catch {
+        // Best-effort hook: restoration must never surface an error into the host.
+      }
+    });
+
     logSummary(agents, skills, errors.length);
+
+    return async () => {
+      await beforeHook.dispose();
+      await afterHook.dispose();
+    };
   },
 });

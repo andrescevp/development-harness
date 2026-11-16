@@ -16,10 +16,11 @@ plan-driven development: **6 agents** — `dh-software-architect`,
 `dh-contingency`, `dh-simplify`, `dh-review`, `dh-code-review`, `dh-preflight`,
 `dh-artifact-check`, `dh-final-review`, `dh-create-documentation`,
 `dh-create-worktree`, `dh-mermaid`, `dh-grill-sdd`, `dh-setup`,
-`dh-code-ruler`, `dh-semver`. The plugin registers
-agents and skills only; the harness tools are served by the shipped
-`dev-harness-mcp` MCP server (no tools, commands, or prompts are registered).
-All plan execution inside the plugin runs the skills loop below.
+`dh-code-ruler`, `dh-semver`. The plugin registers agents and skills plus
+exactly two native `execute` tool hooks (TOON compression and forwarded-payload
+restoration); it registers no tools, commands, or prompts. The harness tools are
+served by the shipped `dev-harness-mcp` MCP server. All plan execution inside
+the plugin runs the skills loop below.
 
 ## The skills loop (harness runtime contract)
 
@@ -82,6 +83,19 @@ agents prefer these tools over manual plan.md edits (fall back to manual edits
 only when the server is unavailable). Format contract:
 `skills/dh-planning/references/phased-plan-template.md`. Wiring and
 verification: [`docs/LOADING.md`](docs/LOADING.md#mcp-server-dh).
+
+**TOON output contract.** Successful `dh` payloads are JSON, or TOON when the
+serialized JSON is at least 256 characters and TOON is strictly shorter; errors
+stay plain text with `isError`. The plugin's `execute.after` hook compresses
+eligible native tool JSON (default `bash`; override the comma-separated set with
+`OPENCODE_TOON_PLUGIN_TOOLS`) and remembers the original in a process-local
+100-entry cache; `execute.before` restores JSON inside forwarded quoted strings
+and heredoc bodies (exact cache match first, valid-TOON decode second) and
+leaves edited, invalid, or unquoted text unchanged. The MCP server and plugin
+are separate processes: exact-match restoration applies only to output
+compressed by the plugin, so MCP TOON forwarded into bash uses the decode
+fallback. The cache never persists; JSON remains canonical internally and on
+disk.
 
 ## Workspace contract (monorepo awareness)
 
@@ -188,9 +202,12 @@ a loop step: the optional pass never clears an unresolved blocker.
 - The V2 plugin (`Plugin.define`) registers the 6 agents and 27 skills via
   synchronous domain transforms (`ctx.agent.transform`, `ctx.skill.transform`)
   from frontmatter-parsed assets (repo `agents/` + `skills/` in source mode,
-  `dist/assets/` in the bundle). Zero tool or command transforms (tools live
-  in the MCP server; commands are out of scope). The root `index.ts` is the
-  plugin-directory discovery entry:
+  `dist/assets/` in the bundle), plus exactly two native tool execute hooks:
+  `execute.after` (TOON compression of eligible tool output) and
+  `execute.before` (JSON restoration of forwarded quoted/heredoc payloads). It
+  performs no tool, command, or prompt transforms and registers no tools,
+  commands, or prompts (tools live in the MCP server; commands are out of
+  scope). The root `index.ts` is the plugin-directory discovery entry:
   cloning this repo into `~/.config/opencode/plugins/` (global) or
   `<project>/.opencode/plugins/` loads the plugin from source — no build or
   config entry needed.

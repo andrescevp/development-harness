@@ -4,7 +4,7 @@ slug: toon-output-integration
 description: Automatic TOON output for MCP tools plus native bash compression and JSON restoration for forwarded payloads.
 created: 2026-11-16
 updated: 2026-11-16
-status: Pending
+status: In Progress
 active: true
 tags: [plan, toon, output]
 project: dev-harness-skills
@@ -80,24 +80,6 @@ adapts them to its V2 plugin hooks and MCP server.
 |---|---|---|---|---|---|
 | None — standalone repository | TypeScript/Node + MCP | `pnpm test` | `pnpm build` | `docs/` | fixed |
 
-## Alternatives Considered
-
-- **MCP opt-in `format` parameter** — rejected: the request is automatic TOON
-  when possible, and a single `textResult` conversion point avoids per-tool
-  schema changes. Tests/helpers are adapted instead.
-- **MCP `dh_logged_command` only** — rejected: plan/sheet payloads are the
-  most tabular and benefit most; the request covers all 12 tools.
-- **Native hooks for `bash` + `shell`** — rejected: the reference behavior and
-  the stated default are `bash` only; `OPENCODE_TOON_PLUGIN_TOOLS` covers other
-  tools without widening the default.
-- **Vendor a minimal codec** — rejected: the official `@toon-format/toon`
-  package is lossless, maintained, MIT-licensed, and small enough to bundle.
-- **Unbounded cache or no cache** — rejected: an unbounded map leaks memory;
-  no cache loses exact JSON restoration. LRU 100 matches the reference plugin.
-- **Persistent/shared cache** — rejected: adds storage and cross-process
-  coupling; the process-local cache plus valid-TOON fallback matches the
-  stated behavior.
-
 ## Assumptions and Constraints
 
 - `@toon-format/toon` 4.4.x is the official, lossless codec; `encode`/`decode`
@@ -117,6 +99,23 @@ adapts them to its V2 plugin hooks and MCP server.
 - The plugin bundle must not evaluate bare imports at load time; TOON must be
   bundled by tsdown.
 - No new MCP tools or tool-input changes; the 12-tool contract stays.
+
+**Rejected alternatives:**
+
+- **MCP opt-in `format` parameter** — the request is automatic TOON when
+  possible, and one `textResult` conversion point avoids per-tool schema
+  changes. Tests/helpers are adapted instead.
+- **MCP `dh_logged_command` only** — plan/sheet payloads are the most tabular
+  and benefit most; the request covers all 12 tools.
+- **Native hooks for `bash` + `shell`** — the reference behavior and the stated
+  default are `bash` only; `OPENCODE_TOON_PLUGIN_TOOLS` covers other tools
+  without widening the default.
+- **Vendor a minimal codec** — the official `@toon-format/toon` package is
+  lossless, maintained, MIT-licensed, and small enough to bundle.
+- **Unbounded cache or no cache** — an unbounded map leaks memory; no cache
+  loses exact JSON restoration. LRU 100 matches the reference plugin.
+- **Persistent/shared cache** — adds storage and cross-process coupling; the
+  process-local cache plus valid-TOON fallback matches the stated behavior.
 
 ## Risks and Areas Requiring Care
 
@@ -219,11 +218,11 @@ question arises.
 
 ### Phase 1: TOON core and MCP output
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 1.1: Add the TOON dependency, bundling, and shared safe-codec helper
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Add `@toon-format/toon` 4.4.x, bundle it into the built artifacts, and implement a shared safe TOON codec with the 256-character/thinner checks.
 - **Related Requirements:** R1, R2, R8, AC2
@@ -247,7 +246,7 @@ question arises.
 
 #### Sub-Task 1.2: Return TOON automatically from MCP textResult and adapt the test contract
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Make `textResult` return TOON for eligible payloads and teach the MCP test helper/parity suites to parse either JSON or TOON without weakening assertions.
 - **Related Requirements:** R3, R8, AC1, AC2
@@ -268,7 +267,7 @@ question arises.
 
 #### Sub-Task 1.3: Document the MCP JSON/TOON contract in server instructions and tool descriptions
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Make the MCP surface explicitly advertise that successful payloads are JSON or TOON, without changing tool names, inputs, or counts.
 - **Related Requirements:** R3, R9, AC6
@@ -287,11 +286,11 @@ question arises.
 
 ### Phase 2: Native bash hooks and restoration
 
-- **Status:** Pending
+- **Status:** Completed
 
 #### Sub-Task 2.1: Add the native bash compression hook and bounded restore cache
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Register an `execute.after` hook that compresses eligible native tool output and remembers the original JSON in a 100-entry bounded cache.
 - **Related Requirements:** R4, R6, R7, R8, AC3, AC5
@@ -316,7 +315,7 @@ question arises.
 
 #### Sub-Task 2.2: Add forwarded quoted/heredoc TOON restoration
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Register an `execute.before` hook that restores JSON inside quoted strings and heredocs using exact cache match first and valid-TOON decode fallback, leaving edited/invalid payloads unchanged.
 - **Related Requirements:** R5, R8, AC4
@@ -342,7 +341,7 @@ question arises.
 
 #### Sub-Task 2.3: Update the plugin registration contract, tests, and headers for tool hooks
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Update the plugin’s hard-cut contract and tests from “zero tool-domain access” to “zero tool/command/prompt transforms, exactly two execute hooks,” and fix the plugin header/comments.
 - **Related Requirements:** R7, R8, AC6
@@ -362,11 +361,11 @@ question arises.
 
 ### Phase 3: Documentation, packaging, verification
 
-- **Status:** Pending
+- **Status:** In Progress
 
 #### Sub-Task 3.1: Update project docs, changelog, and skill guidance
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-documentor
 - **Objective:** Document automatic MCP TOON, native bash compression/restoration, the env override, and the JSON/TOON contract in the human-facing docs.
 - **Related Requirements:** R9, AC8
@@ -387,7 +386,7 @@ question arises.
 
 #### Sub-Task 3.2: Run packaging/build checks and the full verification gate
 
-- **Status:** Pending
+- **Status:** Completed
 - **Delegated to agent:** dh-software-engineer
 - **Objective:** Prove TOON is bundled, the package remains self-contained, and the full release gate is green.
 - **Related Requirements:** R1, R7, R8, AC7
@@ -408,7 +407,7 @@ question arises.
 
 #### Sub-Task 3.3: Write evolution and observation close-out notes
 
-- **Status:** Pending
+- **Status:** In Progress
 - **Delegated to agent:** dh-documentor
 - **Objective:** Record what changed, why, the output-pipeline design, validation results, limitations, and session learnings.
 - **Related Requirements:** AC8

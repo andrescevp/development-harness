@@ -5,6 +5,32 @@ All notable changes to this project are documented here. The format follows
 Semantic Versioning. During the 0.x line, breaking changes bump the minor
 version.
 
+## [Unreleased]
+
+### Added
+
+- Automatic TOON output for the `dh` MCP server: successful tool payloads
+  whose serialized JSON is at least 256 characters and whose TOON form is
+  strictly shorter are returned as TOON; every other payload (and every error
+  result) stays JSON/plain text. `@toon-format/toon` 4.4.x is a runtime
+  dependency, bundled into `dist/plugin.js` and `dist/mcp/stdio.js`.
+- Native TOON compression and restoration: the plugin's `execute.after` hook
+  compresses eligible completed tool output (default `bash`, overridable with
+  `OPENCODE_TOON_PLUGIN_TOOLS`) and remembers the original JSON in a
+  process-local 100-entry cache; `execute.before` restores JSON inside
+  forwarded quoted strings and heredoc bodies (exact cache match first, strict
+  TOON decode second).
+
+### Changed
+
+- MCP tool text is now JSON **or** TOON; payload semantics, tool names, tool
+  inputs, error messages, and the 12-tool surface are unchanged. JSON remains
+  canonical internally and on disk.
+- The plugin now registers exactly two native `execute` tool hooks
+  (`execute.after`, `execute.before`) alongside the 6 agents and 27 skills. It
+  still registers no tools, commands, or prompts and performs no tool, command,
+  or prompt transforms.
+
 ## [0.9.0] — 2026-11-16
 
 ### Added

@@ -2,14 +2,23 @@
  * tool-results.ts — shared MCP result/guard helpers.
  *
  * Handlers stay thin adapters: helpers serialize payloads and map thrown
- * values onto the MCP error-result contract. stdout is the protocol channel
- * over stdio, so nothing here logs.
+ * values onto the MCP error-result contract. Successful payloads are JSON, or
+ * TOON when the shared codec finds a strictly shorter form (>= 256 chars);
+ * both decode to the same value. Errors stay plain text. stdout is the
+ * protocol channel over stdio, so nothing here logs.
  */
 import type { CallToolResult } from '@modelcontextprotocol/server';
+import { tryEncodeToon } from '../lib/toon.js';
 
-/** Serialize a tool payload into the MCP text-content result contract. */
+/**
+ * Serialize a tool payload into the MCP text-content result contract.
+ * TOON is attempted first for eligible payloads; every other case (and any
+ * encoder failure) keeps the exact JSON text.
+ */
 export function textResult(payload: unknown): CallToolResult {
-  return { content: [{ type: 'text', text: JSON.stringify(payload) }] };
+  const json = JSON.stringify(payload);
+  const text = tryEncodeToon(payload, json) ?? json;
+  return { content: [{ type: 'text', text }] };
 }
 
 /** MCP error-result contract (parity error messages survive verbatim). */

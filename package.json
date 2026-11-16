@@ -64,6 +64,7 @@
   "dependencies": {
     "@modelcontextprotocol/server": "^2.3.1",
     "@opencode/plugin": "2.2.7",
+    "@toon-format/toon": "4.4.0",
     "duckdb": "^1.4.4",
     "jsonc-parser": "^3.3.1",
     "yaml": "^2.9.1",

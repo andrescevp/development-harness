@@ -11,6 +11,7 @@ import os from 'node:os';
 import path from 'node:path';
 import type { CallToolResult, ListToolsResult } from '@modelcontextprotocol/client';
 import { Client, InMemoryTransport } from '@modelcontextprotocol/client';
+import { decodeToon } from '../../lib/toon.js';
 import { buildServer } from '../../mcp/server.js';
 
 export interface McpTestHarnessOptions {
@@ -27,7 +28,7 @@ export interface McpTestHarness {
   client: Client;
   listTools: () => Promise<ListToolsResult>;
   callTool: (name: string, args?: Record<string, unknown>) => Promise<CallToolResult>;
-  /** Call a tool and JSON-parse its first text content block. */
+  /** Call a tool and parse its first text content block (JSON or TOON). */
   callToolJson: <T = Record<string, unknown>>(name: string, args?: Record<string, unknown>) => Promise<T>;
   /** Close client + server and remove the temp workspace (idempotent). */
   close: () => Promise<void>;
@@ -79,7 +80,7 @@ export async function createMcpTestHarness(options: McpTestHarnessOptions = {}):
       callTool: (name, args) => clientInstance.callTool({ name, arguments: args }),
       callToolJson: async <T = Record<string, unknown>>(name: string, args?: Record<string, unknown>): Promise<T> => {
         const result = await clientInstance.callTool({ name, arguments: args });
-        return JSON.parse(textOf(result)) as T;
+        return parseToolText<T>(textOf(result));
       },
       close,
     };
@@ -94,6 +95,28 @@ export function textOf(result: CallToolResult): string {
   const block = result.content[0];
   if (block?.type !== 'text') throw new Error('expected a text content block');
   return block.text;
+}
+
+/** Characters quoted from a payload when neither parser accepts it. */
+const PARSE_SNIPPET_CHARS = 80;
+
+/**
+ * Parse a successful tool text payload: JSON first, then TOON. Successful
+ * payloads are JSON, or TOON when the shared codec found a strictly shorter
+ * form; both decode to the same value. Only object/array values count as a
+ * payload — TOON's decoder also accepts bare prose as a scalar, which must not
+ * pass silently. Fails loudly (with a short text prefix) when neither parser
+ * yields a payload.
+ */
+export function parseToolText<T>(text: string): T {
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    const decoded = decodeToon(text);
+    if (typeof decoded === 'object' && decoded !== null) return decoded as T;
+  }
+  const prefix = text.length > PARSE_SNIPPET_CHARS ? `${text.slice(0, PARSE_SNIPPET_CHARS)}…` : text;
+  throw new Error(`tool text is neither JSON nor TOON: ${JSON.stringify(prefix)}`);
 }
 
 /** Loosely typed JSON Schema record as listed by `tools/list`. */
