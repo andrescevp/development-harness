@@ -7,6 +7,12 @@ version.
 
 ## [Unreleased]
 
+### Fixed
+
+- **TUI Markdown tab:** Mermaid flowcharts render as terminal diagrams using
+  the bundled `mermaid-ascii` renderer; unsupported diagram types fall back to
+  the fenced code block.
+
 ## [0.12.2] — 2026-11-16
 
 ### Fixed

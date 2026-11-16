@@ -5,6 +5,7 @@
  * Markdown body and the phase/sub-task tree once per file read, and the
  * component only renders the strings.
  */
+import { mermaidToAscii } from 'mermaid-ascii';
 import { splitFrontmatter } from '../lib/frontmatter.js';
 import { parsePlan } from '../tools/plan-lifecycle.js';
 import { statusSymbol } from './components/format.js';
@@ -13,6 +14,16 @@ import { statusSymbol } from './components/format.js';
 export function planFileMarkdown(contents: string): string {
   const split = splitFrontmatter(contents);
   return split !== null && !('error' in split) ? split.body.replace(/^\r?\n+/, '') : contents;
+}
+
+/** Render a Mermaid flowchart to terminal ASCII; null when unsupported. */
+export function planMermaidAscii(source: string): string | null {
+  try {
+    const rendered = mermaidToAscii(source);
+    return rendered.trim().length === 0 ? null : rendered;
+  } catch {
+    return null;
+  }
 }
 
 /** Flat phase/sub-task tree with statuses and delegated agents. */

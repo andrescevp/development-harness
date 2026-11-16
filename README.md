@@ -220,7 +220,7 @@ workspace only.
   current sub-task's delegated agent, plan status, a one-line activity, and an
   `[open]` action that opens the plan file in a scrollable read-only modal with
   **Plan tree** and **Markdown** tabs; the Markdown tab renders headings,
-  tables, code blocks and Mermaid diagrams.
+  tables, code blocks and Mermaid flowcharts as terminal diagrams.
 - **`/plan-progress` panel** (palette entry "Plan progress"): every phase and
   sub-task with status and delegated agent, checklists, review verdict,
   fast-mode skipped-check ledger and last update. `↑`/`↓` and `PgUp`/`PgDn`
