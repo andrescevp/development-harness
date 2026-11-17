@@ -1,7 +1,7 @@
 /**
  * dev-harness-skills — OpenCode V2 plugin.
  *
- * Registers the bundled dev harness (6 agents, 27 skills) via synchronous
+ * Registers the bundled dev harness (7 agents, 30 skills) via synchronous
  * domain transforms, plus exactly two native tool execute hooks —
  * `execute.after` (TOON compression of eligible tool output) and
  * `execute.before` (JSON restoration of forwarded quoted/heredoc payloads).

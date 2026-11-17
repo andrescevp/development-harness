@@ -1,6 +1,6 @@
 # Skills Index — dev-harness-skills plugin
 
-> The plugin bundles **27 skills** (incl. `dh-grill-sdd` SDD interviewer,
+> The plugin bundles **30 skills** (incl. `dh-grill-sdd` SDD interviewer,
 > `dh-setup` harness setup, `dh-contingency` planning support, `dh-research`
 > source-cited research, and `dh-pause-plan` / `dh-resume-plan` lifecycle
 > support).
@@ -110,7 +110,7 @@ only when the tools are unavailable. These tools are exposed by the project-scop
 
 ## Workspace behavior
 
-All 27 skills stay workspace-aware. The workspace root owns `docs/plans` and the
+All 30 skills stay workspace-aware. The workspace root owns `docs/plans` and the
 research registry `docs/research`; `dh-setup` writes the workspace map
 (`WORKSPACE.md`, root first, else `docs/WORKSPACE.md`) with packages and
 per-package commands; plans declare affected packages in `## Workspace Impact`.
@@ -129,7 +129,7 @@ Standalone repositories keep the single-root behavior unchanged.
 | Worktree/submodule discovery | [`dh-create-worktree/references/worktree-discovery.md`](dh-create-worktree/references/worktree-discovery.md) |
 | Package-aware pause/resume | [`dh-pause-plan/references/package-scope.md`](dh-pause-plan/references/package-scope.md) |
 
-## The 27 bundled skills
+## The 30 bundled skills
 
 | Skill | Role in the loop |
 |---|---|
@@ -137,6 +137,9 @@ Standalone repositories keep the single-root behavior unchanged.
 | [`dh-domain-check`](dh-domain-check/SKILL.md) | During planning + before complex implementation — DDD/SOLID validation |
 | [`dh-contingency`](dh-contingency/SKILL.md) | Planning support — generate Plan A/B/C alternatives with risk, complexity, and trade-off analysis (`docs/plans/<slug>/contingency.md`) |
 | [`dh-research`](dh-research/SKILL.md) | Support / optional unblock — one bounded, cited research pass for an external-fact question; note at `docs/research/<topic>.md` plus the registry `docs/research/index.md` |
+| [`dh-security-audit`](dh-security-audit/SKILL.md) | Support — whole-application audit: authorization, inventory, standards-based controls, severity/evidence, report and re-test; consumes the `dh-setup` project profile |
+| [`dh-threat-model`](dh-threat-model/SKILL.md) | Support — DFD/trust boundaries, STRIDE/LINDDUN, abuse cases and agentic/MCP threat catalog |
+| [`dh-security-probe`](dh-security-probe/SKILL.md) | Support — authorized, non-destructive probing with rules of engagement, tool tiers, playbooks and stop conditions |
 | [`dh-execute-plan`](dh-execute-plan/SKILL.md) | Step 2 — schedule ready phases/sub-tasks in parallel (default 3, cap 8), review fan-in, orchestrator-owned status/commits, resume mode |
 | [`dh-execute-plan-fast`](dh-execute-plan-fast/SKILL.md) | Fast step 2 — same parallel scheduler from `plan_fast.md`, no per-task gates; critical gates at plan end, serialized skipped-check ledger |
 | [`dh-execute-plan-task`](dh-execute-plan-task/SKILL.md) | Step 2.1 — execute one sub-task (project-type-aware delegation), or `parallel-worker` mode: implement/validate one exact sub-task and return a result envelope, no status writes |
@@ -163,14 +166,15 @@ Standalone repositories keep the single-root behavior unchanged.
 
 ## Agents
 
-The 6 bundled agents available as harness capabilities (see `AGENTS.md` →
+The 7 bundled agents available as harness capabilities (see `AGENTS.md` →
 Runtime delegation):
 
 `dh-software-architect` (architecture, planning support) ·
 `dh-software-engineer` (implementation, TDD coding) · `dh-reviewer` (review,
 code-review) · `dh-final-reviewer` (final sign-off) · `dh-documentor`
 (documentation owner) · `dh-researcher` (source-cited research support, not a
-loop step).
+loop step) · `dh-security-auditor` (whole-application security audit, threat
+modeling and authorized probing).
 
 Delegation is capability-based: skills resolve the architecture,
 implementation, testing/QA, review, final-review, documentation, and research

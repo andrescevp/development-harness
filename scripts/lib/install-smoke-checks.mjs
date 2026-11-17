@@ -59,8 +59,8 @@ export function preflight(repoRoot, check) {
   check('dist/plugin.js exists and is non-empty', isFileWithContent(plugin), 'run pnpm build');
   check('dist/tui.js exists and is non-empty', isFileWithContent(tui), 'run pnpm build');
   check('dist/assets exists', isDirectory(assets), 'run pnpm build');
-  check('dist/assets has exactly 6 agent files', agents.length === 6, `found ${agents.length}`);
-  check('dist/assets has exactly 27 skill directories', skillDirs.length === 27, `found ${skillDirs.length}`);
+  check('dist/assets has exactly 7 agent files', agents.length === 7, `found ${agents.length}`);
+  check('dist/assets has exactly 30 skill directories', skillDirs.length === 30, `found ${skillDirs.length}`);
   return (
     isFileWithContent(cli) &&
     isFileWithContent(plugin) &&

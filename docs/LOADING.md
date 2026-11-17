@@ -35,7 +35,7 @@ npx -y github:andrescevp/development-harness install --project --path .
 | `--project` | `<project>/.opencode/plugins/dev-harness-skills` | `<project>/opencode.jsonc` (or existing `opencode.json`) |
 
 The managed layout is self-contained: `index.ts`, package metadata,
-`dist/plugin.js`, `dist/assets` (6 agents, 27 skills), and
+`dist/plugin.js`, `dist/assets` (7 agents, 30 skills), and
 `.dev-harness-install.json`; no `pnpm install` is needed in the target.
 
 Common flags:
@@ -247,12 +247,12 @@ After loading, confirm the harness is registered (opencode v2.0.18 exposes
 only the `agents`, `config`, and `paths` debug subcommands):
 
 ```
-opencode debug agents   → the 6 dh-* agents (when the build surfaces plugin agents; otherwise verify in a session)
+opencode debug agents   → the 7 dh-* agents (when the build surfaces plugin agents; otherwise verify in a session)
 opencode debug config   → the plugin entry, and mcp.servers.dh once wired
 opencode mcp list       → `dh` connected (server/status only)
 ```
 
-The plugin also registers 27 skills (there is no skills debug subcommand on
+The plugin also registers 30 skills (there is no skills debug subcommand on
 v2.0.18 — the bundled list lives in `skills/index.md`) and exactly two native
 `execute` tool hooks for TOON output. Zero tools are registered by the plugin:
 the 12 tools come from the MCP server below.
@@ -262,10 +262,15 @@ and `dh-research` (the bounded research workflow); research notes live in
 `docs/research/` and are owned by the documentation agent, with plans linking
 them through the optional `## Research` section.
 
+The security capability is `dh-security-auditor` plus `dh-security-audit`,
+`dh-threat-model` and `dh-security-probe`. `dh-setup` detects the project's
+surfaces and writes the project security profile/standards selection under
+`docs/security/`; the audit reads it first (absent → safe defaults).
+
 ## Agent selection
 
 Skills do not name fixed agents; they name a capability (architecture,
-implementation, testing/QA, review, final review, documentation) and resolve it
+implementation, testing/QA, review, final review, documentation, security audit) and resolve it
 at runtime. The protocol in
 [`../skills/dh-planning/references/agent-selection.md`](../skills/dh-planning/references/agent-selection.md)
 discovers agents from the runtime list first, then project config/agent
@@ -519,7 +524,7 @@ opencode mcp list   # expect the `dh` server, connected
 
 MCP servers connect at session start — restart opencode after adding or
 changing the project entry. The in-repo gates are
-`src/__tests__/registration.test.ts` (exactly 6 agents + 27 skills, zero
+`src/__tests__/registration.test.ts` (exactly 7 agents + 30 skills, zero
 tool/command/prompt transforms, exactly two `execute` hooks) and
 `node scripts/smoke-mcp.mjs` (spawns the built binary, lists the 12 tools, and
 round-trips plan create/read/update + fast create/read/update/skip).

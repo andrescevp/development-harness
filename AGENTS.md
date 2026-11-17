@@ -8,13 +8,14 @@ delegation routing.
 ## Role summary
 
 The `dev-harness-skills` OpenCode V2 plugin bundles a self-contained dev harness for
-plan-driven development: **6 agents** — `dh-software-architect`,
+plan-driven development: **7 agents** — `dh-software-architect`,
 `dh-software-engineer`, `dh-reviewer`, `dh-final-reviewer`, `dh-documentor`,
-`dh-researcher` — and **27 skills** — `dh-planning`, `dh-domain-check`,
+`dh-researcher`, `dh-security-auditor` — and **30 skills** — `dh-planning`, `dh-domain-check`,
 `dh-execute-plan`, `dh-execute-plan-fast`, `dh-execute-plan-task`,
 `dh-execute-plan-task-fast`, `dh-pause-plan`, `dh-resume-plan`, `dh-coding`,
 `dh-execute-cli`, `dh-explore`, `dh-code-query`, `dh-research`,
-`dh-contingency`, `dh-simplify`, `dh-review`, `dh-code-review`, `dh-preflight`,
+`dh-contingency`, `dh-simplify`, `dh-review`, `dh-code-review`, `dh-security-audit`,
+`dh-threat-model`, `dh-security-probe`, `dh-preflight`,
 `dh-artifact-check`, `dh-final-review`, `dh-create-documentation`,
 `dh-create-worktree`, `dh-mermaid`, `dh-grill-sdd`, `dh-setup`,
 `dh-code-ruler`, `dh-semver`. The plugin registers agents and skills plus
@@ -220,14 +221,14 @@ a loop step: the optional pass never clears an unresolved blocker.
   owned by this repository — the repo is self-contained and independent
   (no external source, no extraction step).
 - OpenCode-only — no copilot/gemini variants.
-- Exactly **6 agents + 27 skills** are bundled. Commands, prompts, and all
+- Exactly **7 agents + 30 skills** are bundled. Commands, prompts, and all
   other non-bundled harness content are intentionally NOT bundled.
 - The `dh-` names are canonical in the repo files; bundled agents ship
   without the `permission` and `tools` frontmatter keys.
 
 ## Plugin registration and loading
 
-- The V2 plugin (`Plugin.define`) registers the 6 agents and 27 skills via
+- The V2 plugin (`Plugin.define`) registers the 7 agents and 30 skills via
   synchronous domain transforms (`ctx.agent.transform`, `ctx.skill.transform`)
   from frontmatter-parsed assets (repo `agents/` + `skills/` in source mode,
   `dist/assets/` in the bundle), plus exactly two native tool execute hooks:
@@ -244,7 +245,7 @@ a loop step: the optional pass never clears an unresolved blocker.
   `opencode.json(c)` pointing at the repo directory (`pnpm install` only; no
   build needed for source loading), or the installed package name. See
   [`docs/LOADING.md`](docs/LOADING.md).
-- **Verify:** launch opencode and confirm the 6 agents and 27 skills appear
+- **Verify:** launch opencode and confirm the 7 agents and 30 skills appear
   (including `dh-coding` and `dh-research`) and no commands are registered; then
   confirm the project-scope `dh` MCP server is connected (`opencode mcp list`)
   so the harness tools are available.

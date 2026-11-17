@@ -2,7 +2,7 @@
  * install-harness.ts — isolated fixture for install-command tests (4.1).
  *
  * Builds a temp root with a fixture package (`dist/plugin.js`, `dist/tui.js`,
- * 6 agents, 27 skills), an isolated HOME/XDG/OPENCODE config dir, and a project
+ * 7 agents, 30 skills), an isolated HOME/XDG/OPENCODE config dir, and a project
  * directory. Every path is under the temp root and removed by `withTempDir` in
  * `finally`.
  */
@@ -18,8 +18,8 @@ const FIXTURE_BUNDLE = "export default { id: 'dev-harness-skills', setup() {} };
 /** Host-provided import: the TUI artifact is never bare-scan/import checked. */
 const FIXTURE_TUI_BUNDLE =
   "import { Plugin } from '@opencode/plugin/tui';\nexport default Plugin.define({ id: 'dev-harness-skills.tui', setup() {} });\n";
-const EXPECTED_AGENTS = 6;
-const EXPECTED_SKILLS = 27;
+const EXPECTED_AGENTS = 7;
+const EXPECTED_SKILLS = 30;
 
 class StringWriter {
   text = '';
