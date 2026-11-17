@@ -7,6 +7,8 @@ version.
 
 ## [Unreleased]
 
+## [0.14.1] — 2026-11-17
+
 ### Fixed
 
 - **`dh_logged_command`:** stdout and stderr are now streamed into the log until
@@ -387,7 +389,8 @@ First release of the standalone OpenCode V2 harness.
 - Plan close-outs include the pause/resume, fast-plan, Mermaid, and
   agent-selection plans with evolution/observation notes.
 
-[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.14.0...HEAD
+[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.14.1...HEAD
+[0.14.1]: https://github.com/andrescevp/development-harness/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/andrescevp/development-harness/compare/v0.13.2...v0.14.0
 [0.13.2]: https://github.com/andrescevp/development-harness/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/andrescevp/development-harness/compare/v0.13.0...v0.13.1
