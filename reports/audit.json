@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-11-17T00:36:06.141Z",
+    "generated": "2026-11-17T00:46:08.265Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -41,9 +41,9 @@
       },
       {
         "name": "Loop membership",
-        "count": 33,
+        "count": 37,
         "sev": "PASS",
-        "note": "27/27 skills present; 6/6 agents present"
+        "note": "30/30 skills present; 7/7 agents present"
       },
       {
         "name": "Secret scan",
@@ -2872,6 +2872,14 @@
         "status": "present"
       },
       {
+        "name": "dh-security-audit",
+        "status": "present"
+      },
+      {
+        "name": "dh-security-probe",
+        "status": "present"
+      },
+      {
         "name": "dh-semver",
         "status": "present"
       },
@@ -2881,6 +2889,10 @@
       },
       {
         "name": "dh-simplify",
+        "status": "present"
+      },
+      {
+        "name": "dh-threat-model",
         "status": "present"
       }
     ],
@@ -2899,6 +2911,10 @@
       },
       {
         "name": "dh-reviewer",
+        "status": "present"
+      },
+      {
+        "name": "dh-security-auditor",
         "status": "present"
       },
       {

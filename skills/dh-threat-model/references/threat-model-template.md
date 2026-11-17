@@ -50,7 +50,7 @@ flowchart LR
 
 | Element | S | T | R | I | D | E |
 |---|---|---|---|---|---|---|
-| <process/store/flow> | <threat or -> | ... | ... | ... | ... | ... |
+| <process/store/flow> | <threat or "none"> | ... | ... | ... | ... | ... |
 
 ## Privacy (LINDDUN, if personal data)
 

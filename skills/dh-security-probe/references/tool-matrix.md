@@ -29,20 +29,20 @@ read-only by default; Tier B requires per-test approval. Primary sources:
 
 ## Tier B — state-changing / intrusive (approval required)
 
-| Surface | Tool | Risk | Required controls |
-|---|---|---|---|
-| Web | ZAP full/active scan | active payloads | scope, rate, non-prod, stop condition |
-| Web | Burp Scanner/Intruder | active/commercial | test accounts, scope, rate |
-| Web | Nuclei (intrusive templates) | request templates | `-rate-limit`, template allowlist, non-prod |
-| Web | ffuf | high-volume fuzzing | `-rate`, scope, stop condition |
-| Web/API | sqlmap | injection/exploitation | `--risk 1 --level 1`, non-destructive flags, written approval |
-| API | Schemathesis | creates/changes/deletes | test/staging only, disposable data |
-| API | RESTler | stateful fuzzing | disposable data, cleanup |
-| Desktop | MobSF dynamic | instrumentation | VM/snapshot, test build |
-| Mobile | Frida / objection | runtime instrumentation | test device/snapshot, GPL/wxWindows licenses |
-| Traffic | mitmproxy / Wireshark | capture privacy | test device, CA consent, redaction |
-| MCP | promptfoo red-team | adversarial prompts | sandbox, local server, approval |
-| Discovery | Amass `-active` | active recon | scope, rate, approval |
+| Surface | Tool | Risk | Required controls | Source |
+|---|---|---|---|---|
+| Web | ZAP full/active scan | active payloads | scope, rate, non-prod, stop condition | https://www.zaproxy.org/docs/docker/full-scan/ |
+| Web | Burp Scanner/Intruder | active/commercial | test accounts, scope, rate | https://portswigger.net/burp |
+| Web | Nuclei (intrusive templates) | request templates | `-rate-limit`, template allowlist, non-prod | https://github.com/projectdiscovery/nuclei |
+| Web | ffuf | high-volume fuzzing | `-rate`, scope, stop condition | https://github.com/ffuf/ffuf |
+| Web/API | sqlmap | injection/exploitation | `--risk 1 --level 1`, non-destructive flags, written approval | https://github.com/sqlmapproject/sqlmap/wiki/Usage |
+| API | Schemathesis | creates/changes/deletes | test/staging only, disposable data | https://github.com/schemathesis/schemathesis |
+| API | RESTler | stateful fuzzing | disposable data, cleanup | https://github.com/microsoft/restler-fuzzer |
+| Desktop | MobSF dynamic | instrumentation | VM/snapshot, test build | https://github.com/MobSF/Mobile-Security-Framework-MobSF |
+| Mobile | Frida / objection | runtime instrumentation | test device/snapshot, GPL/wxWindows licenses | https://frida.re/ · https://github.com/sensepost/objection |
+| Traffic | mitmproxy / Wireshark | capture privacy | test device, CA consent, redaction | https://mitmproxy.org/ · https://www.wireshark.org/ |
+| MCP | promptfoo red-team | adversarial prompts | sandbox, local server, approval | https://www.promptfoo.dev/docs/red-team/mcp-security-testing/ |
+| Discovery | Amass `-active` | active recon | scope, rate, approval | https://github.com/owasp-amass/amass |
 
 ## Licensing notes
 

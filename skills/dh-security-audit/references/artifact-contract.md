@@ -4,7 +4,7 @@
 
 | Artifact | Path | Owner |
 |---|---|---|
-| Plan-scoped audit | `docs/plans/<slug>/tasks/security-audit.md` | security auditor / plan |
+| Plan-scoped audit | `docs/plans/<slug>/tasks/security-audit.md` (self-audits may use `security-self-audit.md`) | security auditor / plan |
 | Plan-scoped threat model | `docs/plans/<slug>/tasks/threat-model.md` | security auditor / plan |
 | Plan-scoped probe log | `docs/plans/<slug>/tasks/probe-log.md` | security auditor / plan |
 | Long-lived sanitized audit | `docs/security/<engagement>/audit.md` | documentation owner |

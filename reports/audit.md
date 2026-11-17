@@ -1,6 +1,6 @@
 # Audit Report — dev-harness-skills plugin
 
-Generated 2026-11-17T00:36:06.141Z by `scripts/audit.mjs`.
+Generated 2026-11-17T00:46:08.265Z by `scripts/audit.mjs`.
 
 ## Verdict
 
@@ -15,7 +15,7 @@ Generated 2026-11-17T00:36:06.141Z by `scripts/audit.mjs`.
 | Name regex | 37 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
 | Cross-references | 1 | WARN | 634 resolved; 0 code-context; 0 allowlisted; 356 prose tokens (warn) |
-| Loop membership | 33 | PASS | 27/27 skills present; 6/6 agents present |
+| Loop membership | 37 | PASS | 30/30 skills present; 7/7 agents present |
 | Secret scan | 66 | PASS | 66 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |
 
@@ -63,13 +63,17 @@ _None._
 | skill | dh-research | present |
 | skill | dh-resume-plan | present |
 | skill | dh-review | present |
+| skill | dh-security-audit | present |
+| skill | dh-security-probe | present |
 | skill | dh-semver | present |
 | skill | dh-setup | present |
 | skill | dh-simplify | present |
+| skill | dh-threat-model | present |
 | agent | dh-documentor | present |
 | agent | dh-final-reviewer | present |
 | agent | dh-researcher | present |
 | agent | dh-reviewer | present |
+| agent | dh-security-auditor | present |
 | agent | dh-software-architect | present |
 | agent | dh-software-engineer | present |
 

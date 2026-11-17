@@ -35,13 +35,14 @@ mobile/web/desktop targets (not present).
 | TUI plan-file modal | static review of traversal/limits | no finding (symlinks skipped, 200-node/1 MB caps) |
 | Asset loading/registration | static review | no finding (frontmatter-only, no code execution) |
 | Agentic command execution | threat model + static review | **SEC-001 (P2)** |
+| Probe gate negative cases | `probe-negative-tests.md` dry-run | PASS (5/5 stop as expected) |
 | Supply chain/CI | read-only policy review | no finding in this pass; OSV/Semgrep/Trivy remain the gate |
 
 ## Findings
 
 ### SEC-001 — MCP `dh_logged_command` exposes unrestricted shell execution to any local client
 
-- **Severity:** P2 · CVSS:4.0/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+- **Severity:** P2 · CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N
   (local trusted-client assumption; adjust if the MCP server is exposed beyond
   the developer account)
 - **CWE:** CWE-78 (OS command injection by design), CWE-250 (execution with
@@ -67,6 +68,8 @@ mobile/web/desktop targets (not present).
   change).
 
 ## Threat model summary
+
+Full sample model: [`threat-model.md`](./threat-model.md).
 
 - Assets: workspace files, plan status, local shell, developer credentials
   reachable by the server user.

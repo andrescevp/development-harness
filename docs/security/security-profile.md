@@ -16,7 +16,7 @@ reviewed: 2026-11-17
 | Surface | Detected | Selected standards | Notes |
 |---|---|---|---|
 | Web | no | — | No web frontend served by this repo; documentation is static. |
-| API / MCP | yes | ASVS 5.0 (input/validation controls), MCP 2026-07-28, CWE Top 25 2025 | Local stdio MCP server with 12 tools; no remote API. |
+| API / MCP | yes | ASVS 5.0.0 (input/validation controls), MCP 2026-07-28, CWE Top 25 2025 | Local stdio MCP server with 12 tools; no remote API. |
 | Desktop | no | — | TUI is a terminal client, not a packaged desktop app. |
 | Mobile | no | — | Not applicable. |
 | Agentic/MCP | yes | Agentic Top 10 2026, LLM Top 10 2025, MCP security/authorization 2026-07-28, AIVSS preview | Agents, skills, subagent delegation and tool-use surfaces. |

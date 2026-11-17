@@ -258,8 +258,8 @@ a loop step: the optional pass never clears an unresolved blocker.
 
 ```text
 index.ts          source-mode plugin entry (re-exports src/plugin.ts)
-agents/           bundled agent definitions (6)
-skills/           bundled skills (27)
+agents/           bundled agent definitions (7)
+skills/           bundled skills (30)
 src/cli/          installer CLI: args, scope, prompt/output, JSONC, config, manifest, commands
 src/mcp/          stdio MCP server + workspace resolver
 src/tools/        plan/sheet/logged-command tool implementations

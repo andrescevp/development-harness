@@ -10,6 +10,9 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { readJson, readJsonc } from './install-smoke.mjs';
 
+const EXPECTED_AGENTS = 7;
+const EXPECTED_SKILLS = 30;
+
 function describe(error) {
   return error instanceof Error ? error.message : String(error);
 }
@@ -59,15 +62,19 @@ export function preflight(repoRoot, check) {
   check('dist/plugin.js exists and is non-empty', isFileWithContent(plugin), 'run pnpm build');
   check('dist/tui.js exists and is non-empty', isFileWithContent(tui), 'run pnpm build');
   check('dist/assets exists', isDirectory(assets), 'run pnpm build');
-  check('dist/assets has exactly 7 agent files', agents.length === 7, `found ${agents.length}`);
-  check('dist/assets has exactly 30 skill directories', skillDirs.length === 30, `found ${skillDirs.length}`);
+  check('dist/assets has exactly 7 agent files', agents.length === EXPECTED_AGENTS, `found ${agents.length}`);
+  check(
+    'dist/assets has exactly 30 skill directories',
+    skillDirs.length === EXPECTED_SKILLS,
+    `found ${skillDirs.length}`
+  );
   return (
     isFileWithContent(cli) &&
     isFileWithContent(plugin) &&
     isFileWithContent(tui) &&
     isDirectory(assets) &&
-    agents.length === 6 &&
-    skillDirs.length === 27
+    agents.length === EXPECTED_AGENTS &&
+    skillDirs.length === EXPECTED_SKILLS
   );
 }
 
