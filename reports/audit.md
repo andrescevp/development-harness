@@ -1,10 +1,10 @@
 # Audit Report — dev-harness-skills plugin
 
-Generated 2026-11-17T00:46:08.265Z by `scripts/audit.mjs`.
+Generated 2026-11-17T02:04:47.509Z by `scripts/audit.mjs`.
 
 ## Verdict
 
-**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 364. Documented schema deviations: 0.
+**PASS** — FAIL findings: **0** (exit code 0). Warn deviations: 365. Documented schema deviations: 0.
 
 ## Summary verdict table
 
@@ -14,7 +14,7 @@ Generated 2026-11-17T00:46:08.265Z by `scripts/audit.mjs`.
 | Frontmatter parse | 38 | PASS | 38 files on audit surface |
 | Name regex | 37 | PASS | /^[a-z0-9]+(-[a-z0-9]+)*$/ |
 | Size limits | 0 | PASS | SKILL.md < 250, agents < 300; warn-only |
-| Cross-references | 1 | WARN | 634 resolved; 0 code-context; 0 allowlisted; 356 prose tokens (warn) |
+| Cross-references | 1 | WARN | 634 resolved; 0 code-context; 0 allowlisted; 357 prose tokens (warn) |
 | Loop membership | 37 | PASS | 30/30 skills present; 7/7 agents present |
 | Secret scan | 66 | PASS | 66 low-signature prose hits (instructional), 0 high-signature |
 | Junk scan | 0 | PASS | 0 junk files, 0 symlinks |

@@ -7,6 +7,13 @@ version.
 
 ## [Unreleased]
 
+### Fixed
+
+- **`dh_logged_command`:** stdout and stderr are now streamed into the log until
+  every output descriptor closes, so buffered writes and background-child output
+  are not lost. Shell redirection was removed; timeouts return exit code 124 and
+  kill the child process tree.
+
 ## [0.14.0] — 2026-11-17
 
 ### Added

@@ -275,7 +275,7 @@ harness tools are served by a local stdio MCP server
 | `dh_read_sheet` | Query tabular data with DuckDB — csv by default; xlsx via a `read_xlsx(...)` query when the extension loads |
 | `dh_update_sheet` | Apply UPDATE/INSERT/DELETE and write the CSV back |
 | `dh_sheet_schema` | Describe columns as `name:type` |
-| `dh_logged_command` | Run a command with its log in the OS temp dir (runs with the MCP server's OS permissions); return head/tail + log path |
+| `dh_logged_command` | Stream a command's stdout/stderr to a log in the OS temp dir (runs with the MCP server's OS permissions); return head/tail + log path |
 
 Full inputs/returns contract: [`docs/LOADING.md` → Tools](docs/LOADING.md#tools).
 
