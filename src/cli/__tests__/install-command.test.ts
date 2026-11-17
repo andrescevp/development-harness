@@ -60,8 +60,8 @@ describe('runInstall', () => {
         '.': './dist/plugin.js',
         './tui': './dist/tui.js',
       });
-      expect(fs.readdirSync(path.join(target, 'dist', 'assets', 'agents'))).toHaveLength(6);
-      expect(fs.readdirSync(path.join(target, 'dist', 'assets', 'skills'))).toHaveLength(27);
+      expect(fs.readdirSync(path.join(target, 'dist', 'assets', 'agents'))).toHaveLength(7);
+      expect(fs.readdirSync(path.join(target, 'dist', 'assets', 'skills'))).toHaveLength(30);
       expect(manifest.config).toEqual({
         path: globalConfig(harness),
         key: 'mcp.servers.dh',

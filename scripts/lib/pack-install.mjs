@@ -154,7 +154,13 @@ async function checkMcp(prefix, env, check) {
     command: path.join(prefix, 'node_modules', '.bin', 'dev-harness-mcp'),
     args: [],
     cwd: workspace,
-    env: { ...getDefaultEnvironment(), DH_WORKSPACE_ROOT: '', HOME: env.HOME },
+    env: {
+      ...getDefaultEnvironment(),
+      DH_WORKSPACE_ROOT: '',
+      HOME: env.HOME,
+      // Keep the current Node ahead of HOME-dependent shims (e.g. node-shim).
+      PATH: `${path.dirname(process.execPath)}:${env.PATH ?? ''}`,
+    },
     stderr: 'pipe',
   });
   let stderr = '';
@@ -190,8 +196,8 @@ function checkAssets(prefix, source, check) {
     .filter((entry) => entry.isDirectory() && fs.existsSync(path.join(assets, 'skills', entry.name, 'SKILL.md')))
     .map((entry) => entry.name)
     .sort();
-  check('installed dist/assets has 6 agents', agents.length === 6, String(agents.length));
-  check('installed dist/assets has 27 skills', skills.length === 27, String(skills.length));
+  check('installed dist/assets has 7 agents', agents.length === 7, String(agents.length));
+  check('installed dist/assets has 30 skills', skills.length === 30, String(skills.length));
   check('installed dist/assets has skills/index.md', fs.existsSync(path.join(assets, 'skills', 'index.md')));
   check(
     'installed agent/skill inventory matches source',

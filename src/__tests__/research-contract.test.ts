@@ -5,7 +5,7 @@
  * planning delegation hooks.
  *
  * Stable phrases and section order only — no prose snapshots. Corpus inventory
- * (6 agents / 27 skills) stays in the assets/frontmatter/registration tests.
+ * (7 agents / 30 skills) stays in the assets/frontmatter/registration tests.
  */
 import fs from 'node:fs';
 import path from 'node:path';

@@ -33,8 +33,8 @@ import type { Scope } from './scope.js';
 export { scanBareSpecifiers } from './bundle-scan.js';
 
 /** Harness corpus guaranteed by the managed layout. */
-export const EXPECTED_AGENT_COUNT = 6;
-export const EXPECTED_SKILL_COUNT = 27;
+export const EXPECTED_AGENT_COUNT = 7;
+export const EXPECTED_SKILL_COUNT = 30;
 
 const INDEX_FILE = 'index.ts';
 const PACKAGE_FILE = 'package.json';

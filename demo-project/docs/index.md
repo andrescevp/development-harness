@@ -12,7 +12,7 @@ epic: plugin-demo
 # Demo Project
 
 Demo folder that links the `dev-harness-skills` plugin: run it isolated and
-exercise the bundled harness (6 agents, 27 skills, and the project-scope `dh`
+exercise the bundled harness (7 agents, 30 skills, and the project-scope `dh`
 MCP server tools).
 
 ## Quickstart
@@ -26,7 +26,7 @@ cd demo-project
 > Note: opencode v2.0.18 does not load directory/local plugins (documented
 > host limitation) — `validate` reports the load status transparently and
 > gates plugin behavior via the harness test suite (in-process
-> registration of the 6 agents / 27 skills; the tools come from the `dh` MCP
+> registration of the 7 agents / 30 skills; the tools come from the `dh` MCP
 > server wired in `opencode.jsonc`).
 
 ## How it is wired
@@ -53,7 +53,7 @@ Skills resolve delegation at runtime: `dh-planning` follows the
 project-specific agents over the bundled capabilities, and records the choice
 in the plan's `## Agent Selection`. Utility roles are skills, not agents:
 `dh-execute-cli` runs commands, tests, builds, and validation; `dh-explore`
-maps the codebase. The bundled surface stays 6 agents / 27 skills.
+maps the codebase. The bundled surface stays 7 agents / 30 skills.
 
 ## Example workflow (plugin usage)
 
@@ -71,7 +71,7 @@ flowchart LR
 +--------------------------------------------------+
 | demo-project          [sdd] [plan] [review] [docs]|
 +--------------------------------------------------+
-|  Harness loaded: 6 agents / 27 skills / dh MCP   |
+|  Harness loaded: 7 agents / 30 skills / dh MCP   |
 |  Try:  dh-planning -> Agent Selection -> execute |
 +--------------------------------------------------+
 ```

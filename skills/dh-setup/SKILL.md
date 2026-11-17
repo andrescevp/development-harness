@@ -136,8 +136,9 @@ project-scope local MCP server; wire it once (idempotent, consent first):
 
 **6. Worktree lifecycle (`WORKTREE_LIFECYCLE.md`)** — with consent, create or update
 `{project_root}/WORKTREE_LIFECYCLE.md` for `dh-create-worktree`; this skill is its only
-generator (never overwrite without review). Interview, template, and validation:
-[references/worktree-lifecycle.md](references/worktree-lifecycle.md).
+generator (never overwrite without review). Interview, template and validation: [references/worktree-lifecycle.md](references/worktree-lifecycle.md).
+
+**7. Project security profile** — detect the project's surfaces and, with consent, write/update `docs/security/security-profile.md` + `standards.selection.md` for `dh-security-audit`; detection, template and drift rules: [references/security-profile.md](references/security-profile.md). Never assume compliance or install tools.
 
 ## Step 4: Architecture Documentation
 
