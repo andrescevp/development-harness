@@ -114,3 +114,6 @@ found not applicable.
 | 2026-11-17T00:34:43.670Z | dh-create-documentation | Plan | fast end gates run once across the full diff | run: PASS |
 | 2026-11-17T00:34:43.670Z | dh-semver | Plan | fast end gates run once across the full diff | run: PASS |
 | 2026-11-17T00:34:43.674Z | dh-domain-check | Plan | asset and inventory capability; no bounded-context code change | not applicable |
+| 2026-11-17T00:46:55.863Z | dh-preflight | Plan re-review | final-review P1/P2/P3 fixes re-verified | run: PASS |
+| 2026-11-17T00:46:55.863Z | dh-artifact-check | Plan re-review | final-review P1/P2/P3 fixes re-verified | run: PASS |
+| 2026-11-17T00:46:55.863Z | dh-final-review | Plan re-review | final-review P1/P2/P3 fixes re-verified | run: PASS |
