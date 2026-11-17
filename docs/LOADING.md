@@ -507,7 +507,7 @@ retired by this release.
 | `dh_read_sheet` | `{ path, query?, limit? }` | `{ ok, columns, rowCount, rows }` — csv by default; xlsx via a `read_xlsx(...)` query when the DuckDB extension loads |
 | `dh_update_sheet` | `{ path, query }` | `{ ok, columns, rowCount, rows }` — applies UPDATE/INSERT/DELETE, writes the CSV back |
 | `dh_sheet_schema` | `{ path }` | `{ ok, columns, rowCount, rows }` — columns as `name:type` |
-| `dh_logged_command` | `{ command, logName?, timeoutMs? }` | `{ ok, exitCode, logPath, head, tail, truncated }` — log in the OS temp dir + head/tail window; the command runs with the MCP server's OS permissions |
+| `dh_logged_command` | `{ command, logName?, timeoutMs? }` | `{ ok, exitCode, logPath, head, tail, truncated }` — all stdout/stderr streamed to a log in the OS temp dir + head/tail window; the command runs with the MCP server's OS permissions |
 
 Phase → `Completed` is gated: it fails while any sub-task of the phase is not
 `Completed`. Plan reads/writes are anchored under `<workspace>/docs/plans`;

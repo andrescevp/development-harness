@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-11-17T00:46:08.265Z",
+    "generated": "2026-11-17T02:04:47.509Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -37,7 +37,7 @@
         "name": "Cross-references",
         "count": 1,
         "sev": "WARN",
-        "note": "634 resolved; 0 code-context; 0 allowlisted; 356 prose tokens (warn)"
+        "note": "634 resolved; 0 code-context; 0 allowlisted; 357 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
@@ -1786,6 +1786,13 @@
       "count": 1,
       "files": [
         "skills/dh-domain-check/SKILL.md"
+      ]
+    },
+    {
+      "token": "background-child",
+      "count": 1,
+      "files": [
+        "skills/dh-execute-cli/SKILL.md"
       ]
     },
     {

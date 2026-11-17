@@ -64,7 +64,7 @@ files and lines when available, and the log path.
 
 Every command must be logged and summarized with a head/tail window:
 
-- **Always** run the command with a log file so it can be explored if needed.
+- **Always** run the command with a log file so it can be explored if needed; the `dh_logged_command` tool streams stdout/stderr until all descriptors close, so buffered and background-child output is included.
 - **Log files live in the system temporary directory** — never in the project.
 - After the command finishes, print the **start** of the log (`head`), a
   `...[TRUNCATED]...` marker, and the **end** of the log (`tail`) so the
