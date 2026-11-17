@@ -3,8 +3,8 @@ title: "Enterprise Security Auditor Agent and Skills — Fast Execution"
 slug: security-auditor-agent
 description: "Fast execution mirror of plan.md; critical verification deferred to plan end."
 source_plan: plan.md
-source_sha256: 7749b709e8b2f26551f638022afb4a0f217857656c56cedc16f17fea98208329
-plan_version: fast-3
+source_sha256: 3f717e533904adcb3f8359cd3fb5e2985de8d41bf7ac55809f1bdb55c4fcf7ed
+plan_version: fast-4
 status: Completed
 active: true
 tags: [plan, fast]
