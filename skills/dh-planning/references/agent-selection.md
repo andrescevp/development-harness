@@ -38,6 +38,7 @@ Select with stable role names; reuse the same names in the plan table.
 | Implementation / engineering | code changes, refactors, debugging, tests |
 | Testing / QA | test strategy, language- or framework-specific guidance |
 | Review | scoped correctness/security review of changed code |
+| Security audit / probing | whole-application security audit, threat modeling, standards mapping, authorized non-destructive probing |
 | Final review | plan-wide sign-off against requirements and gates |
 | Documentation | docs, guides, README, API references |
 | Research | web research, source verification, current ecosystem facts |

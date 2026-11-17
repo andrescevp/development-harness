@@ -7,6 +7,35 @@ version.
 
 ## [Unreleased]
 
+## [0.14.1] — 2026-11-17
+
+### Fixed
+
+- **`dh_logged_command`:** stdout and stderr are now streamed into the log until
+  every output descriptor closes, so buffered writes and background-child output
+  are not lost. Shell redirection was removed; timeouts return exit code 124 and
+  kill the child process tree.
+
+## [0.14.0] — 2026-11-17
+
+### Added
+
+- **Enterprise security capability:** `dh-security-auditor` plus
+  `dh-security-audit`, `dh-threat-model` and `dh-security-probe` cover
+  whole-application audit, standards mapping, threat modeling and authorized
+  non-destructive probing for web, API, desktop, mobile and agentic/MCP systems.
+- **Project security profile:** `dh-setup` detects project surfaces and writes
+  `docs/security/security-profile.md` + `standards.selection.md`; the audit
+  consumes them with safe defaults and drift reporting.
+- **Standards and safety references:** version-pinned matrix, CVSS/AIVSS
+  severity/reporting, artifact/evidence contract, agentic/MCP threat catalog and
+  two-tier probing tool matrix.
+
+### Changed
+
+- Inventory advances to **7 agents / 30 skills / 37 unique names** across
+  registration, installer, smokes, audit and docs.
+
 ## [0.13.2] — 2026-11-16
 
 ### Fixed
@@ -360,7 +389,9 @@ First release of the standalone OpenCode V2 harness.
 - Plan close-outs include the pause/resume, fast-plan, Mermaid, and
   agent-selection plans with evolution/observation notes.
 
-[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.13.2...HEAD
+[Unreleased]: https://github.com/andrescevp/development-harness/compare/v0.14.1...HEAD
+[0.14.1]: https://github.com/andrescevp/development-harness/compare/v0.14.0...v0.14.1
+[0.14.0]: https://github.com/andrescevp/development-harness/compare/v0.13.2...v0.14.0
 [0.13.2]: https://github.com/andrescevp/development-harness/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/andrescevp/development-harness/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/andrescevp/development-harness/compare/v0.12.2...v0.13.0

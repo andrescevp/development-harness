@@ -5,7 +5,7 @@ description: "Newest-first workspace registry of research notes: one row per not
 tags: [research, index]
 project: "dev-harness-skills"
 created: 2026-11-16
-updated: 2026-11-16
+updated: 2026-11-17
 stack: "Markdown skills + TypeScript inventory/test tooling"
 feature: "Web Research Agent and Skill"
 epic: "Research capability"
@@ -24,8 +24,8 @@ documentation agent persists both.
 
 | Date | Topic | Question | Confidence | Used by | Note |
 |---|---|---|---|---|---|
-
-No notes registered yet.
+| 2026-11-17 | security-auditor-standards-2026 | Which authoritative standards, frameworks and testing guides should define an enterprise security auditor for web, API, desktop, mobile and agentic/MCP systems as of November 2026, with exact versions and URLs? | verified | plan: security-auditor | [security-auditor-standards-2026](./security-auditor-standards-2026.md) |
+| 2026-11-17 | security-probing-tooling-2026 | Which non-destructive security testing tools and frameworks are appropriate in 2026 for authorized web, API, desktop, mobile and agentic/MCP assessments? | partially verified | plan: security-auditor | [security-probing-tooling-2026](./security-probing-tooling-2026.md) |
 
 ## Where Notes Live
 

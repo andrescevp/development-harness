@@ -201,11 +201,11 @@ describe('buildStagedPlugin', () => {
     { name: 'a missing TUI bundle', options: { withTui: false }, pattern: /dist\/tui\.js is missing/ },
     { name: 'an empty TUI bundle', options: { tuiSource: '' }, pattern: /dist\/tui\.js is missing or empty/ },
     { name: 'missing assets', options: { withAssets: false }, pattern: /dist\/assets is missing/ },
-    { name: 'too few agents', options: { agents: 4 }, pattern: /expected 6 agent files.*found 4 agents and 27 skills/ },
+    { name: 'too few agents', options: { agents: 4 }, pattern: /expected 7 agent files.*found 4 agents and 30 skills/ },
     {
       name: 'too few skills',
       options: { skills: 17 },
-      pattern: /expected 6 agent files and 27 skill directories.*found 6 agents and 17 skills/,
+      pattern: /expected 7 agent files and 30 skill directories.*found 7 agents and 17 skills/,
     },
   ];
 

@@ -1,7 +1,7 @@
 /**
  * workspace-agents.test.ts — R8: workspace-first guidance in every bundled agent.
  *
- * Structural assertions that the six shipped agents read the workspace map,
+ * Structural assertions that the seven shipped agents read the workspace map,
  * take affected packages from `## Workspace Impact`, scope their actions and
  * keep the standalone fallback, plus the 300-line agent limit.
  * Deterministic: file reads only.
@@ -54,6 +54,11 @@ const AGENTS: AgentCase[] = [
     focus: 'research registry home',
     needle: '`{workspace_root}/docs/research/<topic>.md`',
   },
+  {
+    file: 'dh-security-auditor.md',
+    focus: 'security report roots',
+    needle: '`{workspace_root}/docs/security/<engagement>/`',
+  },
 ];
 
 const SHARED_DIRECTIVE = [
@@ -100,7 +105,7 @@ describe('workspace-first agent guidance (R8)', () => {
     expect(contentLines(fullPath)).toBeLessThan(300);
   });
 
-  it('keeps exactly the six bundled agents', () => {
+  it('keeps exactly the seven bundled agents', () => {
     const shipped = fs
       .readdirSync(AGENTS_DIR)
       .filter((entry) => entry.endsWith('.md'))

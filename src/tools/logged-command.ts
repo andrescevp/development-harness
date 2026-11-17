@@ -1,16 +1,16 @@
 /**
  * logged-command.ts — logged command execution strategy (dh_logged_command).
  *
- * Encodes the dh-execute-cli skill's mandatory strategy: run the command with its
- * output written to a log file in the SYSTEM TEMP directory, then return a
- * head/tail window (first 20 / last 30 lines with a TRUNCATED marker) plus
- * the log path so the full log can be explored on demand.
+ * Streams the child's stdout and stderr directly into the log while the process
+ * tree runs, instead of shell-redirecting to a file. That keeps buffered writes
+ * and output from background children: the handler waits for the stdio streams
+ * to close, then returns a head/tail window plus the log path so the full output
+ * can be explored.
  *
- * Pure helper `buildLoggedCommand` is unit-testable per platform; the
- * `runLoggedCommand` handler executes via node:child_process on the same
- * machine/user as the MCP server.
+ * Pure helpers stay unit-testable; the `runLoggedCommand` handler executes via
+ * node:child_process on the same machine/user as the MCP server.
  */
-import { exec } from 'node:child_process';
+import { type ChildProcess, spawn } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -20,7 +20,6 @@ import path from 'node:path';
 export const HEAD_LINES = 20;
 /** Lines shown from the end of the log. */
 export const TAIL_LINES = 30;
-export const TRUNCATED_MARKER = '\n...[TRUNCATED]...\n';
 
 export interface LoggedCommandInput {
   command: string;
@@ -49,32 +48,6 @@ export function tempLogPath(logName?: string): string {
   return path.join(os.tmpdir(), name);
 }
 
-/**
- * Build the wrapped command string for the current platform.
- * Linux/macOS: `cmd > log 2>&1; head -n 20 log; echo TRUNCATED; tail -n 30 log`.
- * Windows (win32): PowerShell-shaped redirection + Get-Content head/tail.
- * Pure string construction — no execution.
- */
-export function buildLoggedCommand(command: string, logPath: string): string {
-  const isWin = process.platform === 'win32';
-  if (isWin) {
-    const log = logPath.replace(/'/g, "''");
-    return (
-      `${command} *>&1 > '${log}'; $__exit = $LASTEXITCODE; ` +
-      `Write-Output "exit=$__exit"; Get-Content '${log}' -TotalCount ${HEAD_LINES}; ` +
-      `Write-Host "${TRUNCATED_MARKER.trim()}"; Get-Content '${log}' -Tail ${TAIL_LINES}; ` +
-      `Write-Output "log=${log}"`
-    );
-  }
-  // POSIX shell: log path passed through env to survive quoting.
-  const quoted = `"${logPath.replace(/"/g, '\\"')}"`;
-  return (
-    `${command} > ${quoted} 2>&1; __exit=$?; echo "exit=$__exit"; head -n ${HEAD_LINES} ${quoted}; ` +
-    `printf '%b\\n' "${TRUNCATED_MARKER.replace(/\\n/g, '\\n')}"; tail -n ${TAIL_LINES} ${quoted}; ` +
-    `echo "log=${quoted}"`
-  );
-}
-
 function readWindow(logPath: string): { head: string; tail: string; truncated: boolean } {
   try {
     const lines = fs.readFileSync(logPath, 'utf8').split('\n');
@@ -86,35 +59,75 @@ function readWindow(logPath: string): { head: string; tail: string; truncated: b
   }
 }
 
+/** Kill the child and its descendants so a timeout cannot leave writers behind. */
+function killTree(child: ChildProcess): void {
+  if (typeof child.pid !== 'number') return;
+  if (process.platform === 'win32') {
+    spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' }).unref();
+    return;
+  }
+  try {
+    // The child is detached into its own process group on POSIX.
+    process.kill(-child.pid, 'SIGTERM');
+  } catch {
+    child.kill('SIGTERM');
+  }
+}
+
 /**
- * Execute the command under the logged strategy and return the head/tail
- * window + log path. Never throws for command failures — non-zero exit codes
- * are reported in the result.
+ * Execute the command while streaming stdout/stderr into the log. Waits for
+ * `close` (all stdio streams closed), not just shell `exit`, so buffered and
+ * background-child writes are included. Never throws for command failures.
  */
 export function runLoggedCommand(input: LoggedCommandInput): Promise<LoggedCommandResult> {
   const logPath = tempLogPath(input.logName);
-  const wrapped = buildLoggedCommand(input.command, logPath);
   const timeoutMs = input.timeoutMs ?? 120_000;
 
   return new Promise((resolve) => {
-    const child = exec(wrapped, { timeout: timeoutMs, maxBuffer: 1024 * 1024 }, (error, _stdout, _stderr) => {
-      // NOTE: on POSIX the head/tail output lands on stdout (merged by 2>&1);
-      // the log itself is the source of truth for content.
-      const window = readWindow(logPath);
-      const exitCode = error ? (typeof error.code === 'number' ? error.code : 1) : 0;
-      resolve({
-        ok: exitCode === 0,
-        exitCode,
-        logPath,
-        head: window.head,
-        tail: window.tail,
-        truncated: window.truncated,
-        error: error && !window.head ? error.message : undefined,
-      });
+    const log = fs.createWriteStream(logPath, { flags: 'w' });
+    const child = spawn(input.command, {
+      shell: true,
+      windowsHide: true,
+      detached: process.platform !== 'win32',
+      stdio: ['ignore', 'pipe', 'pipe'],
     });
-    if (typeof child.pid === 'number' && child.pid > 0) {
-      // Ensure SIGTERM on timeout is not silently swallowed.
-      child.on('error', () => undefined);
-    }
+    let settled = false;
+    let timedOut = false;
+    let spawnError: Error | undefined;
+    let fallback: NodeJS.Timeout | undefined;
+
+    const finish = (code: number | null, signal: NodeJS.Signals | null): void => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      if (fallback !== undefined) clearTimeout(fallback);
+      const exitCode = timedOut ? 124 : (code ?? (signal === null ? 0 : 1));
+      log.end(() => {
+        const window = readWindow(logPath);
+        resolve({
+          ok: !timedOut && !spawnError && exitCode === 0,
+          exitCode,
+          logPath,
+          head: window.head,
+          tail: window.tail,
+          truncated: window.truncated,
+          error: spawnError?.message ?? (timedOut ? `timed out after ${timeoutMs} ms` : undefined),
+        });
+      });
+    };
+
+    child.stdout?.pipe(log, { end: false });
+    child.stderr?.pipe(log, { end: false });
+    child.on('error', (error) => {
+      spawnError = error;
+    });
+    child.on('close', finish);
+
+    const timeout = setTimeout(() => {
+      timedOut = true;
+      killTree(child);
+      // A grandchild can keep the pipes open; finalize with the partial log.
+      fallback = setTimeout(() => finish(null, null), 2_000);
+    }, timeoutMs);
   });
 }

@@ -277,7 +277,7 @@ export function buildServer({ workspaceRoot, version, instructions }: BuildServe
     'logged_command',
     {
       description: withToonNote(
-        "Run a command under the logged-execution strategy: output is written to a log file in the SYSTEM TEMP directory, then the first 20 and last 30 lines are returned with a TRUNCATED marker plus the log path for full exploration. Intended for the dh-execute-cli skill; command runs locally with the MCP server's permissions."
+        "Run a command under the logged-execution strategy: stdout and stderr are streamed to a log file in the SYSTEM TEMP directory until all output descriptors close, then the first 20 and last 30 lines are returned with a TRUNCATED marker plus the log path for full exploration. Intended for the dh-execute-cli skill; command runs locally with the MCP server's permissions."
       ),
       inputSchema: z.object({
         command: z.string().describe('The shell command to run (POSIX shell on linux/macOS; PowerShell on Windows)'),

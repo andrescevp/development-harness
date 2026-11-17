@@ -1,13 +1,14 @@
 # dev-harness-skills
 
-An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 6 agents and 27 skills.
+An [OpenCode](https://opencode.ai) V2 plugin that bundles an opinionated development harness for plan-driven development with 7 agents and 30 skills.
 
 ## Features
 
 - **Plan-driven loop**: Automated 5-step engineering lifecycle covering planning, phased execution, review, verification, and documentation.
 - **Phased plans**: Dual-status progress tracking across phases and sub-tasks, with every sub-task naming its responsible agent (`Delegated to agent`) and strict halt-on-blocker safeguards.
 - **Parallel plan execution**: Opt-in `Parallelizable`, `Depends on`, `Files/Scope`, and `Isolation` metadata let a shared scheduler run ready work concurrently — 3 workers by default, hard cap 8 — with orchestrator-only status writes and hybrid shared/worktree isolation. Legacy plans stay sequential.
-- **6 agents and 27 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts, plus two native `execute` hooks for TOON output.
+- **7 agents and 30 skills**: Purpose-built agents and skills operating via runtime delegation without bundled commands or prompts, plus two native `execute` hooks for TOON output.
+- **Enterprise security**: `dh-security-auditor` + `dh-security-audit` / `dh-threat-model` / `dh-security-probe` cover full-application security, standards-based control review and authorized non-destructive probing for web, API, desktop, mobile and agentic/MCP systems. `dh-setup` writes the project security profile/standards selection.
 - **Source-cited research**: `dh-researcher` + `dh-research` answer one external-fact question per pass with primary sources, retrieval dates, and confidence labels; notes live in one workspace registry at [`docs/research/index.md`](docs/research/index.md). An optional bounded pass may precede an execution-blocker report, but it never clears an unresolved blocker.
 - **`dh` MCP server (12 tools)**: A project-scope local stdio MCP server serves `dh_plan_read`, `dh_plan_update_status`, `dh_plan_create`, `dh_plan_fast_create`, `dh_plan_fast_read`, `dh_plan_fast_update_status`, `dh_plan_fast_sync`, `dh_plan_fast_skip_check`, `dh_read_sheet`, `dh_update_sheet`, `dh_sheet_schema`, and `dh_logged_command` (Code Mode: `tools.dh.<tool>`). The plugin itself registers agents, skills, and the two TOON hooks; the tools come from the MCP server.
 - **Automatic TOON output**: Successful `dh` MCP payloads are JSON, or TOON when the payload is an object/array whose JSON is at least 256 characters and TOON is strictly shorter. The two `execute` hooks compress eligible native `bash` JSON output (default `bash`; override with `OPENCODE_TOON_PLUGIN_TOOLS`) and restore JSON inside forwarded quoted strings and quoted-marker heredocs. JSON remains canonical on disk; errors stay plain text.
@@ -116,7 +117,7 @@ opencode debug config   # plugin entry, and mcp.servers.dh once wired
 opencode mcp list       # expect: dh connected (server/status only)
 ```
 
-The plugin also registers 27 skills (there is no skills debug subcommand on
+The plugin also registers 30 skills (there is no skills debug subcommand on
 v2.0.18 — see `skills/index.md`) and zero tools — only the two native `execute`
 hooks for TOON output; the harness tools come from the project-scope MCP server
 — see [MCP server (`dh`)](#mcp-server-dh).
@@ -274,7 +275,7 @@ harness tools are served by a local stdio MCP server
 | `dh_read_sheet` | Query tabular data with DuckDB — csv by default; xlsx via a `read_xlsx(...)` query when the extension loads |
 | `dh_update_sheet` | Apply UPDATE/INSERT/DELETE and write the CSV back |
 | `dh_sheet_schema` | Describe columns as `name:type` |
-| `dh_logged_command` | Run a command with its log in the OS temp dir (runs with the MCP server's OS permissions); return head/tail + log path |
+| `dh_logged_command` | Stream a command's stdout/stderr to a log in the OS temp dir (runs with the MCP server's OS permissions); return head/tail + log path |
 
 Full inputs/returns contract: [`docs/LOADING.md` → Tools](docs/LOADING.md#tools).
 
@@ -369,7 +370,7 @@ Evidence and gaps:
 
 ## Agents & skills
 
-The plugin defines 6 agents and 27 skills using the `@opencode/plugin` SDK, plus exactly two `execute` tool hooks for TOON output. No tool, command, or prompt transforms are registered.
+The plugin defines 7 agents and 30 skills using the `@opencode/plugin` SDK, plus exactly two `execute` tool hooks for TOON output. No tool, command, or prompt transforms are registered.
 
 ### Agent selection
 
@@ -395,6 +396,7 @@ execution/validation and `dh-explore` for codebase exploration. Full protocol:
 | `dh-final-reviewer` | Final reviewer conducting full diff review and plan-level sign-off. |
 | `dh-documentor` | Documentation agent responsible for creating, updating, and maintaining project documentation. |
 | `dh-researcher` | Source-cited web research support: one external-fact question per pass, primary sources, retrieval dates, and confidence labels; owns no files. |
+| `dh-security-auditor` | Enterprise security auditor for web, API, desktop, mobile and agentic/MCP systems; whole-application audit, threat modeling and authorized non-destructive probing. |
 
 ### Skills
 
@@ -404,6 +406,9 @@ execution/validation and `dh-explore` for codebase exploration. Full protocol:
 | `dh-domain-check` | Validates domain boundaries and SOLID design during planning and execution. |
 | `dh-contingency` | Generates Plan A/B/C architectural alternatives with risk, complexity, and trade-off analysis. |
 | `dh-research` | Support / optional unblock: one bounded, cited web research pass for an external-fact question; notes and registry under `docs/research/`. |
+| `dh-security-audit` | Whole-application audit: authorization/scope, inventory, standards-based controls, severity/evidence, report and re-test; consumes the `dh-setup` security profile. |
+| `dh-threat-model` | DFD/trust boundaries, STRIDE/LINDDUN, abuse cases and the agentic/MCP threat catalog. |
+| `dh-security-probe` | Authorized, non-destructive probing with rules of engagement, tool tiers, per-surface playbooks and stop conditions. |
 | `dh-execute-plan` | Orchestrates the end-to-end execution and status tracking of phased plans. |
 | `dh-execute-plan-fast` | Fast alternative: executes from `plan_fast.md`, defers critical gates to plan end, records skipped checks. |
 | `dh-execute-plan-task` | Executes an individual sub-task by delegating to the plan's selected implementation agent. |
@@ -422,7 +427,7 @@ execution/validation and `dh-explore` for codebase exploration. Full protocol:
 | `dh-create-documentation` | Generates and updates documentation in the project docs directory, including evolution and observation notes. |
 | `dh-mermaid` | Generates plan/documentation Mermaid diagrams: current state, desired state, critical changes, component graphs, flows, sequences, and data models. |
 | `dh-grill-sdd` | Conducts interactive requirement interviews to produce `sdd.md` specification documents. |
-| `dh-setup` | Audits system tools, user plugins, MCPs, and project quality configuration. |
+| `dh-setup` | Audits system tools, user plugins, MCPs, and project quality configuration; writes the project security profile/standards selection. |
 | `dh-code-ruler` | Interviews users and inspects code to generate project-level `CODE_RULES.md`. |
 | `dh-semver` | Analyzes commits since the last tag, determines the version bump, generates a changelog, and creates a local tag — harness adaptation of the global `semver` skill. |
 
@@ -463,8 +468,8 @@ offline `pnpm qa:check:full` gate.
 
 ```text
 index.ts         Root plugin entry point for OpenCode plugin discovery (source mode)
-agents/          Markdown definitions and system prompts for the 6 bundled agents
-skills/          Instructions, templates, and references for the 27 bundled skills
+agents/          Markdown definitions and system prompts for the 7 bundled agents
+skills/          Instructions, templates, and references for the 30 bundled skills
 src/cli/         Installer CLI (args, scope, JSONC config, manifest, commands)
 src/mcp/         Local stdio MCP server and workspace resolver
 src/tools/       Plan/sheet/logged-command implementations + TOON execute hooks

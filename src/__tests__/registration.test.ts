@@ -1,7 +1,7 @@
 /**
  * registration.test.ts — integration-style check: run the REAL plugin setup
  * against a stub ctx and assert the registration contract (R7/AC6): the plugin
- * registers 6 agents, 27 skills, and EXACTLY TWO tool execute hooks
+ * registers 7 agents, 30 skills, and EXACTLY TWO tool execute hooks
  * (`execute.after`, `execute.before`) that implement TOON compression and
  * restoration. Tools still live in the `dh` MCP server, so ANY tool, command,
  * or prompt TRANSFORM throws (same guard style as the command domain); the
@@ -90,7 +90,7 @@ describe('plugin setup registration (built bundle)', () => {
     expect(fs.existsSync(DIST_PLUGIN)).toBe(true);
   });
 
-  it('registers 6 agents, 27 skills, and exactly two tool execute hooks (hard cut)', async () => {
+  it('registers 7 agents, 30 skills, and exactly two tool execute hooks (hard cut)', async () => {
     const { default: plugin } = (await import(DIST_PLUGIN)) as {
       default: {
         id: string;
@@ -112,8 +112,8 @@ describe('plugin setup registration (built bundle)', () => {
       .map((c) => c.name)
       .sort();
 
-    expect(agents).toHaveLength(6);
-    expect(skills).toHaveLength(27);
+    expect(agents).toHaveLength(7);
+    expect(skills).toHaveLength(30);
     expect(agents).toContain('dh-researcher');
     expect(skills).toContain('dh-research');
 

@@ -5,7 +5,7 @@ description: "Newest-first register of evolution and observation notes for the d
 tags: [evolution, index]
 project: "dev-harness-skills"
 created: 2026-11-08
-updated: 2026-11-16
+updated: 2026-11-17
 stack: "Markdown skills + TypeScript inventory/test tooling"
 feature: "Parallel Plan Execution"
 epic: "Orchestration"
@@ -20,6 +20,8 @@ Newest-first register of evolution and observation notes for this project.
 
 | Date | Type | Title | Plan/Release | Link |
 |---|---|---|---|---|
+| 2026-11-17 | observation | Security Auditor Agent and Skills — session learnings | plan: security-auditor-agent | [obs-20261117-0128-security-auditor-agent](./observations/2026-11-17-0128-security-auditor-agent.md) |
+| 2026-11-17 | evolution | Enterprise Security Auditor Agent and Skills | plan: security-auditor-agent / unreleased | [evo-20261117-security-auditor-agent](./2026-11-17-security-auditor-agent.md) |
 | 2026-11-16 | observation | Parallel Plan Execution — session learnings | plan: parallel-plan-execution | [obs-20261116-1131-parallel-plan-execution](./observations/2026-11-16-1131-parallel-plan-execution.md) |
 | 2026-11-16 | evolution | Parallel Plan Execution | plan: parallel-plan-execution / unreleased | [evo-20261116-parallel-plan-execution](./2026-11-16-parallel-plan-execution.md) |
 | 2026-11-16 | observation | TOON Output Integration — session learnings | plan: toon-output-integration | [obs-20261116-0248-toon-output-integration](./observations/2026-11-16-0248-toon-output-integration.md) |

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-11-16T14:07:28.928Z",
+    "generated": "2026-11-17T02:07:59.553Z",
     "repo": "/home/andres/workspace/dev-harness-skills",
     "script": "scripts/audit.mjs",
     "reRun": "node scripts/audit.mjs"
@@ -11,19 +11,19 @@
     "dimensions": [
       {
         "name": "Inventory & structure",
-        "count": 33,
+        "count": 37,
         "sev": "PASS",
-        "note": "6 agents, 27 skill dirs + index.md; no commands/, no prompts/"
+        "note": "7 agents, 30 skill dirs + index.md; no commands/, no prompts/"
       },
       {
         "name": "Frontmatter parse",
-        "count": 34,
+        "count": 38,
         "sev": "PASS",
-        "note": "34 files on audit surface"
+        "note": "38 files on audit surface"
       },
       {
         "name": "Name regex",
-        "count": 33,
+        "count": 37,
         "sev": "PASS",
         "note": "/^[a-z0-9]+(-[a-z0-9]+)*$/"
       },
@@ -37,19 +37,19 @@
         "name": "Cross-references",
         "count": 1,
         "sev": "WARN",
-        "note": "598 resolved; 0 code-context; 0 allowlisted; 320 prose tokens (warn)"
+        "note": "634 resolved; 0 code-context; 0 allowlisted; 357 prose tokens (warn)"
       },
       {
         "name": "Loop membership",
-        "count": 33,
+        "count": 37,
         "sev": "PASS",
-        "note": "27/27 skills present; 6/6 agents present"
+        "note": "30/30 skills present; 7/7 agents present"
       },
       {
         "name": "Secret scan",
-        "count": 54,
+        "count": 66,
         "sev": "PASS",
-        "note": "54 low-signature prose hits (instructional), 0 high-signature"
+        "note": "66 low-signature prose hits (instructional), 0 high-signature"
       },
       {
         "name": "Junk scan",
@@ -61,6 +61,11 @@
   },
   "schemaDevs": [],
   "deviations": [
+    {
+      "dimension": "frontmatter",
+      "severity": "warn",
+      "note": "agent missing 'model' (plugin registration impact)"
+    },
     {
       "dimension": "frontmatter",
       "severity": "warn",
@@ -105,26 +110,26 @@
   "kebabList": [
     {
       "token": "agent-selection",
-      "count": 39,
+      "count": 40,
       "files": [
+        "agents/dh-security-auditor.md",
         "agents/dh-software-architect.md",
         "agents/dh-software-engineer.md",
         "skills/dh-coding/SKILL.md",
         "skills/dh-contingency/SKILL.md",
-        "skills/dh-create-documentation/SKILL.md",
-        "skills/dh-execute-plan/SKILL.md"
+        "skills/dh-create-documentation/SKILL.md"
       ]
     },
     {
       "token": "project-name",
-      "count": 30,
+      "count": 34,
       "files": [
         "agents/dh-final-reviewer.md",
         "agents/dh-researcher.md",
         "agents/dh-reviewer.md",
+        "agents/dh-security-auditor.md",
         "agents/dh-software-architect.md",
-        "agents/dh-software-engineer.md",
-        "skills/dh-artifact-check/SKILL.md"
+        "agents/dh-software-engineer.md"
       ]
     },
     {
@@ -170,6 +175,30 @@
       ]
     },
     {
+      "token": "workspace-map",
+      "count": 13,
+      "files": [
+        "agents/dh-documentor.md",
+        "agents/dh-final-reviewer.md",
+        "agents/dh-researcher.md",
+        "agents/dh-reviewer.md",
+        "agents/dh-security-auditor.md",
+        "agents/dh-software-architect.md"
+      ]
+    },
+    {
+      "token": "read-only",
+      "count": 13,
+      "files": [
+        "agents/dh-documentor.md",
+        "agents/dh-security-auditor.md",
+        "skills/dh-code-query/SKILL.md",
+        "skills/dh-execute-plan-task-fast/SKILL.md",
+        "skills/dh-pause-plan/SKILL.md",
+        "skills/dh-preflight/SKILL.md"
+      ]
+    },
+    {
       "token": "workspace-docs",
       "count": 13,
       "files": [
@@ -193,18 +222,6 @@
         "skills/dh-execute-plan-fast/SKILL.md",
         "skills/dh-execute-plan-task-fast/SKILL.md",
         "skills/dh-review/SKILL.md"
-      ]
-    },
-    {
-      "token": "workspace-map",
-      "count": 12,
-      "files": [
-        "agents/dh-documentor.md",
-        "agents/dh-final-reviewer.md",
-        "agents/dh-researcher.md",
-        "agents/dh-reviewer.md",
-        "agents/dh-software-architect.md",
-        "agents/dh-software-engineer.md"
       ]
     },
     {
@@ -259,22 +276,22 @@
       ]
     },
     {
-      "token": "read-only",
-      "count": 10,
-      "files": [
-        "agents/dh-documentor.md",
-        "skills/dh-code-query/SKILL.md",
-        "skills/dh-execute-plan-task-fast/SKILL.md",
-        "skills/dh-pause-plan/SKILL.md",
-        "skills/dh-preflight/SKILL.md",
-        "skills/dh-resume-plan/SKILL.md"
-      ]
-    },
-    {
       "token": "qualified-name",
       "count": 9,
       "files": [
         "skills/dh-code-query/SKILL.md"
+      ]
+    },
+    {
+      "token": "package-local",
+      "count": 8,
+      "files": [
+        "agents/dh-documentor.md",
+        "agents/dh-final-reviewer.md",
+        "agents/dh-researcher.md",
+        "agents/dh-reviewer.md",
+        "agents/dh-security-auditor.md",
+        "agents/dh-software-architect.md"
       ]
     },
     {
@@ -294,15 +311,12 @@
       ]
     },
     {
-      "token": "package-local",
+      "token": "security-profile",
       "count": 7,
       "files": [
-        "agents/dh-documentor.md",
-        "agents/dh-final-reviewer.md",
-        "agents/dh-researcher.md",
-        "agents/dh-reviewer.md",
-        "agents/dh-software-architect.md",
-        "agents/dh-software-engineer.md"
+        "agents/dh-security-auditor.md",
+        "skills/dh-security-audit/SKILL.md",
+        "skills/dh-setup/SKILL.md"
       ]
     },
     {
@@ -363,6 +377,26 @@
       "files": [
         "skills/dh-pause-plan/SKILL.md",
         "skills/dh-resume-plan/SKILL.md"
+      ]
+    },
+    {
+      "token": "long-lived",
+      "count": 5,
+      "files": [
+        "agents/dh-security-auditor.md",
+        "skills/dh-security-audit/SKILL.md",
+        "skills/dh-setup/SKILL.md",
+        "skills/dh-threat-model/SKILL.md"
+      ]
+    },
+    {
+      "token": "state-changing",
+      "count": 5,
+      "files": [
+        "agents/dh-security-auditor.md",
+        "skills/dh-coding/SKILL.md",
+        "skills/dh-security-audit/SKILL.md",
+        "skills/dh-security-probe/SKILL.md"
       ]
     },
     {
@@ -464,6 +498,34 @@
       ]
     },
     {
+      "token": "plan-scoped",
+      "count": 4,
+      "files": [
+        "agents/dh-security-auditor.md",
+        "skills/dh-final-review/SKILL.md",
+        "skills/dh-security-audit/SKILL.md",
+        "skills/dh-threat-model/SKILL.md"
+      ]
+    },
+    {
+      "token": "non-production",
+      "count": 4,
+      "files": [
+        "agents/dh-security-auditor.md",
+        "skills/dh-security-audit/SKILL.md",
+        "skills/dh-security-probe/SKILL.md"
+      ]
+    },
+    {
+      "token": "third-party",
+      "count": 4,
+      "files": [
+        "agents/dh-security-auditor.md",
+        "agents/dh-software-architect.md",
+        "skills/dh-security-probe/SKILL.md"
+      ]
+    },
+    {
       "token": "bounded-context",
       "count": 4,
       "files": [
@@ -546,6 +608,41 @@
       ]
     },
     {
+      "token": "standards-matrix",
+      "count": 4,
+      "files": [
+        "skills/dh-security-audit/SKILL.md"
+      ]
+    },
+    {
+      "token": "severity-and-reporting",
+      "count": 4,
+      "files": [
+        "skills/dh-security-audit/SKILL.md"
+      ]
+    },
+    {
+      "token": "artifact-contract",
+      "count": 4,
+      "files": [
+        "skills/dh-security-audit/SKILL.md"
+      ]
+    },
+    {
+      "token": "tool-matrix",
+      "count": 4,
+      "files": [
+        "skills/dh-security-probe/SKILL.md"
+      ]
+    },
+    {
+      "token": "probe-playbooks",
+      "count": 4,
+      "files": [
+        "skills/dh-security-probe/SKILL.md"
+      ]
+    },
+    {
       "token": "monorepo-versioning",
       "count": 4,
       "files": [
@@ -557,6 +654,36 @@
       "count": 4,
       "files": [
         "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "threat-catalog",
+      "count": 4,
+      "files": [
+        "skills/dh-threat-model/SKILL.md"
+      ]
+    },
+    {
+      "token": "threat-model-template",
+      "count": 4,
+      "files": [
+        "skills/dh-threat-model/SKILL.md"
+      ]
+    },
+    {
+      "token": "re-test",
+      "count": 3,
+      "files": [
+        "agents/dh-security-auditor.md",
+        "skills/dh-security-audit/SKILL.md"
+      ]
+    },
+    {
+      "token": "non-normative",
+      "count": 3,
+      "files": [
+        "agents/dh-security-auditor.md",
+        "skills/dh-security-audit/SKILL.md"
       ]
     },
     {
@@ -589,6 +716,14 @@
       "count": 3,
       "files": [
         "skills/dh-coding/SKILL.md"
+      ]
+    },
+    {
+      "token": "follow-ups",
+      "count": 3,
+      "files": [
+        "skills/dh-create-documentation/SKILL.md",
+        "skills/dh-security-audit/SKILL.md"
       ]
     },
     {
@@ -718,6 +853,29 @@
       "count": 3,
       "files": [
         "skills/dh-setup/SKILL.md"
+      ]
+    },
+    {
+      "token": "inter-agent",
+      "count": 3,
+      "files": [
+        "skills/dh-threat-model/SKILL.md"
+      ]
+    },
+    {
+      "token": "cross-references",
+      "count": 2,
+      "files": [
+        "agents/dh-documentor.md",
+        "agents/dh-security-auditor.md"
+      ]
+    },
+    {
+      "token": "data-flow",
+      "count": 2,
+      "files": [
+        "agents/dh-software-architect.md",
+        "skills/dh-security-audit/SKILL.md"
       ]
     },
     {
@@ -862,13 +1020,6 @@
       "files": [
         "skills/dh-coding/SKILL.md",
         "skills/dh-setup/SKILL.md"
-      ]
-    },
-    {
-      "token": "follow-ups",
-      "count": 2,
-      "files": [
-        "skills/dh-create-documentation/SKILL.md"
       ]
     },
     {
@@ -1084,6 +1235,21 @@
       ]
     },
     {
+      "token": "per-test",
+      "count": 2,
+      "files": [
+        "skills/dh-security-audit/SKILL.md",
+        "skills/dh-security-probe/SKILL.md"
+      ]
+    },
+    {
+      "token": "rules-of-engagement",
+      "count": 2,
+      "files": [
+        "skills/dh-security-probe/SKILL.md"
+      ]
+    },
+    {
       "token": "user-level",
       "count": 2,
       "files": [
@@ -1098,14 +1264,14 @@
       ]
     },
     {
-      "token": "plan-diagram",
-      "count": 1,
+      "token": "threat-model",
+      "count": 2,
       "files": [
-        "agents/dh-documentor.md"
+        "skills/dh-threat-model/SKILL.md"
       ]
     },
     {
-      "token": "cross-references",
+      "token": "plan-diagram",
       "count": 1,
       "files": [
         "agents/dh-documentor.md"
@@ -1140,14 +1306,28 @@
       ]
     },
     {
-      "token": "system-level",
+      "token": "evidence-backed",
       "count": 1,
       "files": [
-        "agents/dh-software-architect.md"
+        "agents/dh-security-auditor.md"
       ]
     },
     {
-      "token": "data-flow",
+      "token": "denial-of-service",
+      "count": 1,
+      "files": [
+        "agents/dh-security-auditor.md"
+      ]
+    },
+    {
+      "token": "data-exfiltration",
+      "count": 1,
+      "files": [
+        "agents/dh-security-auditor.md"
+      ]
+    },
+    {
+      "token": "system-level",
       "count": 1,
       "files": [
         "agents/dh-software-architect.md"
@@ -1190,13 +1370,6 @@
     },
     {
       "token": "framework-native",
-      "count": 1,
-      "files": [
-        "agents/dh-software-architect.md"
-      ]
-    },
-    {
-      "token": "third-party",
       "count": 1,
       "files": [
         "agents/dh-software-architect.md"
@@ -1448,13 +1621,6 @@
       ]
     },
     {
-      "token": "state-changing",
-      "count": 1,
-      "files": [
-        "skills/dh-coding/SKILL.md"
-      ]
-    },
-    {
       "token": "cookie-based",
       "count": 1,
       "files": [
@@ -1620,6 +1786,13 @@
       "count": 1,
       "files": [
         "skills/dh-domain-check/SKILL.md"
+      ]
+    },
+    {
+      "token": "background-child",
+      "count": 1,
+      "files": [
+        "skills/dh-execute-cli/SKILL.md"
       ]
     },
     {
@@ -1848,13 +2021,6 @@
     },
     {
       "token": "pre-run",
-      "count": 1,
-      "files": [
-        "skills/dh-final-review/SKILL.md"
-      ]
-    },
-    {
-      "token": "plan-scoped",
       "count": 1,
       "files": [
         "skills/dh-final-review/SKILL.md"
@@ -2225,6 +2391,83 @@
       ]
     },
     {
+      "token": "active-test",
+      "count": 1,
+      "files": [
+        "skills/dh-security-audit/SKILL.md"
+      ]
+    },
+    {
+      "token": "clean-scan",
+      "count": 1,
+      "files": [
+        "skills/dh-security-audit/SKILL.md"
+      ]
+    },
+    {
+      "token": "trust-boundary",
+      "count": 1,
+      "files": [
+        "skills/dh-security-audit/SKILL.md"
+      ]
+    },
+    {
+      "token": "business-flow",
+      "count": 1,
+      "files": [
+        "skills/dh-security-audit/SKILL.md"
+      ]
+    },
+    {
+      "token": "not-tested",
+      "count": 1,
+      "files": [
+        "skills/dh-security-audit/SKILL.md"
+      ]
+    },
+    {
+      "token": "high-volume",
+      "count": 1,
+      "files": [
+        "skills/dh-security-probe/SKILL.md"
+      ]
+    },
+    {
+      "token": "snyk-agent-scan",
+      "count": 1,
+      "files": [
+        "skills/dh-security-probe/SKILL.md"
+      ]
+    },
+    {
+      "token": "mcp-scanner",
+      "count": 1,
+      "files": [
+        "skills/dh-security-probe/SKILL.md"
+      ]
+    },
+    {
+      "token": "tool-output",
+      "count": 1,
+      "files": [
+        "skills/dh-security-probe/SKILL.md"
+      ]
+    },
+    {
+      "token": "red-team",
+      "count": 1,
+      "files": [
+        "skills/dh-security-probe/SKILL.md"
+      ]
+    },
+    {
+      "token": "supply-chain",
+      "count": 1,
+      "files": [
+        "skills/dh-security-probe/SKILL.md"
+      ]
+    },
+    {
       "token": "under-reports",
       "count": 1,
       "files": [
@@ -2338,13 +2581,6 @@
     },
     {
       "token": "unused-code",
-      "count": 1,
-      "files": [
-        "skills/dh-setup/SKILL.md"
-      ]
-    },
-    {
-      "token": "long-lived",
       "count": 1,
       "files": [
         "skills/dh-setup/SKILL.md"
@@ -2489,9 +2725,58 @@
       "files": [
         "skills/dh-simplify/SKILL.md"
       ]
+    },
+    {
+      "token": "non-repudiation",
+      "count": 1,
+      "files": [
+        "skills/dh-threat-model/SKILL.md"
+      ]
+    },
+    {
+      "token": "non-compliance",
+      "count": 1,
+      "files": [
+        "skills/dh-threat-model/SKILL.md"
+      ]
+    },
+    {
+      "token": "business-logic",
+      "count": 1,
+      "files": [
+        "skills/dh-threat-model/SKILL.md"
+      ]
+    },
+    {
+      "token": "human-safety",
+      "count": 1,
+      "files": [
+        "skills/dh-threat-model/SKILL.md"
+      ]
+    },
+    {
+      "token": "human-agent",
+      "count": 1,
+      "files": [
+        "skills/dh-threat-model/SKILL.md"
+      ]
+    },
+    {
+      "token": "state-handle",
+      "count": 1,
+      "files": [
+        "skills/dh-threat-model/SKILL.md"
+      ]
+    },
+    {
+      "token": "mix-up",
+      "count": 1,
+      "files": [
+        "skills/dh-threat-model/SKILL.md"
+      ]
     }
   ],
-  "secretLow": 54,
+  "secretLow": 66,
   "secretHigh": [],
   "junkList": [],
   "symlinkCount": 0,
@@ -2594,6 +2879,14 @@
         "status": "present"
       },
       {
+        "name": "dh-security-audit",
+        "status": "present"
+      },
+      {
+        "name": "dh-security-probe",
+        "status": "present"
+      },
+      {
         "name": "dh-semver",
         "status": "present"
       },
@@ -2603,6 +2896,10 @@
       },
       {
         "name": "dh-simplify",
+        "status": "present"
+      },
+      {
+        "name": "dh-threat-model",
         "status": "present"
       }
     ],
@@ -2621,6 +2918,10 @@
       },
       {
         "name": "dh-reviewer",
+        "status": "present"
+      },
+      {
+        "name": "dh-security-auditor",
         "status": "present"
       },
       {
@@ -2708,6 +3009,27 @@
           "name": "dh-reviewer",
           "description": "Scoped code reviewer — reviews changed code against sub-task acceptance criteria. Selected by the `dh-review` skill for the review role when the plan's Agent Selection names this agent.",
           "mode": "subagent"
+        }
+      },
+      "findings": [
+        {
+          "dimension": "frontmatter",
+          "severity": "warn",
+          "note": "agent missing 'model' (plugin registration impact)"
+        }
+      ]
+    },
+    {
+      "file": "agents/dh-security-auditor.md",
+      "kind": "agent",
+      "lines": 117,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-security-auditor",
+          "description": "Enterprise security auditor for web applications, APIs, desktop/Electron and mobile apps, agentic/MCP systems and supply chains. Use for whole-application security audits, threat modeling, control verification, authorized non-destructive probing, severity/evidence reporting and remediation review. Requires written authorization and an explicit scope before touching a target.",
+          "mode": "all"
         }
       },
       "findings": [
@@ -3193,6 +3515,42 @@
       "findings": []
     },
     {
+      "file": "skills/dh-security-audit/SKILL.md",
+      "kind": "skill",
+      "lines": 158,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-security-audit",
+          "description": "Run an enterprise security audit of a whole application or system: establish authorization and scope, inventory assets, consume the project security profile, model threats, verify controls against current standards (OWASP ASVS, Top 10, API/MASVS/MASTG, Desktop, Agentic/MCP), delegate authorized probing, and write evidence-backed findings with CVSS/AIVSS severity and remediation. Use for security audits, control reviews, pre-release security gates or standards/compliance mapping. Never run active tests without written authorization.",
+          "license": "MIT",
+          "compatibility": "opencode",
+          "allowed-tools": "read, write, bash, webfetch, websearch",
+          "metadata": "audience: developers workflow: security"
+        }
+      },
+      "findings": []
+    },
+    {
+      "file": "skills/dh-security-probe/SKILL.md",
+      "kind": "skill",
+      "lines": 118,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-security-probe",
+          "description": "Run authorized, non-destructive security probes against web apps, APIs, desktop/Electron and mobile clients, MCP/agentic systems and supply chains. Enforces written authorization, scope allowlist, rate limits, read-only default, test accounts, snapshots/VMs, evidence redaction, escalation and stop conditions; uses a two-tier tool matrix and per-surface playbooks. Use only after the engagement gate in dh-security-audit.",
+          "license": "MIT",
+          "compatibility": "opencode",
+          "allowed-tools": "read, write, bash, webfetch, websearch",
+          "metadata": "audience: developers workflow: security"
+        }
+      },
+      "findings": []
+    },
+    {
       "file": "skills/dh-semver/SKILL.md",
       "kind": "skill",
       "lines": 145,
@@ -3213,7 +3571,7 @@
     {
       "file": "skills/dh-setup/SKILL.md",
       "kind": "skill",
-      "lines": 249,
+      "lines": 250,
       "frontmatter": {
         "status": "ok",
         "errors": [],
@@ -3247,9 +3605,27 @@
       "findings": []
     },
     {
+      "file": "skills/dh-threat-model/SKILL.md",
+      "kind": "skill",
+      "lines": 117,
+      "frontmatter": {
+        "status": "ok",
+        "errors": [],
+        "fields": {
+          "name": "dh-threat-model",
+          "description": "Build or refresh a threat model for a system architecture: inventory assets and data flows, draw trust boundaries, apply STRIDE per element and LINDDUN for personal data, capture abuse cases, and add agentic/MCP threats (goal hijack, tool misuse, identity abuse, supply chain, code execution, memory poisoning, inter-agent spoofing, cascading failures, trust exploitation, rogue agents). Use during design, before a security audit, or when a system or trust boundary changes.",
+          "license": "MIT",
+          "compatibility": "opencode",
+          "allowed-tools": "read, write, bash",
+          "metadata": "audience: developers workflow: security"
+        }
+      },
+      "findings": []
+    },
+    {
       "file": "skills/index.md",
       "kind": "index",
-      "lines": 190,
+      "lines": 194,
       "frontmatter": {
         "status": "none-expected"
       },
