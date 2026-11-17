@@ -70,7 +70,7 @@ status: active
 
 ## Implications
 
-- **Pin versions in one registry, not in prose.** `dh-security-auditor` should own a machine-readable `standards.lock` (id, version, publication date, URL, retrieval date, authority tier) and refuse to emit a finding that cites a standard not present in it. This research note is the seed for that file.
+- **Pin versions in one registry, not in prose.** `dh-security-auditor` should own a machine-readable `standards.lock` (id, version, publication date, URL, retrieval date, authority tier) and refuse to emit a finding that cites a standard not present in it. This research note is the seed for that file. `dh-setup` should generate the project-specific selection from this matrix rather than hardcoding every standard in the audit skill.
 - **Three authority tiers, enforced.** Tier 1 normative (ASVS 5.0.0, MASVS 2.1.0, MCP 2026-07-28, RFC 9700/8725, ISO 27001:2022, PCI DSS 4.0.1); Tier 2 consensus awareness (Top 10:2025, API Top 10 2023, LLM Top 10 2025, Agentic Top 10 2026, CWE Top 25); Tier 3 draft/incubator (AIVSS v0.8, Desktop App Security Top 10, Code Review Guide v2.0). Never gate a release or a "fail" verdict on Tier 3.
 - **Correct four stale premises in the SDD.** SLSA **v1.2**, not v1.1 (v1.1 Retired); WSTG **v4.2**, not v5; API Top 10 **2023**, not 2026; SOC 2 **2017 TSC (2022 points of focus)**, not the 2027 exposure draft. Stating v1.1/v5/2026 in the plan would make the auditor ship outdated citations on day one.
 - **`dh-security-audit` should be target-class dispatched.** Detect target type → load the matrix row → load only that row's requirement IDs + test IDs. This keeps the skill under its file/line budget and prevents web checks leaking into mobile or agentic audits.

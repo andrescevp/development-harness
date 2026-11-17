@@ -47,6 +47,12 @@ validate with a read-only self-audit.
   MCP/TUI surfaces using the new workflow.
 - **R12:** Keep the capability read-only by default and introduce no runtime
   dependency, network call or credential requirement.
+- **R13:** `dh-setup` must detect the project's security surfaces and generate
+  or update a project-specific security profile and standards selection
+  reference under `{project_root}/docs/security/` with explicit consent.
+- **R14:** The audit workflow reads that profile before selecting standards;
+  absent → safe defaults + recommendation to run `dh-setup`; stale → drift
+  report.
 
 - **AC1:** All four assets are present, registered and discoverable; inventory
   tests assert 7/30/37.
@@ -59,11 +65,15 @@ validate with a read-only self-audit.
   coverage-qualified no-findings result.
 - **AC6:** `pnpm qa:check:full` passes with no secrets, dead links or
   over-limit skills.
+- **AC7:** `dh-setup` generates a valid project security profile/standards
+  selection for this repo (or a fixture); the audit consumes it and reports
+  missing/stale profiles with safe defaults.
 
 ## Scope
 
 - **In scope:** Agent and skill authoring; references/templates; standards and
-  tooling research; agent-selection role; inventory/test/smoke/doc updates;
+  tooling research; project security profile and standards customization via
+  `dh-setup`; agent-selection role; inventory/test/smoke/doc updates;
   read-only self-audit; validation.
 - **Out of scope:** External penetration testing, commercial tool purchases or
   installs, scanner-engine implementation, automatic exploitation, compliance
@@ -91,6 +101,8 @@ validate with a read-only self-audit.
   `dh-security-audit`, `dh-threat-model`, `dh-security-probe`.
 - Dynamic probing is opt-in and non-destructive; the default posture is
   read-only.
+- `dh-setup` owns project-specific security profiling and standards selection;
+  `dh-security-audit` consumes the profile and never silently overrides it.
 - No new runtime dependency. Security tools are external, installed only with
   approval, and never bundled into the plugin.
 - Plan-scoped evidence lives under `docs/plans/security-auditor-agent/tasks/`;
@@ -141,6 +153,20 @@ v0.8 + MCP security best practices 2026-07-28 for agentic/MCP, and NIST SSDF
 SP 800-218 v1.1/CSF 2.0 + SLSA v1.2 + CWE Top 25 2025 for supply chain and
 secure development.
 
+### Project security profile (`dh-setup`)
+
+`dh-setup` owns project customization. It detects the project's surfaces from
+markers (web framework, OpenAPI/GraphQL/proto, Electron/Tauri/Qt/.NET,
+Android/iOS/Flutter/React Native, MCP config/tool manifests/LLM SDKs,
+Docker/Terraform/Kubernetes, compliance notes) and interviews the user for data
+classification, assurance target, compliance scope, test environment and
+authorized tools. With consent it writes `{project_root}/docs/security/security-profile.md`
+and `{project_root}/docs/security/standards.selection.md` (or a compact
+`standards.lock`) and updates them when the stack/compliance changes.
+`dh-security-audit` reads these files first; absent → safe defaults and a
+recommendation to run `dh-setup`; stale → drift warning. `dh-setup` remains the
+only owner of the project profile.
+
 ### Severity model
 
 Use CVSS v4.0 vectors for conventional findings and AIVSS for agentic findings;
@@ -180,6 +206,7 @@ every active step. Destructive requests need explicit escalation.
 | Final review | dh-final-reviewer | Bundled plan sign-off capability. | bundled final-review capability |
 | Documentation | dh-documentor | Bundled documentation owner for index, README/LOADING/AGENTS and evolution notes. | bundled documentation capability |
 | Research | dh-researcher | Bundled source-cited research capability for standards and tooling notes. | bundled research capability |
+| Setup / project profiling | dh-software-architect | Bundled architecture capability; runs the `dh-setup` skill to profile the project and write the security selection. | bundled architecture capability |
 
 > The delivered `dh-security-auditor` becomes selectable for the Security audit
 > role after this plan merges. Its first delegated engagement is a follow-up
@@ -272,7 +299,7 @@ every active step. Destructive requests need explicit escalation.
 - **Dependencies and Preconditions:** Agent and contracts complete.
 - **In Scope for This Sub-Task:** Frontmatter/description/`allowed-tools`; authorization gate; inventory; threat-model handoff; static control review; probe handoff; severity; report template; re-test; stop conditions.
 - **Out of Scope for This Sub-Task:** Reference files' full content; active probing procedures; inventory counts.
-- **Instructions:** Keep the skill ≤ 250 lines; push standards tables and report schema to references; make the safe default and escalation explicit; require a coverage statement and residual risk.
+- **Instructions:** Keep the skill ≤ 250 lines; push standards tables and report schema to references; require reading `docs/security/security-profile.md`/`standards.selection.md` first with safe defaults when absent; make the safe default and escalation explicit; require a coverage statement and residual risk.
 - **Acceptance Criteria:** A reader can run a static audit without active testing, knows when to call `dh-threat-model`/`dh-security-probe`, and can produce the required report sections.
 - **Cautionary Points (Risks & Edge Cases):** Do not claim a clean scan proves security; do not run probes by default; redact evidence.
 - **Implementation Suggestions:** Model the workflow on `dh-preflight`/`dh-review` step structure; use P0–P3 plus CVSS/AIVSS.
@@ -292,12 +319,32 @@ every active step. Destructive requests need explicit escalation.
 - **Dependencies and Preconditions:** Research notes are current and linked.
 - **In Scope for This Sub-Task:** `standards-matrix.md` (target → standards → control domains → URLs/version dates); `severity-and-reporting.md` (CVSS v4.0, AIVSS, P0–P3, finding/report template); `artifact-contract.md` (paths, naming, redaction, retention, publication via documentation owner).
 - **Out of Scope for This Sub-Task:** Threat catalog and probe playbooks (Phase 3).
-- **Instructions:** Verify every version/URL against the research note; include a "reviewed on" date and a rule for updating; keep standards mapping table-driven; make the report template copy-ready.
+- **Instructions:** Verify every version/URL against the research note; include a "reviewed on" date and a rule for updating; define how the project profile narrows this matrix; keep standards mapping table-driven; make the report template copy-ready.
 - **Acceptance Criteria:** Matrix covers web/API/desktop/mobile/agentic-MCP/supply-chain; report template includes ID/severity/CWE/control/evidence/repro/impact/remediation/re-test; artifact paths are unambiguous.
 - **Cautionary Points (Risks & Edge Cases):** Standards drift; no invented versions; keep compliance mapping advisory, not certification.
 - **Implementation Suggestions:** Link primary URLs only; mark secondary sources explicitly; keep each reference focused and under the repo's reference conventions.
 - **Testing Suggestions:** `node scripts/check-links.mjs`; spot-check every URL in the matrix; sample finding rendered.
 - **Done When:** References are complete, sourced, linked and used by the skill.
+
+#### Sub-Task 2.4: Extend dh-setup with project security profile and standards selection
+
+- **Status:** Pending
+- **Delegated to agent:** dh-software-architect
+- **Parallelizable:** no
+- **Depends on:** 2.3
+- **Files/Scope:** `skills/dh-setup/SKILL.md`, `skills/dh-setup/references/security-profile.md`
+- **Isolation:** shared
+- **Objective:** Make `dh-setup` the owner of project-specific security surface detection and standards selection.
+- **Related Requirements:** R13, R14, AC7
+- **Dependencies and Preconditions:** Audit references and standards matrix complete.
+- **In Scope for This Sub-Task:** Add a concise security-profile step to `dh-setup/SKILL.md` (≤250 lines); add `references/security-profile.md` with detection matrix (web/API/desktop/mobile/agentic-MCP/CI-cloud/compliance), interview questions, profile and standards-selection templates, validation and update/drift rules; define `{project_root}/docs/security/security-profile.md` and `standards.selection.md` (or compact lock) ownership and consent.
+- **Out of Scope for This Sub-Task:** Running setup on this repo (4.3), authoring security audit skills, installing tools.
+- **Instructions:** Delegate the detailed procedure to the new reference; keep the skill step short. The audit skill must be able to read the profile; no profile means safe defaults and a recommendation to run `dh-setup`. Detect surfaces from markers, ask only for data classification, assurance target, compliance scope, test environment and authorized tools, and require consent before writing. Update the profile when stack/compliance changes; mark stale selections with a review date.
+- **Acceptance Criteria:** `dh-setup` names the profile step and reference; the reference covers detection, interview, template, validation and drift; `dh-security-audit` instructions point to the profile; `dh-setup/SKILL.md` stays under 250 lines.
+- **Cautionary Points (Risks & Edge Cases):** Do not write the profile without consent; do not hardcode a single compliance regime; do not let setup silently install security tools.
+- **Implementation Suggestions:** Follow the `worktree-lifecycle.md` pattern: setup owns a project file with a reference template and validation checklist.
+- **Testing Suggestions:** Link check; line-count check; dry-run profile generation on a fixture project; audit skill reads it.
+- **Done When:** `dh-setup` can generate/update the project profile and standards selection with a documented contract.
 
 ### Phase 3: Threat modeling and authorized probing
 
@@ -382,7 +429,7 @@ every active step. Destructive requests need explicit escalation.
 - **Objective:** Make the new security capability discoverable and document the inventory/role changes.
 - **Related Requirements:** R10, AC1, AC6
 - **Dependencies and Preconditions:** Inventory counts finalized.
-- **In Scope for This Sub-Task:** Add Security audit/probing role to agent selection; add agent/skill rows and counts; update role summaries, skill matrix, verification lists and loading docs; link references.
+- **In Scope for This Sub-Task:** Add Security audit/probing role to agent selection; add agent/skill rows and counts; update role summaries, skill matrix, verification lists and loading docs; document the `dh-setup` security-profile step and the audit’s profile-first behavior; link references.
 - **Out of Scope for This Sub-Task:** Implementation files and research notes.
 - **Instructions:** Update 6→7 agents and 27→30 skills everywhere in these docs; add `dh-security-auditor` and the three skills with accurate descriptions; keep the existing matrix style and anchors.
 - **Acceptance Criteria:** Docs consistently say 7/30/37; agent selection lists Security; link check passes; no stale 6/27 claims remain in the active docs.
@@ -390,6 +437,26 @@ every active step. Destructive requests need explicit escalation.
 - **Implementation Suggestions:** Use a single inventory table and link to it; keep AGENTS.md role summary concise.
 - **Testing Suggestions:** `node scripts/check-links.mjs`; `rg "6 agents|27 skills|33-name"` on active docs.
 - **Done When:** A new user can find and select the security capability from docs and agent selection.
+
+#### Sub-Task 4.3: Run dh-setup to generate this project's security profile and standards selection
+
+- **Status:** Pending
+- **Delegated to agent:** dh-software-architect
+- **Parallelizable:** no
+- **Depends on:** 2.4, 4.2
+- **Files/Scope:** `docs/security/**`
+- **Isolation:** shared
+- **Objective:** Exercise the new `dh-setup` security-profile workflow on this repository and produce the profile the audit/self-audit will consume.
+- **Related Requirements:** R13, R14, AC7
+- **Dependencies and Preconditions:** `dh-setup` extension and docs complete.
+- **In Scope for This Sub-Task:** Run `dh-setup` in profile mode (with consent) to detect this repo's surfaces (TypeScript plugin, MCP server, TUI, agentic assets, CI/Node), interview/record data classification and compliance assumptions, write `docs/security/security-profile.md` and `docs/security/standards.selection.md` (or lock), and verify `dh-security-audit` reads them.
+- **Out of Scope for This Sub-Task:** Active probing, installing security tools, changing runtime code.
+- **Instructions:** Use the `dh-setup` skill; mark the profile as dev/internal tooling with no production customer data unless the user says otherwise; select ASVS/API/MCP/agentic and supply-chain controls that actually apply; record excluded standards and a review date. This is the explicit `dh-setup` delegation for standards customization.
+- **Acceptance Criteria:** Profile and selection files exist with frontmatter, detected surfaces, selected versions, exclusions and review date; audit dry-run consumes them; missing/stale behavior documented.
+- **Cautionary Points (Risks & Edge Cases):** Do not over-classify a dev plugin as PCI/SOC 2 scope; do not claim compliance; keep the profile editable and project-owned.
+- **Implementation Suggestions:** Keep this repo's profile compact: MCP/TUI/agentic surface, ASVS/API/MCP/agentic/supply-chain rows, no mobile/desktop unless detected.
+- **Testing Suggestions:** `node scripts/check-links.mjs`; audit dry-run; `dh-setup` idempotent re-run.
+- **Done When:** This repo has a valid profile/selection that the security audit reads.
 
 ### Phase 5: Validation and read-only self-audit
 
@@ -422,15 +489,15 @@ every active step. Destructive requests need explicit escalation.
 - **Status:** Pending
 - **Delegated to agent:** dh-software-architect
 - **Parallelizable:** no
-- **Depends on:** 5.1
+- **Depends on:** 4.3, 5.1
 - **Files/Scope:** `docs/plans/security-auditor-agent/tasks/security-self-audit.md`
 - **Isolation:** shared
 - **Objective:** Exercise the new audit and threat-model workflows against this plugin without active probing or runtime changes.
-- **Related Requirements:** R11, AC5
-- **Dependencies and Preconditions:** New skills exist and pass validation.
+- **Related Requirements:** R11, R14, AC5, AC7
+- **Dependencies and Preconditions:** New skills exist and pass validation; the project security profile exists.
 - **In Scope for This Sub-Task:** Read-only static audit of the MCP server, TUI and plugin asset pipeline; threat model of the agentic/MCP surface; findings with severity/control/evidence; coverage statement.
 - **Out of Scope for This Sub-Task:** Network probing, production targets, exploit development, code fixes.
-- **Instructions:** Use `dh-security-audit` + `dh-threat-model`; scope to the local repo; treat the plugin's own MCP tools as the agentic surface; record at least one concrete observation or a coverage-qualified no-findings result.
+- **Instructions:** Start from `docs/security/security-profile.md` and `standards.selection.md`; use `dh-security-audit` + `dh-threat-model`; scope to the local repo; treat the plugin's own MCP tools as the agentic surface; record at least one concrete observation or a coverage-qualified no-findings result.
 - **Acceptance Criteria:** `security-self-audit.md` exists with scope, method, findings (or qualified none), standards mapping and residual risk.
 - **Cautionary Points (Risks & Edge Cases):** Do not expose secrets from test fixtures; do not run the MCP server against external services.
 - **Implementation Suggestions:** Focus on tool input validation, symlink/path ACL, TOON restoration, subagent delegation and plugin asset loading.
@@ -459,8 +526,8 @@ every active step. Destructive requests need explicit escalation.
 
 ## Final Integration & Verification
 
-- **System-Wide Test:** `pnpm qa:check:full` plus `node scripts/smoke-pack.mjs`; verify 7/30/37 inventory, registration, links and line limits; review the self-audit report for coverage and redaction.
-- **Completion Checklist:** All sub-tasks Completed; all four assets present; standards matrix current; negative probe gates tested; docs consistent; no secrets; evolution notes written.
+- **System-Wide Test:** `pnpm qa:check:full` plus `node scripts/smoke-pack.mjs`; verify 7/30/37 inventory, registration, links and line limits; run `dh-setup` to generate this repo's security profile/standards selection; review the self-audit report for coverage and redaction.
+- **Completion Checklist:** All sub-tasks Completed; all four assets present; standards matrix current and project-customized by `dh-setup`; negative probe gates tested; docs consistent; no secrets; evolution notes written.
 
 ## Execution Record
 

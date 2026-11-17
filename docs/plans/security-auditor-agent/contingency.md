@@ -21,6 +21,8 @@ status: proposed
 3. **Evidence/report ownership** — plan-local reports, a long-lived
    `docs/security/` area, or documentation-agent-only publication.
 4. **Standards mapping** — one broad matrix or per-surface reference files.
+5. **Project customization** — hardcoded standards or a `dh-setup`-owned
+   project profile/standards selection.
 
 ## Plan A: Unified auditor agent + three focused skills — Recommended
 
@@ -36,6 +38,8 @@ status: proposed
 5. Put the standards matrix, severity/reporting schema and artifact contract in
    `dh-security-audit/references/`; put the threat catalog and playbooks in the
    owning skill's references.
+6. Extend `dh-setup` to detect project surfaces and write a project security
+   profile/standards selection; the audit reads it before choosing controls.
 
 ### Risk: Medium
 

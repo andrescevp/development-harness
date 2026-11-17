@@ -81,8 +81,16 @@ it safely, and report at enterprise quality.
 - **R11:** Validate with the full QA gate, link checks, size/frontmatter checks,
   registration tests and a read-only self-audit of this plugin's MCP/TUI
   surfaces using the new workflow.
-- **R12:** Keep the capability read-only by default; no new runtime dependency,
-  network call or credential requirement is introduced into the plugin bundle.
+- **R12:** Keep the capability read-only by default and introduce no runtime
+  dependency, network call or credential requirement.
+- **R13:** `dh-setup` must detect the project's security surfaces and generate
+  or update a project-specific security profile and standards selection
+  reference (target types, assurance level, compliance scope, exclusions,
+  review date) under `{project_root}/docs/security/`, with explicit consent.
+- **R14:** The audit workflow must read the project security profile before
+  selecting standards; absent profile → safe defaults plus a recommendation to
+  run `dh-setup`; present profile → only the selected standards, with drift
+  reported when the profile is stale.
 
 - **AC1:** `dh-security-auditor`, `dh-security-audit`, `dh-threat-model` and
   `dh-security-probe` are present, registered and discoverable; inventory tests
@@ -99,11 +107,15 @@ it safely, and report at enterprise quality.
   for this plugin without modifying runtime behavior.
 - **AC6:** Full `pnpm qa:check:full` passes; no secrets, dead links or
   over-limit skill files are introduced.
+- **AC7:** `dh-setup` produces a valid project security profile and standards
+  selection for this repo (or a fixture project), and the audit skill consumes
+  it; a missing/stale profile is reported with safe defaults.
 
 ## Scope
 
 - **In scope:** Agent and skill authoring; references/templates; standards and
-  tooling research; agent-selection role; inventory/test/smoke/doc updates;
+  tooling research; project security profile and standards customization via
+  `dh-setup`; agent-selection role; inventory/test/smoke/doc updates;
   read-only self-audit; validation.
 - **Out of scope:** Running an external penetration test, buying/installing
   commercial tools, changing the MCP tool count, building a scanner engine,
@@ -151,6 +163,9 @@ it safely, and report at enterprise quality.
   state coverage and residual risk.
 - **Standards drift:** versions change; the research note and matrix need a
   review date and source links.
+- **Profile drift:** the `dh-setup` security profile can become stale after a
+  stack/compliance change; the audit must report drift instead of silently
+  using old selections.
 - **Inventory churn:** hardcoded 6/27 counts in tests, smokes and docs must move
   together to 7/30.
 
@@ -168,10 +183,14 @@ it safely, and report at enterprise quality.
   explicit "no findings, coverage stated" result.
 - **AC6:** Full QA gate, link check, line limits, frontmatter and registration
   tests pass.
+- **AC7:** `dh-setup` generates a valid project security profile and standards
+  selection for this repo (or a fixture project); the audit skill consumes it
+  and reports missing/stale profiles with safe defaults.
 
 ## Open Questions
 
 - None blocking. Defaults: agent name `dh-security-auditor`, `mode: all`;
   skills `dh-security-audit` / `dh-threat-model` / `dh-security-probe`;
-  active probing requires explicit authorization and safe mode; the first real
-  client engagement is a follow-up plan after this capability is merged.
+  active probing requires explicit authorization and safe mode; `dh-setup`
+  owns project profile/standards customization; the first real client
+  engagement is a follow-up plan after this capability is merged.
