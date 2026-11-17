@@ -13,7 +13,7 @@ status: completed
 
 - **Plan:** `docs/plans/security-auditor-agent/plan.md`
 - **Mirror:** `docs/plans/security-auditor-agent/plan_fast.md`
-- **Source hash:** `3f717e533904adcb3f8359cd3fb5e2985de8d41bf7ac55809f1bdb55c4fcf7ed`
+- **Source hash:** `0662c4c6ef0ea3233308e28a01f03c0eb26f7c3d2750d2fd5123c453e6207284`
 - **Sync:** `aligned: true`, no differences
 - **Statuses:** all 5 phases and 14 sub-tasks `Completed` in both plans
 - **Structural check:** phases, sub-tasks, IDs, titles, delegated agents, scopes and dependencies match

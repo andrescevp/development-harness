@@ -2,7 +2,7 @@
 
 **Plan:** `docs/plans/security-auditor-agent/plan.md`
 **Contract:** `docs/plans/security-auditor-agent/sdd.md`
-**Diff reviewed:** `03736cf..HEAD` (current HEAD `1684b73`, 64 files)
+**Diff reviewed:** `03736cf..1870c42` (re-review after final fixes, 64+ files)
 **Workspace impact:** `None — standalone repository` (no `WORKSPACE.md`; full diff reviewed)
 **Overall risk:** Medium
 **Binding verdict:** **Approve with comments** (re-review after fixes)

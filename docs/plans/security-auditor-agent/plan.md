@@ -537,7 +537,7 @@ every active step. Destructive requests need explicit escalation.
 - **Repository kind:** standalone
 - **Repository path:** `.`
 - **Branch / worktree:** `feature/security-auditor-agent` (main checkout)
-- **Commit range:** `03736cf..c275156`
+- **Commit range:** `03736cf..1870c42`
 - **Plan path:** docs/plans/security-auditor-agent/plan.md
 - **Mirrored plan path:** docs/plans/security-auditor-agent/plan_fast.md
 - **Summary:**
