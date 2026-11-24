@@ -27,3 +27,6 @@ docs/plans/**/*.tmp
 
 # Managed OpenCode plugin installs (dev-harness installer)
 .opencode/plugins/dev-harness-skills/
+
+# Local ia-agents-development plugin clone (project-scope install)
+.opencode/plugins/ia-agents-development/
